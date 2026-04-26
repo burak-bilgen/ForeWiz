@@ -48,4 +48,4 @@ nesting:
 excluded:
   - DerivedData
   - .build
-  - HavaAsistaniTests/Generated
+  - WeatherAssistantTests/Generated

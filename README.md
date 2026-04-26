@@ -1,6 +1,6 @@
-# HavaAsistani
+# WeatherAssistant
 
-HavaAsistani is a personal weather decision assistant for iOS. The product goal is not to show a dense
+WeatherAssistant is a personal weather decision assistant for iOS. The product goal is not to show a dense
 forecast dashboard, but to answer practical daily questions in Turkish: what to wear, whether going outside
 is sensible, which hours are best for running or walking, and which windows should be avoided.
 
@@ -27,13 +27,15 @@ must stay out of the domain layer.
 
 ## Current Slice
 
-This first implementation slice includes:
+The current implementation slice includes:
 
 - Project structure for the requested layers.
+- Project, target, bundle, and source folder identity renamed to `WeatherAssistant`.
 - Domain entities for weather snapshots, hourly/daily points, recommendations, risks, scores, profile, and notifications.
 - Repository and use-case protocols.
 - Deterministic decision engines for outdoor scoring, activity windows, outfit suggestions, and notification planning.
-- A minimal SwiftUI onboarding/home shell with glass-style components.
+- A modern SwiftUI onboarding/home shell with adaptive glass-style components, score tiles, activity windows,
+  outfit guidance, avoid hours, and risk chips.
 - Swift Testing coverage for hot summer, mild spring, rain, wind, cold-sensitive users, and notification spam prevention.
 
 ## Weather Decision Engine
@@ -107,7 +109,7 @@ swiftlint
 Run unit tests with:
 
 ```sh
-xcodebuild test -project AirAssistant.xcodeproj -scheme AirAssistant -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.4'
+xcodebuild test -project WeatherAssistant.xcodeproj -scheme WeatherAssistant -destination 'platform=iOS Simulator,name=iPhone 17e,OS=26.4.1'
 ```
 
 ## Privacy
