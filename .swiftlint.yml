@@ -1,0 +1,51 @@
+opt_in_rules:
+  - empty_count
+  - explicit_init
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - sorted_imports
+  - redundant_nil_coalescing
+  - closure_spacing
+  - operator_usage_whitespace
+  - vertical_whitespace
+
+analyzer_rules:
+  - unused_import
+
+disabled_rules:
+  - trailing_whitespace
+
+line_length:
+  warning: 120
+  error: 160
+  ignores_comments: true
+
+type_body_length:
+  warning: 300
+  error: 500
+
+file_length:
+  warning: 500
+  error: 800
+
+function_body_length:
+  warning: 60
+  error: 100
+
+identifier_name:
+  min_length: 2
+  excluded:
+    - id
+    - x
+    - y
+
+nesting:
+  type_level:
+    warning: 2
+
+excluded:
+  - DerivedData
+  - .build
+  - HavaAsistaniTests/Generated
