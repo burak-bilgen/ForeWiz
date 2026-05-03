@@ -9,7 +9,7 @@ enum UnitSystem: String, CaseIterable, Codable, Hashable, Sendable {
         case .metric:
             "Metrik"
         case .imperial:
-            "İngiliz"
+            "Imperial"
         }
     }
 }

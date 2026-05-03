@@ -4,6 +4,8 @@ enum AppError: Error, Equatable {
     case locationPermissionDenied
     case locationUnavailable
     case weatherUnavailable
+    case weatherKitPermissionMissing
+    case weatherKitFailed(String)
     case cacheUnavailable
     case notificationPermissionDenied
     case persistenceFailed
@@ -17,6 +19,10 @@ enum AppError: Error, Equatable {
             "Konum alınamadı. Lütfen daha sonra tekrar dene."
         case .weatherUnavailable:
             "Hava durumu alınamadı. Son kayıtlı öneriyi gösteriyoruz."
+        case .weatherKitPermissionMissing:
+            "WeatherKit kimlik doğrulaması reddedildi. Apple Developer'da bu Bundle ID için WeatherKit'i hem App Services hem App Capabilities altında açıp provisioning profilini yenile."
+        case .weatherKitFailed(let reason):
+            "WeatherKit yanıt vermedi: \(reason)"
         case .cacheUnavailable:
             "Kayıtlı hava önerisi bulunamadı."
         case .notificationPermissionDenied:

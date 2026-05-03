@@ -20,9 +20,10 @@ struct OutfitCard: View {
                             Text(item)
                                 .font(AppTypography.caption)
                                 .lineLimit(1)
+                                .foregroundStyle(AppTheme.ink)
                                 .padding(.horizontal, AppSpacing.small)
                                 .padding(.vertical, AppSpacing.xSmall)
-                                .background(.white.opacity(0.42), in: Capsule())
+                                .background(AppTheme.elevatedSurface, in: Capsule())
                         }
                     }
                 }
@@ -30,7 +31,7 @@ struct OutfitCard: View {
                 if !outfit.accessories.isEmpty {
                     InsightRow(
                         icon: "sparkles",
-                        title: "Yanına al",
+                        title: "Yanına iyi gider",
                         value: outfit.accessories.joined(separator: " • "),
                         tint: AppTheme.teal
                     )
@@ -39,7 +40,7 @@ struct OutfitCard: View {
                 if let warning = outfit.warning {
                     InsightRow(
                         icon: "exclamationmark.triangle.fill",
-                        title: "Not",
+                        title: "Hava notu",
                         value: warning,
                         tint: AppTheme.warning
                     )

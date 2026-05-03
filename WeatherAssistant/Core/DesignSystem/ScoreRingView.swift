@@ -6,7 +6,7 @@ struct ScoreRingView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(.white.opacity(0.35), lineWidth: 10)
+                .stroke(.primary.opacity(0.12), lineWidth: 10)
             Circle()
                 .trim(from: 0, to: score.displayValue / 10)
                 .stroke(scoreColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
@@ -16,7 +16,7 @@ struct ScoreRingView: View {
                     .font(.system(size: 28, weight: .bold, design: .rounded))
                 Text("/10")
                     .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.secondaryText)
             }
         }
         .frame(width: 92, height: 92)

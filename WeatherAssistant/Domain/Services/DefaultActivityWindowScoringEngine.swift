@@ -245,14 +245,13 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
     private func reason(for activity: ActivityType, score: WeatherScore, window: TimeWindow) -> String {
         if score.rawValue >= 80 {
-            return "\(activity.localizedTitle) için en rahat aralık \(window.shortDisplayText)."
+            return "\(activity.localizedTitle) için günün en rahat aralığı \(window.shortDisplayText)."
         }
 
         if score.rawValue >= 60 {
-            return "\(activity.localizedTitle) için en makul aralık \(window.shortDisplayText), yine de koşulları izle."
+            return "\(activity.localizedTitle) için \(window.shortDisplayText) uygun; yağış ve rüzgarı takip et."
         }
 
-        return "\(activity.localizedTitle) için bugün net bir rahat aralık yok; " +
-            "en az riskli zaman \(window.shortDisplayText)."
+        return "\(activity.localizedTitle) için bugün net rahat aralık yok; en az zorlayan zaman \(window.shortDisplayText)."
     }
 }

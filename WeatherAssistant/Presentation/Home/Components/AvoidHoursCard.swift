@@ -11,9 +11,9 @@ struct AvoidHoursCard: View {
                     .foregroundStyle(AppTheme.ink)
 
                 if avoidWindows.isEmpty {
-                    Text("Bugün belirgin kaçınılacak saat yok.")
+                    Text("Bugün özellikle kaçınman gereken belirgin bir saat görünmüyor.")
                         .font(AppTypography.body)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppTheme.secondaryText)
                 } else {
                     ForEach(avoidWindows) { warning in
                         InsightRow(

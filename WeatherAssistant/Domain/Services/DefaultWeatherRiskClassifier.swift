@@ -140,7 +140,7 @@ struct DefaultWeatherRiskClassifier {
                 type: .heat,
                 severity: hour.apparentTemperatureCelsius >= 35 ? .high : .medium,
                 title: "Sıcak saatler",
-                message: "Bu saatlerde hissedilen sıcaklık yüksek."
+                message: "Bu aralıkta hissedilen sıcaklık yüksek."
             )
         }
 
@@ -149,7 +149,7 @@ struct DefaultWeatherRiskClassifier {
                 type: .uv,
                 severity: .high,
                 title: "UV saatleri",
-                message: "UV seviyesi yüksek; güneş altında uzun kalma."
+                message: "UV yüksek; güneşte uzun kalma."
             )
         }
 
@@ -158,7 +158,7 @@ struct DefaultWeatherRiskClassifier {
                 type: .rain,
                 severity: .high,
                 title: "Yağmur",
-                message: "Yağmur dış planları belirgin etkileyebilir."
+                message: "Yağmur dış planı belirgin etkileyebilir."
             )
         }
 
@@ -185,7 +185,7 @@ struct DefaultWeatherRiskClassifier {
             type: .poorComfort,
             severity: .medium,
             title: "Düşük konfor",
-            message: "Bu saatlerde dışarı konforu düşük."
+            message: "Bu saatlerde dışarıda konfor düşük."
         )
     }
 
@@ -198,7 +198,7 @@ struct DefaultWeatherRiskClassifier {
             type: .storm,
             severity: severeWeatherRisk,
             title: "Fırtına",
-            message: "Şiddetli hava riski var; dış planları ertelemek daha güvenli."
+            message: "Şiddetli hava riski var; dış planı ertelemek daha güvenli."
         )
     }
 
@@ -210,7 +210,7 @@ struct DefaultWeatherRiskClassifier {
                 type: .heat,
                 severity: hour.apparentTemperatureCelsius >= 39 ? .extreme : .high,
                 title: "Sıcak",
-                message: "Hissedilen sıcaklık yüksek; uzun süre dışarıda kalma."
+                message: "Hissedilen sıcaklık yüksek; uzun dış planı kısalt."
             )
         }
 
@@ -219,7 +219,7 @@ struct DefaultWeatherRiskClassifier {
                 type: .heat,
                 severity: .medium,
                 title: "Öğle sıcağı",
-                message: "Öğle saatlerinde hissedilen sıcaklık konforu düşürüyor."
+                message: "Öğle saatlerinde sıcaklık konforu düşürüyor."
             )
         }
 
@@ -236,7 +236,7 @@ struct DefaultWeatherRiskClassifier {
             type: .uv,
             severity: uvIndex >= 9 ? .high : .medium,
             title: "UV",
-            message: "UV seviyesi yüksek; güneş koruması kullan."
+            message: "UV yüksek; güneş koruması iyi olur."
         )
     }
 
@@ -251,7 +251,7 @@ struct DefaultWeatherRiskClassifier {
             type: .rain,
             severity: precipitationChance >= 0.75 ? .high : .medium,
             title: "Yağmur",
-            message: "Yağmur ihtimali yüksek; şemsiye veya yağmurluk al."
+            message: "Yağmur ihtimali yüksek; şemsiye veya yağmurluk iyi olur."
         )
     }
 
@@ -264,7 +264,7 @@ struct DefaultWeatherRiskClassifier {
             type: .wind,
             severity: windSpeed >= 45 ? .high : .medium,
             title: "Rüzgar",
-            message: "Rüzgar dışarı konforunu ve bisiklet güvenliğini etkileyebilir."
+            message: "Rüzgar açık alan ve bisiklet planlarını zorlayabilir."
         )
     }
 
@@ -290,7 +290,7 @@ struct DefaultWeatherRiskClassifier {
             type: .cold,
             severity: hour.apparentTemperatureCelsius <= 0 ? .high : .medium,
             title: "Soğuk",
-            message: "Hissedilen sıcaklık düşük; ekstra katman al."
+            message: "Hissedilen sıcaklık düşük; ekstra katman iyi olur."
         )
     }
 }

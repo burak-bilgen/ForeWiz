@@ -18,12 +18,12 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         if rainRisk {
             items = ["Yağmurluk veya su geçirmez mont"] + items.filter { $0 != "İnce ceket" }
             accessories.append("Şemsiye")
-            warnings.append("Yağmur ihtimali belirgin; dışarı çıkarken hazırlıklı ol.")
+            warnings.append("Yağmur ihtimali belirgin; şemsiye veya yağmurluk iyi olur.")
         }
 
         if windRisk {
             items.append("Rüzgar geçirmeyen hafif katman")
-            warnings.append("Rüzgar hissedilen sıcaklığı değiştirebilir.")
+            warnings.append("Rüzgar hissedilen sıcaklığı düşürebilir.")
         }
 
         if heatRisk || uvRisk {
@@ -34,7 +34,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         }
 
         if eveningGetsCooler(hourly: input.hourly, calendar: input.calendar), apparentTemperature < 24 {
-            warnings.append("Akşam serinleyebilir.")
+            warnings.append("Akşam serinleyebilir; ince bir katman iyi olur.")
         }
 
         let title = title(
@@ -83,20 +83,20 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         sensitivity: TemperatureSensitivity
     ) -> String {
         if apparentTemperature >= 30 {
-            return "Hafif tişört, şort veya ince pantolon iyi olur."
+            return "Hafif, nefes alan parçalar iyi olur."
         }
 
         if (17..<24).contains(apparentTemperature) {
             return sensitivity == .getsColdEasily
-                ? "Tişört + ince ceket iyi olur; üşüyorsan katman al."
-                : "Tişört + ince ceket iyi olur."
+                ? "Tişört ve ince ceket dengeli olur."
+                : "Tişört ve hafif bir katman yeterli."
         }
 
         if apparentTemperature < 8 {
-            return "Mont, kazak ve kapalı ayakkabı iyi olur."
+            return "Sıcak tutan katmanlar ve kapalı ayakkabı iyi olur."
         }
 
-        return "\(items.prefix(3).joined(separator: ", ")) iyi olur."
+        return "\(items.prefix(3).joined(separator: ", ")) dengeli olur."
     }
 
     private func eveningGetsCooler(hourly: [HourlyWeatherPoint], calendar: Calendar) -> Bool {

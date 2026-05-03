@@ -141,22 +141,22 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         risks: [WeatherRisk]
     ) -> String {
         if let risk = risks.first(where: { $0.severity >= .high }) {
-            return "\(risk.title) riski öne çıkıyor. Kısa dış planlar daha mantıklı."
+            return "\(risk.title) bugün öne çıkıyor. Dış planı kısa ve esnek tut."
         }
 
         if let bestWindow {
-            return "En iyi dışarı penceresi \(bestWindow.shortDisplayText)."
+            return "Dışarı için en rahat aralık \(bestWindow.shortDisplayText)."
         }
 
         switch decision {
         case .good:
-            return "Bugün dışarı planları için hava genel olarak iyi."
+            return "Bugün dışarı planları için hava rahat görünüyor."
         case .moderate:
-            return "Bugün dışarı çıkılır; birkaç saate dikkat etmek iyi olur."
+            return "Bugün dışarı çıkılır; gün içindeki değişimleri takip et."
         case .risky:
-            return "Bugün bazı saatler yorucu olabilir."
+            return "Bugün bazı saatler dışarıda yorucu olabilir."
         case .avoid:
-            return "Bugün dışarı planlarını kısa ve esnek tut."
+            return "Bugün dış planı ertelemek veya kısa tutmak daha iyi."
         }
     }
 
@@ -172,8 +172,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             ? "kaçınılacak belirgin saat yok"
             : avoidWindows.map(\.window.shortDisplayText).joined(separator: ", ")
 
-        return "Skor \(score.displayValue)/10. Değerlendirmede sıcaklık, hissedilen sıcaklık, nem, UV, " +
-            "yağış, rüzgar ve gün içi saatler dikkate alındı. Öne çıkan riskler: \(riskText). " +
-            "Kaçınılacak saatler: \(avoidText)."
+        return "Skor \(score.displayValue)/10. Hissedilen sıcaklık, yağış, rüzgar, UV, nem ve gün içi saatler birlikte değerlendirildi. " +
+            "Öne çıkan riskler: \(riskText). Dikkat saatleri: \(avoidText)."
     }
 }

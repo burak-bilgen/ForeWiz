@@ -11,9 +11,9 @@ struct WeatherRiskSection: View {
                     .foregroundStyle(AppTheme.ink)
 
                 if risks.isEmpty {
-                    Text("Bugün belirgin hava riski yok.")
+                    Text("Bugün dikkat çeken hava riski yok.")
                         .font(AppTypography.body)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppTheme.secondaryText)
                 } else {
                     FlowLayout(spacing: AppSpacing.small) {
                         ForEach(risks) { risk in

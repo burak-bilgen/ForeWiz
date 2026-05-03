@@ -11,7 +11,7 @@ struct DailyDecisionCard: View {
                     Spacer(minLength: AppSpacing.small)
                     Text(recommendation.outdoorScore.label)
                         .font(AppTypography.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppTheme.secondaryText)
                 }
 
                 ViewThatFits(in: .horizontal) {
@@ -31,7 +31,7 @@ struct DailyDecisionCard: View {
                     Divider().opacity(0.4)
                     InsightRow(
                         icon: "clock.fill",
-                        title: "En iyi dışarı saati",
+                        title: "En rahat aralık",
                         value: bestWindow.shortDisplayText,
                         tint: AppTheme.accent
                     )
@@ -44,14 +44,14 @@ struct DailyDecisionCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.small) {
             Text("Bugün dışarı çıkılır mı?")
                 .font(AppTypography.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppTheme.secondaryText)
             Text(recommendation.outdoorDecision.localizedTitle)
                 .font(.system(.largeTitle, design: .rounded, weight: .heavy))
                 .foregroundStyle(AppTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
             Text(recommendation.summaryText)
                 .font(AppTypography.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -74,13 +74,13 @@ private struct DecisionPill: View {
     private var labelText: String {
         switch decision {
         case .good:
-            "Uygun"
+            "Rahat"
         case .moderate:
-            "Dikkatli"
+            "Uygun"
         case .risky:
             "Riskli"
         case .avoid:
-            "Kaçın"
+            "Zorlayıcı"
         }
     }
 
@@ -109,13 +109,13 @@ struct InsightRow: View {
             Image(systemName: icon)
                 .font(.headline)
                 .frame(width: 34, height: 34)
-                .background(tint.opacity(0.14), in: Circle())
+                .background(AppTheme.softBubbleGradient(tint: tint), in: Circle())
                 .foregroundStyle(tint)
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
                 Text(title)
                     .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.secondaryText)
                 Text(value)
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)

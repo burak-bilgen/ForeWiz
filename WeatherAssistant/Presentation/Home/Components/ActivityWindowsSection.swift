@@ -11,9 +11,9 @@ struct ActivityWindowsSection: View {
                     .foregroundStyle(AppTheme.ink)
 
                 if recommendations.isEmpty {
-                    Text("Bugün belirgin bir aktivite penceresi yok.")
+                    Text("Bugün aktiviteler için öne çıkan net bir aralık yok.")
                         .font(AppTypography.body)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(AppTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
                     ForEach(recommendations) { recommendation in
@@ -33,13 +33,13 @@ private struct ActivityWindowRow: View {
             Image(systemName: iconName)
                 .font(.headline)
                 .frame(width: 34, height: 34)
-                .background(tint.opacity(0.14), in: Circle())
+                .background(AppTheme.softBubbleGradient(tint: tint), in: Circle())
                 .foregroundStyle(tint)
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
                 Text(recommendation.activityType.localizedTitle)
                     .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.secondaryText)
 
                 Text(recommendation.bestWindow.shortDisplayText)
                     .font(AppTypography.title3)
@@ -49,7 +49,7 @@ private struct ActivityWindowRow: View {
 
                 Text(recommendation.reason)
                     .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
 

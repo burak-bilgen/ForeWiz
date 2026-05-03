@@ -9,12 +9,13 @@ struct LiquidGlassContainer<Content: View>: View {
 
     var body: some View {
         content
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .background(AppTheme.surface, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+            .background(AppTheme.surface.opacity(0.70), in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(.white.opacity(0.55), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
+                    .stroke(.white.opacity(0.26), lineWidth: 1)
             }
-            .shadow(color: .black.opacity(0.07), radius: 20, y: 10)
+            .shadow(color: AppTheme.accent.opacity(0.10), radius: 22, y: 12)
+            .shadow(color: .black.opacity(0.06), radius: 10, y: 5)
     }
 }

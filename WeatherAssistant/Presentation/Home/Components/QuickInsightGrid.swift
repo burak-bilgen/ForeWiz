@@ -18,14 +18,14 @@ struct QuickInsightGrid: View {
 
             MetricTile(
                 icon: "clock.badge.checkmark",
-                title: "En iyi saat",
+                title: "Rahat aralık",
                 value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "Belirsiz",
                 tint: AppTheme.accent
             )
 
             MetricTile(
                 icon: "exclamationmark.triangle.fill",
-                title: "Kaçın",
+                title: "Dikkat saati",
                 value: recommendation.avoidWindows.first?.window.shortDisplayText ?? "Yok",
                 tint: recommendation.avoidWindows.isEmpty ? AppTheme.success : AppTheme.warning
             )
@@ -56,12 +56,12 @@ private struct MetricTile: View {
                 Image(systemName: icon)
                     .font(.headline)
                     .frame(width: 34, height: 34)
-                    .background(tint.opacity(0.14), in: Circle())
+                    .background(AppTheme.softBubbleGradient(tint: tint), in: Circle())
                     .foregroundStyle(tint)
 
                 Text(title)
                     .font(AppTypography.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(AppTheme.secondaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
 
