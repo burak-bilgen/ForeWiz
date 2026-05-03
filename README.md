@@ -1,6 +1,6 @@
-# WeatherAssistant
+# Weathra
 
-WeatherAssistant is a personal weather decision assistant for iOS. The product goal is not to show a dense
+Weathra is a personal weather decision assistant for iOS. The product goal is not to show a dense
 forecast dashboard, but to answer practical daily questions in Turkish: what to wear, whether going outside
 is sensible, which hours are best for running or walking, and which windows should be avoided.
 
@@ -9,7 +9,7 @@ is sensible, which hours are best for running or walking, and which windows shou
 - Onboarding for location, notifications, temperature sensitivity, preferred activities, and quiet hours.
 - A calm home screen with one daily decision, outdoor score, best window, avoid hours, outfit guidance, and risks.
 - A detail screen explaining hourly comfort, activity scoring, and the weather factors behind the recommendation.
-- Settings for preferences, units, notification categories, and language-ready structure.
+- Settings for appearance, language, permissions, units, notification categories, and onboarding preferences.
 - Local smart notifications with a default cap of 2 per day and a hard cap of 3.
 
 ## Architecture
@@ -30,7 +30,7 @@ must stay out of the domain layer.
 The current implementation slice includes:
 
 - Project structure for the requested layers.
-- Project, target, bundle, and source folder identity renamed to `WeatherAssistant`.
+- Project, target, bundle, module, test, and source folder identity renamed to `Weathra`.
 - Domain entities for weather snapshots, hourly/daily points, recommendations, risks, scores, profile, and notifications.
 - Repository and use-case protocols.
 - Deterministic decision engines for outdoor scoring, activity windows, outfit suggestions, and notification planning.
@@ -102,14 +102,6 @@ sorted imports. Preferred setup is Homebrew SwiftLint plus an Xcode build phase:
 
 ```sh
 swiftlint
-```
-
-## Tests
-
-Run unit tests with:
-
-```sh
-xcodebuild test -project WeatherAssistant.xcodeproj -scheme WeatherAssistant -destination 'platform=iOS Simulator,name=iPhone 17e,OS=26.4.1'
 ```
 
 ## Privacy
