@@ -41,7 +41,7 @@ private struct LaunchingView: View {
     var body: some View {
         ZStack {
             AppBackground()
-            ProgressView("Weathra hazırlanıyor…")
+            ProgressView(String(localized: "launch_preparing"))
                 .font(AppTypography.body)
         }
     }
@@ -57,11 +57,41 @@ private struct MainTabView: View {
                     loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
                     scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
                     preferencesRepository: coordinator.container.preferencesRepository,
-                    dateProvider: coordinator.container.dateProvider
-                )
+                    widgetRepository: coordinator.container.widgetRepository,
+                    dateProvider: coordinator.container.dateProvider,
+                    selectedLocationName: coordinator.profile.savedLocations.first(where: { $0.id == coordinator.profile.selectedLocationID })?.name ?? String(localized: "home_current_location")
+                ),
+                savedLocations: $coordinator.profile.savedLocations,
+                selectedLocationID: $coordinator.profile.selectedLocationID,
+                isPremium: coordinator.container.subscriptionManager.isPremium,
+                store: coordinator.container.subscriptionManager,
+                onRecommendationLoaded: { recommendation in
+                    coordinator.updateRecommendation(recommendation)
+                }
             )
             .tabItem {
-                Label("Bugün", systemImage: "sun.max.fill")
+                Label(String(localized: "tab_today"), systemImage: "sun.max.fill")
+            }
+
+            NavigationStack {
+                InsightsView(
+                    recommendation: coordinator.latestRecommendation ?? DailyRecommendation(
+                        generatedAt: Date(),
+                        outdoorDecision: .good,
+                        outdoorScore: WeatherScore(rawValue: 0),
+                        bestOutdoorWindow: nil,
+                        bestActivityWindows: [],
+                        avoidWindows: [],
+                        outfit: OutfitRecommendation(title: "", items: [], accessories: [], warning: nil),
+                        risks: [],
+                        summaryText: "",
+                        explanation: ""
+                    ),
+                    isPremium: coordinator.container.subscriptionManager.isPremium
+                )
+            }
+            .tabItem {
+                Label(String(localized: "premium_feature_analytics"), systemImage: "chart.bar")
             }
 
             NavigationStack {
@@ -69,13 +99,14 @@ private struct MainTabView: View {
                     viewModel: SettingsViewModel(
                         profile: coordinator.profile,
                         updateUserPreferencesUseCase: coordinator.container.updateUserPreferencesUseCase,
+                        subscriptionManager: coordinator.container.subscriptionManager,
                         onProfileSaved: coordinator.applyProfile,
                         onResetOnboarding: coordinator.resetToOnboarding
                     )
                 )
             }
             .tabItem {
-                Label("Ayarlar", systemImage: "gearshape.fill")
+                Label(String(localized: "tab_settings"), systemImage: "gearshape.fill")
             }
         }
     }

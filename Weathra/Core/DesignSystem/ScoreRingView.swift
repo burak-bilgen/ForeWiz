@@ -2,26 +2,38 @@ import SwiftUI
 
 struct ScoreRingView: View {
     let score: WeatherScore
+    var size: CGFloat = 92
+    @State private var progress: Double = 0
 
     var body: some View {
         ZStack {
             Circle()
                 .stroke(.primary.opacity(0.12), lineWidth: 10)
             Circle()
-                .trim(from: 0, to: score.displayValue / 10)
+                .trim(from: 0, to: progress)
                 .stroke(scoreColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             VStack(spacing: 0) {
                 Text(score.displayValue, format: .number.precision(.fractionLength(1)))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: size * 0.3, weight: .bold, design: .rounded))
                 Text("/10")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
             }
         }
-        .frame(width: 92, height: 92)
+        .frame(width: size, height: size)
+        .onAppear {
+            withAnimation(.spring(response: 1.2, dampingFraction: 0.8, blendDuration: 0)) {
+                progress = score.displayValue / 10
+            }
+        }
+        .onChange(of: score) {
+            withAnimation(.spring(response: 1.2, dampingFraction: 0.8, blendDuration: 0)) {
+                progress = score.displayValue / 10
+            }
+        }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Dışarı skoru \(score.displayValue, specifier: "%.1f") / 10")
+        .accessibilityLabel(String(localized: "widget_outdoor_score") + " \(score.displayValue.formatted(.number.precision(.fractionLength(1)))) / 10")
     }
 
     private var scoreColor: Color {

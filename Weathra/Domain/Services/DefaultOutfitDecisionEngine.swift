@@ -11,30 +11,43 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         let heatRisk = input.risks.contains { $0.type == .heat && $0.severity >= .medium }
         let uvRisk = input.risks.contains { $0.type == .uv && $0.severity >= .medium }
 
-        var items = baseItems(for: apparentTemperature)
+        let wardrobe = input.profile.wardrobe
+        var items = baseItems(for: apparentTemperature, wardrobe: wardrobe)
         var accessories: [String] = []
         var warnings: [String] = []
 
         if rainRisk {
-            items = ["Yağmurluk veya su geçirmez mont"] + items.filter { $0 != "İnce ceket" }
-            accessories.append("Şemsiye")
-            warnings.append("Yağmur ihtimali belirgin. Şemsiye veya hafif yağmurluk planı daha az kırılgan yapar.")
+            var rainWarning = "Yağmur bekleniyor."
+            
+            if wardrobe.hasRaincoat {
+                items = ["Yağmurluk"] + items.filter { $0 != "İnce ceket" }
+            }
+            
+            if wardrobe.hasUmbrella {
+                accessories.append("Şemsiye")
+                rainWarning += " Şemsiye almak işini rahatlatır."
+            } else if wardrobe.hasRaincoat == false {
+                rainWarning = "Yağmur görünüyor ancak şemsiye veya yağmurluğun yok, ıslanabilirsin!"
+            }
+            
+            warnings.append(rainWarning)
         }
 
         if windRisk {
-            items.append("Rüzgar geçirmeyen hafif katman")
-            warnings.append("Rüzgar hissedilen sıcaklığı düşürebilir; açık alanlarda ince bir dış katman işe yarar.")
+            items.append("Rüzgar geçirmeyen katman")
+            warnings.append("Rüzgar hissedilen sıcaklığı düşürebilir.")
         }
 
         if heatRisk || uvRisk {
-            accessories.append(contentsOf: ["Güneş gözlüğü", "Şapka", "Su"])
+            if wardrobe.hasSunglasses { accessories.append("Güneş gözlüğü") }
+            accessories.append(contentsOf: ["Şapka", "Su"])
             if let avoidWindow = input.avoidWindows.first(where: { $0.risk.type == .heat || $0.risk.type == .uv }) {
                 warnings.append("\(avoidWindow.window.shortDisplayText) arasında uzun süre dışarıda kalmamaya çalış.")
             }
         }
 
         if eveningGetsCooler(hourly: input.hourly, calendar: input.calendar), apparentTemperature < 24 {
-            warnings.append("Akşam serinleyebilir. Çantaya ince bir katman eklemek iyi olur.")
+            warnings.append("Akşam serinleyebilir. Çantaya ince bir hırka ya da ceket atmak iyi olur.")
         }
 
         let title = title(
@@ -62,19 +75,26 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         }
     }
 
-    private func baseItems(for apparentTemperature: Double) -> [String] {
+    private func baseItems(for apparentTemperature: Double, wardrobe: WardrobePreferences) -> [String] {
+        var base: [String]
+
         switch apparentTemperature {
         case 30...:
-            ["Hafif tişört", "Şort veya ince pantolon"]
+            base = ["Hafif tişört", "Şort veya ince pantolon"]
         case 24..<30:
-            ["Tişört", "İnce pantolon"]
+            base = ["Tişört", "İnce pantolon"]
         case 17..<24:
-            ["Tişört", "İnce ceket", "Rahat pantolon"]
+            base = ["Tişört", "İnce ceket", "Rahat pantolon"]
         case 8..<17:
-            ["Kazak", "İnce mont", "Kapalı ayakkabı"]
+            base = ["Kazak", "İnce mont", "Kapalı ayakkabı"]
         default:
-            ["Mont", "Kazak", "Kapalı ayakkabı"]
+            let coat = wardrobe.hasWinterCoat ? "Kışlık Mont" : "Kalın Mont"
+            base = [coat, "Kazak", "Kapalı ayakkabı"]
+            if wardrobe.hasGloves { base.append("Eldiven/Atkı") }
+            if wardrobe.hasThermals { base.append("Termal İçlik") }
         }
+
+        return base
     }
 
     private func title(
@@ -83,7 +103,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         sensitivity: TemperatureSensitivity
     ) -> String {
         if apparentTemperature >= 30 {
-            return "Hafif, nefes alan parçalar sıcak saatlerde daha konforlu olur."
+            return "Hafif, nefes alan parçalar sıcakta daha rahat hissettirir."
         }
 
         if (17..<24).contains(apparentTemperature) {
@@ -93,7 +113,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         }
 
         if apparentTemperature < 8 {
-            return "Sıcak tutan katmanlar ve kapalı ayakkabı soğuk hissini azaltır."
+            return "Sıcak tutan katmanlar ve kapalı ayakkabı soğuğu hissettirmez."
         }
 
         return "\(items.prefix(3).joined(separator: ", ")) bugün için dengeli bir kombin olur."

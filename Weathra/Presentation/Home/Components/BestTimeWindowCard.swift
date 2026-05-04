@@ -9,7 +9,7 @@ struct BestTimeWindowCard: View {
             InsightRow(
                 icon: "sun.max.fill",
                 title: title,
-                value: window?.shortDisplayText ?? "Bugün belirgin iyi pencere yok",
+                value: window?.shortDisplayText ?? String(localized: "forecast_no_best_window"),
                 tint: AppTheme.accent
             )
         }

@@ -5,32 +5,44 @@ import Foundation
 final class SettingsViewModel: ObservableObject {
     @Published var profile: UserComfortProfile
     @Published private(set) var saveMessage: String?
+    @Published var showPaywall = false
 
     private let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
+    let subscriptionManager: StoreKitSubscriptionManager
     private let onProfileSaved: (UserComfortProfile) -> Void
     private let onResetOnboarding: (() -> Void)?
 
     init(
         profile: UserComfortProfile,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
+        subscriptionManager: StoreKitSubscriptionManager,
         onProfileSaved: @escaping (UserComfortProfile) -> Void,
         onResetOnboarding: (() -> Void)? = nil
     ) {
         self.profile = profile
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
+        self.subscriptionManager = subscriptionManager
         self.onProfileSaved = onProfileSaved
         self.onResetOnboarding = onResetOnboarding
     }
 
+    var isPremium: Bool {
+        subscriptionManager.isPremium
+    }
+
     func save() {
-        let profile = profile
+        let current = profile
         Task {
             do {
-                try await updateUserPreferencesUseCase.execute(profile: profile)
-                onProfileSaved(profile)
-                saveMessage = "✓ Tercihler kaydedildi"
+                try await updateUserPreferencesUseCase.execute(profile: current)
+                onProfileSaved(current)
+                saveMessage = String(localized: "settings_save_success")
+                try? await Task.sleep(nanoseconds: 2_500_000_000)
+                saveMessage = nil
             } catch {
                 saveMessage = AppError.persistenceFailed.userMessage
+                try? await Task.sleep(nanoseconds: 2_500_000_000)
+                saveMessage = nil
             }
         }
     }
@@ -38,5 +50,8 @@ final class SettingsViewModel: ObservableObject {
     func resetOnboarding() {
         onResetOnboarding?()
     }
-}
 
+    func openPaywall() {
+        showPaywall = true
+    }
+}

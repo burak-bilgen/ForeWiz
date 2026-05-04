@@ -17,13 +17,13 @@ struct WeatherScore: Codable, Equatable, Hashable, Sendable {
     private static func defaultLabel(for value: Int) -> String {
         switch value {
         case 80...100:
-            "Harika"
+            String(localized: "decision_good")
         case 60..<80:
-            "Fena değil"
+            String(localized: "decision_moderate")
         case 40..<60:
-            "Dikkat et"
+            String(localized: "decision_risky")
         default:
-            "Bugün zor"
+            String(localized: "decision_avoid")
         }
     }
 }

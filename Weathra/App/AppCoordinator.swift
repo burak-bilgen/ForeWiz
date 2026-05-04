@@ -12,7 +12,8 @@ final class AppCoordinator: ObservableObject {
     let container: DependencyContainer
 
     @Published private(set) var rootFlow: RootFlow
-    @Published private(set) var profile: UserComfortProfile = .default
+    @Published var profile: UserComfortProfile = .default
+    @Published var latestRecommendation: DailyRecommendation?
 
     init(container: DependencyContainer, rootFlow: RootFlow = .launching) {
         self.container = container
@@ -21,7 +22,10 @@ final class AppCoordinator: ObservableObject {
 
     func start() async {
         do {
-            profile = try await container.preferencesRepository.loadProfile()
+            var loadedProfile = try await container.preferencesRepository.loadProfile()
+            await container.subscriptionManager.refreshStatus()
+            loadedProfile.subscriptionTier = container.subscriptionManager.tier
+            profile = loadedProfile
             rootFlow = try await container.preferencesRepository.isOnboardingCompleted() ? .main : .onboarding
         } catch {
             rootFlow = .onboarding
@@ -36,6 +40,10 @@ final class AppCoordinator: ObservableObject {
 
     func applyProfile(_ profile: UserComfortProfile) {
         self.profile = profile
+    }
+
+    func updateRecommendation(_ recommendation: DailyRecommendation) {
+        self.latestRecommendation = recommendation
     }
 
     func resetToOnboarding() {

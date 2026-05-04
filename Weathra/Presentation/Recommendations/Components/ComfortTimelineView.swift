@@ -5,6 +5,6 @@ struct ComfortTimelineView: View {
 
     var body: some View {
         HourlyScorePreview(scores: scores)
-            .accessibilityLabel("Saatlik konfor zaman çizelgesi")
+            .accessibilityLabel(String(localized: "comfort_timeline_accessibility"))
     }
 }

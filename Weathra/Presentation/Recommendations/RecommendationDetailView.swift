@@ -33,7 +33,7 @@ struct RecommendationDetailView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle("Günün Detayı")
+        .navigationTitle(String(localized: "premium_feature_hourly"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -70,7 +70,7 @@ private struct DetailHeroCard: View {
                         .background(.white.opacity(0.18), in: Circle())
 
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("Dışarı çıkmak için en iyi saat")
+                        Text(String(localized: "widget_best_time"))
                             .font(AppTypography.caption)
                             .foregroundStyle(.white.opacity(0.76))
                         Text(bestWindow.shortDisplayText)
@@ -94,7 +94,7 @@ private struct DetailExplanationCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Label("Neden Bu Karar?", systemImage: "lightbulb.fill")
+                Label(String(localized: "decision_moderate"), systemImage: "lightbulb.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -113,7 +113,7 @@ private struct DetailActivityTimeline: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Aktivite Zaman Çizelgesi", systemImage: "figure.run")
+                Label(String(localized: "notification_best_run"), systemImage: "figure.run")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -189,7 +189,7 @@ private struct DetailOutfitCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Kıyafet Önerisi", systemImage: "tshirt.fill")
+                Label(String(localized: "notification_outfit"), systemImage: "tshirt.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -215,7 +215,7 @@ private struct DetailOutfitCard: View {
                 if outfit.accessories.isEmpty == false {
                     InsightRow(
                         icon: "sparkles",
-                        title: "Yanına al",
+                        title: String(localized: "wardrobe_umbrella"),
                         value: outfit.accessories.joined(separator: " • "),
                         tint: AppTheme.teal
                     )
@@ -224,7 +224,7 @@ private struct DetailOutfitCard: View {
                 if let warning = outfit.warning {
                     InsightRow(
                         icon: "exclamationmark.triangle.fill",
-                        title: "Dikkat",
+                        title: String(localized: "risk_high"),
                         value: warning,
                         tint: AppTheme.warning
                     )
@@ -240,7 +240,7 @@ private struct DetailAvoidCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Bu Saatlerden Kaçın", systemImage: "exclamationmark.octagon.fill")
+                Label(String(localized: "decision_risky"), systemImage: "exclamationmark.octagon.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -284,7 +284,7 @@ private struct DetailRiskList: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Bugünkü Riskler", systemImage: "exclamationmark.triangle.fill")
+                Label(String(localized: "decision_risky"), systemImage: "exclamationmark.triangle.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 

@@ -25,6 +25,16 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             candidates.append(morningPlan)
         }
 
+        if enabledCategories.contains(.outfitSuggestion),
+           let outfitPlan = makeOutfitPlan(
+            recommendation: recommendation,
+            profile: profile,
+            now: now,
+            calendar: calendar
+           ) {
+            candidates.append(outfitPlan)
+        }
+
         if enabledCategories.contains(.bestRunWindow),
            let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .running }),
            let plan = makeActivityPlan(activityRecommendation: runningWindow, now: now, calendar: calendar) {
@@ -40,7 +50,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             )
         )
 
-        let uniqueCandidates = deduplicate(candidates)
+        let result = deduplicate(candidates)
             .filter { $0.fireDate >= now }
             .filter { isQuiet($0.fireDate, quietHours: profile.quietHours, calendar: calendar) == false }
             .sorted {
@@ -50,7 +60,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
                 return $0.priority > $1.priority
             }
 
-        return Array(uniqueCandidates.prefix(profile.maximumDailyNotifications.clamped(to: 1...3)))
+        return Array(result.prefix(profile.maximumDailyNotifications.clamped(to: 1...3)))
     }
 
     private func makeMorningBriefing(
@@ -60,7 +70,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         calendar: Calendar
     ) -> NotificationPlan? {
         let preference = profile.notificationPreferences.first { $0.category == .morningBriefing }
-        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 8, minute: 0)
+        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 0)
         guard let fireDate = calendar.nextDate(
             after: calendar.startOfDay(for: now).addingTimeInterval(-1),
             matching: preferredTime,
@@ -69,14 +79,83 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             return nil
         }
 
+        let body = buildMorningBody(recommendation: recommendation)
+
         return NotificationPlan(
             id: stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
             category: .morningBriefing,
             fireDate: fireDate,
-            title: "Bugünün hava kararı",
-            body: recommendation.summaryText,
-            priority: 70,
+            title: "Günaydın! İşte bugünün hava raporu",
+            body: body,
+            priority: 75,
             reason: "Kullanıcının sabah özeti tercihi açık."
+        )
+    }
+
+    private func buildMorningBody(recommendation: DailyRecommendation) -> String {
+        var parts: [String] = []
+
+        switch recommendation.outdoorDecision {
+        case .good:
+            parts.append("Dışarıda harika bir gün seni bekliyor!")
+        case .moderate:
+            parts.append("Dışarı çıkmak mümkün ama ideal değil.")
+        case .risky:
+            parts.append("Riskli saatler var, planını buna göre yap.")
+        case .avoid:
+            parts.append("Bugün dışarı çıkmaman önerilir, zorlu hava koşulları var.")
+        }
+
+        if let bestWindow = recommendation.bestOutdoorWindow {
+            parts.append("En rahat dışarı zamanı \(bestWindow.shortDisplayText).")
+        }
+
+        let significantRisks = recommendation.risks.filter { $0.severity >= .medium }
+        if !significantRisks.isEmpty {
+            let riskTitles = significantRisks.map(\.title).joined(separator: ", ")
+            parts.append("Dikkat: \(riskTitles).")
+        }
+
+        parts.append("Kıyafet önerisi: \(recommendation.outfit.title).")
+
+        return parts.joined(separator: " ")
+    }
+
+    private func makeOutfitPlan(
+        recommendation: DailyRecommendation,
+        profile: UserComfortProfile,
+        now: Date,
+        calendar: Calendar
+    ) -> NotificationPlan? {
+        let preference = profile.notificationPreferences.first { $0.category == .outfitSuggestion }
+        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 15)
+        guard let fireDate = calendar.nextDate(
+            after: calendar.startOfDay(for: now).addingTimeInterval(-1),
+            matching: preferredTime,
+            matchingPolicy: .nextTime
+        ) else {
+            return nil
+        }
+
+        let outfit = recommendation.outfit
+        var parts: [String] = []
+
+        parts.append("\(outfit.items.joined(separator: ", ")).")
+        if !outfit.accessories.isEmpty {
+            parts.append("Yanına al: \(outfit.accessories.joined(separator: ", ")).")
+        }
+        if let warning = outfit.warning {
+            parts.append("Not: \(warning)")
+        }
+
+        return NotificationPlan(
+            id: stableID(category: .outfitSuggestion, fireDate: fireDate, calendar: calendar),
+            category: .outfitSuggestion,
+            fireDate: fireDate,
+            title: "Bugün böyle giyin",
+            body: parts.joined(separator: " "),
+            priority: 70,
+            reason: "Günlük kıyafet önerisi."
         )
     }
 
@@ -85,21 +164,31 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         now: Date,
         calendar: Calendar
     ) -> NotificationPlan? {
-        guard let fireDate = calendar.date(
-            byAdding: .minute,
-            value: -45,
-            to: activityRecommendation.bestWindow.start
-        ), fireDate >= now else {
+        let fireDate = activityRecommendation.bestWindow.start
+        guard fireDate >= now else {
             return nil
+        }
+
+        let activityName = activityRecommendation.activityType.localizedTitle.lowercased()
+        let score = activityRecommendation.score.rawValue
+        let window = activityRecommendation.bestWindow.shortDisplayText
+
+        let body: String
+        if score >= 80 {
+            body = "Hava şu anda \(activityName) için çok uygun. \(window) saatleri arası tam zamanı, kaçırma!"
+        } else if score >= 60 {
+            body = "\(activityName) için uygun bir pencere başladı (\(window)). Şimdi çıkabilirsin."
+        } else {
+            body = "\(activityName) için günün en iyi zamanı \(window). Fırsat varken değerlendir."
         }
 
         return NotificationPlan(
             id: stableID(category: .bestRunWindow, fireDate: fireDate, calendar: calendar),
             category: .bestRunWindow,
             fireDate: fireDate,
-            title: "Koşu için iyi pencere",
-            body: "Koşu için en iyi saat \(activityRecommendation.bestWindow.shortDisplayText).",
-            priority: 95,
+            title: "\(activityRecommendation.activityType.localizedTitle) zamanı!",
+            body: body,
+            priority: 80,
             reason: activityRecommendation.reason
         )
     }
@@ -110,24 +199,127 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         now: Date,
         calendar: Calendar
     ) -> [NotificationPlan] {
-        recommendation.avoidWindows.compactMap { avoidWindow in
+        let eligible = recommendation.avoidWindows.filter { avoidWindow in
             guard let category = notificationCategory(for: avoidWindow.risk.type),
                   enabledCategories.contains(category),
                   avoidWindow.severity >= .medium,
-                  let fireDate = calendar.date(byAdding: .minute, value: -30, to: avoidWindow.window.start),
-                  fireDate >= now else {
-                return nil
+                  avoidWindow.window.start >= now else {
+                return false
             }
+            return true
+        }
 
-            return NotificationPlan(
-                id: stableID(category: category, fireDate: fireDate, calendar: calendar),
-                category: category,
-                fireDate: fireDate,
-                title: title(for: category),
-                body: body(for: avoidWindow),
-                priority: priority(for: avoidWindow),
-                reason: avoidWindow.reason
-            )
+        let grouped = Dictionary(grouping: eligible) { $0.window.start }
+
+        return grouped.compactMap { (startDate, windows) in
+            makeCombinedRiskPlan(windows: windows, fireDate: startDate, calendar: calendar)
+        }
+    }
+
+    private func makeCombinedRiskPlan(
+        windows: [AvoidWindowRecommendation],
+        fireDate: Date,
+        calendar: Calendar
+    ) -> NotificationPlan? {
+        guard let first = windows.first else { return nil }
+        let sorted = windows.sorted { $0.severity.rawValue > $1.severity.rawValue }
+
+        let combinedTitle: String
+        let combinedBody: String
+        let combinedPriority: Int
+        let combinedReason: String
+        let planID: String
+
+        if sorted.count == 1 {
+            let w = sorted[0]
+            guard let category = notificationCategory(for: w.risk.type) else { return nil }
+            combinedTitle = w.risk.title
+            combinedBody = buildSingleRiskBody(avoidWindow: w)
+            combinedPriority = priorityForSeverity(w.severity)
+            combinedReason = w.reason
+            planID = stableID(category: category, fireDate: fireDate, calendar: calendar)
+        } else {
+            guard let primaryCategory = notificationCategory(for: sorted[0].risk.type) else { return nil }
+            let window = first.window.shortDisplayText
+            let riskNames = sorted.map { $0.risk.title }
+            combinedTitle = "\(riskNames.joined(separator: " ve ")) — \(window)"
+            combinedBody = buildCombinedRiskBody(windows: sorted, window: first.window)
+            combinedPriority = priorityForSeverity(sorted[0].severity)
+            combinedReason = sorted.map(\.reason).joined(separator: "; ")
+
+            let riskTypes = sorted.map { $0.risk.type.rawValue }.sorted().joined(separator: "+")
+            let components = calendar.dateComponents([.year, .month, .day], from: fireDate)
+            let year = components.year ?? 0
+            let month = components.month ?? 0
+            let day = components.day ?? 0
+            planID = "smart.\(riskTypes).\(year)-\(month)-\(day)"
+        }
+
+        return NotificationPlan(
+            id: planID,
+            category: notificationCategory(for: sorted[0].risk.type) ?? .avoidHeatWindow,
+            fireDate: fireDate,
+            title: combinedTitle,
+            body: combinedBody,
+            priority: combinedPriority,
+            reason: combinedReason
+        )
+    }
+
+    private func buildSingleRiskBody(avoidWindow: AvoidWindowRecommendation) -> String {
+        let window = avoidWindow.window.shortDisplayText
+        switch avoidWindow.risk.type {
+        case .heat:
+            let advice = heatAdvice(severity: avoidWindow.severity)
+            return "\(window) arası \(advice)"
+        case .uv:
+            return "\(window) arası UV indeksi yüksek. Şapka tak, güneş kremi sür, gölgede kal."
+        case .rain:
+            return "\(window) arası yağmur bekleniyor. Şemsiyeni al, açık hava planlarını ertele."
+        case .wind:
+            return "\(window) arası kuvvetli rüzgar var. Bisiklet ve açık alan aktivitelerine dikkat et."
+        case .humidity, .cold, .storm, .poorComfort:
+            return avoidWindow.reason
+        }
+    }
+
+    private func buildCombinedRiskBody(windows: [AvoidWindowRecommendation], window: TimeWindow) -> String {
+        let windowText = window.shortDisplayText
+        let parts = windows.map { riskLine($0) }
+        return "\(windowText) saatleri arası: \(parts.joined(separator: " "))"
+    }
+
+    private func riskLine(_ avoidWindow: AvoidWindowRecommendation) -> String {
+        switch avoidWindow.risk.type {
+        case .heat:
+            return "hissedilen sıcaklık yükseliyor (\(avoidWindow.severity.localizedTitle))."
+        case .uv:
+            return "UV indeksi yüksek."
+        case .rain:
+            return "yağmur bekleniyor."
+        case .wind:
+            return "kuvvetli rüzgar var."
+        case .humidity:
+            return "yüksek nem bunaltıcı olabilir."
+        case .cold:
+            return "soğuk hava etkili."
+        case .storm:
+            return "fırtına riski var."
+        case .poorComfort:
+            return "konfor seviyesi düşük."
+        }
+    }
+
+    private func heatAdvice(severity: RiskLevel) -> String {
+        switch severity {
+        case .extreme:
+            return "hissedilen sıcaklık tehlikeli seviyede. Dışarı çıkmaktan kaçının, bol su için."
+        case .high:
+            return "hissedilen sıcaklık çok yükselecek. Açık renkli bol giysiler giyin, sık sık su için."
+        case .medium:
+            return "hissedilen sıcaklık yükseliyor. Gölgede kalın, yanınıza su alın."
+        case .low:
+            return "hissedilen sıcaklık hafif yükselecek."
         }
     }
 
@@ -146,60 +338,26 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         }
     }
 
-    private func title(for category: NotificationCategory) -> String {
-        switch category {
-        case .morningBriefing:
-            "Bugünün hava kararı"
-        case .outfitSuggestion:
-            "Kıyafet önerisi"
-        case .bestRunWindow:
-            "Koşu için en rahat saat"
-        case .avoidHeatWindow:
-            "Sıcaklık planı etkiliyor"
-        case .rainWarning:
-            "Yağmur saatine dikkat"
-        case .windWarning:
-            "Rüzgar açık alanı zorlar"
-        case .uvWarning:
-            "Güneş koruması gerekli"
-        }
-    }
-
-    private func body(for avoidWindow: AvoidWindowRecommendation) -> String {
-        switch avoidWindow.risk.type {
-        case .heat:
-            "\(avoidWindow.window.shortDisplayText) arasında hissedilen sıcaklık yükseliyor. Uzun dış planı daha serin saate al."
-        case .uv:
-            "\(avoidWindow.window.shortDisplayText) arasında UV yüksek. Şapka, gölge ve güneş koruması planla."
-        case .rain:
-            "\(avoidWindow.window.shortDisplayText) arasında yağmur planı aksatabilir. Şemsiye al veya kapalı alternatif bırak."
-        case .wind:
-            "\(avoidWindow.window.shortDisplayText) arasında rüzgar artıyor. Bisiklet, sahil ve açık alan planını dikkatli yap."
-        case .humidity, .cold, .storm, .poorComfort:
-            avoidWindow.reason
-        }
-    }
-
-    private func priority(for avoidWindow: AvoidWindowRecommendation) -> Int {
-        switch avoidWindow.severity {
+    private func priorityForSeverity(_ severity: RiskLevel) -> Int {
+        switch severity {
         case .extreme:
             100
         case .high:
-            92
+            95
         case .medium:
-            78
+            85
         case .low:
-            40
+            60
         }
     }
 
     private func deduplicate(_ plans: [NotificationPlan]) -> [NotificationPlan] {
-        var seenCategories: Set<NotificationCategory> = []
+        var seenIDs: Set<String> = []
         var uniquePlans: [NotificationPlan] = []
 
         for plan in plans.sorted(by: { $0.priority > $1.priority })
-            where seenCategories.contains(plan.category) == false {
-            seenCategories.insert(plan.category)
+            where seenIDs.contains(plan.id) == false {
+            seenIDs.insert(plan.id)
             uniquePlans.append(plan)
         }
 

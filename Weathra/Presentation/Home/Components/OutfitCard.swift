@@ -6,7 +6,7 @@ struct OutfitCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Bugün Ne Giymeliyim?", systemImage: "tshirt.fill")
+                Label(String(localized: "notification_outfit"), systemImage: "tshirt.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
                 Text(outfit.title)
@@ -31,7 +31,7 @@ struct OutfitCard: View {
                 if !outfit.accessories.isEmpty {
                     InsightRow(
                         icon: "sparkles",
-                        title: "Yanına al",
+                        title: String(localized: "outfit_accessories"),
                         value: outfit.accessories.joined(separator: " • "),
                         tint: AppTheme.teal
                     )
@@ -40,7 +40,7 @@ struct OutfitCard: View {
                 if let warning = outfit.warning {
                     InsightRow(
                         icon: "exclamationmark.triangle.fill",
-                        title: "Dikkat",
+                        title: String(localized: "outfit_warning"),
                         value: warning,
                         tint: AppTheme.warning
                     )

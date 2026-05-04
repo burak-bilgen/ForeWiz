@@ -12,6 +12,10 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var appearance: AppAppearance
     var accentPalette: AppAccentPalette
     var language: AppLanguage
+    var wardrobe: WardrobePreferences
+    var savedLocations: [SavedLocation]
+    var selectedLocationID: String
+    var subscriptionTier: SubscriptionTier
 
     private enum CodingKeys: String, CodingKey {
         case temperatureSensitivity
@@ -25,6 +29,10 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         case appearance
         case accentPalette
         case language
+        case wardrobe
+        case savedLocations
+        case selectedLocationID
+        case subscriptionTier
     }
 
     init(
@@ -38,7 +46,11 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         maximumDailyNotifications: Int = 2,
         appearance: AppAppearance = .system,
         accentPalette: AppAccentPalette = .sky,
-        language: AppLanguage = .system
+        language: AppLanguage = .system,
+        wardrobe: WardrobePreferences = .default,
+        savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
+        selectedLocationID: String = "current-location",
+        subscriptionTier: SubscriptionTier = .free
     ) {
         self.temperatureSensitivity = temperatureSensitivity
         self.preferredActivities = preferredActivities
@@ -51,6 +63,10 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.appearance = appearance
         self.accentPalette = accentPalette
         self.language = language
+        self.wardrobe = wardrobe
+        self.savedLocations = savedLocations
+        self.selectedLocationID = selectedLocationID
+        self.subscriptionTier = subscriptionTier
     }
 
     static var `default`: UserComfortProfile {
@@ -92,7 +108,11 @@ extension UserComfortProfile {
             ) ?? 2,
             appearance: try container.decodeIfPresent(AppAppearance.self, forKey: .appearance) ?? .system,
             accentPalette: try container.decodeIfPresent(AppAccentPalette.self, forKey: .accentPalette) ?? .sky,
-            language: try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system
+            language: try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system,
+            wardrobe: try container.decodeIfPresent(WardrobePreferences.self, forKey: .wardrobe) ?? .default,
+            savedLocations: try container.decodeIfPresent([SavedLocation].self, forKey: .savedLocations) ?? [SavedLocation.currentLocation],
+            selectedLocationID: try container.decodeIfPresent(String.self, forKey: .selectedLocationID) ?? "current-location",
+            subscriptionTier: try container.decodeIfPresent(SubscriptionTier.self, forKey: .subscriptionTier) ?? .free
         )
     }
 }

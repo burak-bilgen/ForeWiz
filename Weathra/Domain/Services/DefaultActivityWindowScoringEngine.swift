@@ -29,6 +29,10 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             score -= 8
         }
 
+        if isLateNight(hour: hourOfDay) {
+            score -= 40
+        }
+
         if let severeWeatherRisk = hour.severeWeatherRisk {
             score -= severeWeatherRisk == .extreme ? 90 : severeWeatherRisk.rawValue * 18
         }
@@ -253,5 +257,9 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
 
         return "\(activity.localizedTitle) için bugün çok rahat bir aralık yok; yine de en az zorlayan zaman \(window.shortDisplayText)."
+    }
+
+    private func isLateNight(hour: Int) -> Bool {
+        hour >= 23 || hour <= 5
     }
 }

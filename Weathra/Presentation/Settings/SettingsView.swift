@@ -10,13 +10,34 @@ struct SettingsView: View {
             AppBackground()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                VStack(alignment: .leading, spacing: AppSpacing.small) {
                     HeaderSection(saveMessage: viewModel.saveMessage)
+                        .padding(.bottom, AppSpacing.xSmall)
+
+                    SectionDivider(label: String(localized: "settings_section_appearance"))
                     AppearanceSection(profile: $viewModel.profile)
                     LanguageSection(profile: $viewModel.profile)
+
+                    SectionDivider(label: String(localized: "settings_section_premium"))
+                    PremiumSection(
+                        isPremium: viewModel.isPremium,
+                        onUpgrade: viewModel.openPaywall
+                    )
+
+                    SectionDivider(label: String(localized: "settings_section_permissions"))
                     PermissionManagementSection()
+
+                    SectionDivider(label: String(localized: "settings_section_locations"))
+                    SavedLocationsSection(profile: $viewModel.profile)
+
+                    SectionDivider(label: String(localized: "settings_section_preferences"))
                     PersonalPreferencesSection(profile: $viewModel.profile)
+                    WardrobeSettingsSection(profile: $viewModel.profile)
+
+                    SectionDivider(label: String(localized: "settings_section_notifications"))
                     NotificationSettingsSection(profile: $viewModel.profile)
+
+                    SectionDivider(label: String(localized: "settings_section_app"))
                     AboutSection()
                     ResetSection(showConfirmation: $showResetConfirmation)
                 }
@@ -25,22 +46,25 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle("Ayarlar")
+        .navigationTitle(String(localized: "settings_title"))
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: viewModel.profile) {
             viewModel.save()
         }
+        .sheet(isPresented: $viewModel.showPaywall) {
+            PaywallView(store: viewModel.subscriptionManager)
+        }
         .confirmationDialog(
-            "Kurulumu sıfırla",
+            String(localized: "settings_reset_title"),
             isPresented: $showResetConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Sıfırla", role: .destructive) {
+            Button(String(localized: "settings_reset_confirm"), role: .destructive) {
                 viewModel.resetOnboarding()
             }
-            Button("İptal", role: .cancel) {}
+            Button(String(localized: "settings_cancel"), role: .cancel) {}
         } message: {
-            Text("Bu işlem onboarding ekranına dönmenizi sağlar. Mevcut tercihleriniz korunur.")
+            Text(String(localized: "settings_reset_message"))
         }
     }
 }
@@ -50,12 +74,12 @@ private struct HeaderSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-            Text("Tercihlerini Düzenle")
+            Text(String(localized: "settings_header_title"))
                 .font(AppTypography.largeTitle)
                 .foregroundStyle(AppTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text(saveMessage ?? "Buradaki seçimler Weathra'nın sana verdiği tüm önerileri, skorları ve bildirimleri etkiler. Değişiklikler anında uygulanır.")
+            Text(saveMessage ?? String(localized: "settings_header_subtitle"))
                 .font(AppTypography.body)
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -70,10 +94,10 @@ private struct AppearanceSection: View {
     var body: some View {
         SettingsCard(
             icon: "circle.lefthalf.filled",
-            title: "Görünüm",
-            subtitle: "Weathra'nın açık mı, koyu mu görüneceğini seç. 'Sistem' seçeneği telefonunun ayarını takip eder."
+            title: String(localized: "settings_appearance_title"),
+            subtitle: String(localized: "settings_appearance_subtitle")
         ) {
-            Picker("Tema", selection: $profile.appearance) {
+            Picker(String(localized: "settings_theme"), selection: $profile.appearance) {
                 ForEach(AppAppearance.allCases, id: \.self) { appearance in
                     Text(appearance.localizedTitle).tag(appearance)
                 }
@@ -89,15 +113,67 @@ private struct LanguageSection: View {
     var body: some View {
         SettingsCard(
             icon: "globe",
-            title: "Dil",
-            subtitle: "Uygulama dilini değiştir. 'Sistem' seçeneği telefonunun dilini kullanır."
+            title: String(localized: "settings_language_title"),
+            subtitle: String(localized: "settings_language_subtitle")
         ) {
-            Picker("Dil", selection: $profile.language) {
+            Picker(String(localized: "settings_language"), selection: $profile.language) {
                 ForEach(AppLanguage.allCases, id: \.self) { language in
                     Text(language.localizedTitle).tag(language)
                 }
             }
             .pickerStyle(.segmented)
+        }
+    }
+}
+
+private struct PremiumSection: View {
+    let isPremium: Bool
+    let onUpgrade: () -> Void
+
+    var body: some View {
+        SettingsCard(
+            icon: "crown.fill",
+            title: String(localized: "settings_premium_title"),
+            subtitle: isPremium
+                ? String(localized: "settings_premium_active_subtitle")
+                : String(localized: "settings_premium_upgrade_subtitle")
+        ) {
+            VStack(spacing: AppSpacing.medium) {
+                if isPremium {
+                    HStack {
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundStyle(AppTheme.success)
+                        Text(String(localized: "settings_premium_active"))
+                            .font(AppTypography.headline)
+                            .foregroundStyle(AppTheme.success)
+                    }
+                } else {
+                    ForEach(PremiumFeature.allCases) { feature in
+                        HStack(spacing: AppSpacing.small) {
+                            Image(systemName: feature.systemImage)
+                                .font(.subheadline)
+                                .foregroundStyle(AppTheme.accent)
+                                .frame(width: 24)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(feature.localizedTitle)
+                                    .font(AppTypography.caption.weight(.semibold))
+                                Text(feature.localizedDescription)
+                                    .font(.system(.caption2, design: .rounded))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+
+                    Button(action: onUpgrade) {
+                        Label(String(localized: "settings_premium_upgrade"), systemImage: "crown.fill")
+                            .font(AppTypography.caption.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(AppTheme.sunshine)
+                }
+            }
         }
     }
 }
@@ -108,24 +184,24 @@ private struct PermissionManagementSection: View {
     var body: some View {
         SettingsCard(
             icon: "hand.raised.fill",
-            title: "İzinler",
-            subtitle: "Konum ve bildirim izinleri iOS tarafından yönetilir. Değiştirmek istersen aşağıdaki butona dokun."
+            title: String(localized: "settings_permissions_title"),
+            subtitle: String(localized: "settings_permissions_subtitle")
         ) {
             VStack(spacing: AppSpacing.small) {
                 SettingsInfoRow(
                     icon: "location.fill",
-                    title: "Konum",
-                    value: "Sadece uygulamayı açtığında konumunu alır, arka planda takip etmez."
+                    title: String(localized: "settings_permission_location"),
+                    value: String(localized: "settings_permission_location_desc")
                 )
 
                 SettingsInfoRow(
                     icon: "bell.badge.fill",
-                    title: "Bildirimler",
-                    value: "Hava değişikliklerinde seni uyarır. Günlük bildirim sayısını aşağıdan sınırlayabilirsin."
+                    title: String(localized: "settings_permission_notifications"),
+                    value: String(localized: "settings_permission_notifications_desc")
                 )
 
                 Button(action: openSystemSettings) {
-                    Label("iOS Ayarları'nı aç", systemImage: "arrow.up.forward.app.fill")
+                    Label(String(localized: "settings_open_ios_settings"), systemImage: "arrow.up.forward.app.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .frame(maxWidth: .infinity)
                 }
@@ -150,18 +226,18 @@ private struct PersonalPreferencesSection: View {
     var body: some View {
         SettingsCard(
             icon: "person.crop.circle.badge.checkmark",
-            title: "Konfor profili",
-            subtitle: "Sıcağa/soğuğa ne kadar hassas olduğunu ve hangi aktiviteleri yaptığını seç. Skorlar buna göre kişiselleşir."
+            title: String(localized: "settings_comfort_title"),
+            subtitle: String(localized: "settings_comfort_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Picker("Birimler", selection: $profile.unitSystem) {
+                Picker(String(localized: "settings_units"), selection: $profile.unitSystem) {
                     ForEach(UnitSystem.allCases, id: \.self) { system in
                         Text(system.localizedTitle).tag(system)
                     }
                 }
                 .pickerStyle(.segmented)
 
-                Picker("Sıcaklık hissi", selection: $profile.temperatureSensitivity) {
+                Picker(String(localized: "settings_temp_sensitivity"), selection: $profile.temperatureSensitivity) {
                     ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
                         Text(sensitivity.localizedTitle).tag(sensitivity)
                     }
@@ -169,7 +245,7 @@ private struct PersonalPreferencesSection: View {
                 .pickerStyle(.segmented)
 
                 VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Text("Aktiviteler")
+                    Text(String(localized: "settings_activities"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.secondaryText)
 
@@ -236,18 +312,62 @@ private struct SettingsActivityChip: View {
     }
 }
 
+private struct WardrobeSettingsSection: View {
+    @Binding var profile: UserComfortProfile
+
+    var body: some View {
+        SettingsCard(
+            icon: "hanger",
+            title: String(localized: "settings_wardrobe_title"),
+            subtitle: String(localized: "settings_wardrobe_subtitle")
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                Toggle(isOn: $profile.wardrobe.hasUmbrella) {
+                    Label(String(localized: "wardrobe_umbrella"), systemImage: "umbrella.fill")
+                }
+                .tint(AppTheme.accent)
+
+                Toggle(isOn: $profile.wardrobe.hasRaincoat) {
+                    Label(String(localized: "wardrobe_raincoat"), systemImage: "cloud.heavyrain.fill")
+                }
+                .tint(AppTheme.accent)
+
+                Toggle(isOn: $profile.wardrobe.hasWinterCoat) {
+                    Label(String(localized: "wardrobe_winter_coat"), systemImage: "snowflake")
+                }
+                .tint(AppTheme.accent)
+
+                Toggle(isOn: $profile.wardrobe.hasSunglasses) {
+                    Label(String(localized: "wardrobe_sunglasses"), systemImage: "sunglasses")
+                }
+                .tint(AppTheme.accent)
+
+                Toggle(isOn: $profile.wardrobe.hasGloves) {
+                    Label(String(localized: "wardrobe_gloves"), systemImage: "hand.raised.fill")
+                }
+                .tint(AppTheme.accent)
+
+                Toggle(isOn: $profile.wardrobe.hasThermals) {
+                    Label(String(localized: "wardrobe_thermals"), systemImage: "flame.fill")
+                }
+                .tint(AppTheme.accent)
+            }
+        }
+    }
+}
+
 private struct NotificationSettingsSection: View {
     @Binding var profile: UserComfortProfile
 
     var body: some View {
         SettingsCard(
             icon: "bell.badge.fill",
-            title: "Akıllı bildirimler",
-            subtitle: "Günde kaç bildirim almak istediğini ve hangi kategorileri istediğini seç. Sessiz saatlerde bildirim gönderilmez."
+            title: String(localized: "settings_notifications_title"),
+            subtitle: String(localized: "settings_notifications_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Stepper(
-                    "Günlük üst sınır: \(profile.maximumDailyNotifications)",
+                    String(localized: "settings_daily_limit") + " \(profile.maximumDailyNotifications)",
                     value: $profile.maximumDailyNotifications,
                     in: 1...3
                 )
@@ -342,12 +462,12 @@ private struct AboutSection: View {
     var body: some View {
         SettingsCard(
             icon: "info.circle.fill",
-            title: "Weathra Hakkında",
-            subtitle: "Kişisel hava karar asistanın. Sıcaklık, rüzgar, yağış ve UV verilerini analiz ederek sana bugün ne yapman gerektiğini söyler."
+            title: String(localized: "settings_about_title"),
+            subtitle: String(localized: "settings_about_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
                 HStack {
-                    Text("Sürüm")
+                    Text(String(localized: "settings_version"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.ink)
                     Spacer()
@@ -357,16 +477,16 @@ private struct AboutSection: View {
                 }
 
                 HStack {
-                    Text("Veri kaynağı")
+                    Text(String(localized: "settings_data_source"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.ink)
                     Spacer()
-                    Text("Apple Weather")
+                    Text(String(localized: "settings_data_apple_weather"))
                         .font(AppTypography.caption)
                         .foregroundStyle(AppTheme.secondaryText)
                 }
 
-                Text("Tüm veriler cihazında saklanır. Üçüncü taraf analitik veya uzak sunucu kullanılmaz.")
+                Text(String(localized: "settings_privacy_note"))
                     .font(.system(.caption2, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -381,17 +501,222 @@ private struct AboutSection: View {
     }
 }
 
+private struct SectionDivider: View {
+    let label: String
+
+    var body: some View {
+        HStack(spacing: AppSpacing.small) {
+            Rectangle()
+                .fill(AppTheme.secondaryText.opacity(0.18))
+                .frame(height: 1)
+
+            Text(label)
+                .font(.system(.caption2, design: .rounded, weight: .bold))
+                .foregroundStyle(AppTheme.secondaryText)
+                .lineLimit(1)
+
+            Rectangle()
+                .fill(AppTheme.secondaryText.opacity(0.18))
+                .frame(height: 1)
+        }
+        .padding(.horizontal, AppSpacing.xSmall)
+    }
+}
+
+private struct SavedLocationsSection: View {
+    @Binding var profile: UserComfortProfile
+
+    var body: some View {
+        SettingsCard(
+            icon: "mappin.and.ellipse",
+            title: String(localized: "settings_saved_locations_title"),
+            subtitle: String(localized: "settings_saved_locations_subtitle")
+        ) {
+            VStack(spacing: AppSpacing.small) {
+                ForEach(profile.savedLocations) { location in
+                    NavigationLink {
+                        SavedLocationDetailView(location: location, onSave: { updated in
+                            updateLocation(updated)
+                        }, onDelete: {
+                            deleteLocation(location)
+                        })
+                    } label: {
+                        SavedLocationRow(location: location, isSelected: location.id == profile.selectedLocationID)
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Divider()
+
+                Button(action: addLocation) {
+                    Label(String(localized: "settings_add_location"), systemImage: "plus.circle.fill")
+                        .font(AppTypography.caption.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(AppTheme.accent)
+            }
+        }
+    }
+
+    private func updateLocation(_ updated: SavedLocation) {
+        guard let index = profile.savedLocations.firstIndex(where: { $0.id == updated.id }) else {
+            return
+        }
+
+        profile.savedLocations[index] = updated
+    }
+
+    private func deleteLocation(_ location: SavedLocation) {
+        guard location.id != "current-location" else {
+            return
+        }
+
+        profile.savedLocations.removeAll { $0.id == location.id }
+
+        if profile.selectedLocationID == location.id {
+            profile.selectedLocationID = "current-location"
+        }
+    }
+
+    private func addLocation() {
+        let newLocation = SavedLocation(
+            name: String(localized: "settings_new_location"),
+            latitude: 0,
+            longitude: 0,
+            address: String(localized: "settings_search_location")
+        )
+
+        profile.savedLocations.append(newLocation)
+    }
+}
+
+private struct SavedLocationRow: View {
+    let location: SavedLocation
+    let isSelected: Bool
+
+    var body: some View {
+        HStack(spacing: AppSpacing.small) {
+            Image(systemName: location.id == "current-location" ? "location.fill" : "mappin.and.ellipse")
+                .font(.subheadline.weight(.semibold))
+                .frame(width: 28, height: 28)
+                .foregroundStyle(AppTheme.accent)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(location.name)
+                    .font(AppTypography.caption.weight(.bold))
+                    .foregroundStyle(AppTheme.ink)
+                Text(location.address)
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: AppSpacing.small)
+
+            if isSelected {
+                Image(systemName: "checkmark")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(AppTheme.accent)
+            }
+
+            Image(systemName: "chevron.right")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(AppTheme.secondaryText)
+        }
+        .padding(.horizontal, AppSpacing.small)
+        .padding(.vertical, AppSpacing.xSmall)
+        .background(AppTheme.elevatedSurface.opacity(0.86), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
+    }
+}
+
+private struct SavedLocationDetailView: View {
+    @State private var name: String
+    @State private var address: String
+
+    let location: SavedLocation
+    let onSave: (SavedLocation) -> Void
+    let onDelete: () -> Void
+
+    @Environment(\.dismiss) private var dismiss
+
+    init(location: SavedLocation, onSave: @escaping (SavedLocation) -> Void, onDelete: @escaping () -> Void) {
+        self.location = location
+        self.onSave = onSave
+        self.onDelete = onDelete
+        _name = State(initialValue: location.name)
+        _address = State(initialValue: location.address)
+    }
+
+    var body: some View {
+        ZStack {
+            AppBackground()
+
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                GlassCard {
+                    VStack(spacing: AppSpacing.medium) {
+                        LabeledContent(String(localized: "settings_location_name")) {
+                            TextField(String(localized: "settings_location_name"), text: $name)
+                                .multilineTextAlignment(.trailing)
+                        }
+
+                        LabeledContent(String(localized: "settings_address")) {
+                            TextField(String(localized: "settings_address"), text: $address)
+                                .multilineTextAlignment(.trailing)
+                        }
+
+                        LabeledContent(String(localized: "settings_coordinates")) {
+                            Text("\(location.latitude.formatted(.number.precision(.fractionLength(4)))), \(location.longitude.formatted(.number.precision(.fractionLength(4))))")
+                                .font(AppTypography.caption)
+                                .foregroundStyle(AppTheme.secondaryText)
+                        }
+                    }
+                }
+
+                if location.id != "current-location" {
+                    Button(role: .destructive) {
+                        onDelete()
+                        dismiss()
+                    } label: {
+                        Label(String(localized: "settings_delete_location"), systemImage: "trash")
+                            .font(AppTypography.caption.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+            .padding(AppSpacing.medium)
+            .frame(maxWidth: 720)
+            .frame(maxWidth: .infinity)
+        }
+        .navigationTitle(String(localized: "settings_edit_location"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(String(localized: "settings_save")) {
+                    var updated = location
+                    updated.name = name
+                    updated.address = address
+                    onSave(updated)
+                    dismiss()
+                }
+                .disabled(name.isEmpty)
+            }
+        }
+    }
+}
+
 private struct ResetSection: View {
     @Binding var showConfirmation: Bool
 
     var body: some View {
         SettingsCard(
             icon: "arrow.counterclockwise.circle.fill",
-            title: "Kurulumu sıfırla",
-            subtitle: "Onboarding ekranına dönerek konum, bildirim ve konfor tercihlerini yeniden ayarlayabilirsin."
+            title: String(localized: "settings_reset_title"),
+            subtitle: String(localized: "settings_reset_subtitle")
         ) {
             Button(action: { showConfirmation = true }) {
-                Label("Kurulumu sıfırla", systemImage: "arrow.counterclockwise")
+                Label(String(localized: "settings_reset_confirm"), systemImage: "arrow.counterclockwise")
                     .font(AppTypography.caption.weight(.semibold))
                     .frame(maxWidth: .infinity)
             }

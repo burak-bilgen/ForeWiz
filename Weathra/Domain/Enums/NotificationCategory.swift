@@ -11,39 +11,25 @@ enum NotificationCategory: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .morningBriefing:
-            "Sabah özeti"
-        case .outfitSuggestion:
-            "Kıyafet önerisi"
-        case .bestRunWindow:
-            "En iyi koşu zamanı"
-        case .avoidHeatWindow:
-            "Sıcaklık planı etkiliyor"
-        case .rainWarning:
-            "Yağmur saatine dikkat"
-        case .windWarning:
-            "Rüzgar açık alanı zorlar"
-        case .uvWarning:
-            "Güneş koruması gerekli"
+        case .morningBriefing: String(localized: "notification_morning_briefing")
+        case .outfitSuggestion: String(localized: "notification_outfit")
+        case .bestRunWindow: String(localized: "notification_best_run")
+        case .avoidHeatWindow: String(localized: "notification_avoid_heat")
+        case .rainWarning: String(localized: "notification_rain")
+        case .windWarning: String(localized: "notification_wind")
+        case .uvWarning: String(localized: "notification_uv")
         }
     }
 
     var localizedDescription: String {
         switch self {
-        case .morningBriefing:
-            "Her sabah günün hava özetini ve ne giyeceğini bildirir."
-        case .outfitSuggestion:
-            "Hava değiştiğinde kıyafet önerisini günceller."
-        case .bestRunWindow:
-            "Koşu için en uygun saati bildirir."
-        case .avoidHeatWindow:
-            "Sıcaklık dışarıyı zorlaştıracak seviyeye ulaştığında uyarır."
-        case .rainWarning:
-            "Yağmur başlamadan kısa süre önce bildirim gönderir."
-        case .windWarning:
-            "Güçlü rüzgar beklendiğinde uyarır."
-        case .uvWarning:
-            "UV indeksi yüksek olduğunda güneş koruması hatırlatır."
+        case .morningBriefing: String(localized: "notification_morning_briefing_desc")
+        case .outfitSuggestion: String(localized: "notification_outfit_desc")
+        case .bestRunWindow: String(localized: "notification_best_run_desc")
+        case .avoidHeatWindow: String(localized: "notification_avoid_heat_desc")
+        case .rainWarning: String(localized: "notification_rain_desc")
+        case .windWarning: String(localized: "notification_wind_desc")
+        case .uvWarning: String(localized: "notification_uv_desc")
         }
     }
 }

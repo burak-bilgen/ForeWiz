@@ -2,7 +2,14 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject var viewModel: HomeViewModel
+    @Binding var savedLocations: [SavedLocation]
+    @Binding var selectedLocationID: String
     @State private var selectedAttribution: WeatherAttributionInfo?
+    @State private var showLocationPicker = false
+    @State private var showPaywall = false
+    let isPremium: Bool
+    let store: StoreKitSubscriptionManager
+    let onRecommendationLoaded: (DailyRecommendation) -> Void
 
     var body: some View {
         NavigationStack {
@@ -10,6 +17,7 @@ struct HomeView: View {
                 AppBackground()
 
                 content
+                    .animation(.easeInOut(duration: 0.35), value: viewModel.state)
             }
             .navigationBarTitleDisplayMode(.inline)
             .task {
@@ -18,6 +26,25 @@ struct HomeView: View {
             .sheet(item: $selectedAttribution) { attribution in
                 WeatherAttributionDetailView(attribution: attribution)
             }
+            .sheet(isPresented: $showLocationPicker) {
+                LocationPickerView(
+                    savedLocations: $savedLocations,
+                    selectedLocationID: $selectedLocationID,
+                    onSelect: { location in
+                        Task {
+                            await viewModel.changeLocation(to: location)
+                        }
+                    }
+                )
+            }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView(store: store)
+            }
+            .onChange(of: viewModel.state) { _, newState in
+                if case .loaded(let state) = newState {
+                    onRecommendationLoaded(state.recommendation)
+                }
+            }
         }
     }
 
@@ -25,15 +52,26 @@ struct HomeView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView("Hava durumun yükleniyor…")
+            VStack(spacing: AppSpacing.medium) {
+                ProgressView()
+                    .controlSize(.large)
+                Text(String(localized: "home_loading"))
+                    .font(AppTypography.caption)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .transition(.opacity)
         case .failed(let message):
-            ScreenErrorView(message: message, retryTitle: "Yeniden dene", retry: viewModel.onAppear)
+            ScreenErrorView(message: message, retryTitle: String(localized: "home_error_retry"), retry: viewModel.onAppear)
+                .transition(.opacity)
         case .loaded(let state):
             ScrollView {
                 VStack(alignment: .leading, spacing: AppSpacing.medium) {
                     HomeHeaderView(
                         lastUpdatedText: state.lastUpdatedText,
-                        isUsingCachedWeather: state.isUsingCachedWeather
+                        isUsingCachedWeather: state.isUsingCachedWeather,
+                        locationName: viewModel.selectedLocationName,
+                        onLocationTap: { showLocationPicker = true }
                     )
                     CurrentWeatherHeroCard(
                         weather: state.currentWeather,
@@ -48,6 +86,11 @@ struct HomeView: View {
                     }
                     .buttonStyle(.plain)
                     QuickInsightGrid(recommendation: state.recommendation)
+                    WeeklyForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium)
+                    if !isPremium {
+                        AdBannerView(adUnitID: nil)
+                            .onTapGesture { showPaywall = true }
+                    }
                     ActivityWindowsSection(recommendations: state.recommendation.bestActivityWindows)
                     OutfitCard(outfit: state.recommendation.outfit)
                     AvoidHoursCard(avoidWindows: state.recommendation.avoidWindows)
@@ -67,6 +110,7 @@ struct HomeView: View {
             .refreshable {
                 await viewModel.refresh()
             }
+            .transition(.opacity)
         }
     }
 }
@@ -74,19 +118,21 @@ struct HomeView: View {
 private struct HomeHeaderView: View {
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
+    let locationName: String
+    let onLocationTap: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                Text("Bugün Dışarısı Nasıl?")
-                    .font(.system(.title2, design: .rounded, weight: .heavy))
+                    Text(String(localized: "home_title"))
+                        .font(.system(.title2, design: .rounded, weight: .heavy))
                     .foregroundStyle(AppTheme.ink)
                     .minimumScaleFactor(0.85)
                     .lineLimit(1)
 
                 HStack(spacing: AppSpacing.small) {
-                    Label("Sana özel günlük özet", systemImage: "sparkles")
-                    Text("Güncellendi \(lastUpdatedText)")
+                    Label(String(localized: "home_daily_summary"), systemImage: "sparkles")
+                        Text(String(localized: "home_updated") + " " + lastUpdatedText)
                 }
                 .font(AppTypography.caption)
                 .foregroundStyle(AppTheme.secondaryText)
@@ -95,15 +141,36 @@ private struct HomeHeaderView: View {
 
             Spacer(minLength: AppSpacing.small)
 
-            Label(isUsingCachedWeather ? "Son kayıt" : "Canlı", systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
-                .font(AppTypography.caption.weight(.semibold))
-                .padding(.horizontal, AppSpacing.small)
-                .padding(.vertical, AppSpacing.xSmall)
-                .background(
-                    isUsingCachedWeather ? AppTheme.warning.opacity(0.14) : AppTheme.success.opacity(0.14),
-                    in: Capsule()
-                )
-                .foregroundStyle(isUsingCachedWeather ? AppTheme.warning : AppTheme.success)
+            VStack(alignment: .trailing, spacing: AppSpacing.xSmall) {
+                Button(action: onLocationTap) {
+                    HStack(spacing: AppSpacing.xSmall) {
+                        Image(systemName: "location.fill")
+                            .font(.caption2.weight(.semibold))
+                        Text(locationName)
+                            .font(AppTypography.caption.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.82)
+                        Image(systemName: "chevron.down")
+                            .font(.caption2.weight(.semibold))
+                    }
+                    .padding(.horizontal, AppSpacing.small)
+                    .padding(.vertical, AppSpacing.xSmall)
+                    .background(AppTheme.elevatedSurface, in: Capsule())
+                    .foregroundStyle(AppTheme.accent)
+                }
+                .buttonStyle(.plain)
+
+                Label(isUsingCachedWeather ? String(localized: "home_last_saved") : String(localized: "home_live"), systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
+                    .symbolEffect(.pulse, isActive: !isUsingCachedWeather)
+                    .font(AppTypography.caption.weight(.semibold))
+                    .padding(.horizontal, AppSpacing.small)
+                    .padding(.vertical, AppSpacing.xSmall)
+                    .background(
+                        isUsingCachedWeather ? AppTheme.warning.opacity(0.14) : AppTheme.success.opacity(0.14),
+                        in: Capsule()
+                    )
+                    .foregroundStyle(isUsingCachedWeather ? AppTheme.warning : AppTheme.success)
+            }
         }
         .padding(.horizontal, AppSpacing.xSmall)
         .accessibilityElement(children: .combine)
@@ -121,7 +188,7 @@ private struct CurrentWeatherHeroCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
             HStack(alignment: .top, spacing: AppSpacing.medium) {
                 VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Label(isUsingCachedWeather ? "Son kaydedilen tahmin" : "Anlık tahmin", systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
+                    Label(isUsingCachedWeather ? String(localized: "weather_latest_forecast") : String(localized: "weather_live_forecast"), systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .padding(.horizontal, AppSpacing.small)
                         .padding(.vertical, AppSpacing.xSmall)
@@ -156,16 +223,16 @@ private struct CurrentWeatherHeroCard: View {
             }
 
             HStack(spacing: AppSpacing.small) {
-                WeatherHeroMetric(
-                    icon: "figure.walk",
-                    title: "Dışarı skoru",
-                    value: recommendation.outdoorScore.displayValue.formatted(.number.precision(.fractionLength(1))) + "/10"
-                )
-                WeatherHeroMetric(
-                    icon: "clock.fill",
-                    title: "En iyi saat",
-                    value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "Belirgin saat yok"
-                )
+                 WeatherHeroMetric(
+                     icon: "figure.walk",
+                     title: String(localized: "widget_outdoor_score"),
+                     value: recommendation.outdoorScore.displayValue.formatted(.number.precision(.fractionLength(1))) + "/10"
+                 )
+                 WeatherHeroMetric(
+                     icon: "clock.fill",
+                     title: String(localized: "widget_best_time"),
+                     value: recommendation.bestOutdoorWindow?.shortDisplayText ?? String(localized: "forecast_no_best_window")
+                 )
             }
         }
         .foregroundStyle(.white)
@@ -242,7 +309,7 @@ private struct WeatherAttributionFooter: View {
                 Image(systemName: "apple.logo")
                     .font(.caption2.weight(.semibold))
 
-                Text("Veriler \(serviceName) tarafından sağlanır")
+                Text(String(localized: "weather_data_provided_by") + " " + serviceName)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
 
@@ -255,7 +322,7 @@ private struct WeatherAttributionFooter: View {
             .padding(.horizontal, AppSpacing.xSmall)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Hava verisi \(serviceName) tarafından sağlanır. Yasal ayrıntıları aç.")
+        .accessibilityLabel(String(localized: "weather_data_provided_by") + " " + serviceName)
     }
 
     private var serviceName: String {
@@ -273,11 +340,11 @@ private struct WeatherAttributionDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: AppSpacing.medium) {
                     VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                        Text("Hava verisi")
+                        Text(String(localized: "about_legal"))
                             .font(AppTypography.title)
                             .foregroundStyle(AppTheme.ink)
 
-                        Text("Tahminler \(serviceName) tarafından sağlanır. Bu bölüm, hava verisi sağlayıcısının yasal atıf metnini ve ayrıntı bağlantısını içerir.")
+                        Text(String(localized: "about_legal_desc") + " " + serviceName)
                             .font(AppTypography.body)
                             .foregroundStyle(AppTheme.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
@@ -294,7 +361,7 @@ private struct WeatherAttributionDetailView: View {
 
                     if let legalPageURL {
                         Link(destination: legalPageURL) {
-                            Label("Apple Weather yasal sayfası", systemImage: "arrow.up.forward.square")
+                            Label(String(localized: "about_apple_weather_legal"), systemImage: "arrow.up.forward.square")
                                 .font(AppTypography.caption.weight(.semibold))
                                 .frame(maxWidth: .infinity)
                         }
@@ -305,11 +372,11 @@ private struct WeatherAttributionDetailView: View {
                 .padding(AppSpacing.large)
             }
             .background(AppBackground())
-            .navigationTitle("Yasal bilgi")
+            .navigationTitle(String(localized: "about_legal"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Bitti") {
+                    Button(String(localized: "about_done")) {
                         dismiss()
                     }
                 }

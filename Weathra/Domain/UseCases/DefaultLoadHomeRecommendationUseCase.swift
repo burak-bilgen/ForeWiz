@@ -27,7 +27,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         self.cachePolicy = cachePolicy
     }
 
-    func execute(forceRefresh: Bool) async throws -> HomeRecommendationResult {
+    func execute(forceRefresh: Bool, targetLocation: LocationCoordinate? = nil) async throws -> HomeRecommendationResult {
         let now = dateProvider.now
         let profile = try await preferencesRepository.loadProfile()
 
@@ -38,12 +38,17 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         }
 
         do {
-            let authorizationStatus = await locationRepository.requestAuthorization()
-            guard authorizationStatus == .authorized else {
-                throw AppError.locationPermissionDenied
+            let location: LocationCoordinate
+            if let targetLocation {
+                location = targetLocation
+            } else {
+                let authorizationStatus = await locationRepository.requestAuthorization()
+                guard authorizationStatus == .authorized else {
+                    throw AppError.locationPermissionDenied
+                }
+                location = try await locationRepository.getCurrentLocation()
             }
 
-            let location = try await locationRepository.getCurrentLocation()
             let snapshot = try await weatherRepository.fetchWeather(for: location)
             try await weatherCacheRepository.save(snapshot)
             return makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false)
@@ -92,6 +97,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         return HomeRecommendationResult(
             recommendation: recommendation,
             currentWeather: snapshot.current,
+            dailyPoints: snapshot.daily,
             isUsingCachedWeather: isCached,
             warningMessage: warningMessage,
             weatherFetchedAt: snapshot.fetchedAt,

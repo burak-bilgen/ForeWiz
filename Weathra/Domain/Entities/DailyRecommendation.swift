@@ -12,3 +12,30 @@ struct DailyRecommendation: Codable, Equatable, Sendable {
     let summaryText: String
     let explanation: String
 }
+
+extension DailyRecommendation {
+    static var placeholder: DailyRecommendation {
+        let calendar = Calendar.current
+        let now = Date()
+        let startTime = calendar.date(bySettingHour: 14, minute: 0, second: 0, of: now) ?? now
+        let endTime = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: now) ?? now
+
+        return DailyRecommendation(
+            generatedAt: now,
+            outdoorDecision: .good,
+            outdoorScore: WeatherScore(rawValue: 85),
+            bestOutdoorWindow: TimeWindow(start: startTime, end: endTime),
+            bestActivityWindows: [],
+            avoidWindows: [],
+            outfit: OutfitRecommendation(
+                title: String(localized: "outfit_light_and_comfortable"),
+                items: [String(localized: "activity_running")],
+                accessories: [],
+                warning: nil
+            ),
+            risks: [],
+            summaryText: String(localized: "decision_good"),
+            explanation: "85/100"
+        )
+    }
+}

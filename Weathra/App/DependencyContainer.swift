@@ -13,10 +13,12 @@ final class DependencyContainer {
     let weatherCacheRepository: WeatherCacheRepository
     let preferencesRepository: PreferencesRepository
     let notificationRepository: NotificationRepository
+    let widgetRepository: WidgetRepository
     let loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase
     let completeOnboardingUseCase: CompleteOnboardingUseCase
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
+    let subscriptionManager: StoreKitSubscriptionManager
 
     init(
         environment: AppEnvironment,
@@ -30,10 +32,12 @@ final class DependencyContainer {
         weatherCacheRepository: WeatherCacheRepository,
         preferencesRepository: PreferencesRepository,
         notificationRepository: NotificationRepository,
+        widgetRepository: WidgetRepository,
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
         completeOnboardingUseCase: CompleteOnboardingUseCase,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
-        scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
+        scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
+        subscriptionManager: StoreKitSubscriptionManager
     ) {
         self.environment = environment
         self.dateProvider = dateProvider
@@ -46,10 +50,12 @@ final class DependencyContainer {
         self.weatherCacheRepository = weatherCacheRepository
         self.preferencesRepository = preferencesRepository
         self.notificationRepository = notificationRepository
+        self.widgetRepository = widgetRepository
         self.loadHomeRecommendationUseCase = loadHomeRecommendationUseCase
         self.completeOnboardingUseCase = completeOnboardingUseCase
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
+        self.subscriptionManager = subscriptionManager
     }
 
     static func live() -> DependencyContainer {
@@ -62,7 +68,7 @@ final class DependencyContainer {
         )
         let notificationEngine = DefaultNotificationPlanningEngine()
         let preferencesRepository = SwiftDataPreferencesRepository()
-        let weatherCacheRepository = SwiftDataWeatherCacheRepository()
+        let weatherCacheRepository = FileWeatherCacheRepository()
         let locationRepository = CoreLocationRepository()
         let weatherRepository = WeatherKitWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()
@@ -85,6 +91,7 @@ final class DependencyContainer {
             notificationPlanningEngine: notificationEngine,
             dateProvider: dateProvider
         )
+        let subscriptionManager = StoreKitSubscriptionManager()
 
         return DependencyContainer(
             environment: .production,
@@ -98,10 +105,12 @@ final class DependencyContainer {
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             notificationRepository: notificationRepository,
+            widgetRepository: SharedWidgetRepository(),
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
-            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase
+            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
+            subscriptionManager: subscriptionManager
         )
     }
 }

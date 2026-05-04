@@ -170,18 +170,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2640;
-				LastUpgradeCheck = 2640;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					67305E742F9E05210034CAA8 = {
-						CreatedOnToolsVersion = 26.4.1;
+						CreatedOnToolsVersion = 16.0;
 					};
 					67305E862F9E05220034CAA8 = {
-						CreatedOnToolsVersion = 26.4.1;
+						CreatedOnToolsVersion = 16.0;
 						TestTargetID = 67305E742F9E05210034CAA8;
 					};
 					67305E902F9E05220034CAA8 = {
-						CreatedOnToolsVersion = 26.4.1;
+						CreatedOnToolsVersion = 16.0;
 						TestTargetID = 67305E742F9E05210034CAA8;
 					};
 				};
@@ -191,6 +191,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				tr,
 				Base,
 			);
 			mainGroup = 67305E6C2F9E05210034CAA8;
@@ -322,7 +323,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -380,7 +381,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -402,6 +403,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Weathra;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Konumunu sadece bulunduğun yere uygun hava önerileri üretmek için kullanıyoruz.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -414,6 +416,19 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					StoreKit,
+					"-framework",
+					WeatherKit,
+					"-framework",
+					CoreLocation,
+					"-framework",
+					UserNotifications,
+					"-framework",
+					WidgetKit,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.weatherassistant;
 				PRODUCT_NAME = Weathra;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -437,6 +452,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Weathra;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Konumunu sadece bulunduğun yere uygun hava önerileri üretmek için kullanıyoruz.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -449,6 +465,19 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					StoreKit,
+					"-framework",
+					WeatherKit,
+					"-framework",
+					CoreLocation,
+					"-framework",
+					UserNotifications,
+					"-framework",
+					WidgetKit,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.weatherassistant;
 				PRODUCT_NAME = Weathra;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -468,7 +497,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = burakbilgen.WeathraTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -490,7 +519,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = burakbilgen.WeathraTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

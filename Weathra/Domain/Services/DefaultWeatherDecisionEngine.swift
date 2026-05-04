@@ -141,20 +141,20 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         risks: [WeatherRisk]
     ) -> String {
         if let risk = risks.first(where: { $0.severity >= .high }) {
-            return "\(risk.title). Dış planı kısa tut ve saatini değiştirebileceğin bir alternatif bırak."
+            return "\(risk.title). Dışarıda geçireceğin vakti kısa tut, saatini değiştirebileceğin bir alternatifin olsun."
         }
 
         if let bestWindow {
-            return "Dışarı için en rahat zaman \(bestWindow.shortDisplayText). Uzun planı bu aralığa almak daha konforlu olur."
+            return "Dışarı çıkmak için en rahat zaman \(bestWindow.shortDisplayText). Uzun planı bu aralığa almak daha konforlu olur."
         }
 
         switch decision {
         case .good:
-            return "Bugün dış plan için koşullar dengeli. Uzun süre dışarıda kalacaksan hava değişimini yine de kontrol et."
+            return "Bugün dışarıda vakit geçirmek için koşullar dengeli. Uzun süre dışarıda kalacaksan hava değişimini yine de kontrol et."
         case .moderate:
             return "Dışarı çıkmak için uygun, ancak bazı saatlerde konfor düşebilir. Planı en rahat aralığa denk getirmek daha iyi olur."
         case .risky:
-            return "Bugün hava bazı saatlerde yorucu veya riskli olabilir. Uzun dış planı kısalt, mola ve alternatif saat bırak."
+            return "Bugün hava bazı saatlerde yorucu veya riskli olabilir. Dışarıda uzun vakit geçirme, mola verip alternatif bir saate kaydır."
         case .avoid:
             return "Bugün dışarıda uzun kalmak iyi bir fikir değil. Zorunlu planları kısa tut, mümkünse daha güvenli bir saate taşı."
         }
@@ -166,13 +166,13 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         avoidWindows: [AvoidWindowRecommendation]
     ) -> String {
         let riskText = risks.isEmpty
-            ? "belirgin risk yok"
+            ? "belirgin bir risk yok"
             : risks.map { $0.title.lowercased() }.joined(separator: ", ")
         let avoidText = avoidWindows.isEmpty
-            ? "kaçınılacak belirgin saat yok"
+            ? "kaçınman gereken belirgin bir saat yok"
             : avoidWindows.map(\.window.shortDisplayText).joined(separator: ", ")
 
-        return "Skor \(score.displayValue)/10. Bu karar; hissedilen sıcaklık, yağış olasılığı, rüzgar, UV, nem ve saatlik değişim birlikte okunarak verildi. " +
-            "Öne çıkan risk: \(riskText). Dikkat edilmesi gereken zaman: \(avoidText)."
+        return "Skor \(score.displayValue)/10. Bu karar; hissedilen sıcaklık, yağış olasılığı, rüzgar, UV, nem ve saatlik değişimler birlikte değerlendirilerek verildi. " +
+            "Öne çıkan risk: \(riskText). Dikkat etmen gereken zaman: \(avoidText)."
     }
 }

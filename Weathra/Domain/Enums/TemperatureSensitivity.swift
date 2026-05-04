@@ -7,12 +7,9 @@ enum TemperatureSensitivity: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .getsColdEasily:
-            "Çabuk üşürüm"
-        case .normal:
-            "Normal"
-        case .getsHotEasily:
-            "Çabuk bunalırım"
+        case .getsColdEasily: String(localized: "sensitivity_cold")
+        case .normal: String(localized: "sensitivity_normal")
+        case .getsHotEasily: String(localized: "sensitivity_hot")
         }
     }
 }

@@ -3,6 +3,7 @@ import Foundation
 struct HomeViewState: Equatable {
     let recommendation: DailyRecommendation
     let currentWeather: HomeCurrentWeatherViewState
+    let dailyForecasts: [DailyForecastItem]
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
     let warningMessage: String?

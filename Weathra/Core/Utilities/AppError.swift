@@ -14,23 +14,23 @@ enum AppError: Error, Equatable {
     var userMessage: String {
         switch self {
         case .locationPermissionDenied:
-            "Konum izni verilmedi. Ayarlar'dan Weathra'ya konum erişimi açarsan bulunduğun yere özel öneriler sunabiliriz."
+            String(localized: "error_location_denied")
         case .locationUnavailable:
-            "Konumun şu an alınamıyor. İnternet bağlantını kontrol edip tekrar dene."
+            String(localized: "error_location_unavailable")
         case .weatherUnavailable:
-            "Hava durumu verisi şu an alınamıyor. En son kaydedilen öneriyi gösteriyoruz."
+            String(localized: "error_weather_unavailable")
         case .weatherKitPermissionMissing:
-            "WeatherKit kimlik doğrulaması reddedildi. Apple Developer'da bu Bundle ID için WeatherKit'i hem App Services hem App Capabilities altında açıp provisioning profilini yenile."
+            String(localized: "error_weatherkit_auth")
         case .weatherKitFailed(let reason):
-            "WeatherKit yanıt vermedi: \(reason)"
+            String(localized: "error_weatherkit_failed") + " " + reason
         case .cacheUnavailable:
-            "Henüz kayıtlı bir hava önerisi yok. İlk veriyi almak için internet bağlantısı gerekiyor."
+            String(localized: "error_cache_unavailable")
         case .notificationPermissionDenied:
-            "Bildirim izni kapalı. Ayarlar'dan açarsan hava değişimlerinde seni uyarabiliriz."
+            String(localized: "error_notification_denied")
         case .persistenceFailed:
-            "Bir sorun oluştu ve ayarların kaydedilemedi. Lütfen tekrar dene."
+            String(localized: "error_persistence")
         case .unknown:
-            "Beklenmeyen bir hata oluştu. Uygulamayı kapatıp yeniden açmayı dene."
+            String(localized: "error_unknown")
         }
     }
 }

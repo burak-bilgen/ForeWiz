@@ -12,14 +12,10 @@ enum RiskLevel: Int, CaseIterable, Codable, Comparable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .low:
-            "Düşük"
-        case .medium:
-            "Orta"
-        case .high:
-            "Yüksek"
-        case .extreme:
-            "Çok yüksek"
+        case .low: String(localized: "risk_low")
+        case .medium: String(localized: "risk_medium")
+        case .high: String(localized: "risk_high")
+        case .extreme: String(localized: "risk_extreme")
         }
     }
 }

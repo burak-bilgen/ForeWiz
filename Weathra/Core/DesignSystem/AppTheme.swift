@@ -152,13 +152,19 @@ private struct WeatherBackgroundSymbol: View {
     let xOffset: CGFloat
     let yOffset: CGFloat
 
+    @State private var isAnimating = false
+
     var body: some View {
         GeometryReader { proxy in
             Image(systemName: name)
                 .font(.system(size: size, weight: .bold))
                 .foregroundStyle(.white.opacity(opacity))
                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: alignment)
-                .offset(x: xOffset, y: yOffset)
+                .offset(x: xOffset, y: isAnimating ? yOffset - 12 : yOffset + 12)
+                .animation(.easeInOut(duration: Double.random(in: 4...6)).repeatForever(autoreverses: true), value: isAnimating)
+                .onAppear {
+                    isAnimating = true
+                }
                 .accessibilityHidden(true)
         }
     }

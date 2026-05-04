@@ -38,7 +38,7 @@ final class WeatherKitWeatherRepository: WeatherRepository {
             throw AppError.weatherKitPermissionMissing
         } catch WeatherError.unknown {
             AppLogger.weather.error("WeatherKit failed with WeatherError.unknown")
-            throw AppError.weatherKitFailed("Bilinmeyen WeatherKit hatası")
+            throw AppError.weatherKitFailed(String(localized: "error_weatherkit_unknown"))
         } catch {
             let diagnostic = Self.diagnosticDescription(for: error)
             AppLogger.weather.error("WeatherKit request failed: \(diagnostic, privacy: .public)")
