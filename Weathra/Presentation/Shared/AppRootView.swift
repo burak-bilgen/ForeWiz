@@ -41,7 +41,7 @@ private struct LaunchingView: View {
     var body: some View {
         ZStack {
             AppBackground()
-            ProgressView("Hazırlanıyor")
+            ProgressView("Weathra hazırlanıyor…")
                 .font(AppTypography.body)
         }
     }
@@ -69,7 +69,8 @@ private struct MainTabView: View {
                     viewModel: SettingsViewModel(
                         profile: coordinator.profile,
                         updateUserPreferencesUseCase: coordinator.container.updateUserPreferencesUseCase,
-                        onProfileSaved: coordinator.applyProfile
+                        onProfileSaved: coordinator.applyProfile,
+                        onResetOnboarding: coordinator.resetToOnboarding
                     )
                 )
             }

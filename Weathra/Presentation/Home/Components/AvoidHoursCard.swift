@@ -6,12 +6,12 @@ struct AvoidHoursCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Planı zorlayan saatler", systemImage: "exclamationmark.octagon.fill")
+                Label("Bu Saatlerden Kaçın", systemImage: "exclamationmark.octagon.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
                 if avoidWindows.isEmpty {
-                    Text("Bugün özellikle ertelemen gereken net bir saat yok. Yine de uzun planları en rahat zamana denk getirmek daha iyi.")
+                    Text("Bugün özellikle kaçınman gereken bir saat yok — gün boyunca rahatça dışarı çıkabilirsin.")
                         .font(AppTypography.body)
                         .foregroundStyle(AppTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)

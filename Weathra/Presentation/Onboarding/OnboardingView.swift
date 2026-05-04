@@ -24,7 +24,7 @@ struct OnboardingView: View {
                     .frame(maxWidth: .infinity)
                 }
             }
-            .navigationTitle("Weathra kurulumu")
+            .navigationTitle("Weathra'ya Hoş Geldin")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -79,12 +79,12 @@ private struct HeroSection: View {
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                Text("Planını havaya göre netleştir.")
+                Text("Bugün dışarı çıkmalı mıyım?")
                     .font(.system(size: 30, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Konumunu, sıcaklık algını ve dışarı çıkma alışkanlıklarını kullanarak bugün için anlaşılır bir karar üretiriz.")
+                Text("Weathra her sabah havayı analiz eder, sana ne giyeceğini, hangi saatte çıkacağını ve nelerden kaçınacağını söyler.")
                     .font(AppTypography.caption)
                     .foregroundStyle(.white.opacity(0.86))
                     .fixedSize(horizontal: false, vertical: true)
@@ -115,13 +115,13 @@ private struct PermissionSetupSection: View {
                 SectionHeader(
                     icon: "location.circle.fill",
                     title: "İzinler",
-                    subtitle: "Konum tahmin için gerekli. Bildirimler isteğe bağlıdır; açarsan yalnızca önemli hava değişimleri için kullanılır."
+                    subtitle: "Weathra'nın sana doğru öneriler verebilmesi için bulunduğun yeri bilmesi gerekiyor. Bildirimler isteğe bağlı — yalnızca yağmur, rüzgar veya UV gibi önemli değişimlerde uyarır."
                 )
 
                 CompactPermissionRow(
                     icon: "location.fill",
                     title: "Konum",
-                    message: "Yakındaki tahmini hesaplamak için sadece kullanım sırasında istenir. Sürekli konum takibi yapılmaz.",
+                    message: "Sadece uygulamayı açtığında konumunu alır, arka planda takip etmez.",
                     statusText: statusText(for: viewModel.locationStatus),
                     isRequired: true,
                     actionTitle: locationActionTitle,
@@ -131,7 +131,7 @@ private struct PermissionSetupSection: View {
                 CompactPermissionRow(
                     icon: "bell.badge.fill",
                     title: "Bildirim",
-                    message: "Yağmur, sert rüzgar, yüksek UV veya iyi aktivite aralığı varsa günlük sınır içinde uyarır.",
+                    message: "Yağmur başlamadan, UV yükselmeden veya koşu için mükemmel saat gelmeden önce seni uyarır. Günde en fazla 2 bildirim.",
                     statusText: notificationText(for: viewModel.notificationStatus),
                     isRequired: false,
                     actionTitle: notificationActionTitle,
@@ -228,7 +228,7 @@ private struct PersonalizationSection: View {
                 SectionHeader(
                     icon: "slider.horizontal.3",
                     title: "Konfor profili",
-                    subtitle: "Skorlar sadece sıcaklığa bakmaz; senin soğuğa/sıcağa tepkini ve hangi aktiviteleri planladığını da hesaba katar."
+                    subtitle: "Bu bilgiyi kullanarak önerilerini kişiselleştiriyoruz. Soğuktan mı, sıcaktan mı çabuk etkilenirsin? Hangi aktiviteleri planlıyorsun?"
                 )
 
                 Picker("Sıcaklık hissi", selection: Binding(
@@ -393,7 +393,7 @@ private struct ContinueButton: View {
                     ProgressView()
                         .tint(.white)
                 }
-                Label(isEnabled ? "Weathra'yı başlat" : "Konum izni gerekli", systemImage: "arrow.right.circle.fill")
+                Label(isEnabled ? "Hazırım, başlayalım" : "Devam etmek için konum izni gerekli", systemImage: "arrow.right.circle.fill")
                     .font(AppTypography.headline)
             }
             .frame(maxWidth: .infinity)

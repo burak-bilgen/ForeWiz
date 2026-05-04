@@ -22,13 +22,13 @@ enum OutdoorDecision: String, Codable, Hashable, Sendable {
     var localizedTitle: String {
         switch self {
         case .good:
-            "Rahat görünüyor"
+            "Güzel bir gün, dışarı çık!"
         case .moderate:
-            "Uygun, takip et"
+            "İdare eder, dikkatli ol"
         case .risky:
-            "Riskli saatler var"
+            "Dikkat — riskli saatler var"
         case .avoid:
-            "Dışarısı zorlayıcı"
+            "Bugün dışarı çıkma"
         }
     }
 }

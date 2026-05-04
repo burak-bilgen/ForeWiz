@@ -8,15 +8,18 @@ final class SettingsViewModel: ObservableObject {
 
     private let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     private let onProfileSaved: (UserComfortProfile) -> Void
+    private let onResetOnboarding: (() -> Void)?
 
     init(
         profile: UserComfortProfile,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
-        onProfileSaved: @escaping (UserComfortProfile) -> Void
+        onProfileSaved: @escaping (UserComfortProfile) -> Void,
+        onResetOnboarding: (() -> Void)? = nil
     ) {
         self.profile = profile
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.onProfileSaved = onProfileSaved
+        self.onResetOnboarding = onResetOnboarding
     }
 
     func save() {
@@ -25,10 +28,15 @@ final class SettingsViewModel: ObservableObject {
             do {
                 try await updateUserPreferencesUseCase.execute(profile: profile)
                 onProfileSaved(profile)
-                saveMessage = "Kaydedildi"
+                saveMessage = "✓ Tercihler kaydedildi"
             } catch {
                 saveMessage = AppError.persistenceFailed.userMessage
             }
         }
     }
+
+    func resetOnboarding() {
+        onResetOnboarding?()
+    }
 }
+

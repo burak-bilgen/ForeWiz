@@ -78,7 +78,7 @@ final class HomeViewModel: ObservableObject {
     ) -> HomeCurrentWeatherViewState {
         HomeCurrentWeatherViewState(
             temperatureText: temperatureText(current.temperatureCelsius, unitSystem: unitSystem),
-            feelsLikeText: "Hissedilen " + temperatureText(
+            feelsLikeText: "Hissedilen: " + temperatureText(
                 current.apparentTemperatureCelsius,
                 unitSystem: unitSystem
             ),

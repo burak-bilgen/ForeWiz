@@ -25,9 +25,9 @@ struct HomeView: View {
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            ProgressView("Öneri hazırlanıyor")
+            ProgressView("Hava durumun yükleniyor…")
         case .failed(let message):
-            ScreenErrorView(message: message, retryTitle: "Tekrar dene", retry: viewModel.onAppear)
+            ScreenErrorView(message: message, retryTitle: "Yeniden dene", retry: viewModel.onAppear)
         case .loaded(let state):
             ScrollView {
                 VStack(alignment: .leading, spacing: AppSpacing.medium) {
@@ -43,7 +43,10 @@ struct HomeView: View {
                     if let warningMessage = state.warningMessage {
                         StatusBanner(message: warningMessage, systemImage: "wifi.exclamationmark")
                     }
-                    DailyDecisionCard(recommendation: state.recommendation)
+                    NavigationLink(destination: RecommendationDetailView(recommendation: state.recommendation)) {
+                        DailyDecisionCard(recommendation: state.recommendation)
+                    }
+                    .buttonStyle(.plain)
                     QuickInsightGrid(recommendation: state.recommendation)
                     ActivityWindowsSection(recommendations: state.recommendation.bestActivityWindows)
                     OutfitCard(outfit: state.recommendation.outfit)
@@ -75,14 +78,14 @@ private struct HomeHeaderView: View {
     var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                Text("Bugünün hava kararı")
+                Text("Bugün Dışarısı Nasıl?")
                     .font(.system(.title2, design: .rounded, weight: .heavy))
                     .foregroundStyle(AppTheme.ink)
                     .minimumScaleFactor(0.85)
                     .lineLimit(1)
 
                 HStack(spacing: AppSpacing.small) {
-                    Label("Planlanabilir özet", systemImage: "sparkles")
+                    Label("Sana özel günlük özet", systemImage: "sparkles")
                     Text("Güncellendi \(lastUpdatedText)")
                 }
                 .font(AppTypography.caption)
@@ -92,7 +95,7 @@ private struct HomeHeaderView: View {
 
             Spacer(minLength: AppSpacing.small)
 
-            Label(isUsingCachedWeather ? "Kayıtlı" : "Canlı", systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
+            Label(isUsingCachedWeather ? "Son kayıt" : "Canlı", systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
                 .font(AppTypography.caption.weight(.semibold))
                 .padding(.horizontal, AppSpacing.small)
                 .padding(.vertical, AppSpacing.xSmall)
@@ -118,7 +121,7 @@ private struct CurrentWeatherHeroCard: View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
             HStack(alignment: .top, spacing: AppSpacing.medium) {
                 VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Label(isUsingCachedWeather ? "Kayıtlı tahmin" : "Canlı tahmin", systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
+                    Label(isUsingCachedWeather ? "Son kaydedilen tahmin" : "Anlık tahmin", systemImage: isUsingCachedWeather ? "clock.fill" : "location.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .padding(.horizontal, AppSpacing.small)
                         .padding(.vertical, AppSpacing.xSmall)
@@ -155,13 +158,13 @@ private struct CurrentWeatherHeroCard: View {
             HStack(spacing: AppSpacing.small) {
                 WeatherHeroMetric(
                     icon: "figure.walk",
-                    title: "Karar skoru",
+                    title: "Dışarı skoru",
                     value: recommendation.outdoorScore.displayValue.formatted(.number.precision(.fractionLength(1))) + "/10"
                 )
                 WeatherHeroMetric(
                     icon: "clock.fill",
-                    title: "Planı buraya al",
-                    value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "Net aralık yok"
+                    title: "En iyi saat",
+                    value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "Belirgin saat yok"
                 )
             }
         }

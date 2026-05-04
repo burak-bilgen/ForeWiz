@@ -6,12 +6,12 @@ struct WeatherRiskSection: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("Bugünkü uyarılar", systemImage: "exclamationmark.triangle.fill")
+                Label("Bugünkü Riskler", systemImage: "exclamationmark.triangle.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
                 if risks.isEmpty {
-                    Text("Yağış, rüzgar, UV veya sıcaklık dış planı bozacak seviyede görünmüyor.")
+                    Text("Bugün yağış, rüzgar, UV veya aşırı sıcaklık riski görünmüyor. Rahat bir gün seni bekliyor!")
                         .font(AppTypography.body)
                         .foregroundStyle(AppTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)

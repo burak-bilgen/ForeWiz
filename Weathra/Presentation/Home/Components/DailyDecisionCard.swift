@@ -31,10 +31,18 @@ struct DailyDecisionCard: View {
                     Divider().opacity(0.4)
                     InsightRow(
                         icon: "clock.fill",
-                        title: "Planı bu saate denk getir",
+                        title: "Dışarı çıkmak için en iyi saat",
                         value: bestWindow.shortDisplayText,
                         tint: AppTheme.accent
                     )
+                }
+
+                Divider().opacity(0.4)
+                HStack {
+                    Label("Detayları gör", systemImage: "chevron.right.circle.fill")
+                        .font(AppTypography.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.accent)
+                    Spacer()
                 }
             }
         }
@@ -42,7 +50,7 @@ struct DailyDecisionCard: View {
 
     private var decisionText: some View {
         VStack(alignment: .leading, spacing: AppSpacing.small) {
-            Text("Bugünün dış plan kararı")
+            Text("Bugünün kararı")
                 .font(AppTypography.caption)
                 .foregroundStyle(AppTheme.secondaryText)
             Text(recommendation.outdoorDecision.localizedTitle)
@@ -74,13 +82,13 @@ private struct DecisionPill: View {
     private var labelText: String {
         switch decision {
         case .good:
-            "Rahat çıkılır"
+            "Harika bir gün ☀️"
         case .moderate:
-            "Saat seç"
+            "İdare eder, saatine dikkat et"
         case .risky:
-            "Planı kısalt"
+            "Riskli, kısa tut"
         case .avoid:
-            "Ertele"
+            "Bugün evde kal"
         }
     }
 

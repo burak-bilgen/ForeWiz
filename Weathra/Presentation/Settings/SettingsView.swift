@@ -3,6 +3,7 @@ import UIKit
 
 struct SettingsView: View {
     @StateObject var viewModel: SettingsViewModel
+    @State private var showResetConfirmation = false
 
     var body: some View {
         ZStack {
@@ -16,6 +17,8 @@ struct SettingsView: View {
                     PermissionManagementSection()
                     PersonalPreferencesSection(profile: $viewModel.profile)
                     NotificationSettingsSection(profile: $viewModel.profile)
+                    AboutSection()
+                    ResetSection(showConfirmation: $showResetConfirmation)
                 }
                 .padding(AppSpacing.medium)
                 .frame(maxWidth: 720)
@@ -27,6 +30,18 @@ struct SettingsView: View {
         .onChange(of: viewModel.profile) {
             viewModel.save()
         }
+        .confirmationDialog(
+            "Kurulumu sıfırla",
+            isPresented: $showResetConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Sıfırla", role: .destructive) {
+                viewModel.resetOnboarding()
+            }
+            Button("İptal", role: .cancel) {}
+        } message: {
+            Text("Bu işlem onboarding ekranına dönmenizi sağlar. Mevcut tercihleriniz korunur.")
+        }
     }
 }
 
@@ -35,12 +50,12 @@ private struct HeaderSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-            Text("Tercihler")
+            Text("Tercihlerini Düzenle")
                 .font(AppTypography.largeTitle)
                 .foregroundStyle(AppTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text(saveMessage ?? "Weathra kararlarını burada kişiselleştirirsin. Değişiklikler bu cihazda saklanır ve ana ekrandaki skorları etkiler.")
+            Text(saveMessage ?? "Buradaki seçimler Weathra'nın sana verdiği tüm önerileri, skorları ve bildirimleri etkiler. Değişiklikler anında uygulanır.")
                 .font(AppTypography.body)
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -56,7 +71,7 @@ private struct AppearanceSection: View {
         SettingsCard(
             icon: "circle.lefthalf.filled",
             title: "Görünüm",
-            subtitle: "Sistem görünümünü takip edebilir ya da Weathra'yı sabit açık/koyu modda kullanabilirsin."
+            subtitle: "Weathra'nın açık mı, koyu mu görüneceğini seç. 'Sistem' seçeneği telefonunun ayarını takip eder."
         ) {
             Picker("Tema", selection: $profile.appearance) {
                 ForEach(AppAppearance.allCases, id: \.self) { appearance in
@@ -75,7 +90,7 @@ private struct LanguageSection: View {
         SettingsCard(
             icon: "globe",
             title: "Dil",
-            subtitle: "Sistem diliyle devam edebilir ya da uygulama içi formatları seçtiğin dile göre kullanabilirsin."
+            subtitle: "Uygulama dilini değiştir. 'Sistem' seçeneği telefonunun dilini kullanır."
         ) {
             Picker("Dil", selection: $profile.language) {
                 ForEach(AppLanguage.allCases, id: \.self) { language in
@@ -94,19 +109,19 @@ private struct PermissionManagementSection: View {
         SettingsCard(
             icon: "hand.raised.fill",
             title: "İzinler",
-            subtitle: "Onboarding'de verdiğin konum ve bildirim izinleri iOS tarafından yönetilir. Buradan sistem ayarlarına hızlıca geçebilirsin."
+            subtitle: "Konum ve bildirim izinleri iOS tarafından yönetilir. Değiştirmek istersen aşağıdaki butona dokun."
         ) {
             VStack(spacing: AppSpacing.small) {
                 SettingsInfoRow(
                     icon: "location.fill",
                     title: "Konum",
-                    value: "Yakındaki tahmin ve saatlik kararlar için kullanılır; arka planda takip edilmez."
+                    value: "Sadece uygulamayı açtığında konumunu alır, arka planda takip etmez."
                 )
 
                 SettingsInfoRow(
                     icon: "bell.badge.fill",
                     title: "Bildirimler",
-                    value: "Yağmur, UV, rüzgar ve uygun aktivite aralıkları için günlük sınır içinde uyarı üretir."
+                    value: "Hava değişikliklerinde seni uyarır. Günlük bildirim sayısını aşağıdan sınırlayabilirsin."
                 )
 
                 Button(action: openSystemSettings) {
@@ -136,7 +151,7 @@ private struct PersonalPreferencesSection: View {
         SettingsCard(
             icon: "person.crop.circle.badge.checkmark",
             title: "Konfor profili",
-            subtitle: "Onboarding'deki kişisel seçimler burada kalır. Skorlar sıcaklık hissine ve seçili aktivitelere göre yeniden yorumlanır."
+            subtitle: "Sıcağa/soğuğa ne kadar hassas olduğunu ve hangi aktiviteleri yaptığını seç. Skorlar buna göre kişiselleşir."
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Picker("Birimler", selection: $profile.unitSystem) {
@@ -228,7 +243,7 @@ private struct NotificationSettingsSection: View {
         SettingsCard(
             icon: "bell.badge.fill",
             title: "Akıllı bildirimler",
-            subtitle: "Bildirimler açık olsa bile Weathra her değişimde konuşmaz. Günlük üst sınır ve sessiz saatler bu gürültüyü kontrol eder."
+            subtitle: "Günde kaç bildirim almak istediğini ve hangi kategorileri istediğini seç. Sessiz saatlerde bildirim gönderilmez."
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Stepper(
@@ -322,3 +337,67 @@ private struct SettingsInfoRow: View {
         .background(AppTheme.elevatedSurface.opacity(0.86), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
     }
 }
+
+private struct AboutSection: View {
+    var body: some View {
+        SettingsCard(
+            icon: "info.circle.fill",
+            title: "Weathra Hakkında",
+            subtitle: "Kişisel hava karar asistanın. Sıcaklık, rüzgar, yağış ve UV verilerini analiz ederek sana bugün ne yapman gerektiğini söyler."
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                HStack {
+                    Text("Sürüm")
+                        .font(AppTypography.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.ink)
+                    Spacer()
+                    Text(appVersion)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+
+                HStack {
+                    Text("Veri kaynağı")
+                        .font(AppTypography.caption.weight(.semibold))
+                        .foregroundStyle(AppTheme.ink)
+                    Spacer()
+                    Text("Apple Weather")
+                        .font(AppTypography.caption)
+                        .foregroundStyle(AppTheme.secondaryText)
+                }
+
+                Text("Tüm veriler cihazında saklanır. Üçüncü taraf analitik veya uzak sunucu kullanılmaz.")
+                    .font(.system(.caption2, design: .rounded))
+                    .foregroundStyle(AppTheme.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
+        return "\(version) (\(build))"
+    }
+}
+
+private struct ResetSection: View {
+    @Binding var showConfirmation: Bool
+
+    var body: some View {
+        SettingsCard(
+            icon: "arrow.counterclockwise.circle.fill",
+            title: "Kurulumu sıfırla",
+            subtitle: "Onboarding ekranına dönerek konum, bildirim ve konfor tercihlerini yeniden ayarlayabilirsin."
+        ) {
+            Button(action: { showConfirmation = true }) {
+                Label("Kurulumu sıfırla", systemImage: "arrow.counterclockwise")
+                    .font(AppTypography.caption.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(AppTheme.danger)
+        }
+    }
+}
+

@@ -6,12 +6,12 @@ struct ActivityWindowsSection: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label("En iyi aktivite saatleri", systemImage: "figure.run")
+                Label("Aktivite İçin En İyi Saatler", systemImage: "figure.run")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
                 if recommendations.isEmpty {
-                    Text("Bugün koşu, yürüyüş veya bisiklet için belirgin biçimde rahat bir aralık görünmüyor.")
+                    Text("Bugün aktivite için belirgin bir iyi zaman dilimi yok. Yine de en düşük riskli saatleri tercih edebilirsin.")
                         .font(AppTypography.body)
                         .foregroundStyle(AppTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -37,7 +37,7 @@ private struct ActivityWindowRow: View {
                 .foregroundStyle(tint)
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                Text(recommendation.activityType.localizedTitle + " için önerilen aralık")
+                Text(recommendation.activityType.localizedTitle + " için en uygun saat")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
 

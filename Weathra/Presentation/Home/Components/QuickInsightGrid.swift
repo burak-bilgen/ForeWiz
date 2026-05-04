@@ -11,7 +11,7 @@ struct QuickInsightGrid: View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: AppSpacing.small) {
             MetricTile(
                 icon: "figure.walk",
-                title: "Dış plan kararı",
+                title: "Dışarı skoru",
                 value: scoreText,
                 note: outdoorDecisionNote,
                 tint: AppTheme.color(for: recommendation.outdoorDecision)
@@ -19,15 +19,15 @@ struct QuickInsightGrid: View {
 
             MetricTile(
                 icon: "clock.badge.checkmark",
-                title: "En rahat zaman",
-                value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "Net aralık yok",
-                note: recommendation.bestOutdoorWindow == nil ? "Saatler birbirine yakın" : "Planı bu aralığa al",
+                title: "En uygun saatler",
+                value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "Belirgin saat yok",
+                note: recommendation.bestOutdoorWindow == nil ? "Bugün saatler arası fark az" : "Bu saatlerde dışarı çık",
                 tint: AppTheme.accent
             )
 
             MetricTile(
                 icon: "exclamationmark.triangle.fill",
-                title: "Planı zorlayan saat",
+                title: "Kaçınılacak saatler",
                 value: avoidWindowText,
                 note: avoidWindowNote,
                 tint: recommendation.avoidWindows.isEmpty ? AppTheme.success : AppTheme.warning
@@ -35,7 +35,7 @@ struct QuickInsightGrid: View {
 
             MetricTile(
                 icon: "bell.badge.fill",
-                title: "Bildirim nedeni",
+                title: "Dikkat edilecek risk",
                 value: notificationReasonText,
                 note: notificationReasonNote,
                 tint: recommendation.risks.isEmpty ? AppTheme.success : AppTheme.danger
@@ -50,19 +50,19 @@ struct QuickInsightGrid: View {
     private var outdoorDecisionNote: String {
         switch recommendation.outdoorDecision {
         case .good:
-            "Rahat çıkılır"
+            "Dışarısı bugün senin için rahat"
         case .moderate:
-            "Saat seçmek önemli"
+            "Çıkabilirsin ama saatine dikkat et"
         case .risky:
-            "Planı kısa tut"
+            "Uzun süre dışarıda kalma"
         case .avoid:
-            "Mümkünse ertele"
+            "Bugün dışarıyı ertele"
         }
     }
 
     private var avoidWindowText: String {
         guard let avoidWindow = recommendation.avoidWindows.first else {
-            return "Özel kaçınma yok"
+            return "Sorun görünmüyor"
         }
 
         return avoidWindow.window.shortDisplayText
@@ -70,7 +70,7 @@ struct QuickInsightGrid: View {
 
     private var avoidWindowNote: String {
         guard let avoidWindow = recommendation.avoidWindows.first else {
-            return "Gün geneli yönetilebilir"
+            return "Günün tamamında rahatça çıkabilirsin"
         }
 
         return avoidWindow.risk.title
@@ -78,7 +78,7 @@ struct QuickInsightGrid: View {
 
     private var notificationReasonText: String {
         guard let risk = recommendation.risks.first(where: { $0.severity >= .medium }) else {
-            return "Ek uyarı yok"
+            return "Risk yok"
         }
 
         return risk.title
@@ -86,7 +86,7 @@ struct QuickInsightGrid: View {
 
     private var notificationReasonNote: String {
         guard let risk = recommendation.risks.first(where: { $0.severity >= .medium }) else {
-            return "Planı değiştiren risk görünmüyor"
+            return "Planlarını değiştirecek bir şey yok"
         }
 
         return risk.severity.localizedTitle + " öncelik"

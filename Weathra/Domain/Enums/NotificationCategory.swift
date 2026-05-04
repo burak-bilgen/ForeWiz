@@ -27,4 +27,23 @@ enum NotificationCategory: String, CaseIterable, Codable, Hashable, Sendable {
             "Güneş koruması gerekli"
         }
     }
+
+    var localizedDescription: String {
+        switch self {
+        case .morningBriefing:
+            "Her sabah günün hava özetini ve ne giyeceğini bildirir."
+        case .outfitSuggestion:
+            "Hava değiştiğinde kıyafet önerisini günceller."
+        case .bestRunWindow:
+            "Koşu için en uygun saati bildirir."
+        case .avoidHeatWindow:
+            "Sıcaklık dışarıyı zorlaştıracak seviyeye ulaştığında uyarır."
+        case .rainWarning:
+            "Yağmur başlamadan kısa süre önce bildirim gönderir."
+        case .windWarning:
+            "Güçlü rüzgar beklendiğinde uyarır."
+        case .uvWarning:
+            "UV indeksi yüksek olduğunda güneş koruması hatırlatır."
+        }
+    }
 }
