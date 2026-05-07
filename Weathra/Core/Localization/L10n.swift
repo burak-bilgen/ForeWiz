@@ -221,5 +221,10 @@ enum L10n {
         "risk_humidity": "Nem",
         "risk_cold": "Soğuk",
         "risk_storm": "Fırtına",
+
+        // MARK: - Additional Keys
+        "widget_best_time": "En İyi Zaman",
+        "today_label": "BUGÜN",
+        "premium_feature_hourly": "Detaylı Saatlik Zaman Çizelgesi",
     ]
 }

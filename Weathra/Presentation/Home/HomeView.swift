@@ -66,7 +66,7 @@ struct HomeView: View {
                 .transition(.opacity)
         case .loaded(let state):
             ScrollView {
-                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                LazyVStack(alignment: .leading, spacing: AppSpacing.medium) {
                     HomeHeaderView(
                         lastUpdatedText: state.lastUpdatedText,
                         isUsingCachedWeather: state.isUsingCachedWeather,

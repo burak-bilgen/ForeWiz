@@ -124,9 +124,11 @@ private struct MetricTile: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.82)
             }
-            .frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
+.frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
             .padding(AppSpacing.medium)
-        }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(title): \(value). \(note)")
+    }
         .accessibilityElement(children: .combine)
     }
 }
