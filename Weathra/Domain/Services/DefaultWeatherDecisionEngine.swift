@@ -172,7 +172,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             ? "kaçınman gereken belirgin bir saat yok"
             : avoidWindows.map(\.window.shortDisplayText).joined(separator: ", ")
 
-        return "Skor \(score.displayValue)/10. Bu karar; hissedilen sıcaklık, yağış olasılığı, rüzgar, UV, nem ve saatlik değişimler birlikte değerlendirilerek verildi. " +
+        return "Skor \(score.displayValue)/10. Bu karar; hissedilen sıcaklık, yağış olasılığı, " +
+            "rüzgar, UV, nem ve saatlik değişimler birlikte değerlendirilerek verildi. " +
             "Öne çıkan risk: \(riskText). Dikkat etmen gereken zaman: \(avoidText)."
     }
 }

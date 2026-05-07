@@ -79,10 +79,28 @@ private struct ScoreBreakdownCard: View {
                     ScoreRingView(score: recommendation.outdoorScore, size: 80)
 
                     VStack(alignment: .leading, spacing: AppSpacing.small) {
-                        ScoreRow(label: String(localized: "insights_temperature"), value: recommendation.outdoorScore.rawValue > 60 ? String(localized: "insights_comfortable") : String(localized: "insights_uncomfortable"), color: AppTheme.accent)
-                        ScoreRow(label: String(localized: "insights_precipitation"), value: String(localized: "insights_low_risk"), color: AppTheme.success)
-                        ScoreRow(label: String(localized: "insights_wind"), value: String(localized: "insights_calm"), color: AppTheme.teal)
-                        ScoreRow(label: String(localized: "insights_uv_index"), value: String(localized: "insights_moderate"), color: AppTheme.sunshine)
+                        ScoreRow(
+                            label: String(localized: "insights_temperature"),
+                            value: recommendation.outdoorScore.rawValue > 60
+                                ? String(localized: "insights_comfortable")
+                                : String(localized: "insights_uncomfortable"),
+                            color: AppTheme.accent
+                        )
+                        ScoreRow(
+                            label: String(localized: "insights_precipitation"),
+                            value: String(localized: "insights_low_risk"),
+                            color: AppTheme.success
+                        )
+                        ScoreRow(
+                            label: String(localized: "insights_wind"),
+                            value: String(localized: "insights_calm"),
+                            color: AppTheme.teal
+                        )
+                        ScoreRow(
+                            label: String(localized: "insights_uv_index"),
+                            value: String(localized: "insights_moderate"),
+                            color: AppTheme.sunshine
+                        )
                     }
                 }
             }

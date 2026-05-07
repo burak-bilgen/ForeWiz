@@ -1,5 +1,5 @@
-import Foundation
 import CoreLocation
+import Foundation
 import OSLog
 import WeatherKit
 
@@ -15,11 +15,11 @@ final class WeatherKitWeatherRepository: WeatherRepository {
         self.dateProvider = dateProvider
     }
 
-    func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
+func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
         do {
             let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
             AppLogger.weather.info(
-                "Fetching WeatherKit forecast for \(location.latitude, privacy: .public), \(location.longitude, privacy: .public)"
+                "Fetching WeatherKit forecast for lat=\(location.latitude), lon=\(location.longitude)"
             )
             let weather = try await service.weather(for: clLocation)
             let attribution = try? await makeAttributionInfo()
@@ -32,9 +32,10 @@ final class WeatherKitWeatherRepository: WeatherRepository {
                 attribution: attribution
             )
         } catch WeatherError.permissionDenied {
-            AppLogger.weather.error(
-                "WeatherKit permission denied for bundle \(Bundle.main.bundleIdentifier ?? "unknown", privacy: .public). Check App ID WeatherKit capability and provisioning."
-            )
+            let bundleID = Bundle.main.bundleIdentifier ?? "unknown"
+            let message = "WeatherKit permission denied for bundle: \(bundleID). " +
+                "Check App ID WeatherKit capability and provisioning."
+            AppLogger.weather.error("\(message)")
             throw AppError.weatherKitPermissionMissing
         } catch WeatherError.unknown {
             AppLogger.weather.error("WeatherKit failed with WeatherError.unknown")

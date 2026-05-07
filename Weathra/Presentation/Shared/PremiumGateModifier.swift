@@ -4,30 +4,22 @@ struct PremiumGateModifier: ViewModifier {
     let feature: PremiumFeature
     let tier: SubscriptionTier
     let onTap: () -> Void
-    
+
     func body(content: Content) -> some View {
-        if FeatureGate.isUnlocked(feature, tier: tier) {
-            content
-        } else {
-            Button(action: onTap) {
-                HStack {
-                    content
-                        .disabled(true)
-                        .opacity(0.6)
-                    
-                    Image(systemName: "lock.fill")
-                        .font(.caption2)
-                        .foregroundStyle(AppTheme.warning)
-                }
-                .overlay(
-                    HStack {
-                        Spacer()
-                        Image(systemName: "crown.fill")
+        Group {
+            if FeatureGate.isUnlocked(feature, tier: tier) {
+                content
+            } else {
+                content
+                    .disabled(true)
+                    .opacity(0.5)
+                    .overlay(alignment: .topTrailing) {
+                        Image(systemName: "lock.fill")
                             .font(.caption2)
                             .foregroundStyle(AppTheme.warning)
+                            .padding(6)
                     }
-                    .padding(.trailing, 4)
-                )
+                    .onTapGesture(perform: onTap)
             }
         }
     }

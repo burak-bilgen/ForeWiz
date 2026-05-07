@@ -1,5 +1,9 @@
 import SwiftUI
 
+private enum Constant {
+    static let lineWidth: CGFloat = 10
+}
+
 struct ScoreRingView: View {
     let score: WeatherScore
     var size: CGFloat = 92
@@ -8,10 +12,10 @@ struct ScoreRingView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(.primary.opacity(0.12), lineWidth: 10)
+                .stroke(.primary.opacity(0.12), lineWidth: Constant.lineWidth)
             Circle()
                 .trim(from: 0, to: progress)
-                .stroke(scoreColor, style: StrokeStyle(lineWidth: 10, lineCap: .round))
+                .stroke(scoreColor, style: StrokeStyle(lineWidth: Constant.lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             VStack(spacing: 0) {
                 Text(score.displayValue, format: .number.precision(.fractionLength(1)))
@@ -33,7 +37,12 @@ struct ScoreRingView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(localized: "widget_outdoor_score") + " \(score.displayValue.formatted(.number.precision(.fractionLength(1)))) / 10")
+        .accessibilityLabel(scoreAccessibilityLabel)
+    }
+
+    private var scoreAccessibilityLabel: String {
+        let scoreValue = score.displayValue.formatted(.number.precision(.fractionLength(1)))
+        return String(localized: "widget_outdoor_score") + " \(scoreValue) / 10"
     }
 
     private var scoreColor: Color {

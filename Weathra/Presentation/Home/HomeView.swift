@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject var viewModel: HomeViewModel
+    @ObservedObject var viewModel: HomeViewModel
     @Binding var savedLocations: [SavedLocation]
     @Binding var selectedLocationID: String
     @State private var selectedAttribution: WeatherAttributionInfo?

@@ -145,6 +145,11 @@ struct AppBackground: View {
 }
 
 private struct WeatherBackgroundSymbol: View {
+    private enum Constant {
+        static let minAnimationDuration: Double = 4
+        static let maxAnimationDuration: Double = 6
+    }
+
     let name: String
     let size: CGFloat
     let opacity: Double
@@ -161,11 +166,18 @@ private struct WeatherBackgroundSymbol: View {
                 .foregroundStyle(.white.opacity(opacity))
                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: alignment)
                 .offset(x: xOffset, y: isAnimating ? yOffset - 12 : yOffset + 12)
-                .animation(.easeInOut(duration: Double.random(in: 4...6)).repeatForever(autoreverses: true), value: isAnimating)
+                .animation(
+                    .easeInOut(duration: animationDuration).repeatForever(autoreverses: true),
+                    value: isAnimating
+                )
                 .onAppear {
                     isAnimating = true
                 }
                 .accessibilityHidden(true)
         }
+    }
+
+    private var animationDuration: Double {
+        Double.random(in: Constant.minAnimationDuration...Constant.maxAnimationDuration)
     }
 }
