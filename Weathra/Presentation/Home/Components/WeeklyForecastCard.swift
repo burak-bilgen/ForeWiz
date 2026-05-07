@@ -15,23 +15,23 @@ struct DailyForecastItem: Identifiable, Equatable {
 struct WeeklyForecastCard: View {
     let dailyForecasts: [DailyForecastItem]
     let isPremium: Bool
+    private let maxFreeDays = 3
+    private let maxPremiumDays = 14
 
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 HStack {
-                    Label(isPremium ? String(localized: "forecast_7day") : String(localized: "forecast_3day"), systemImage: "calendar")
+                    Label(title, systemImage: "calendar")
                         .font(AppTypography.headline)
                         .foregroundStyle(AppTheme.ink)
 
+                    Spacer()
+
                     if !isPremium {
-                        Spacer()
-                        NavigationLink(destination: Text(String(localized: "forecast_premium_required"))) {
-                            Image(systemName: "lock.fill")
-                                .font(.caption2)
-                                .foregroundStyle(AppTheme.sunshine)
-                        }
-                        .buttonStyle(.plain)
+                        Text("+\((maxPremiumDays - maxFreeDays)) gun")
+                            .font(AppTypography.caption)
+                            .foregroundStyle(AppTheme.sunshine)
                     }
                 }
 
@@ -41,7 +41,7 @@ struct WeeklyForecastCard: View {
                             DailyForecastCell(item: day)
                         }
 
-                        if !isPremium && dailyForecasts.count > 3 {
+                        if shouldShowUpgradeCell {
                             PremiumForecastLockCell()
                         }
                     }
@@ -51,11 +51,22 @@ struct WeeklyForecastCard: View {
         }
     }
 
-    private var displayedForecasts: [DailyForecastItem] {
-        if isPremium {
-            return dailyForecasts
+    private var title: String {
+        if isPremium && dailyForecasts.count > 7 {
+            return "\(maxPremiumDays) Gunluk Tahmin"
+        } else if isPremium {
+            return "7 Gunluk Tahmin"
         }
-        return Array(dailyForecasts.prefix(3))
+        return "3 Gunluk Tahmin"
+    }
+
+    private var displayedForecasts: [DailyForecastItem] {
+        let maxDays = isPremium ? maxPremiumDays : maxFreeDays
+        return Array(dailyForecasts.prefix(maxDays))
+    }
+
+    private var shouldShowUpgradeCell: Bool {
+        !isPremium && dailyForecasts.count > maxFreeDays
     }
 }
 

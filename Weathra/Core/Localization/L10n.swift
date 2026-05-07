@@ -226,5 +226,13 @@ enum L10n {
         "widget_best_time": "En İyi Zaman",
         "today_label": "BUGÜN",
         "premium_feature_hourly": "Detaylı Saatlik Zaman Çizelgesi",
+
+        // NEW Premium Features
+        "premium_feature_forecast_14day": "14 Günlük Tahmin",
+        "premium_feature_forecast_14day_desc": "Sadece bugün değil, iki haftanın her günü için dışarı planı önerisi.",
+        "premium_feature_alerts": "Olumsuz Hava Uyarıları",
+        "premium_feature_alerts_desc": "Fırtına, sel, dolu gibi kritik hava durumlarında anında bildirim.",
+        "premium_feature_watch": "Apple Watch",
+        "premium_feature_watch_desc": "Bileğinden anında hava durumu ve öneri kontrolü.",
     ]
 }
