@@ -18,8 +18,10 @@ final class StoreKitSubscriptionManager: ObservableObject {
 
     private var storeProducts: [Product] = []
     private var updateListenerTask: Task<Void, Error>?
+    private let cacheKey = "cached_subscription_tier"
 
     init() {
+        tier = loadCachedTier()
         updateListenerTask = listenForTransactions()
     }
 
@@ -85,13 +87,27 @@ final class StoreKitSubscriptionManager: ObservableObject {
                 guard let status = try await product.subscription?.status.first else { continue }
                 if status.state == .subscribed || status.state == .inGracePeriod {
                     tier = .premium
+                    saveCachedTier(.premium)
                     return
                 }
             }
             tier = .free
+            saveCachedTier(.free)
         } catch {
             tier = .free
         }
+    }
+
+    private func loadCachedTier() -> SubscriptionTier {
+        guard let rawValue = UserDefaults.standard.string(forKey: cacheKey),
+              let cached = SubscriptionTier(rawValue: rawValue) else {
+            return .free
+        }
+        return cached
+    }
+
+    private func saveCachedTier(_ tier: SubscriptionTier) {
+        UserDefaults.standard.set(tier.rawValue, forKey: cacheKey)
     }
 
     private func listenForTransactions() -> Task<Void, Error> {
