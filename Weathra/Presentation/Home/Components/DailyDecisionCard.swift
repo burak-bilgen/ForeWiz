@@ -2,7 +2,6 @@ import SwiftUI
 
 struct DailyDecisionCard: View {
     let recommendation: DailyRecommendation
-    @State private var isAppeared = false
 
     var body: some View {
         GlassCard {
@@ -45,13 +44,6 @@ struct DailyDecisionCard: View {
                         .foregroundStyle(AppTheme.accent)
                     Spacer()
                 }
-            }
-        }
-        .opacity(isAppeared ? 1 : 0)
-        .scaleEffect(isAppeared ? 1 : 0.95)
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                isAppeared = true
             }
         }
     }

@@ -62,7 +62,10 @@ private struct WeatherRiskRow: View {
             Spacer(minLength: 0)
         }
         .padding(AppSpacing.small)
-        .background(AppTheme.elevatedSurface.opacity(0.72), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
+        .background(
+            AppTheme.elevatedSurface.opacity(0.72),
+            in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+        )
         .accessibilityElement(children: .combine)
     }
 

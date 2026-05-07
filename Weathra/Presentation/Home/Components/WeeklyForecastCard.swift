@@ -29,7 +29,10 @@ struct WeeklyForecastCard: View {
                     Spacer()
 
                     if !isPremium {
-                        Text(L10n.text("forecast_more_days").replacingOccurrences(of: "%d", with: "\(maxPremiumDays - maxFreeDays)"))
+                        Text(
+                            L10n.text("forecast_more_days")
+                                .replacingOccurrences(of: "%d", with: "\(maxPremiumDays - maxFreeDays)")
+                        )
                             .font(AppTypography.caption)
                             .foregroundStyle(AppTheme.sunshine)
                     }

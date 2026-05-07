@@ -63,8 +63,18 @@ final class UserPreferencesModel {
         if quietHoursEnabled {
             let calendar = Calendar.current
             let now = Date()
-            let start = calendar.date(bySettingHour: quietHoursStartHour, minute: quietHoursStartMinute, second: 0, of: now) ?? now
-            let end = calendar.date(bySettingHour: quietHoursEndHour, minute: quietHoursEndMinute, second: 0, of: now) ?? now
+            let start = calendar.date(
+                bySettingHour: quietHoursStartHour,
+                minute: quietHoursStartMinute,
+                second: 0,
+                of: now
+            ) ?? now
+            let end = calendar.date(
+                bySettingHour: quietHoursEndHour,
+                minute: quietHoursEndMinute,
+                second: 0,
+                of: now
+            ) ?? now
             quietHours = TimeWindow(start: start, end: end, id: "quiet-hours")
         } else {
             quietHours = nil

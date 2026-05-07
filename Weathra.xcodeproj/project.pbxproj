@@ -50,15 +50,11 @@
 		};
 		67305E8A2F9E05220034CAA8 /* WeathraTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = WeathraTests;
 			sourceTree = "<group>";
 		};
 		67305E942F9E05220034CAA8 /* WeathraUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = WeathraUITests;
 			sourceTree = "<group>";
 		};
@@ -422,6 +418,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Weathra/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Weathra;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -463,6 +460,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Weathra/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Weathra;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

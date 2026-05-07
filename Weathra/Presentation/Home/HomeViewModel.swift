@@ -206,7 +206,10 @@ final class HomeViewModel: ObservableObject {
         return formatter.localizedString(for: date, relativeTo: dateProvider.now)
     }
 
-    private func makeDailyForecastItems(from dailyPoints: [DailyWeatherPoint], unitSystem: UnitSystem) -> [DailyForecastItem] {
+    private func makeDailyForecastItems(
+        from dailyPoints: [DailyWeatherPoint],
+        unitSystem: UnitSystem
+    ) -> [DailyForecastItem] {
         let calendar = Calendar.current
         let todayStart = calendar.startOfDay(for: dateProvider.now)
 
@@ -225,7 +228,11 @@ final class HomeViewModel: ObservableObject {
                 dayName = formatter.string(from: point.date).capitalized
             }
 
-            let score = weeklyScore(high: point.highTemperatureCelsius, low: point.lowTemperatureCelsius, precipitationChance: point.precipitationChance)
+            let score = weeklyScore(
+                high: point.highTemperatureCelsius,
+                low: point.lowTemperatureCelsius,
+                precipitationChance: point.precipitationChance
+            )
             let decision = OutdoorDecision(score: WeatherScore(rawValue: score))
 
             let highTemp = convertTemperature(point.highTemperatureCelsius, unitSystem: unitSystem)

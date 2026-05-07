@@ -33,7 +33,7 @@ struct WeathraApp: App {
                         .modelContainer(modelContainer)
                 } else {
                     ProgressView()
-                        .task { await initializeCoordinator() }
+                        .task { initializeCoordinator() }
                 }
             }
         }

@@ -4,35 +4,24 @@ struct SavedLocationsSection: View {
     @Binding var profile: UserComfortProfile
 
     var body: some View {
-        SettingsCard(
-            icon: "mappin.and.ellipse",
-            title: L10n.text("settings_saved_locations_title"),
-            subtitle: L10n.text("settings_saved_locations_subtitle")
-        ) {
-            VStack(spacing: AppSpacing.small) {
-                ForEach(profile.savedLocations) { location in
-                    NavigationLink {
-                        SavedLocationDetailView(location: location, onSave: { updated in
-                            updateLocation(updated)
-                        }, onDelete: {
-                            deleteLocation(location)
-                        })
-                    } label: {
-                        SavedLocationRow(location: location, isSelected: location.id == profile.selectedLocationID)
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                Divider()
-
-                Button(action: addLocation) {
-                    Label(L10n.text("settings_add_location"), systemImage: "plus.circle.fill")
-                        .font(AppTypography.caption.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(AppTheme.accent)
+        ForEach(profile.savedLocations) { location in
+            NavigationLink {
+                SavedLocationDetailView(location: location, onSave: { updated in
+                    updateLocation(updated)
+                }, onDelete: {
+                    deleteLocation(location)
+                })
+            } label: {
+                SavedLocationRow(
+                    location: location,
+                    isSelected: location.id == profile.selectedLocationID
+                )
             }
+        }
+
+        Button(action: addLocation) {
+            Label(L10n.text("settings_add_location"), systemImage: "plus.circle.fill")
+                .foregroundStyle(AppTheme.accent)
         }
     }
 
@@ -73,40 +62,27 @@ struct SavedLocationRow: View {
     let isSelected: Bool
 
     var body: some View {
-        HStack(spacing: AppSpacing.small) {
-            Image(systemName: location.id == "current-location" ? "location.fill" : "mappin.and.ellipse")
-                .font(.subheadline.weight(.semibold))
-                .frame(width: 28, height: 28)
-                .foregroundStyle(AppTheme.accent)
-
+        Label {
             VStack(alignment: .leading, spacing: 2) {
-                Text(location.name)
-                    .font(AppTypography.caption.weight(.bold))
-                    .foregroundStyle(AppTheme.ink)
+                HStack(spacing: 6) {
+                    Text(location.name)
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(AppTheme.accent)
+                    }
+                }
                 Text(location.address)
-                    .font(.system(.caption2, design: .rounded))
-                    .foregroundStyle(AppTheme.secondaryText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
-
-            Spacer(minLength: AppSpacing.small)
-
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(AppTheme.accent)
-            }
-
-            Image(systemName: "chevron.right")
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(AppTheme.secondaryText)
+        } icon: {
+            Image(systemName: location.id == "current-location"
+                  ? "location.fill"
+                  : "mappin.and.ellipse")
+                .foregroundStyle(AppTheme.accent)
         }
-        .padding(.horizontal, AppSpacing.small)
-        .padding(.vertical, AppSpacing.xSmall)
-        .background(
-            AppTheme.elevatedSurface.opacity(0.86),
-            in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
-        )
     }
 }
 

@@ -23,7 +23,11 @@ struct QuietHoursPicker: View {
                         selection: Binding(
                             get: { binding.wrappedValue.start },
                             set: { newStart in
-                                binding.wrappedValue = TimeWindow(start: newStart, end: binding.wrappedValue.end, id: "quiet-hours")
+                                binding.wrappedValue = TimeWindow(
+                                    start: newStart,
+                                    end: binding.wrappedValue.end,
+                                    id: "quiet-hours"
+                                )
                             }
                         ),
                         displayedComponents: .hourAndMinute
@@ -39,7 +43,11 @@ struct QuietHoursPicker: View {
                         selection: Binding(
                             get: { binding.wrappedValue.end },
                             set: { newEnd in
-                                binding.wrappedValue = TimeWindow(start: binding.wrappedValue.start, end: newEnd, id: "quiet-hours")
+                                binding.wrappedValue = TimeWindow(
+                                    start: binding.wrappedValue.start,
+                                    end: newEnd,
+                                    id: "quiet-hours"
+                                )
                             }
                         ),
                         displayedComponents: .hourAndMinute

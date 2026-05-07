@@ -38,12 +38,24 @@ struct AppRootView: View {
 }
 
 private struct LaunchingView: View {
+    @State private var animate = false
+
     var body: some View {
         ZStack {
             AppBackground()
-            ProgressView(L10n.text("launch_preparing"))
-                .font(AppTypography.body)
+            VStack(spacing: AppSpacing.medium) {
+                Image(systemName: "cloud.sun.fill")
+                    .font(.system(size: 56, weight: .regular))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(AppTheme.accent)
+                    .symbolEffect(.pulse, isActive: animate)
+
+                Text(L10n.text("launch_preparing"))
+                    .font(AppTypography.callout)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
         }
+        .onAppear { animate = true }
     }
 }
 
@@ -52,6 +64,11 @@ private struct MainTabView: View {
     @State private var showInsightsPaywall = false
 
     var body: some View {
+        tabContent
+    }
+
+    @ViewBuilder
+    private var tabContent: some View {
         TabView {
             HomeView(
                 viewModel: HomeViewModel(

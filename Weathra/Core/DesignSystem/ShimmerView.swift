@@ -54,10 +54,13 @@ struct ShimmerView: View {
 }
 
 struct LoadingCardPlaceholder: View {
+    var height: CGFloat = 120
+    var cornerRadius: CGFloat = AppTheme.compactRadius
+
     var body: some View {
-        RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .fill(AppTheme.elevatedSurface)
-            .frame(height: 120)
+            .frame(height: height)
             .modifier(ShimmerModifier())
     }
 }

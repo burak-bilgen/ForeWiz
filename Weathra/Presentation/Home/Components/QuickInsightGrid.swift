@@ -1,10 +1,12 @@
 import SwiftUI
 
+/// 2×2 grid of compact glass tiles surfacing the most actionable numbers for the day.
 struct QuickInsightGrid: View {
     let recommendation: DailyRecommendation
 
     private let columns = [
-        GridItem(.adaptive(minimum: 150), spacing: AppSpacing.small)
+        GridItem(.flexible(), spacing: AppSpacing.small),
+        GridItem(.flexible(), spacing: AppSpacing.small)
     ]
 
     var body: some View {
@@ -13,29 +15,32 @@ struct QuickInsightGrid: View {
                 icon: "figure.walk",
                 title: L10n.text("widget_outdoor_score"),
                 value: scoreText,
-                note: outdoorDecisionNote,
+                note: recommendation.outdoorDecision.localizedTitle,
                 tint: AppTheme.color(for: recommendation.outdoorDecision)
             )
 
             MetricTile(
                 icon: "clock.badge.checkmark",
                 title: L10n.text("widget_best_time"),
-                value: recommendation.bestOutdoorWindow?.shortDisplayText ?? L10n.text("forecast_no_best_window"),
-                note: recommendation.bestOutdoorWindow == nil ? L10n.text("decision_moderate") : L10n.text("decision_good"),
+                value: recommendation.bestOutdoorWindow?.shortDisplayText
+                    ?? L10n.text("forecast_no_best_window"),
+                note: recommendation.bestOutdoorWindow == nil
+                    ? L10n.text("decision_moderate")
+                    : L10n.text("decision_good"),
                 tint: AppTheme.accent
             )
 
             MetricTile(
                 icon: "exclamationmark.triangle.fill",
-                title: L10n.text("decision_risky"),
+                title: L10n.text("avoid_hours_title"),
                 value: avoidWindowText,
                 note: avoidWindowNote,
                 tint: recommendation.avoidWindows.isEmpty ? AppTheme.success : AppTheme.warning
             )
 
             MetricTile(
-                icon: "bell.badge.fill",
-                title: L10n.text("notification_uv"),
+                icon: "shield.lefthalf.filled",
+                title: L10n.text("decision_risky"),
                 value: notificationReasonText,
                 note: notificationReasonNote,
                 tint: recommendation.risks.isEmpty ? AppTheme.success : AppTheme.danger
@@ -44,52 +49,33 @@ struct QuickInsightGrid: View {
     }
 
     private var scoreText: String {
-        recommendation.outdoorScore.displayValue.formatted(.number.precision(.fractionLength(1))) + "/10"
-    }
-
-    private var outdoorDecisionNote: String {
-        switch recommendation.outdoorDecision {
-        case .good: L10n.text("decision_good")
-        case .moderate: L10n.text("decision_moderate")
-        case .risky: L10n.text("decision_risky")
-        case .avoid: L10n.text("decision_avoid")
-        }
+        recommendation.outdoorScore.displayValue
+            .formatted(.number.precision(.fractionLength(1))) + "/10"
     }
 
     private var avoidWindowText: String {
-        guard let avoidWindow = recommendation.avoidWindows.first else {
-            return L10n.text("risk_low")
-        }
-
-        return avoidWindow.window.shortDisplayText
+        recommendation.avoidWindows.first?.window.shortDisplayText
+            ?? L10n.text("avoid_hours_none")
     }
 
     private var avoidWindowNote: String {
-        guard let avoidWindow = recommendation.avoidWindows.first else {
-            return L10n.text("decision_good")
-        }
-
-        return avoidWindow.risk.title
+        recommendation.avoidWindows.first?.risk.title
+            ?? L10n.text("decision_good")
     }
 
     private var notificationReasonText: String {
-        guard let risk = recommendation.risks.first(where: { $0.severity >= .medium }) else {
-            return L10n.text("risk_low")
-        }
-
-        return risk.title
+        recommendation.risks.first(where: { $0.severity >= .medium })?.title
+            ?? L10n.text("risk_low")
     }
 
     private var notificationReasonNote: String {
-        guard let risk = recommendation.risks.first(where: { $0.severity >= .medium }) else {
-            return L10n.text("decision_good")
-        }
-
-        return risk.severity.localizedTitle
+        recommendation.risks.first(where: { $0.severity >= .medium })?.severity.localizedTitle
+            ?? L10n.text("decision_good")
     }
 }
 
-private struct MetricTile: View {
+/// Compact rectangular tile with an icon, title, primary value and tinted footnote.
+struct MetricTile: View {
     let icon: String
     let title: String
     let value: String
@@ -97,13 +83,16 @@ private struct MetricTile: View {
     let tint: Color
 
     var body: some View {
-        LiquidGlassContainer {
+        GlassCard(padding: AppSpacing.medium) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Image(systemName: icon)
-                    .font(.headline)
-                    .frame(width: 34, height: 34)
-                    .background(AppTheme.softBubbleGradient(tint: tint), in: Circle())
-                    .foregroundStyle(tint)
+                ZStack {
+                    Circle()
+                        .fill(AppTheme.softBubble(tint))
+                    Image(systemName: icon)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(tint)
+                }
+                .frame(width: 32, height: 32)
 
                 Text(title)
                     .font(AppTypography.caption)
@@ -112,23 +101,21 @@ private struct MetricTile: View {
                     .minimumScaleFactor(0.85)
 
                 Text(value)
-                    .font(AppTypography.headline)
+                    .font(AppTypography.metricNumber)
                     .foregroundStyle(AppTheme.ink)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.82)
+                    .minimumScaleFactor(0.8)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(note)
                     .font(.system(.caption2, design: .rounded, weight: .semibold))
                     .foregroundStyle(tint)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.82)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
             }
-.frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
-            .padding(AppSpacing.medium)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title): \(value). \(note)")
-    }
+            .frame(maxWidth: .infinity, minHeight: 132, alignment: .leading)
+        }
         .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title), \(value), \(note)")
     }
 }

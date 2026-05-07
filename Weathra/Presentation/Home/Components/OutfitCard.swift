@@ -2,7 +2,6 @@ import SwiftUI
 
 struct OutfitCard: View {
     let outfit: OutfitRecommendation
-    @State private var isAppeared = false
 
     var body: some View {
         GlassCard {
@@ -10,21 +9,16 @@ struct OutfitCard: View {
                 Label(L10n.text("notification_outfit"), systemImage: "tshirt.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
+
                 Text(outfit.title)
                     .font(AppTypography.title3)
                     .foregroundStyle(AppTheme.ink)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if outfit.items.isEmpty == false {
+                if !outfit.items.isEmpty {
                     FlowLayout(spacing: AppSpacing.small) {
                         ForEach(outfit.items, id: \.self) { item in
-                            Text(item)
-                                .font(AppTypography.caption)
-                                .lineLimit(1)
-                                .foregroundStyle(AppTheme.ink)
-                                .padding(.horizontal, AppSpacing.small)
-                                .padding(.vertical, AppSpacing.xSmall)
-                                .background(AppTheme.elevatedSurface, in: Capsule())
+                            OutfitChip(text: item)
                         }
                     }
                 }
@@ -48,12 +42,23 @@ struct OutfitCard: View {
                 }
             }
         }
-        .opacity(isAppeared ? 1 : 0)
-        .offset(y: isAppeared ? 0 : 20)
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                isAppeared = true
+    }
+}
+
+private struct OutfitChip: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(AppTypography.caption)
+            .lineLimit(1)
+            .foregroundStyle(AppTheme.ink)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(AppTheme.elevatedSurface, in: Capsule(style: .continuous))
+            .overlay {
+                Capsule(style: .continuous)
+                    .stroke(AppTheme.separator.opacity(0.4), lineWidth: 0.5)
             }
-        }
     }
 }

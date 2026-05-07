@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// Three-step onboarding: hero, comparison, setup.
+/// Background, controls, and text colours all adapt to light/dark mode automatically.
 struct OnboardingView: View {
     @StateObject var viewModel: OnboardingViewModel
     let existingProfile: UserComfortProfile
@@ -9,59 +11,44 @@ struct OnboardingView: View {
     @State private var currentPage = 0
     @State private var showConfetti = false
     @Namespace private var logoNamespace
-    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        NavigationStack {
+        ZStack {
+            AppBackground()
+
             TabView(selection: $currentPage) {
-                ZStack {
-                    AppBackground()
-                    HeroPage(
-                        logoNamespace: logoNamespace,
-                        next: { withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentPage = 1 } }
-                    )
-                }
-                .tag(0)
-
-                ZStack {
-                    AppBackground()
-                    WhyWeathraPage(
-                        logoNamespace: logoNamespace,
-                        next: { withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentPage = 2 } }
-                    )
-                }
-                .tag(1)
-
-                ZStack {
-                    AppBackground()
-                    SetupPage(
-                        viewModel: viewModel,
-                        isCompleting: isCompleting,
-                        complete: complete
-                    )
-                }
+                HeroPage(logoNamespace: logoNamespace, next: { goTo(1) })
+                    .tag(0)
+                WhyWeathraPage(logoNamespace: logoNamespace, next: { goTo(2) })
+                    .tag(1)
+                SetupPage(
+                    viewModel: viewModel,
+                    isCompleting: isCompleting,
+                    complete: complete
+                )
                 .tag(2)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
-            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentPage)
-        }
-        .navigationTitle(L10n.text("onboarding_welcome"))
-        .navigationBarTitleDisplayMode(.inline)
-        .overlay(
-            Group {
-                if showConfetti {
-                    ConfettiOverlay()
-                        .allowsHitTesting(false)
-                        .transition(.opacity)
-                }
+            .indexViewStyle(.page(backgroundDisplayMode: .always))
+            .animation(AppTheme.springSmooth, value: currentPage)
+
+            if showConfetti {
+                ConfettiOverlay()
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
             }
-        )
+        }
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func goTo(_ page: Int) {
+        withAnimation(AppTheme.springSmooth) {
+            currentPage = page
+        }
     }
 
     private func complete() {
-        guard viewModel.canContinue, !isCompleting else {
-            return
-        }
+        guard viewModel.canContinue, !isCompleting else { return }
 
         showConfetti = true
         isCompleting = true
@@ -75,5 +62,3 @@ struct OnboardingView: View {
         }
     }
 }
-
-// MARK: - Page 1: Hero / Value Proposition

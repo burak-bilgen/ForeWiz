@@ -17,16 +17,16 @@ struct PaywallView: View {
 
                         VStack(spacing: AppSpacing.small) {
                             Image(systemName: "crown.fill")
-                                .font(.system(size: 56, weight: .bold))
+                                .font(.system(size: 48, weight: .semibold))
+                                .symbolRenderingMode(.hierarchical)
                                 .foregroundStyle(AppTheme.sunshine)
-                                .shadow(color: AppTheme.sunshine.opacity(0.35), radius: 16, y: 8)
 
                             Text(L10n.text("paywall_title"))
-                                .font(.system(size: 32, weight: .heavy, design: .rounded))
+                                .font(AppTypography.title)
                                 .foregroundStyle(AppTheme.ink)
 
                             Text(L10n.text("paywall_subtitle"))
-                                .font(AppTypography.body)
+                                .font(AppTypography.callout)
                                 .foregroundStyle(AppTheme.secondaryText)
                                 .multilineTextAlignment(.center)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -89,7 +89,9 @@ struct PaywallView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(action: { dismiss() }) {
+                    Button {
+                        dismiss()
+                    } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title3)
                             .foregroundStyle(AppTheme.secondaryText)
@@ -123,14 +125,14 @@ private struct PremiumBenefitRow: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: AppSpacing.medium) {
-            Image(systemName: feature.systemImage)
-                .font(.system(size: 22, weight: .semibold))
-                .foregroundStyle(AppTheme.accent)
-                .frame(width: 36, height: 36)
-                .background(
-                    AppTheme.softBubbleGradient(tint: AppTheme.accent),
-                    in: RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous)
-                )
+            ZStack {
+                RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous)
+                    .fill(AppTheme.softBubble(AppTheme.accent))
+                Image(systemName: feature.systemImage)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(AppTheme.accent)
+            }
+            .frame(width: 40, height: 40)
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
                 Text(feature.localizedTitle)
@@ -144,8 +146,6 @@ private struct PremiumBenefitRow: View {
 
             Spacer(minLength: 0)
         }
-        .padding(AppSpacing.medium)
-        .background(AppTheme.elevatedSurface.opacity(0.86), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
     }
 }
 
@@ -153,28 +153,34 @@ private struct PurchaseButton: View {
     let product: SubscriptionProduct
     let action: () -> Void
 
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(alignment: .center, spacing: AppSpacing.medium) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(product.displayName)
-                        .font(AppTypography.headline)
+                        .font(AppTypography.bodyEmphasized)
                     Text(product.description)
                         .font(AppTypography.caption)
-                        .foregroundStyle(.white.opacity(colorScheme == .dark ? 0.75 : 0.85))
+                        .foregroundStyle(.white.opacity(0.85))
+                        .lineLimit(2)
                 }
-
-                Spacer()
-
+                Spacer(minLength: 0)
                 Text(product.price)
-                    .font(.system(.title3, design: .rounded, weight: .bold))
+                    .font(AppTypography.metricNumber)
+                    .monospacedDigit()
             }
-            .padding(AppSpacing.medium)
             .foregroundStyle(.white)
-            .background(AppTheme.weatherGradient(for: colorScheme), in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
-            .shadow(color: AppTheme.accent.opacity(0.22), radius: 16, y: 8)
+            .padding(AppSpacing.medium)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                LinearGradient(
+                    colors: [AppTheme.accent, AppTheme.accent.opacity(0.86)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
+            )
+            .shadow(color: AppTheme.accent.opacity(0.20), radius: 14, y: 8)
         }
         .buttonStyle(.plain)
     }

@@ -78,12 +78,18 @@ private struct DetailHeroCard: View {
                     }
                 }
                 .padding(AppSpacing.small)
-                .background(.white.opacity(colorScheme == .dark ? 0.18 : 0.14), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
+                .background(
+                    .white.opacity(colorScheme == .dark ? 0.18 : 0.14),
+                    in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+                )
             }
         }
         .foregroundStyle(.white)
         .padding(AppSpacing.large)
-        .background(AppTheme.weatherGradient(for: colorScheme), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .background(
+            AppTheme.weatherGradient(for: colorScheme),
+            in: RoundedRectangle(cornerRadius: 28, style: .continuous)
+        )
         .shadow(color: AppTheme.accent.opacity(0.20), radius: 22, y: 12)
     }
 }

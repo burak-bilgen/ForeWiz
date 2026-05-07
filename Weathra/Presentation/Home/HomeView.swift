@@ -4,21 +4,22 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
     @Binding var savedLocations: [SavedLocation]
     @Binding var selectedLocationID: String
-    @State private var showLocationPicker = false
-    @State private var showPaywall = false
+
     let isPremium: Bool
     let store: StoreKitSubscriptionManager
     let onRecommendationLoaded: (DailyRecommendation) -> Void
+
+    @State private var showLocationPicker = false
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
             ZStack {
                 AppBackground()
-
                 content
-                    .animation(.easeInOut(duration: 0.3), value: viewModel.state)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar { toolbarContent }
             .task { viewModel.onAppear() }
             .sheet(isPresented: $showLocationPicker) {
                 LocationPickerView(
@@ -38,111 +39,155 @@ struct HomeView: View {
         }
     }
 
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(L10n.text("home_title"))
+                    .font(AppTypography.headline)
+                Text(lastUpdatedSubtitle)
+                    .font(.caption2)
+                    .foregroundStyle(AppTheme.secondaryText)
+            }
+        }
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                HapticManager.medium()
+                showLocationPicker = true
+            } label: {
+                Label(viewModel.selectedLocationName, systemImage: "location.fill")
+                    .labelStyle(.titleAndIcon)
+                    .font(AppTypography.caption2)
+                    .lineLimit(1)
+            }
+        }
+    }
+
     @ViewBuilder
     private var content: some View {
         switch viewModel.state {
         case .idle, .loading:
-            loadingView
+            HomeLoadingView()
         case .failed(let message):
-            ScreenErrorView(message: message, retryTitle: L10n.text("home_error_retry"), retry: viewModel.onAppear)
+            ScreenErrorView(
+                message: message,
+                retryTitle: L10n.text("home_error_retry"),
+                retry: viewModel.onAppear
+            )
         case .loaded(let state):
-            ScrollView {
-                LazyVStack(spacing: 20) {
-                    HomeHeader(
-                        lastUpdatedText: state.lastUpdatedText,
-                        isUsingCached: state.isUsingCachedWeather,
-                        locationName: viewModel.selectedLocationName,
-                        onLocationTap: { showLocationPicker = true }
-                    )
-
-                    CurrentWeatherHero(
-                        weather: state.currentWeather,
-                        recommendation: state.recommendation,
-                        isUsingCached: state.isUsingCachedWeather
-                    )
-
-                    DecisionCard(recommendation: state.recommendation)
-
-                    QuickInsightGrid(recommendation: state.recommendation)
-
-                    WeeklyForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium)
-
-                    if !isPremium {
-                        AdBannerView(adUnitID: nil, isPremium: isPremium) {
-                            showPaywall = true
-                        }
-                    }
-
-                    ActivityWindowsSection(recommendations: state.recommendation.bestActivityWindows)
-
-                    OutfitCard(outfit: state.recommendation.outfit)
-
-                    if !state.recommendation.risks.isEmpty {
-                        WeatherRiskSection(risks: state.recommendation.risks)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 16)
-                .padding(.bottom, 100)
-            }
-            .refreshable { await viewModel.refresh() }
+            HomeLoadedScroll(
+                state: state,
+                isPremium: isPremium,
+                onUpgradeTap: { showPaywall = true },
+                refresh: { await viewModel.refresh() }
+            )
+            .transition(.opacity.combined(with: .move(edge: .bottom)))
         }
     }
 
-    private var loadingView: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .controlSize(.large)
-            Text(L10n.text("home_loading"))
-                .font(AppTypography.body)
-                .foregroundStyle(AppTheme.secondaryText)
+    private var lastUpdatedSubtitle: String {
+        if case .loaded(let state) = viewModel.state {
+            return state.lastUpdatedText
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        return ""
     }
 }
 
-// MARK: - Home Header
-private struct HomeHeader: View {
-    let lastUpdatedText: String
-    let isUsingCached: Bool
-    let locationName: String
-    let onLocationTap: () -> Void
+// MARK: - Loading
+
+private struct HomeLoadingView: View {
+    var body: some View {
+        VStack(spacing: AppSpacing.large) {
+            LoadingCardPlaceholder(height: 220, cornerRadius: AppTheme.cardRadius)
+            LoadingCardPlaceholder(height: 120, cornerRadius: AppTheme.cardRadius)
+            LoadingCardPlaceholder(height: 160, cornerRadius: AppTheme.cardRadius)
+        }
+        .padding(.horizontal, AppSpacing.medium)
+        .padding(.top, AppSpacing.medium)
+        .frame(maxHeight: .infinity, alignment: .top)
+        .accessibilityLabel(L10n.text("home_loading"))
+    }
+}
+
+// MARK: - Loaded scroll
+
+private struct HomeLoadedScroll: View {
+    let state: HomeViewState
+    let isPremium: Bool
+    let onUpgradeTap: () -> Void
+    let refresh: () async -> Void
 
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(L10n.text("home_title"))
-                    .font(AppTypography.title)
+        ScrollView {
+            LazyVStack(spacing: AppSpacing.medium) {
+                CurrentWeatherHero(
+                    weather: state.currentWeather,
+                    recommendation: state.recommendation,
+                    isUsingCached: state.isUsingCachedWeather
+                )
 
-                HStack(spacing: 6) {
-                    Text(L10n.text("home_daily_summary"))
-                    Text("-").foregroundStyle(.secondary)
-                    Text(lastUpdatedText)
+                if let warning = state.warningMessage {
+                    HomeWarningBanner(message: warning)
                 }
+
+                QuickInsightGrid(recommendation: state.recommendation)
+
+                WeeklyForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium)
+
+                if !isPremium {
+                    AdBannerView(adUnitID: nil, isPremium: isPremium, onRemoveAdsTapped: onUpgradeTap)
+                }
+
+                if !state.recommendation.bestActivityWindows.isEmpty {
+                    ActivityWindowsSection(recommendations: state.recommendation.bestActivityWindows)
+                }
+
+                OutfitCard(outfit: state.recommendation.outfit)
+
+                if !state.recommendation.risks.isEmpty {
+                    WeatherRiskSection(risks: state.recommendation.risks)
+                }
+            }
+            .padding(.horizontal, AppSpacing.medium)
+            .padding(.top, AppSpacing.small)
+            .padding(.bottom, AppSpacing.xxLarge)
+        }
+        .scrollIndicators(.hidden)
+        .refreshable { await refresh() }
+    }
+}
+
+// MARK: - Warning banner
+
+private struct HomeWarningBanner: View {
+    let message: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: AppSpacing.small) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(AppTheme.warning)
+            Text(message)
                 .font(AppTypography.caption)
-                .foregroundStyle(AppTheme.secondaryText)
-            }
-
-            Spacer()
-
-            Button(action: onLocationTap) {
-                HStack(spacing: 4) {
-                    Image(systemName: "location.fill")
-                        .font(.caption2)
-                    Text(locationName)
-                        .font(AppTypography.caption2)
-                    Image(systemName: "chevron.down")
-                        .font(.caption2)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.ultraThinMaterial, in: Capsule())
-            }
+                .foregroundStyle(AppTheme.ink)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(AppSpacing.medium)
+        .background(
+            AppTheme.warning.opacity(0.10),
+            in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+                .stroke(AppTheme.warning.opacity(0.25), lineWidth: 0.5)
         }
     }
 }
 
-// MARK: - Current Weather Hero
+// MARK: - Current weather hero
+
+/// Single combined hero: condition icon, big temperature, decision pill, score ring,
+/// best-time chip. Sits on a tinted gradient that follows the day's outdoor decision.
 private struct CurrentWeatherHero: View {
     let weather: HomeCurrentWeatherViewState
     let recommendation: DailyRecommendation
@@ -151,130 +196,127 @@ private struct CurrentWeatherHero: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: AppSpacing.medium) {
+            // Top row: condition + temperature
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(isUsingCached ? L10n.text("weather_latest_forecast") : L10n.text("home_live"))
-                        .font(AppTypography.caption2)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(cardBackground, in: Capsule())
-
+                    if isUsingCached {
+                        HeroChip(
+                            text: L10n.text("weather_latest_forecast"),
+                            systemImage: "clock.arrow.circlepath"
+                        )
+                    }
                     Text(weather.temperatureText)
-                        .font(.system(size: 60, weight: .bold, design: .rounded))
-
-                    Text(weather.feelsLikeText)
-                        .font(AppTypography.body)
-                        .foregroundStyle(cardForeground)
-                }
-
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 8) {
-                    Image(systemName: weather.symbolName)
-                        .font(.system(size: 50, weight: .medium))
-                        .symbolRenderingMode(.hierarchical)
-
+                        .font(AppTypography.heroNumber)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                     Text(weather.conditionText)
+                        .font(AppTypography.title3)
+                    Text(weather.feelsLikeText)
                         .font(AppTypography.callout)
+                        .foregroundStyle(.white.opacity(0.78))
                 }
+                Spacer(minLength: 0)
+                Image(systemName: weather.symbolName)
+                    .font(.system(size: 64, weight: .regular))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(.white)
+                    .symbolEffect(.variableColor.iterative, options: .repeating)
+                    .accessibilityHidden(true)
             }
 
-            HStack(spacing: 16) {
-                HeroMetric(icon: "figure.walk", title: L10n.text("home_score"), value: "\(recommendation.outdoorScore.displayValue)/10")
-                HeroMetric(icon: "clock.fill", title: L10n.text("home_best_time"), value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "-")
+            Divider()
+                .overlay(.white.opacity(0.25))
+
+            // Bottom row: decision summary + score ring
+            HStack(alignment: .center, spacing: AppSpacing.medium) {
+                VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+                    Text(recommendation.outdoorDecision.localizedTitle)
+                        .font(AppTypography.title2)
+                    Text(recommendation.summaryText)
+                        .font(AppTypography.caption)
+                        .foregroundStyle(.white.opacity(0.82))
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let bestWindow = recommendation.bestOutdoorWindow {
+                        HeroChip(
+                            text: bestWindow.shortDisplayText,
+                            systemImage: "clock.fill"
+                        )
+                    }
+                }
+                Spacer(minLength: 0)
+                HeroScoreRing(score: recommendation.outdoorScore)
             }
         }
         .foregroundStyle(.white)
-        .padding(24)
-        .background(AppTheme.weatherGradient(for: colorScheme), in: RoundedRectangle(cornerRadius: 28))
-        .overlay(alignment: .topTrailing) {
-            Image(systemName: "cloud.fill")
-                .font(.system(size: 100, weight: .bold))
-                .foregroundStyle(cardOverlay)
-                .offset(x: 20, y: -30)
-                .accessibilityHidden(true)
+        .padding(AppSpacing.large)
+        .background(
+            AppTheme.heroGradient(for: recommendation.outdoorDecision, colorScheme: colorScheme),
+            in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
+                .stroke(.white.opacity(0.15), lineWidth: 0.5)
         }
-    }
-
-    private var cardBackground: Color {
-        .white.opacity(colorScheme == .dark ? 0.2 : 0.15)
-    }
-
-    private var cardForeground: Color {
-        .white.opacity(colorScheme == .dark ? 0.75 : 0.85)
-    }
-
-    private var cardOverlay: Color {
-        .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
+        .shadow(color: .black.opacity(colorScheme == .dark ? 0.30 : 0.10), radius: 16, y: 8)
+        .accessibilityElement(children: .combine)
     }
 }
 
-private struct HeroMetric: View {
-    let icon: String
-    let title: String
-    let value: String
-
-    @Environment(\.colorScheme) private var colorScheme
+private struct HeroChip: View {
+    let text: String
+    let systemImage: String
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.subheadline)
-                .frame(width: 28, height: 28)
-                .background(metricBackground, in: Circle())
+        Label(text, systemImage: systemImage)
+            .font(.caption2.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .background(.white.opacity(0.18), in: Capsule(style: .continuous))
+            .overlay {
+                Capsule(style: .continuous).stroke(.white.opacity(0.25), lineWidth: 0.5)
+            }
+    }
+}
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.caption2)
-                Text(value).font(AppTypography.caption2).fontWeight(.semibold)
+/// Inline white-on-tint score ring tuned for the hero card.
+private struct HeroScoreRing: View {
+    let score: WeatherScore
+    @State private var progress: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(.white.opacity(0.25), lineWidth: 7)
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(.white, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            VStack(spacing: 0) {
+                Text(score.displayValue, format: .number.precision(.fractionLength(1)))
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                Text("/10")
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.78))
             }
         }
-        .padding(10)
-        .background(metricBackground.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+        .frame(width: 76, height: 76)
+        .onAppear { animate() }
+        .onChange(of: score) { _, _ in animate() }
     }
 
-    private var metricBackground: Color {
-        .white.opacity(colorScheme == .dark ? 0.2 : 0.15)
-    }
-}
-
-// MARK: - Decision Card
-private struct DecisionCard: View {
-    let recommendation: DailyRecommendation
-
-    var body: some View {
-        HStack(spacing: 16) {
-            DecisionPill(decision: recommendation.outdoorDecision)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(recommendation.outdoorDecision.localizedTitle)
-                    .font(AppTypography.title2)
-
-                Text(recommendation.summaryText)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(AppTheme.secondaryText)
-                    .lineLimit(2)
+    private func animate() {
+        let target = score.displayValue / 10
+        if reduceMotion {
+            progress = target
+        } else {
+            withAnimation(.spring(response: 0.9, dampingFraction: 0.85)) {
+                progress = target
             }
-
-            Spacer()
-
-            ScoreRingView(score: recommendation.outdoorScore, size: 60)
         }
-        .padding(20)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
-    }
-}
-
-private struct DecisionPill: View {
-    let decision: OutdoorDecision
-
-    var body: some View {
-        Text(decision.localizedTitle)
-            .font(AppTypography.caption2)
-            .fontWeight(.semibold)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(AppTheme.color(for: decision).opacity(0.15), in: Capsule())
-            .foregroundStyle(AppTheme.color(for: decision))
     }
 }
