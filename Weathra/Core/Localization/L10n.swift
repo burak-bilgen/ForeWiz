@@ -315,16 +315,7 @@ enum L10n {
 
         // MARK: - Additional
         "today_label": "BUGÜN",
-        "premium_feature_hourly": "Saatlik",
-
-        // MARK: - Premium New
-        "premium_feature_forecast_14day": "14 Günlük",
-        "premium_feature_forecast_14day_desc": "İki hafta önerisi.",
-        "premium_feature_alerts": "Uyarılar",
-        "premium_feature_alerts_desc": "Fırtına, sel uyarıları.",
-        "widget_forecast_days": "Gunluk Tahmin",
-        "premium_feature_watch": "Watch",
-        "premium_feature_watch_desc": "Bileğinden kontrol.",
+        "widget_forecast_days": "Günlük Tahmin",
 
         // MARK: - Risk Types (Doğru imla)
         "risk_heat": "Sıcaklık",
@@ -380,8 +371,6 @@ enum L10n {
         "settings_reset_subtitle": "Onboarding'ı yeniden başlat",
         "settings_reset_confirm": "Sıfırla",
         "settings_reset_message": "Onboarding sürecine yeniden başlayacaksınız. Bu işlem geri alınamaz.",
-        "settings_cancel": "İptal",
-        "settings_save": "Kaydet",
         "settings_open_ios_settings": "iOS Ayarlarını Aç",
         "settings_permission_location": "Konum",
         "settings_permission_location_desc": "Hava durumu için konum gerekir",
@@ -429,20 +418,15 @@ enum L10n {
         "outfit_accessories": "Aksesuarlar",
         "outfit_warning": "Uyarı",
 
-        // MARK: - Misc
-        "premium_feature_hourly": "Saatlik",
-
         // MARK: - Premium Features
-        "premium_feature_locations": "Birden Fazla Konum",
-        "premium_feature_locations_desc": "Birden fazla şehri takip et",
+        "premium_remove_ads": "Reklamsız Deneyim",
+        "premium_remove_ads_desc": "Reklamları kaldır ve kesintisiz kullan.",
+        "premium_feature_forecast_14day": "14 Günlük Tahmin",
         "premium_feature_forecast_14day_desc": "İki hafta boyunca planla",
-        "premium_feature_hourly_desc": "Saatlik detaylı hava durumu",
-        "premium_feature_alerts_desc": "Fırtına ve sel uyarıları",
-        "premium_feature_widget": "Widget Özelleştirme",
-        "premium_feature_widget_desc": "Widget'ını kişiselleştir",
         "premium_feature_analytics": "Gelişmiş Analitik",
         "premium_feature_analytics_desc": "Geçmiş verileri incele",
-        "premium_feature_watch_desc": "Apple Watch'tan kontrol et",
+        "premium_feature_watch": "Apple Watch",
+        "premium_feature_watch_desc": "Bileğinden kontrol et",
 
         // MARK: - Weekly Forecast
         "forecast_7_days": "7 Gün",
@@ -476,10 +460,6 @@ enum L10n {
 
         // MARK: - Launch
         "launch_preparing": "Hazırlanıyor...",
-
-        // MARK: - Tabs
-        "tab_today": "Bugün",
-        "tab_settings": "Ayarlar",
 
         // MARK: - Premium
         "premium_product_not_found": "Ürün bulunamadı",
