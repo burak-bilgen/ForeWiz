@@ -1,51 +1,70 @@
 import Foundation
+import SwiftData
 
 final class SwiftDataPreferencesRepository: PreferencesRepository {
-    private enum Key {
-        static let profile = "weathra.profile.v1"
-        static let onboardingCompleted = "weathra.onboardingCompleted.v1"
-        static let legacyProfile = "weathra.profile.v1"
-        static let legacyOnboardingCompleted = "weathra.onboardingCompleted.v1"
-    }
+    private let modelContext: ModelContext
 
-    private let userDefaults: UserDefaults
-    private let encoder = JSONEncoder()
-    private let decoder = JSONDecoder()
-
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
     }
 
     func loadProfile() async throws -> UserComfortProfile {
-        guard let data = userDefaults.data(forKey: Key.profile) ?? userDefaults.data(forKey: Key.legacyProfile) else {
+        let descriptor = FetchDescriptor<UserPreferencesModel>(
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        let preferences = try modelContext.fetch(descriptor)
+        
+        guard let model = preferences.first else {
             return .default
         }
-
-        do {
-            return try decoder.decode(UserComfortProfile.self, from: data)
-        } catch {
-            throw AppError.persistenceFailed
-        }
+        
+        return model.toProfile()
     }
 
     func saveProfile(_ profile: UserComfortProfile) async throws {
-        do {
-            let data = try encoder.encode(profile)
-            userDefaults.set(data, forKey: Key.profile)
-        } catch {
-            throw AppError.persistenceFailed
+        let descriptor = FetchDescriptor<UserPreferencesModel>()
+        let existing = try modelContext.fetch(descriptor)
+        
+        if let model = existing.first {
+            model.update(from: profile)
+        } else {
+            let model = UserPreferencesModel(
+                temperatureSensitivity: profile.temperatureSensitivity,
+                preferredActivities: Array(profile.preferredActivities),
+                quietHours: profile.quietHours,
+                onboardingCompleted: true,
+                preferredLanguage: profile.language,
+                preferredAppearance: profile.appearance,
+                preferredUnitSystem: profile.unitSystem
+            )
+            modelContext.insert(model)
         }
+        
+        try modelContext.save()
     }
 
     func isOnboardingCompleted() async throws -> Bool {
-        if userDefaults.object(forKey: Key.onboardingCompleted) != nil {
-            return userDefaults.bool(forKey: Key.onboardingCompleted)
-        }
-
-        return userDefaults.bool(forKey: Key.legacyOnboardingCompleted)
+        let descriptor = FetchDescriptor<UserPreferencesModel>()
+        let preferences = try modelContext.fetch(descriptor)
+        return preferences.first?.onboardingCompleted ?? false
     }
 
     func setOnboardingCompleted(_ completed: Bool) async throws {
-        userDefaults.set(completed, forKey: Key.onboardingCompleted)
+        let descriptor = FetchDescriptor<UserPreferencesModel>()
+        let existing = try modelContext.fetch(descriptor)
+        
+        if let model = existing.first {
+            model.onboardingCompleted = completed
+        } else {
+            let model = UserPreferencesModel(
+                temperatureSensitivity: .normal,
+                preferredActivities: [.goingOutside, .walking],
+                quietHours: nil,
+                onboardingCompleted: completed
+            )
+            modelContext.insert(model)
+        }
+        
+        try modelContext.save()
     }
 }

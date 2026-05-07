@@ -5,3 +5,5 @@ xcuserdata/
 *.xcuserstate
 *.xcscmblueprint
 *.moved-aside
+Pods/
+*.xcworkspace

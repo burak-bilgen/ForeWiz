@@ -39,7 +39,7 @@ final class StoreKitSubscriptionManager: ObservableObject {
 
     func purchase(_ product: SubscriptionProduct) async -> Bool {
         guard let storeProduct = storeProducts.first(where: { $0.id == product.id }) else {
-            errorMessage = L10n.text( "premium_product_not_found")
+            errorMessage = L10n.text("premium_product_not_found")
             return false
         }
 
@@ -55,7 +55,7 @@ final class StoreKitSubscriptionManager: ObservableObject {
             case .userCancelled:
                 return false
             case .pending:
-                errorMessage = L10n.text( "premium_pending")
+                errorMessage = L10n.text("premium_pending")
                 return false
             @unknown default:
                 return false
@@ -131,7 +131,7 @@ final class StoreKitSubscriptionManager: ObservableObject {
         if let skError = error as? StoreKitError {
             switch skError {
             case .networkError:
-                return L10n.text( "premium_network_error")
+                return L10n.text("premium_network_error")
             case .notAvailableInStorefront, .notEntitled:
                 return error.localizedDescription
             default:

@@ -1,16 +1,86 @@
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
-struct WidgetStrings {
-    static let widgetName = "Weathra"
-    static let widgetDescription = "Dışarı çıkma kararınızı anlık olarak görün."
-    static let widgetNoData = "Veri yok"
-    static let widgetOpenApp = "Uygulamayı aç"
-    static let decisionGood = "Dışarı çıkabilirsiniz"
-    static let decisionBad = "Dışarı çıkmanızı önermiyoruz"
-    static let decisionModerate = "Dikkatli olun"
-    static let outfitLightAndComfortable = "Hafif ve rahat"
-    static let activityRunning = "Koşu"
+enum WidgetStrings {
+    static var widgetName: String { "Weathra" }
+    static var widgetDescription: String { WidgetLocalization.text("widget_description") }
+    static var widgetNoData: String { WidgetLocalization.text("widget_no_data") }
+    static var widgetOpenApp: String { WidgetLocalization.text("widget_open_app") }
+    static var decisionGood: String { WidgetLocalization.text("widget_decision_good") }
+    static var decisionBad: String { WidgetLocalization.text("widget_decision_bad") }
+    static var decisionModerate: String { WidgetLocalization.text("widget_decision_moderate") }
+    static var outfitLightAndComfortable: String { WidgetLocalization.text("outfit_light_and_comfortable") }
+    static var activityRunning: String { WidgetLocalization.text("activity_running") }
+}
+
+private enum WidgetLocalization {
+    private static let suiteName = "group.weathra"
+    private static let languageOverrideKey = "weathra.languageOverride.v1"
+    private static let fallbackLanguageCode = "en"
+
+    private static let localizedStrings: [String: [String: String]] = [
+        "en": [
+            "widget_description": "Today's weather and outdoor recommendation",
+            "widget_no_data": "No data",
+            "widget_open_app": "Open app",
+            "widget_decision_good": "Good to go outside",
+            "widget_decision_moderate": "Be careful",
+            "widget_decision_bad": "Not recommended outside",
+            "outfit_light_and_comfortable": "Light and comfortable",
+            "activity_running": "Running"
+        ],
+        "tr": [
+            "widget_description": "Bugünün hava durumu ve dışarı çıkma önerisi",
+            "widget_no_data": "Veri yok",
+            "widget_open_app": "Uygulamayı aç",
+            "widget_decision_good": "Dışarı çıkabilirsiniz",
+            "widget_decision_moderate": "Dikkatli olun",
+            "widget_decision_bad": "Dışarı çıkmanızı önermiyoruz",
+            "outfit_light_and_comfortable": "Hafif ve rahat",
+            "activity_running": "Koşu"
+        ]
+    ]
+
+    static func text(_ key: String) -> String {
+        let languageCode = currentLanguageCode
+        return localizedStrings[languageCode]?[key]
+            ?? localizedStrings[fallbackLanguageCode]?[key]
+            ?? key
+    }
+
+    static var locale: Locale {
+        Locale(identifier: currentLanguageCode)
+    }
+
+    private static var currentLanguageCode: String {
+        if let override = UserDefaults(suiteName: suiteName)?.string(forKey: languageOverrideKey),
+           let languageCode = normalizedLanguageCode(override) {
+            return languageCode
+        }
+
+        for identifier in Locale.preferredLanguages {
+            if let languageCode = normalizedLanguageCode(identifier) {
+                return languageCode
+            }
+        }
+
+        return fallbackLanguageCode
+    }
+
+    private static func normalizedLanguageCode(_ identifier: String) -> String? {
+        let code = identifier
+            .replacingOccurrences(of: "_", with: "-")
+            .split(separator: "-")
+            .first
+            .map(String.init)?
+            .lowercased()
+
+        guard code == "en" || code == "tr" else {
+            return nil
+        }
+
+        return code
+    }
 }
 
 struct Provider: TimelineProvider {
@@ -30,7 +100,11 @@ struct Provider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
         let recommendation = loadRecommendation()
         let entry = DailyDecisionEntry(date: Date(), recommendation: recommendation)
-        let nextUpdateDate = Calendar.current.date(byAdding: .hour, value: 2, to: Date()) ?? Date().addingTimeInterval(7200)
+        let nextUpdateDate = Calendar.current.date(
+            byAdding: .hour,
+            value: 2,
+            to: Date()
+        ) ?? Date().addingTimeInterval(7200)
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdateDate))
         completion(timeline)
     }
@@ -83,6 +157,7 @@ struct WidgetTimeWindow: Codable {
 
     var shortDisplayText: String {
         let formatter = DateFormatter()
+        formatter.locale = WidgetLocalization.locale
         formatter.dateFormat = "HH:mm"
         return "\(formatter.string(from: start)) - \(formatter.string(from: end))"
     }
@@ -108,7 +183,7 @@ struct WeathraWidgetEntryView: View {
                     if family != .systemSmall {
                         Text(recommendation.summaryText)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                             .lineLimit(3)
                     }
 
@@ -117,7 +192,7 @@ struct WeathraWidgetEntryView: View {
                     if let bestWindow = recommendation.bestOutdoorWindow {
                         HStack(spacing: 4) {
                             Image(systemName: "clock.fill")
-                                .foregroundColor(.blue)
+                                .foregroundStyle(.blue)
                             Text(bestWindow.shortDisplayText)
                                 .font(.caption2.weight(.bold))
                         }
@@ -127,12 +202,12 @@ struct WeathraWidgetEntryView: View {
                 VStack(spacing: 8) {
                     Image(systemName: "cloud.sun.fill")
                         .font(.title2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text(WidgetStrings.widgetNoData)
                         .font(.caption.weight(.semibold))
                     Text(WidgetStrings.widgetOpenApp)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
             }

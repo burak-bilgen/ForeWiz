@@ -1,25 +1,18 @@
 import Combine
 import Foundation
-import GoogleMobileAds
 
-protocol AdManager: Sendable {
-    var isReady: Bool { get }
-    func load() async
-    func showInterstitial() async
-    func showRewarded() async -> Bool
-}
+#if canImport(GoogleMobileAds) && canImport(UIKit)
+import GoogleMobileAds
+import UIKit
 
 final class GoogleAdManager: AdManager, @unchecked Sendable {
     private let interstitialAdUnitID = "ca-app-pub-3940256099942544/1033173712"
     private let rewardedAdUnitID = "ca-app-pub-3940256099942544/5224354917"
     
-    private let isReadyLock = NSLock()
-    private var _isReady = false
+    private let isReadyLock = OSAllocatedUnfairLock(initialState: false)
     
     var isReady: Bool {
-        isReadyLock.lock()
-        defer { isReadyLock.unlock() }
-        return _isReady
+        isReadyLock.withLock { $0 }
     }
     
     static let shared = GoogleAdManager()
@@ -28,9 +21,7 @@ final class GoogleAdManager: AdManager, @unchecked Sendable {
         await loadInterstitial()
         await loadRewarded()
         
-        isReadyLock.lock()
-        _isReady = true
-        isReadyLock.unlock()
+        isReadyLock.withLock { $0 = true }
     }
     
     private func loadInterstitial() async {
@@ -101,4 +92,30 @@ final class GoogleAdManager: AdManager, @unchecked Sendable {
         }
         return topVC
     }
+}
+#else
+final class GoogleAdManager: AdManager {
+    var isReady: Bool { false }
+    
+    static let shared = GoogleAdManager()
+    
+    func load() async {
+        // No-op when GoogleMobileAds is not available
+    }
+    
+    func showInterstitial() async {
+        // No-op when GoogleMobileAds is not available
+    }
+    
+    func showRewarded() async -> Bool {
+        return false
+    }
+}
+#endif
+
+protocol AdManager: Sendable {
+    var isReady: Bool { get }
+    func load() async
+    func showInterstitial() async
+    func showRewarded() async -> Bool
 }

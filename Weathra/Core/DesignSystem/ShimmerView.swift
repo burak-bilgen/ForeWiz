@@ -2,10 +2,11 @@ import SwiftUI
 
 struct ShimmerModifier: ViewModifier {
     @State private var phase: CGFloat = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
-            .overlay(
+            .overlay {
                 GeometryReader { geometry in
                     LinearGradient(
                         gradient: Gradient(colors: [
@@ -18,12 +19,27 @@ struct ShimmerModifier: ViewModifier {
                     )
                     .frame(width: geometry.size.width * 2)
                     .offset(x: -geometry.size.width + (geometry.size.width * 2 * phase))
+                    .opacity(reduceMotion ? 0 : 1)
                 }
-            )
+            }
             .mask(content)
             .onAppear {
+                guard reduceMotion == false else {
+                    phase = 0
+                    return
+                }
+
                 withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
                     phase = 1
+                }
+            }
+            .onChange(of: reduceMotion) { _, newValue in
+                if newValue {
+                    phase = 0
+                } else {
+                    withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                        phase = 1
+                    }
                 }
             }
     }

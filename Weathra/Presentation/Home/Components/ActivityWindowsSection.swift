@@ -6,12 +6,12 @@ struct ActivityWindowsSection: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(L10n.text( "notification_best_run"), systemImage: "figure.run")
+                Label(L10n.text("notification_best_run"), systemImage: "figure.run")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
                 if recommendations.isEmpty {
-                    Text(L10n.text( "decision_moderate"))
+                    Text(L10n.text("decision_moderate"))
                         .font(AppTypography.body)
                         .foregroundStyle(AppTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -37,7 +37,7 @@ private struct ActivityWindowRow: View {
                 .foregroundStyle(tint)
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                Text("\(recommendation.activityType.localizedTitle) \(L10n.text( "activity_best_time_suffix"))")
+                Text("\(recommendation.activityType.localizedTitle) \(L10n.text("activity_best_time_suffix"))")
                     .font(AppTypography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
 

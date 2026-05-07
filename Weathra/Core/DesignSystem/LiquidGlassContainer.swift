@@ -2,9 +2,16 @@ import SwiftUI
 
 struct LiquidGlassContainer<Content: View>: View {
     let content: Content
+    var useShadow: Bool = true
+    @Environment(\.colorScheme) private var colorScheme
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
+    }
+
+    init(useShadow: Bool = true, @ViewBuilder content: () -> Content) {
+        self.content = content()
+        self.useShadow = useShadow
     }
 
     var body: some View {
@@ -14,14 +21,22 @@ struct LiquidGlassContainer<Content: View>: View {
                 style: .continuous
             ))
             .background(
-                AppTheme.surface.opacity(0.70),
+                AppTheme.glassFill(for: colorScheme),
                 in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
             )
             .overlay {
                 RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
-                    .stroke(.white.opacity(0.26), lineWidth: 1)
+                    .stroke(AppTheme.glassStroke(for: colorScheme), lineWidth: 1)
             }
-            .shadow(color: AppTheme.accent.opacity(0.10), radius: 22, y: 12)
-            .shadow(color: .black.opacity(0.06), radius: 10, y: 5)
+            .shadow(
+                color: AppTheme.glassAccentShadow(for: colorScheme, isEnabled: useShadow),
+                radius: useShadow ? 22 : 0,
+                y: useShadow ? 12 : 0
+            )
+            .shadow(
+                color: AppTheme.glassDepthShadow(for: colorScheme, isEnabled: useShadow),
+                radius: useShadow ? 10 : 0,
+                y: useShadow ? 5 : 0
+            )
     }
 }

@@ -16,7 +16,7 @@ struct HourlyWeatherPoint: Codable, Equatable, Identifiable, Sendable {
     let severeWeatherRisk: RiskLevel?
     let pollenLevel: PollenLevel?
     let airQualityIndex: AirQualityIndex?
-    let pm25Level:Pm25Level?
+    let pm25Level: Pm25Level?
 }
 
 enum PollenLevel: String, Codable, Sendable {

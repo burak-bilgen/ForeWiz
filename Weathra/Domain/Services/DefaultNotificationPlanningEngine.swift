@@ -38,7 +38,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         if enabledCategories.contains(.bestRunWindow),
            let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .running }),
            let plan = makeActivityPlan(activityRecommendation: runningWindow, now: now, calendar: calendar),
-           isWorthNotifying(plan: plan, now: now) {
+           isWorthNotifying(plan: plan, now: now, calendar: calendar) {
             candidates.append(plan)
         }
 
@@ -56,10 +56,13 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let filtered = deduplicated
             .filter { $0.fireDate >= now }
             .filter { isQuiet($0.fireDate, quietHours: profile.quietHours, calendar: calendar) == false }
-            .filter { isWorthNotifying(plan: $0, now: now) }
+            .filter { isWorthNotifying(plan: $0, now: now, calendar: calendar) }
 
         let sorted = filtered.sorted { p0, p1 in
             if p0.priority == p1.priority {
+                if p0.fireDate == p1.fireDate {
+                    return p0.category.rawValue < p1.category.rawValue
+                }
                 return p0.fireDate < p1.fireDate
             }
             return p0.priority > p1.priority
@@ -75,7 +78,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         calendar: Calendar
     ) -> NotificationPlan? {
         let preference = profile.notificationPreferences.first { $0.category == .morningBriefing }
-        var preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 30)
+        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 30)
 
         guard let fireDate = calendar.nextDate(
             after: calendar.startOfDay(for: now).addingTimeInterval(-1),
@@ -132,7 +135,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         calendar: Calendar
     ) -> NotificationPlan? {
         let preference = profile.notificationPreferences.first { $0.category == .outfitSuggestion }
-        var preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 45)
+        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 45)
 
         guard let fireDate = calendar.nextDate(
             after: calendar.startOfDay(for: now).addingTimeInterval(-1),
@@ -212,10 +215,18 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             return true
         }
 
-        let grouped = Dictionary(grouping: eligible) { $0.window.start }
+        let grouped = Dictionary(grouping: eligible) { window in
+            fireDate(for: window, now: now, calendar: calendar)
+        }
 
         return grouped.compactMap { startDate, windows in
             makeCombinedRiskPlan(windows: windows, fireDate: startDate, calendar: calendar)
+        }
+        .sorted { p0, p1 in
+            if p0.fireDate == p1.fireDate {
+                return p0.category.rawValue < p1.category.rawValue
+            }
+            return p0.fireDate < p1.fireDate
         }
     }
 
@@ -224,7 +235,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         fireDate: Date,
         calendar: Calendar
     ) -> NotificationPlan? {
-        guard let first = windows.first else { return nil }
+        guard windows.isEmpty == false else { return nil }
         let sorted = windows.sorted { $0.severity.rawValue > $1.severity.rawValue }
 
         let severity = sorted[0].severity
@@ -250,13 +261,27 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         return "\(time): \(risks)"
     }
 
-    private func isWorthNotifying(plan: NotificationPlan, now: Date) -> Bool {
-        let calendar = Calendar.current
+    private func isWorthNotifying(plan: NotificationPlan, now: Date, calendar: Calendar) -> Bool {
         let hour = calendar.component(.hour, from: now)
         if hour >= 22 || hour < 6 {
             return plan.priority >= 90
         }
         return true
+    }
+
+    private func fireDate(
+        for window: AvoidWindowRecommendation,
+        now: Date,
+        calendar: Calendar
+    ) -> Date {
+        let warningLeadMinutes = 30
+        let leadDate = calendar.date(
+            byAdding: .minute,
+            value: -warningLeadMinutes,
+            to: window.window.start
+        ) ?? window.window.start
+
+        return max(leadDate, now)
     }
 
     private func deduplicateSmart(_ plans: [NotificationPlan]) -> [NotificationPlan] {

@@ -26,7 +26,8 @@ struct OutfitDecisionEngineTests {
             calendar: calendar
         )
 
-        #expect(normal.outfit.items.contains("İnce ceket") == false)
-        #expect(coldSensitive.outfit.items.contains("İnce ceket"))
+        let lightJacket = L10n.text("outfit_light_jacket", lang: "tr")
+        #expect(normal.outfit.items.contains(lightJacket) == false)
+        #expect(coldSensitive.outfit.items.contains(lightJacket))
     }
 }

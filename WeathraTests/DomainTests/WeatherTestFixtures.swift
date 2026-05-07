@@ -28,7 +28,9 @@ enum WeatherTestFixtures {
         quietHours: TimeWindow? = nil,
         maximumDailyNotifications: Int = 2
     ) -> UserComfortProfile {
-        UserComfortProfile(
+        L10n.configure(language: .turkish)
+
+        return UserComfortProfile(
             temperatureSensitivity: sensitivity,
             preferredActivities: activities,
             quietHours: quietHours,
@@ -53,7 +55,7 @@ enum WeatherTestFixtures {
     ) -> WeatherSnapshot {
         let calendar = calendar
         let start = calendar.date(bySettingHour: 6, minute: 0, second: 0, of: now) ?? now
-        let hourly = (0..<18).compactMap { offset -> HourlyWeatherPoint? in
+        let hourly = (0..<18).compactMap { (offset: Int) -> HourlyWeatherPoint? in
             guard let date = calendar.date(byAdding: .hour, value: offset, to: start) else {
                 return nil
             }
@@ -70,7 +72,10 @@ enum WeatherTestFixtures {
                 uvIndex: uvIndex(hour),
                 conditionCode: "test",
                 isDaylight: (6...20).contains(hour),
-                severeWeatherRisk: severeRisk(hour)
+                severeWeatherRisk: severeRisk(hour),
+                pollenLevel: nil,
+                airQualityIndex: nil,
+                pm25Level: nil
             )
         }
 

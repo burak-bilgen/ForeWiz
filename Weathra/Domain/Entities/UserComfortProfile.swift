@@ -114,8 +114,14 @@ extension UserComfortProfile {
             accentPalette: try container.decodeIfPresent(AppAccentPalette.self, forKey: .accentPalette) ?? .sky,
             language: try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system,
             wardrobe: try container.decodeIfPresent(WardrobePreferences.self, forKey: .wardrobe) ?? .default,
-            savedLocations: try container.decodeIfPresent([SavedLocation].self, forKey: .savedLocations) ?? [SavedLocation.currentLocation],
-            selectedLocationID: try container.decodeIfPresent(String.self, forKey: .selectedLocationID) ?? "current-location",
+            savedLocations: try container.decodeIfPresent(
+                [SavedLocation].self,
+                forKey: .savedLocations
+            ) ?? [SavedLocation.currentLocation],
+            selectedLocationID: try container.decodeIfPresent(
+                String.self,
+                forKey: .selectedLocationID
+            ) ?? "current-location",
             subscriptionTier: try container.decodeIfPresent(SubscriptionTier.self, forKey: .subscriptionTier) ?? .free,
             allergyProfile: try container.decodeIfPresent(AllergyProfile.self, forKey: .allergyProfile) ?? .default
         )

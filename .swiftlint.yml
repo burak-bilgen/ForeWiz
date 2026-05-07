@@ -48,4 +48,5 @@ nesting:
 excluded:
   - DerivedData
   - .build
+  - Pods
   - WeatherAssistantTests/Generated

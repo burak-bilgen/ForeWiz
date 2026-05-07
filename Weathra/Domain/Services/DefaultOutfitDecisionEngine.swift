@@ -17,44 +17,25 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         var warnings: [String] = []
 
         if rainRisk {
-            let rainWarning = "\(L10n.text("outfit_rainwear")) \(L10n.text("outfit_warning_rain"))"
-            
-            if wardrobe.hasRaincoat {
-                let rainwear = L10n.text("outfit_rainwear")
-                let lightJacket = L10n.text("outfit_light_jacket")
-                items = [rainwear] + items.filter { $0 != lightJacket }
-            }
-            
-            if wardrobe.hasUmbrella {
-                let umbrella = L10n.text("outfit_umbrella")
-                accessories.append(umbrella)
-            } else if wardrobe.hasRaincoat == false {
-                let noGear = L10n.text("outfit_warning_no_gear")
-                warnings.append(noGear)
-            }
-            
-            warnings.append(rainWarning)
+            applyRainRisk(
+                wardrobe: wardrobe,
+                items: &items,
+                accessories: &accessories,
+                warnings: &warnings
+            )
         }
 
         if windRisk {
-            let windbreaker = L10n.text("outfit_windbreaker")
-            items.append(windbreaker)
-            let windWarning = L10n.text("outfit_warning_wind")
-            warnings.append(windWarning)
+            applyWindRisk(items: &items, warnings: &warnings)
         }
 
         if heatRisk || uvRisk {
-            if wardrobe.hasSunglasses {
-                let sunglasses = L10n.text("outfit_sunglasses")
-                accessories.append(sunglasses)
-            }
-            let hat = L10n.text("outfit_hat")
-            let water = L10n.text("outfit_water")
-            accessories.append(contentsOf: [hat, water])
-            if let avoidWindow = input.avoidWindows.first(where: { $0.risk.type == .heat || $0.risk.type == .uv }) {
-                let warning = L10n.text("outfit_warning_avoid")
-                warnings.append("\(avoidWindow.window.shortDisplayText) \(warning)")
-            }
+            applySunRisk(
+                wardrobe: wardrobe,
+                avoidWindows: input.avoidWindows,
+                accessories: &accessories,
+                warnings: &warnings
+            )
         }
 
         if eveningGetsCooler(hourly: input.hourly, calendar: input.calendar), apparentTemperature < 24 {
@@ -74,6 +55,55 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
             accessories: Array(Set(accessories)).sorted(),
             warning: warnings.first
         )
+    }
+
+    private func applyRainRisk(
+        wardrobe: WardrobePreferences,
+        items: inout [String],
+        accessories: inout [String],
+        warnings: inout [String]
+    ) {
+        let rainWarning = "\(L10n.text("outfit_rainwear")) \(L10n.text("outfit_warning_rain"))"
+
+        if wardrobe.hasRaincoat {
+            let rainwear = L10n.text("outfit_rainwear")
+            let lightJacket = L10n.text("outfit_light_jacket")
+            items = [rainwear] + items.filter { $0 != lightJacket }
+        }
+
+        if wardrobe.hasUmbrella {
+            accessories.append(L10n.text("outfit_umbrella"))
+        } else if wardrobe.hasRaincoat == false {
+            warnings.append(L10n.text("outfit_warning_no_gear"))
+        }
+
+        warnings.append(rainWarning)
+    }
+
+    private func applyWindRisk(items: inout [String], warnings: inout [String]) {
+        items.append(L10n.text("outfit_windbreaker"))
+        warnings.append(L10n.text("outfit_warning_wind"))
+    }
+
+    private func applySunRisk(
+        wardrobe: WardrobePreferences,
+        avoidWindows: [AvoidWindowRecommendation],
+        accessories: inout [String],
+        warnings: inout [String]
+    ) {
+        if wardrobe.hasSunglasses {
+            accessories.append(L10n.text("outfit_sunglasses"))
+        }
+
+        accessories.append(contentsOf: [
+            L10n.text("outfit_hat"),
+            L10n.text("outfit_water")
+        ])
+
+        if let avoidWindow = avoidWindows.first(where: { $0.risk.type == .heat || $0.risk.type == .uv }) {
+            let warning = L10n.text("outfit_warning_avoid")
+            warnings.append("\(avoidWindow.window.shortDisplayText) \(warning)")
+        }
     }
 
     private func adjustedTemperature(_ temperature: Double, sensitivity: TemperatureSensitivity) -> Double {

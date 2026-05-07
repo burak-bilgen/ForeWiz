@@ -1,36 +1,42 @@
 import Foundation
+import SwiftData
 
 final class SwiftDataWeatherCacheRepository: WeatherCacheRepository {
-    private enum Key {
-        static let latestWeather = "weathra.latestWeather.v1"
-    }
+    private let modelContext: ModelContext
+    private let cachePolicy: WeatherCachePolicy
 
-    private let userDefaults: UserDefaults
-    private let encoder = JSONEncoder()
-    private let decoder = JSONDecoder()
-
-    init(userDefaults: UserDefaults = .standard) {
-        self.userDefaults = userDefaults
+    init(modelContext: ModelContext, cachePolicy: WeatherCachePolicy = .init()) {
+        self.modelContext = modelContext
+        self.cachePolicy = cachePolicy
     }
 
     func loadLatest() async throws -> WeatherSnapshot? {
-        guard let data = userDefaults.data(forKey: Key.latestWeather) else {
+        let descriptor = FetchDescriptor<WeatherSnapshotModel>(
+            sortBy: [SortDescriptor(\.fetchedAt, order: .reverse)]
+        )
+        guard let model = try modelContext.fetch(descriptor).first else {
             return nil
         }
-
-        do {
-            return try decoder.decode(StoredWeatherSnapshot.self, from: data).snapshot
-        } catch {
-            throw AppError.cacheUnavailable
+        
+        let snapshot = try model.toSnapshot()
+        
+        if cachePolicy.freshness(for: snapshot.fetchedAt, now: Date()) == .expired {
+            modelContext.delete(model)
+            try modelContext.save()
+            return nil
         }
+        
+        return snapshot
     }
 
     func save(_ snapshot: WeatherSnapshot) async throws {
-        do {
-            let data = try encoder.encode(StoredWeatherSnapshot(snapshot: snapshot))
-            userDefaults.set(data, forKey: Key.latestWeather)
-        } catch {
-            throw AppError.cacheUnavailable
-        }
+        let descriptor = FetchDescriptor<WeatherSnapshotModel>()
+        let existing = try modelContext.fetch(descriptor)
+        
+        existing.forEach { modelContext.delete($0) }
+        
+        let model = try WeatherSnapshotModel(snapshot: snapshot)
+        modelContext.insert(model)
+        try modelContext.save()
     }
 }

@@ -14,7 +14,7 @@ struct LocationPickerView: View {
         VStack(spacing: 0) {
             HStack {
                 if savedLocations.count > 1 {
-                    Button(isEditing ? L10n.text( "location_picker_done") : L10n.text( "location_picker_edit")) {
+                    Button(isEditing ? L10n.text("location_picker_done") : L10n.text("location_picker_edit")) {
                         isEditing.toggle()
                     }
                     .padding(.leading, AppSpacing.medium)
@@ -27,7 +27,7 @@ struct LocationPickerView: View {
                         .font(.title3)
                         .foregroundStyle(AppTheme.accent)
                 }
-                Button(L10n.text( "location_picker_close")) {
+                Button(L10n.text("location_picker_close")) {
                     dismiss()
                 }
                 .fontWeight(.semibold)
@@ -42,10 +42,10 @@ struct LocationPickerView: View {
                     Image(systemName: "mappin.slash")
                         .font(.system(size: 40))
                         .foregroundStyle(AppTheme.secondaryText)
-                    Text(L10n.text( "location_picker_empty"))
+                    Text(L10n.text("location_picker_empty"))
                         .font(AppTypography.headline)
                         .foregroundStyle(AppTheme.ink)
-                    Text(L10n.text( "location_picker_empty_hint"))
+                    Text(L10n.text("location_picker_empty_hint"))
                         .font(AppTypography.caption)
                         .foregroundStyle(AppTheme.secondaryText)
                 }
@@ -141,12 +141,12 @@ private struct AddLocationView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Button(L10n.text( "location_picker_cancel")) { dismiss() }
+                Button(L10n.text("location_picker_cancel")) { dismiss() }
                 Spacer()
-                Text(L10n.text( "location_picker_add_title"))
+                Text(L10n.text("location_picker_add_title"))
                     .font(AppTypography.headline)
                 Spacer()
-                Button(L10n.text( "location_picker_add_button")) { addLocation() }
+                Button(L10n.text("location_picker_add_button")) { addLocation() }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                     .fontWeight(.semibold)
             }
@@ -154,19 +154,19 @@ private struct AddLocationView: View {
             .background(.regularMaterial)
 
             Form {
-                Section(L10n.text( "location_picker_name_section")) {
-                    TextField(L10n.text( "location_picker_name_placeholder"), text: $name)
+                Section(L10n.text("location_picker_name_section")) {
+                    TextField(L10n.text("location_picker_name_placeholder"), text: $name)
                 }
 
-                Section(L10n.text( "location_picker_coordinates")) {
-                    TextField(L10n.text( "location_picker_latitude"), text: $latitudeText)
+                Section(L10n.text("location_picker_coordinates")) {
+                    TextField(L10n.text("location_picker_latitude"), text: $latitudeText)
                         .keyboardType(.decimalPad)
-                    TextField(L10n.text( "location_picker_longitude"), text: $longitudeText)
+                    TextField(L10n.text("location_picker_longitude"), text: $longitudeText)
                         .keyboardType(.decimalPad)
                 }
 
                 Section {
-                    Text(L10n.text( "location_picker_default_coords_note"))
+                    Text(L10n.text("location_picker_default_coords_note"))
                         .font(.system(.caption2, design: .rounded))
                         .foregroundStyle(.secondary)
                 }

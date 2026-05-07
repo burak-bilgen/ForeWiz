@@ -7,17 +7,20 @@ struct PrimaryButton: View {
     var useHaptic: Bool = true
 
     var body: some View {
-        Button(action: {
-            if useHaptic {
-                HapticManager.medium()
+        Button(
+            action: {
+                if useHaptic {
+                    HapticManager.medium()
+                }
+                action()
+            },
+            label: {
+                Label(title, systemImage: systemImage)
+                    .font(AppTypography.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, AppSpacing.medium)
             }
-            action()
-        }) {
-            Label(title, systemImage: systemImage)
-                .font(AppTypography.headline)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, AppSpacing.medium)
-        }
+        )
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
     }

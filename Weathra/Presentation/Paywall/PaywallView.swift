@@ -100,12 +100,12 @@ struct PaywallView: View {
                 await store.loadProducts()
                 await store.refreshStatus()
             }
-            .alert(L10n.text( "paywall_purchases"), isPresented: $showRestoreAlert) {
-                Button(L10n.text( "paywall_ok"), role: .cancel) {}
+            .alert(L10n.text("paywall_purchases"), isPresented: $showRestoreAlert) {
+                Button(L10n.text("paywall_ok"), role: .cancel) {}
             } message: {
                 Text(restoreSuccess
-                     ? L10n.text( "paywall_restore_success")
-                     : L10n.text( "paywall_restore_failed"))
+                     ? L10n.text("paywall_restore_success")
+                     : L10n.text("paywall_restore_failed"))
             }
         }
     }
@@ -127,7 +127,10 @@ private struct PremiumBenefitRow: View {
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(AppTheme.accent)
                 .frame(width: 36, height: 36)
-                .background(AppTheme.softBubbleGradient(tint: AppTheme.accent), in: RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous))
+                .background(
+                    AppTheme.softBubbleGradient(tint: AppTheme.accent),
+                    in: RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous)
+                )
 
             VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
                 Text(feature.localizedTitle)

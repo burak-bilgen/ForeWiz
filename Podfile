@@ -5,6 +5,10 @@ target 'Weathra' do
 
   pod 'Google-Mobile-Ads-SDK'
   pod 'GoogleUserMessagingPlatform'
+
+  target 'WeathraTests' do
+    inherit! :search_paths
+  end
   
 end
 

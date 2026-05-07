@@ -147,6 +147,15 @@ private struct DailyForecastCell: View {
                 .stroke(item.isToday ? AppTheme.accent.opacity(0.35) : Color.clear, lineWidth: 1.5)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(item.dayName), \(L10n.text("weekly_score_accessor")) \(item.outdoorScore), \(L10n.text("weekly_high_accessor")) \(Int(item.highTemp)) \(L10n.text("weekly_low_accessor")) \(Int(item.lowTemp))")
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        [
+            item.dayName,
+            "\(L10n.text("weekly_score_accessor")) \(item.outdoorScore)",
+            "\(L10n.text("weekly_high_accessor")) \(Int(item.highTemp))",
+            "\(L10n.text("weekly_low_accessor")) \(Int(item.lowTemp))"
+        ].joined(separator: ", ")
     }
 }

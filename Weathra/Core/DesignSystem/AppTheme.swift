@@ -95,6 +95,54 @@ enum AppTheme {
         )
     }
 
+    static func glassFill(for colorScheme: ColorScheme) -> Color {
+        switch colorScheme {
+        case .dark:
+            Color.white.opacity(0.08)
+        case .light:
+            Color.white.opacity(0.58)
+        @unknown default:
+            surface.opacity(0.72)
+        }
+    }
+
+    static func glassStroke(for colorScheme: ColorScheme) -> Color {
+        switch colorScheme {
+        case .dark:
+            Color.white.opacity(0.16)
+        case .light:
+            Color.primary.opacity(0.08)
+        @unknown default:
+            Color.primary.opacity(0.10)
+        }
+    }
+
+    static func glassAccentShadow(for colorScheme: ColorScheme, isEnabled: Bool) -> Color {
+        guard isEnabled else { return .clear }
+
+        switch colorScheme {
+        case .dark:
+            return accent.opacity(0.18)
+        case .light:
+            return accent.opacity(0.10)
+        @unknown default:
+            return accent.opacity(0.10)
+        }
+    }
+
+    static func glassDepthShadow(for colorScheme: ColorScheme, isEnabled: Bool) -> Color {
+        guard isEnabled else { return .clear }
+
+        switch colorScheme {
+        case .dark:
+            return .black.opacity(0.20)
+        case .light:
+            return .black.opacity(0.05)
+        @unknown default:
+            return .black.opacity(0.06)
+        }
+    }
+
     static func color(for decision: OutdoorDecision) -> Color {
         switch decision {
         case .good: return success
@@ -119,6 +167,7 @@ enum AppTheme {
 
 struct AppBackground: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -130,7 +179,8 @@ struct AppBackground: View {
                 opacity: colorScheme == .dark ? 0.08 : 0.14,
                 alignment: .topTrailing,
                 xOffset: 40,
-                yOffset: -40
+                yOffset: -40,
+                reduceMotion: reduceMotion
             )
 
             WeatherBackgroundSymbol(
@@ -139,7 +189,8 @@ struct AppBackground: View {
                 opacity: colorScheme == .dark ? 0.06 : 0.10,
                 alignment: .bottomLeading,
                 xOffset: -30,
-                yOffset: 20
+                yOffset: 20,
+                reduceMotion: reduceMotion
             )
         }
         .ignoresSafeArea()
@@ -158,23 +209,30 @@ private struct WeatherBackgroundSymbol: View {
     let alignment: Alignment
     let xOffset: CGFloat
     let yOffset: CGFloat
+    let reduceMotion: Bool
 
     @State private var isAnimating = false
+    private let animationDuration = Double.random(in: Constant.minDuration...Constant.maxDuration)
 
     var body: some View {
         Image(systemName: name)
             .font(.system(size: size, weight: .bold))
             .foregroundStyle(.white.opacity(opacity))
-            .offset(x: xOffset, y: isAnimating ? yOffset - 10 : yOffset + 10)
+            .offset(x: xOffset, y: reduceMotion ? yOffset : animatedYOffset)
             .animation(
-                .easeInOut(duration: animationDuration).repeatForever(autoreverses: true),
+                reduceMotion ? nil : .easeInOut(duration: animationDuration).repeatForever(autoreverses: true),
                 value: isAnimating
             )
-            .onAppear { isAnimating = true }
+            .onAppear {
+                isAnimating = reduceMotion == false
+            }
+            .onChange(of: reduceMotion) { _, newValue in
+                isAnimating = newValue == false
+            }
             .accessibilityHidden(true)
     }
 
-    private var animationDuration: Double {
-        Double.random(in: Constant.minDuration...Constant.maxDuration)
+    private var animatedYOffset: CGFloat {
+        isAnimating ? yOffset - 10 : yOffset + 10
     }
 }

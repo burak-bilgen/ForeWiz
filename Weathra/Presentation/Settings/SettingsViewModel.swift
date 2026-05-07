@@ -37,10 +37,12 @@ final class SettingsViewModel: ObservableObject {
                 try await updateUserPreferencesUseCase.execute(profile: current)
                 onProfileSaved(current)
                 saveMessage = L10n.text("settings_save_success")
+                HapticManager.success()
                 try? await Task.sleep(nanoseconds: 2_500_000_000)
                 saveMessage = nil
             } catch {
                 saveMessage = AppError.persistenceFailed.userMessage
+                HapticManager.error()
                 try? await Task.sleep(nanoseconds: 2_500_000_000)
                 saveMessage = nil
             }
@@ -52,6 +54,7 @@ final class SettingsViewModel: ObservableObject {
     }
 
     func openPaywall() {
+        HapticManager.medium()
         showPaywall = true
     }
 }

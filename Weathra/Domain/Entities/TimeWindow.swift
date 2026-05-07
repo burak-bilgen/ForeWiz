@@ -13,7 +13,7 @@ struct TimeWindow: Codable, Equatable, Hashable, Identifiable, Sendable {
 
     var shortDisplayText: String {
         let formatter = DateFormatter()
-        formatter.locale = .current
+        formatter.locale = L10n.locale
         formatter.dateFormat = "HH:mm"
         return "\(formatter.string(from: start))–\(formatter.string(from: end))"
     }

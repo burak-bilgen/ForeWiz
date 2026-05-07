@@ -25,8 +25,8 @@ struct WeatherDecisionEngineTests {
 
         #expect(recommendation.risks.contains { $0.type == .heat && $0.severity >= .high })
         #expect(recommendation.risks.contains { $0.type == .uv && $0.severity >= .medium })
-        #expect(recommendation.outfit.accessories.contains("Su"))
-        #expect(recommendation.outfit.accessories.contains("Şapka"))
+        #expect(recommendation.outfit.accessories.contains(L10n.text("outfit_water", lang: "tr")))
+        #expect(recommendation.outfit.accessories.contains(L10n.text("outfit_hat", lang: "tr")))
 
         let heatWindow = recommendation.avoidWindows.first { $0.risk.type == .heat }
         #expect(heatWindow != nil)
@@ -60,7 +60,7 @@ struct WeatherDecisionEngineTests {
         #expect(recommendation.outdoorScore.rawValue >= 80)
         #expect(recommendation.outdoorDecision == .good)
         #expect(recommendation.avoidWindows.isEmpty)
-        #expect(recommendation.outfit.title.contains("hafif bir katman"))
+        #expect(recommendation.outfit.title == L10n.text("outfit_title_mild", lang: "tr"))
     }
 
     @Test func rainyDayProducesRainRiskAndUmbrellaSuggestion() {
@@ -83,7 +83,7 @@ struct WeatherDecisionEngineTests {
         )
 
         #expect(recommendation.risks.contains { $0.type == .rain && $0.severity >= .high })
-        #expect(recommendation.outfit.accessories.contains("Şemsiye"))
+        #expect(recommendation.outfit.accessories.contains(L10n.text("outfit_umbrella", lang: "tr")))
         #expect(recommendation.outdoorScore.rawValue < 80)
         #expect(recommendation.avoidWindows.contains { $0.risk.type == .rain })
     }

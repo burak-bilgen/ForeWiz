@@ -2,7 +2,6 @@ import Foundation
 
 protocol WidgetRepository {
     func save(recommendation: DailyRecommendation) throws
-    func loadLatest() throws -> DailyRecommendation?
 }
 
 final class SharedWidgetRepository: WidgetRepository {
@@ -18,19 +17,48 @@ final class SharedWidgetRepository: WidgetRepository {
             throw AppError.persistenceFailed
         }
 
-        let data = try JSONEncoder().encode(recommendation)
+        let data = try JSONEncoder().encode(WidgetRecommendationPayload(recommendation: recommendation))
         userDefaults.set(data, forKey: key)
-        
-        // Tells WidgetKit to reload the timeline
-        // Using a NotificationCenter isn't direct for WidgetKit, but since we can't import WidgetKit in Data layer directly without tying it,
-        // we will leave WidgetCenter.shared.reloadAllTimelines() to the Presentation/App layer if needed, or just let UserDefaults do its job.
     }
+}
 
-    func loadLatest() throws -> DailyRecommendation? {
-        guard let userDefaults, let data = userDefaults.data(forKey: key) else {
-            return nil
+private struct WidgetRecommendationPayload: Codable {
+    let outdoorDecision: WidgetOutdoorDecisionPayload
+    let outdoorScore: Int
+    let bestOutdoorWindow: WidgetTimeWindowPayload?
+    let summaryText: String
+
+    init(recommendation: DailyRecommendation) {
+        self.outdoorDecision = WidgetOutdoorDecisionPayload(decision: recommendation.outdoorDecision)
+        self.outdoorScore = recommendation.outdoorScore.rawValue
+        self.bestOutdoorWindow = recommendation.bestOutdoorWindow.map { WidgetTimeWindowPayload(timeWindow: $0) }
+        self.summaryText = recommendation.summaryText
+    }
+}
+
+private enum WidgetOutdoorDecisionPayload: String, Codable {
+    case good
+    case moderate
+    case bad
+
+    init(decision: OutdoorDecision) {
+        switch decision {
+        case .good:
+            self = .good
+        case .moderate:
+            self = .moderate
+        case .risky, .avoid:
+            self = .bad
         }
+    }
+}
 
-        return try JSONDecoder().decode(DailyRecommendation.self, from: data)
+private struct WidgetTimeWindowPayload: Codable {
+    let start: Date
+    let end: Date
+
+    init(timeWindow: TimeWindow) {
+        self.start = timeWindow.start
+        self.end = timeWindow.end
     }
 }

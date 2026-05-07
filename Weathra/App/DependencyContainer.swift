@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 
 @MainActor
 final class DependencyContainer {
@@ -61,7 +62,7 @@ final class DependencyContainer {
         self.adManager = adManager
     }
 
-    static func live() -> DependencyContainer {
+    static func live(modelContext: ModelContext) -> DependencyContainer {
         let dateProvider = SystemDateProvider()
         let activityEngine = DefaultActivityWindowScoringEngine()
         let outfitEngine = DefaultOutfitDecisionEngine()
@@ -70,8 +71,8 @@ final class DependencyContainer {
             outfitDecisionEngine: outfitEngine
         )
         let notificationEngine = DefaultNotificationPlanningEngine()
-        let preferencesRepository = SwiftDataPreferencesRepository()
-        let weatherCacheRepository = FileWeatherCacheRepository()
+        let preferencesRepository = SwiftDataPreferencesRepository(modelContext: modelContext)
+        let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
         let locationRepository = CoreLocationRepository()
         let weatherRepository = WeatherKitWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()

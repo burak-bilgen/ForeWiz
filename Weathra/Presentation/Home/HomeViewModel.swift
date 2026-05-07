@@ -70,13 +70,18 @@ final class HomeViewModel: ObservableObject {
 
         do {
             let targetLocation: LocationCoordinate?
-            if let selectedLocation, selectedLocation.id != "current-location" {
-                targetLocation = LocationCoordinate(latitude: selectedLocation.latitude, longitude: selectedLocation.longitude)
+            if let selectedLocation,
+               selectedLocation.id != "current-location" {
+                targetLocation = LocationCoordinate(
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude
+                )
             } else {
                 targetLocation = nil
             }
 
-            let result = try await loadHomeRecommendationUseCase.execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
+            let result = try await loadHomeRecommendationUseCase
+                .execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
             let profile = try await preferencesRepository.loadProfile()
 
             state = .loaded(

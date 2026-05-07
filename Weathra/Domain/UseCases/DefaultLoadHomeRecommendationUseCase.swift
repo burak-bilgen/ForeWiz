@@ -27,7 +27,10 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         self.cachePolicy = cachePolicy
     }
 
-    func execute(forceRefresh: Bool, targetLocation: LocationCoordinate? = nil) async throws -> HomeRecommendationResult {
+    func execute(
+        forceRefresh: Bool,
+        targetLocation: LocationCoordinate? = nil
+    ) async throws -> HomeRecommendationResult {
         let now = dateProvider.now
         let profile = try await preferencesRepository.loadProfile()
 

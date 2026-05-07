@@ -1,509 +1,92 @@
 import Foundation
 
 enum L10n {
-    static func text(_ key: String) -> String {
-        Self.dictionary[key] ?? key
+    private enum Constant {
+        static let languageOverrideKey = "weathra.languageOverride.v1"
+        static let appGroupSuiteName = "group.weathra"
+        static let fallbackLanguageCode = "en"
+        static let supportedLanguageCodes = Set(["en", "tr"])
     }
 
-    private static let dictionary: [String: String] = [
-        // MARK: - Home Screen
-        "home_title": "Bugün Dışarı",
-        "home_daily_summary": "Günlük Özet",
-        "home_current_location": "Konumum",
-        "home_last_saved": "Son güncellenme",
-        "home_live": "Canlı",
-        "home_loading": "Hava durumu yükleniyor...",
-        "home_error_retry": "Tekrar Dene",
-        "home_updated": "Güncellendi",
-        "home_score": "Skor",
-        "home_best_time": "En İyi",
-        "settings_units": "Birimler",
+    static func configure(language: AppLanguage, userDefaults: UserDefaults = .standard) {
+        let sharedUserDefaults = UserDefaults(suiteName: Constant.appGroupSuiteName)
 
-        // MARK: - Weather (Doğru imla)
-        "weather_live_forecast": "Anlık Hava",
-        "weather_latest_forecast": "Son Veri",
-        "weather_feels_like": "Hissedilen",
-        "weather_current": "Şu An",
-        "weather_clear": "Açık",
-        "weather_cloudy": "Bulutlu",
-        "weather_rain": "Yağışlı",
-        "weather_snow": "Karlı",
-        "weather_storm": "Fırtınalı",
-        "weather_foggy": "Sisli",
-        "weather_data_provided_by": "Veren:",
-        "weather_limited_data": "Sınırlı veri",
-        "risk_no_risk": "Belirgin risk yok",
-        "risk_no_avoid": "Kaçınılacak belirgin saat yok",
-        "alert_tornado": "Kasırga",
-        "alert_flashFlood": "Ani Sel",
-        "alert_highWind": "Kuvvetli Rüzgar",
-        "alert_hail": "Dolu",
-        "alert_denseFog": "Kalın Sis",
-        "weather_storm_severe": "Şiddetli Fırtına",
-        "alert_blizzard": "Kar Fırtınası",
-        "alert_extremeHeat": "Aşırı Sıcaklık",
-        "alert_extremeCold": "Aşırı Soğuk",
+        if let localeIdentifier = language.localeIdentifier {
+            userDefaults.set(localeIdentifier, forKey: Constant.languageOverrideKey)
+            sharedUserDefaults?.set(localeIdentifier, forKey: Constant.languageOverrideKey)
+        } else {
+            userDefaults.removeObject(forKey: Constant.languageOverrideKey)
+            sharedUserDefaults?.removeObject(forKey: Constant.languageOverrideKey)
+        }
+    }
 
-        // MARK: - Outfit Items
-        "outfit_rainwear": "Yağmurluk",
-        "outfit_umbrella": "Şemsiye",
-        "outfit_light_jacket": "İnce ceket",
-        "outfit_hat": "Şapka",
-        "outfit_water": "Su",
-        "outfit_windbreaker": "Rüzgar geçirmeyen katman",
-        "outfit_light_tshirt": "Hafif tişört",
-        "outfit_shorts_pants": "Şort veya ince pantolon",
-        "outfit_tshirt": "Tişört",
-        "outfit_light_pants": "İnce pantolon",
-        "outfit_casual_pants": "Rahat pantolon",
-        "outfit_sweater": "Kazak",
-        "outfit_light_coat": "İnce mont",
-        "outfit_closed_shoes": "Kapalı ayakkabı",
-        "outfit_winter_coat": "Kışlık Mont",
-        "outfit_thick_coat": "Kalın Mont",
-        "outfit_thermals": "Termal İçlik",
-        "outfit_warning_rain": "Yağmur bekleniyor.",
-        "outfit_warning_no_gear": "Yağmur görünüyor ancak şemsiye veya yağmurluğun yok, ıslanabilirsin!",
-        "outfit_warning_wind": "Rüzgar hissedilen sıcaklığı düşürebilir.",
-        "outfit_warning_avoid": "arasında uzun süre dışarıda kalmamaya çalış.",
-        "outfit_warning_evening": "Akşam serinleyebilir. Çantaya ince bir hırka ya da ceket atmak iyi olur.",
-        "outfit_sunglasses": "Güneş gözlüğü",
-        "outfit_gloves": "Eldiven/Atkı",
-        "outfit_title_hot": "Hafif, nefes alan parçalar sıcakta daha rahat hissettirir.",
-        "outfit_title_mild": "Tişört ve hafif bir katman yeterli.",
-        "outfit_title_mild_cold": "Tişört ve ince ceket dengeli olur.",
-        "outfit_title_cold": "Sıcak tutan katmanlar ve kapalı ayakkabı soğuğu hissettirmez.",
-        "outfit_title_balanced": "bugün için dengeli bir kombin olur.",
+    static func text(_ key: String) -> String {
+        text(key, languageCode: currentLanguageCode)
+    }
 
-        // MARK: - Weather Risks
-        "risk_feels_like_rising": "Hissedilen sıcaklık yükseliyor",
-        "risk_feels_like_high": "Bu aralıkta hissedilen sıcaklık yüksek. Uzun yürüyüş veya koşu " +
-            "planını daha serin saate al.",
-        "risk_sun_protection": "Güneş koruması gerekiyor",
-        "risk_uv_high": "UV seviyesi yükseliyor. Gölge, şapka ve güneş koruması planına dahil edilmeli.",
-        "risk_rain_disrupt": "Yağmur planı aksatabilir",
-        "risk_rain_message": "Yağmur ihtimali dış planı aksatabilir. Açık alan planında esnek saat veya kapalı " +
-            "alternatif bırak.",
-        "risk_feels_high_message": "Hissedilen sıcaklık yüksek. Uzun dış planı kısalt, su ve gölge molası bırak.",
-        "risk_feels_low_message": "Hissedilen sıcaklık düşük. Dışarıda uzun kalacaksan ekstra katman ve kapalı ayakkabı iyi olur.",
-        "risk_hot_exhausting": "Sıcaklık yorucu seviyede",
-        "risk_midday_heating": "Öğlen sıcaklık artıyor",
-        "risk_midday_message": "Öğle saatlerinde sıcaklık konforu düşürüyor. Efor gerektiren işleri sabah veya akşama almak daha iyi.",
-        "risk_cold_message": "Hissedilen sıcaklık düşük. Isınmış iç mekana geçene kadar sıcak tutacak katmanlar giy.",
-        "risk_cold_feels": "Soğuk hissediliyor",
-        "risk_poor_comfort": "Dışarıda konfor düşük",
-        "risk_poor_comfort_message": "Bu saatlerde dışarıda konfor düşük. Zorunlu değilse planı daha rahat bir aralığa taşı.",
-        "risk_severe_weather": "Şiddetli hava riski",
-        "risk_severe_weather_message": "Şiddetli hava riski var; dış planı ertelemek daha güvenli.",
-        "risk_uv_need": "UV koruması gerekli",
-        "risk_rain_high": "Yağmur ihtimali yüksek",
-        "risk_wind_open": "Rüzgar açık alanı zorlayabilir",
-        "risk_humid": "Nem sıcaklığı yorucu hissettirir",
-        "risk_uv_message": "UV yüksek. Kısa süreli planlarda bile güneş koruması ve gölge önemli.",
-        "risk_rain_message2": "Yağmur ihtimali dış planı aksatabilir. Alternatif plan hazırla.",
-        "risk_wind_message": "Kuvvetli rüzgar açık alanlarda zorlayıcı. Kapalı güzergah tercih et.",
-        "risk_humid_message": "Yüksek nem + sıcak birlikte yorucu. Bol su ve dinlenme molası planla.",
+    static func text(_ key: String, lang languageCode: String) -> String {
+        text(key, languageCode: normalizedLanguageCode(languageCode) ?? Constant.fallbackLanguageCode)
+    }
 
-        // MARK: - Notifications
-        "notification_morning_title": "Günaydın!",
-        "notification_morning_reason": "Sabah özeti",
-        "notification_outfit_reason": "Kıyafet önerisi",
-        "notification_activity_time": "zamanı",
-        "notification_outdoor_great": "Dışarı harika!",
-        "notification_outdoor_moderate": "İdare eder.",
-        "notification_outdoor_risky": "Dikkatli ol.",
-        "notification_outdoor_bad": "Dışarı sorunlu.",
-        "notification_best_window": "En rahat:",
-        "decision_caution": "Dikkat",
-        "notification_outfit_title": "Ne giyeyim?",
-        "alert_warning": "Uyarısı",
-        "decision_best_window": "Dışarı çıkmak için en rahat zaman",
-        "decision_best_window_message": "Uzun planı bu aralığa almak daha konforlu olur.",
-        "decision_good_message": "Bugün dışarıda vakit geçirmek için koşullar dengeli. Uzun süre dışarıda kalacaksan hava değişimini yine de kontrol et.",
-        "decision_moderate_message": "Dışarı çıkmak için uygun, ancak bazı saatlerde konfor düşebilir. Planı en rahat aralığa denk getirmek daha iyi olur.",
-        "decision_risky_message": "Bugün hava bazı saatlerde yorucu veya riskli olabilir. Dışarıda uzun vakit geçirme, mola verip alternatif bir saate kaydır.",
-        "decision_avoid_message": "Bugün dışarıda uzun kalmak iyi bir fikir değil. Zorunlu planları kısa tut, mümkünse daha güvenli bir saate taşı.",
-        "decision_score_explanation": "Skor",
-        "decision_risk_high_message": "Dışarıda geçireceğin vakti kısa tut, saatini değiştirebileceğin bir alternatifin olsun.",
-        "decision_no_risk": "belirgin bir risk yok",
-        "decision_no_avoid": "kaçınman gereken belirgin bir saat yok",
-        "decision_explanation_factors": "Bu karar; hissedilen sıcaklık, yağış olasılığı, rüzgar, UV, nem ve saatlik değişimler " +
-            "birlikte değerlendirilerek verildi.",
-        "decision_main_risk": "Öne çıkan risk:",
-        "decision_avoid_time": "Dikkat etmen gereken zaman:",
-        "scoring_best_range": "için günün en rahat aralığı",
-        "scoring_balanced": "sıcaklık, yağış ve rüzgar birlikte daha dengeli görünüyor.",
-        "scoring_ok": "için uygun.",
-        "scoring_check": "Başlamadan önce yağış ve rüzgar değişimini tekrar kontrol et.",
-        "scoring_no_best": "için bugün çok rahat bir aralık yok;",
-        "scoring_least_bad": "yine de en az zorlayan zaman",
-        "instruction_tornado": "En yakın sığınak veya bodrum kata git. Pencerelerden uzak dur.",
-        "instruction_flashFlood": "Araçla veya yaya derelerden geçme. Yüksek noktalara çık.",
-        "instruction_storm": "Dışarı çıkma. Sağlam bir yapının içinde kal.",
-        "instruction_blizzard": "Dışarı çıkma. Isı kaybını önle ve bol sıvı al.",
-        "instruction_heat": "Bol su iç, klimalı ortamda kal, yoğun fiziksel aktiviteden kaçın.",
-        "instruction_cold": "Katmanlı giyin, dışarıda geçirme, evde ısıtma kullan.",
-        "instruction_wind": "Ağaçlardan ve baskın yapılarından uzak dur. Bisikletten in.",
-        "instruction_hail": "Araçları kapalı alana park et. Dışarıda isen koruna.",
-        "instruction_fog": "Farları aç, hızını azalt, güvenli mesafeyi koru.",
-        "notification_ideal": "Tam ideal!",
-        "notification_suitable": "Uygun.",
-        "notification_best": "En iyi:",
-        "error_live_forecast": "Canlı tahmin alınamadı; en son kayıtlı hava gösteriliyor.",
+    static func formatted(_ key: String, _ arguments: CVarArg...) -> String {
+        String(format: text(key), locale: locale, arguments: arguments)
+    }
 
-        // MARK: - Decisions
-        "decision_good": "Harika, dışarı çık!",
-        "decision_moderate": "İdare eder",
-        "decision_risky": "Dikkatli ol",
-        "decision_avoid": "Dışarı çıkma",
+    static var locale: Locale {
+        Locale(identifier: currentLanguageCode)
+    }
 
-        // MARK: - Widget
-        "widget_outdoor_score": "Dışarı Skoru",
-        "widget_best_time": "En İyi Zaman",
+    static var currentLanguageCode: String {
+        if let override = UserDefaults.standard.string(forKey: Constant.languageOverrideKey),
+           let languageCode = normalizedLanguageCode(override) {
+            return languageCode
+        }
 
-        // MARK: - Forecast
-        "forecast_3day": "3 Günlük",
-        "forecast_7day": "7 Günlük",
-        "forecast_14day": "14 Günlük",
-        "forecast_no_best_window": "Belirgin saat yok",
-        "forecast_premium_required": "Premium gerekli",
+        return preferredSupportedLanguageCode
+    }
 
-        // MARK: - Onboarding
-        "onboarding_welcome": "Weathra'ya Hoş Geldin",
-        "onboarding_subtitle": "Hava durumunu bilmekten daha fazlası.",
-        "onboarding_why_weathra": "Neden Weathra?",
-        "onboarding_why_subtitle": "Sana özel hava kararları.",
-        "onboarding_setup_title": "Hızlıca Ayarlayalım",
-        "onboarding_setup_subtitle": "Deneyimini basitleştirelim.",
-        "onboarding_continue": "Devam",
-        "onboarding_ready": "Başlayalım!",
-        "onboarding_location_required": "Konum izni lazım",
-        "onboarding_feature_decision": "Karar Asistanı",
-        "onboarding_feature_decision_desc": "Bugün dışarı çıkmalı mısın? Ne giymelisin?",
-        "onboarding_feature_personal": "Kişisel Öneriler",
-        "onboarding_feature_personal_desc": "Sana özel, akıllı kararlar.",
-        "onboarding_feature_notifications": "Bildirimler",
-        "onboarding_feature_notifications_desc": "Fırsatları kaçırma.",
+    private static var preferredSupportedLanguageCode: String {
+        for identifier in Locale.preferredLanguages {
+            if let languageCode = normalizedLanguageCode(identifier) {
+                return languageCode
+            }
+        }
 
-        // MARK: - Settings
-        "settings_header_title": "Ayarlar",
-        "settings_header_subtitle": "Kişiselleştir",
-        "settings_appearance_title": "Görünüm",
-        "settings_appearance_subtitle": "Tema ve dil",
-        "settings_comfort_title": "Konfor",
-        "settings_comfort_subtitle": "Tercihlerini belirle",
-        "settings_notifications_title": "Bildirimler",
-        "settings_notifications_subtitle": "Bildirim ayarları",
-        "settings_permissions_title": "İzinler",
-        "settings_permissions_subtitle": "App izinleri",
-        "settings_premium_title": "Premium",
-        "settings_saved_locations_title": "Konumlarım",
-        "settings_saved_locations_subtitle": "Kayıtlı konumlar",
-        "settings_language_title": "Dil",
-        "settings_language_subtitle": "Seç",
+        return Constant.fallbackLanguageCode
+    }
 
-        // MARK: - Tabs
-        "tab_today": "Bugün",
-        "tab_settings": "Ayarlar",
+    private static func text(_ key: String, languageCode: String) -> String {
+        let localizedBundle = bundle(for: languageCode)
+        let localized = localizedBundle.localizedString(forKey: key, value: nil, table: nil)
 
-        // MARK: - Errors
-        "error_unknown": "Bir şey oldu. Tekrar dene.",
-        "error_location_denied": "Konum erişimi kapalı. Ayarlar'a git.",
-        "error_location_unavailable": "Konum bulunamadı.",
-        "error_weather_unavailable": "Veri alınamıyor.",
-        "error_notification_denied": "Bildirimler kapalı.",
-        "error_cache_unavailable": "Önce veri yok.",
+        if localized != key || languageCode == Constant.fallbackLanguageCode {
+            return localized
+        }
 
-        // MARK: - Premium
-        "premium_title": "Weathra Premium",
-        "premium_subtitle": "Tüm özellikleri aç.",
-        "premium_upgrade": "Premium Al",
-        "premium_restore": "Geri Yükle",
-        "premium_restore_success": "Başarıyla geri yüklendi.",
-        "premium_restore_none": "Premium bulunamadı.",
+        return bundle(for: Constant.fallbackLanguageCode).localizedString(forKey: key, value: key, table: nil)
+    }
 
-        // MARK: - Activities
-        "activity_walking": "Yürüyüş",
-        "activity_running": "Koşu",
-        "activity_cycling": "Bisiklet",
-        "activity_outside": "Dışarı",
+    private static func bundle(for languageCode: String) -> Bundle {
+        guard let path = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
+              let bundle = Bundle(path: path) else {
+            return .main
+        }
 
-        // MARK: - Sensitivity
-        "sensitivity_normal": "Normal",
-        "sensitivity_hot": "Sıcağa hassas",
-        "sensitivity_cold": "Soğuğa hassas",
+        return bundle
+    }
 
-        // MARK: - Risk
-        "risk_low": "Düşük",
-        "risk_medium": "Orta",
-        "risk_high": "Yüksek",
-        "risk_extreme": "Çok Yüksek",
+    private static func normalizedLanguageCode(_ identifier: String) -> String? {
+        let normalized = identifier
+            .replacingOccurrences(of: "_", with: "-")
+            .split(separator: "-")
+            .first
+            .map(String.init)?
+            .lowercased()
 
-        // MARK: - About
-        "about_legal": "Yasal",
-        "about_legal_desc": "Veriler Apple Weather'den.",
-        "about_apple_weather_legal": "Apple Weather",
-        "about_done": "Tamam",
+        guard let normalized, Constant.supportedLanguageCodes.contains(normalized) else {
+            return nil
+        }
 
-        // MARK: - Common
-        "settings_cancel": "İptal",
-        "settings_save": "Kaydet",
-
-        // MARK: - Notifications
-        "notification_morning_briefing": "Sabah Özeti",
-        "notification_morning_briefing_desc": "Her sabah özet al.",
-        "notification_outfit": "Kıyafet",
-        "notification_outfit_desc": "Ne giymeli?",
-        "notification_best_run": "Koşu Zamanı",
-        "notification_best_run_desc": "En uygun koşu saatleri.",
-        "notification_uv": "UV Uyarısı",
-        "notification_uv_desc": "Güneş koruması hatırlatması.",
-        "notification_rain": "Yağmur",
-        "notification_rain_desc": "Yağmur öncesi bildirim.",
-        "notification_wind": "Rüzgâr",
-        "notification_wind_desc": "Kuvvetli rüzgâr uyarısı.",
-        "notification_avoid_heat": "Sıcaklık",
-        "notification_avoid_heat_desc": "Sıcaklık uyarısı.",
-
-        // MARK: - Insights
-        "insights_score_breakdown": "Skor Detay",
-        "insights_temperature": "Sıcaklık",
-        "insights_precipitation": "Yağış",
-        "insights_wind": "Rüzgâr",
-        "insights_uv_index": "UV",
-        "insights_activity_scores": "Aktiviteler",
-        "insights_weekly_trend": "Haftalık",
-        "insights_comfortable": "Konforlu",
-        "insights_uncomfortable": "Konforsuz",
-        "insights_low_risk": "Risk Düşük",
-        "insights_calm": "Sakin",
-        "insights_moderate": "Orta",
-        "insights_trend_description": "Bu hafta stabil.",
-        "insights_good": "İyi",
-        "insights_fair": "Orta",
-        "insights_poor": "Kötü",
-
-        // MARK: - Avoid Hours
-        "avoid_hours_title": "Kaçınılacak Saatler",
-        "avoid_hours_none": "Kaçınılacak yok",
-
-        // MARK: - Appearance
-        "appearance_light": "Açık",
-        "appearance_dark": "Koyu",
-        "appearance_system": "Otomatik",
-
-        // MARK: - Language
-        "language_turkish": "Türkçe",
-        "language_english": "İngilizce",
-        "language_system": "Sistem",
-
-        // MARK: - Location Picker
-        "location_picker_add_title": "Yeni Konum",
-        "location_picker_add_button": "Ekle",
-        "location_picker_name_section": "İsim",
-        "location_picker_name_placeholder": "Ev, İş...",
-        "location_picker_coordinates": "Koordinatlar",
-        "location_picker_latitude": "Enlem",
-        "location_picker_longitude": "Boylam",
-        "location_picker_default_coords_note": "Haritadan seç",
-        "location_picker_cancel": "İptal",
-        "location_picker_close": "Kapat",
-        "location_picker_edit": "Düzenle",
-        "location_picker_done": "Tamam",
-        "location_picker_empty": "Konum yok",
-        "location_picker_empty_hint": "Yeni eklemek için +",
-
-        // MARK: - Location Status
-        "location_being_determined": "GPS ile belirleniyor",
-
-        // MARK: - Additional
-        "today_label": "BUGÜN",
-        "widget_forecast_days": "Günlük Tahmin",
-        "recommendation_detail_title": "Detaylı İnceleme",
-        "home_see_details": "Detaylar",
-        "forecast_more_days": "%d gün daha",
-        "home_best_time": "En İyi Zaman",
-        "home_score": "Puan",
-        "home_live": "Canlı",
-        "home_loading": "Yükleniyor...",
-        "home_error_retry": "Tekrar Dene",
-        "home_title": "Bugün",
-        "home_daily_summary": "Günlük Özet",
-        "home_current_location": "Mevcut Konum",
-
-        // MARK: - Risk Types (Doğru imla)
-        "risk_heat": "Sıcaklık",
-        "risk_uv": "UV",
-        "risk_rain": "Yağmur",
-        "risk_wind": "Rüzgâr",
-        "risk_humidity": "Nem",
-        "risk_cold": "Soğuk",
-        "risk_storm": "Fırtına",
-        "risk_pollen_high": "Polen seviyesi yüksek",
-        "risk_pollen_message": "Polen seviyesi yükseliyor. Alerjisi olanlar dikkatli olmalı.",
-        "risk_air_quality": "Hava kalitesi düşük",
-        "risk_air_message": "Hava kalitesi sağlığı etkileyebilir. Dışarıda uzun süre kalmamaya çalış.",
-        "risk_pm25": "PM2.5 yüksek",
-        "risk_pm25_message": "PM2.5 seviyesi yüksek. Nefes problemi olanlar dikkatli olmalı.",
-        "allergy_pollen": "Polen",
-        "allergy_dust": "Toz",
-        "allergy_mold": "Küf",
-        "allergy_pet": "Ev hayvanı",
-        "allergy_smoke": "Duman",
-        "allergy_air": "Hava kalitesi",
-        "pollen_grass": "Çim",
-        "pollen_tree": "Ağaç",
-        "pollen_weed": "Ot",
-        "pollen_olive": "Zeytin",
-        "settings_allergy_title": "Alerjiler",
-        "settings_allergy_subtitle": "Alerji türlerini seç",
-        "settings_allergy_enable": "Alerji takibi aktif",
-        "premium_auto_renew": "Otomatik olarak yenilenir. İstediğin zaman Ayarlar'dan iptal edebilirsin.",
-
-        // MARK: - Paywall
-        "paywall_title": "Weathra Premium",
-        "paywall_subtitle": "Tüm özellikleri aç",
-        "paywall_loading": "Yükleniyor...",
-        "paywall_restore": "Geri Yükle",
-        "paywall_purchases": "Satın Alma",
-        "paywall_ok": "Tamam",
-        "paywall_restore_success": "Başarıyla geri yüklendi.",
-        "paywall_restore_failed": "Premium bulunamadı.",
-
-        // MARK: - Settings Sections
-        "settings_section_appearance": "Görünüm",
-        "settings_section_premium": "Premium",
-        "settings_section_permissions": "İzinler",
-        "settings_section_locations": "Konumlar",
-        "settings_section_preferences": "Tercihler",
-        "settings_section_notifications": "Bildirimler",
-        "settings_section_app": "Uygulama",
-        "settings_title": "Ayarlar",
-        "settings_theme": "Tema",
-        "settings_language": "Dil",
-        "settings_reset_title": "Sıfırla",
-        "settings_reset_subtitle": "Onboarding'ı yeniden başlat",
-        "settings_reset_confirm": "Sıfırla",
-        "settings_reset_message": "Onboarding sürecine yeniden başlayacaksınız. Bu işlem geri alınamaz.",
-        "settings_cancel": "İptal",
-        "settings_save": "Kaydet",
-        "settings_open_ios_settings": "iOS Ayarlarını Aç",
-        "settings_permission_location": "Konum",
-        "settings_permission_location_desc": "Hava durumu için konum gerekir",
-        "settings_permission_notifications": "Bildirimler",
-        "settings_permission_notifications_desc": "Fırsatları kaçırma",
-        "settings_version": "Versiyon",
-        "settings_data_source": "Veri Kaynağı",
-        "settings_data_apple_weather": "Apple Weather",
-        "settings_privacy_note": "Konum verileri cihazda işlenir ve paylaşılmaz.",
-        "settings_about_title": "Hakkında",
-        "settings_about_subtitle": "Uygulama bilgileri",
-        "settings_add_location": "Konum Ekle",
-        "settings_new_location": "Yeni Konum",
-        "settings_search_location": "Konum ara...",
-        "settings_edit_location": "Düzenle",
-        "settings_location_name": "İsim",
-        "settings_address": "Adres",
-        "settings_coordinates": "Koordinatlar",
-        "settings_delete_location": "Sil",
-        "settings_activities": "Aktiviteler",
-        "settings_daily_limit": "Günlük limit",
-        "settings_premium_active": "Premium Aktif",
-        "settings_premium_active_subtitle": "Tüm özellikler açık",
-        "settings_premium_upgrade_subtitle": "Özellikleri açmak için yükselt",
-
-        // MARK: - Wardrobe
-        "wardrobe_umbrella": "Şemsiye",
-        "wardrobe_raincoat": "Yağmurluk",
-        "wardrobe_winter_coat": "Kışlık mont",
-        "wardrobe_sunglasses": "Güneş gözlüğü",
-        "wardrobe_gloves": "Eldiven/Atkı",
-        "wardrobe_thermals": "Termal içlik",
-
-        // MARK: - Onboarding
-        "onboarding_location_permission_title": "Konumunu görmemize izin ver",
-        "onboarding_location_permission_desc": "Hava durumunu ve dışarı çıkma önerilerini kişiselleştirmek için konumuna ihtiyacımız var.",
-        "onboarding_location_permission_note": "Konum verileri cihazda kalır ve başkalarıyla paylaşılmaz.",
-        "onboarding_notification_permission_title": "Bildirimlerini ister misin?",
-        "onboarding_notification_permission_desc": "En iyi dışarı çıkma zamanları ve hava değişiklikleri hakkında bilgi al.",
-        "onboarding_permission_allow": "İzin Ver",
-        "onboarding_permission_skip": "Şimdilik Yok",
-        "onboarding_notification_badge": "Bildirimler açık",
-
-        // MARK: - Components
-        "outfit_accessories": "Aksesuarlar",
-        "outfit_warning": "Uyarı",
-
-        // MARK: - Premium Features
-        "premium_remove_ads": "Reklamsız Deneyim",
-        "premium_remove_ads_desc": "Reklamları kaldır ve kesintisiz kullan.",
-        "premium_feature_forecast_14day": "14 Günlük Tahmin",
-        "premium_feature_forecast_14day_desc": "İki hafta boyunca planla",
-        "premium_feature_analytics": "Gelişmiş Analitik",
-        "premium_feature_analytics_desc": "Geçmiş verileri incele",
-        "premium_feature_watch": "Apple Watch",
-        "premium_feature_watch_desc": "Bileğinden kontrol et",
-
-        // MARK: - Weekly Forecast
-        "forecast_7_days": "7 Gün",
-        "forecast_premium": "Premium Gerekli",
-        "weekly_score_accessor": "Skor",
-        "weekly_high_accessor": "Yüksek",
-        "weekly_low_accessor": "Düşük",
-
-        // MARK: - Permissions
-        "permission_location_not_requested": "Konum istenmedi",
-        "permission_location_granted": "Konum aktif",
-        "permission_open": "Aç",
-        "permission_settings": "Ayarlar",
-        "permission_allow": "İzin Ver",
-        "permission_pending": "Bekleniyor",
-        "permission_closed": "Kapalı",
-        "permission_optional": "İsteğe bağlı",
-        "permission_silent_on": "Sessiz açık",
-        "permission_required": "Gerekli",
-        "comfort_timeline_accessibility": "Konfor zaman çizelgesi",
-
-        // MARK: - Quiet Hours
-        "quiet_hours_title": "Sessiz Saatler",
-        "quiet_hours_description": "Belirli saatlerde bildirim alma",
-        "quiet_hours_start": "Başlangıç",
-        "quiet_hours_end": "Bitiş",
-
-        // MARK: - Ads
-        "ad_label_text": "Reklam",
-        "ad_space_text": "Reklam alanı",
-
-        // MARK: - Launch
-        "launch_preparing": "Hazırlanıyor...",
-
-        // MARK: - Premium
-        "premium_product_not_found": "Ürün bulunamadı",
-        "premium_pending": "Satın alma bekleniyor",
-        "premium_network_error": "Ağ hatası",
-
-        // MARK: - Errors
-        "error_weatherkit_unknown": "Bilinmeyen hata",
-        "error_weatherkit_auth": "WeatherKit izni gerekli",
-        "error_weatherkit_failed": "WeatherKit hatası",
-        "error_persistence": "Kaydetme hatası",
-        "settings_save_success": "Başarıyla kaydedildi",
-
-        // MARK: - Widget
-        "widget_no_data": "Veri yok",
-        "widget_open_app": "Uygulamayı aç",
-        "widget_name": "Weathra",
-        "widget_description": "Bugünün hava durumu ve dışarı çıkma önerisi",
-        "outfit_light_and_comfortable": "Hafif ve rahat",
-
-        // MARK: - Misc Enums
-        "tier_free": "Ücretsiz",
-        "tier_premium": "Premium",
-        "palette_sky": "Gökyüzü",
-        "palette_mint": "Nane",
-        "palette_ember": "Kömür",
-        "units_metric": "Metrik",
-        "units_imperial": "İngilizce",
-        "activity_best_time_suffix": "için en iyi zaman"
-    ]
+        return normalized
+    }
 }
