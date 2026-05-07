@@ -318,6 +318,7 @@ enum L10n {
         "widget_forecast_days": "Günlük Tahmin",
         "recommendation_detail_title": "Detaylı İnceleme",
         "home_see_details": "Detaylar",
+        "forecast_more_days": "%d gün daha",
 
         // MARK: - Risk Types (Doğru imla)
         "risk_heat": "Sıcaklık",
