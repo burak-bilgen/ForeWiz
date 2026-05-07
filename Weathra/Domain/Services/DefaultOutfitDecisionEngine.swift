@@ -17,47 +17,59 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         var warnings: [String] = []
 
         if rainRisk {
-            var rainWarning = "Yağmur bekleniyor."
+            let rainWarning = "\(L10n.text("outfit_rainwear")) \(L10n.text("outfit_warning_rain"))"
             
             if wardrobe.hasRaincoat {
-                items = ["Yağmurluk"] + items.filter { $0 != "İnce ceket" }
+                let rainwear = L10n.text("outfit_rainwear")
+                let lightJacket = L10n.text("outfit_light_jacket")
+                items = [rainwear] + items.filter { $0 != lightJacket }
             }
             
             if wardrobe.hasUmbrella {
-                accessories.append("Şemsiye")
-                rainWarning += " Şemsiye almak işini rahatlatır."
+                let umbrella = L10n.text("outfit_umbrella")
+                accessories.append(umbrella)
             } else if wardrobe.hasRaincoat == false {
-                rainWarning = "Yağmur görünüyor ancak şemsiye veya yağmurluğun yok, ıslanabilirsin!"
+                let noGear = L10n.text("outfit_warning_no_gear")
+                warnings.append(noGear)
             }
             
             warnings.append(rainWarning)
         }
 
         if windRisk {
-            items.append("Rüzgar geçirmeyen katman")
-            warnings.append("Rüzgar hissedilen sıcaklığı düşürebilir.")
+            let windbreaker = L10n.text("outfit_windbreaker")
+            items.append(windbreaker)
+            let windWarning = L10n.text("outfit_warning_wind")
+            warnings.append(windWarning)
         }
 
         if heatRisk || uvRisk {
-            if wardrobe.hasSunglasses { accessories.append("Güneş gözlüğü") }
-            accessories.append(contentsOf: ["Şapka", "Su"])
+            if wardrobe.hasSunglasses {
+                let sunglasses = L10n.text("outfit_sunglasses")
+                accessories.append(sunglasses)
+            }
+            let hat = L10n.text("outfit_hat")
+            let water = L10n.text("outfit_water")
+            accessories.append(contentsOf: [hat, water])
             if let avoidWindow = input.avoidWindows.first(where: { $0.risk.type == .heat || $0.risk.type == .uv }) {
-                warnings.append("\(avoidWindow.window.shortDisplayText) arasında uzun süre dışarıda kalmamaya çalış.")
+                let warning = L10n.text("outfit_warning_avoid")
+                warnings.append("\(avoidWindow.window.shortDisplayText) \(warning)")
             }
         }
 
         if eveningGetsCooler(hourly: input.hourly, calendar: input.calendar), apparentTemperature < 24 {
-            warnings.append("Akşam serinleyebilir. Çantaya ince bir hırka ya da ceket atmak iyi olur.")
+            let eveningWarning = L10n.text("outfit_warning_evening")
+            warnings.append(eveningWarning)
         }
 
-        let title = title(
+        let outfitTitle = title(
             for: items,
             apparentTemperature: apparentTemperature,
             sensitivity: input.profile.temperatureSensitivity
         )
 
         return OutfitRecommendation(
-            title: title,
+            title: outfitTitle,
             items: Array(Set(items)).sorted(),
             accessories: Array(Set(accessories)).sorted(),
             warning: warnings.first
@@ -80,18 +92,24 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
 
         switch apparentTemperature {
         case 30...:
-            base = ["Hafif tişört", "Şort veya ince pantolon"]
+            base = [L10n.text("outfit_light_tshirt"), L10n.text("outfit_shorts_pants")]
         case 24..<30:
-            base = ["Tişört", "İnce pantolon"]
+            base = [L10n.text("outfit_tshirt"), L10n.text("outfit_light_pants")]
         case 17..<24:
-            base = ["Tişört", "İnce ceket", "Rahat pantolon"]
+            base = [L10n.text("outfit_tshirt"), L10n.text("outfit_light_jacket"), L10n.text("outfit_casual_pants")]
         case 8..<17:
-            base = ["Kazak", "İnce mont", "Kapalı ayakkabı"]
+            base = [L10n.text("outfit_sweater"), L10n.text("outfit_light_coat"), L10n.text("outfit_closed_shoes")]
         default:
-            let coat = wardrobe.hasWinterCoat ? "Kışlık Mont" : "Kalın Mont"
-            base = [coat, "Kazak", "Kapalı ayakkabı"]
-            if wardrobe.hasGloves { base.append("Eldiven/Atkı") }
-            if wardrobe.hasThermals { base.append("Termal İçlik") }
+            let coat = wardrobe.hasWinterCoat ? L10n.text("outfit_winter_coat") : L10n.text("outfit_thick_coat")
+            base = [coat, L10n.text("outfit_sweater"), L10n.text("outfit_closed_shoes")]
+            if wardrobe.hasGloves {
+                let gloves = L10n.text("outfit_gloves")
+                base.append(gloves)
+            }
+            if wardrobe.hasThermals {
+                let thermals = L10n.text("outfit_thermals")
+                base.append(thermals)
+            }
         }
 
         return base
@@ -103,20 +121,20 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         sensitivity: TemperatureSensitivity
     ) -> String {
         if apparentTemperature >= 30 {
-            return "Hafif, nefes alan parçalar sıcakta daha rahat hissettirir."
+            return L10n.text("outfit_title_hot")
         }
 
         if (17..<24).contains(apparentTemperature) {
             return sensitivity == .getsColdEasily
-                ? "Tişört ve ince ceket dengeli olur."
-                : "Tişört ve hafif bir katman yeterli."
+                ? L10n.text("outfit_title_mild_cold")
+                : L10n.text("outfit_title_mild")
         }
 
         if apparentTemperature < 8 {
-            return "Sıcak tutan katmanlar ve kapalı ayakkabı soğuğu hissettirmez."
+            return L10n.text("outfit_title_cold")
         }
 
-        return "\(items.prefix(3).joined(separator: ", ")) bugün için dengeli bir kombin olur."
+        return "\(items.prefix(3).joined(separator: ", ")) \(L10n.text("outfit_title_balanced"))"
     }
 
     private func eveningGetsCooler(hourly: [HourlyWeatherPoint], calendar: Calendar) -> Bool {

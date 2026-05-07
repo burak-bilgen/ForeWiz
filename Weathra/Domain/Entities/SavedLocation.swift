@@ -30,10 +30,10 @@ struct SavedLocation: Codable, Equatable, Identifiable, Sendable {
     static var currentLocation: SavedLocation {
         SavedLocation(
             id: "current-location",
-            name: "Bulunduğum Konum",
+            name: L10n.text("home_current_location"),
             latitude: 0,
             longitude: 0,
-            address: "GPS ile belirleniyor",
+            address: L10n.text("location_being_determined"),
             isFavorite: true
         )
     }

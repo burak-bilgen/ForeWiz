@@ -97,7 +97,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             }
 
         guard daylightScores.isEmpty == false else {
-            return WeatherScore(rawValue: 40, label: "Sınırlı veri")
+            return WeatherScore(rawValue: 40, label: L10n.text("weather_limited_data"))
         }
 
         var score = daylightScores.reduce(0, +) / daylightScores.count
@@ -141,22 +141,24 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         risks: [WeatherRisk]
     ) -> String {
         if let risk = risks.first(where: { $0.severity >= .high }) {
-            return "\(risk.title). Dışarıda geçireceğin vakti kısa tut, saatini değiştirebileceğin bir alternatifin olsun."
+            return "\(risk.title). \(L10n.text("decision_risk_high_message"))"
         }
 
         if let bestWindow {
-            return "Dışarı çıkmak için en rahat zaman \(bestWindow.shortDisplayText). Uzun planı bu aralığa almak daha konforlu olur."
+            let prefix = L10n.text("decision_best_window")
+            let suffix = L10n.text("decision_best_window_message")
+            return "\(prefix) \(bestWindow.shortDisplayText). \(suffix)"
         }
 
         switch decision {
         case .good:
-            return "Bugün dışarıda vakit geçirmek için koşullar dengeli. Uzun süre dışarıda kalacaksan hava değişimini yine de kontrol et."
+            return L10n.text("decision_good_message")
         case .moderate:
-            return "Dışarı çıkmak için uygun, ancak bazı saatlerde konfor düşebilir. Planı en rahat aralığa denk getirmek daha iyi olur."
+            return L10n.text("decision_moderate_message")
         case .risky:
-            return "Bugün hava bazı saatlerde yorucu veya riskli olabilir. Dışarıda uzun vakit geçirme, mola verip alternatif bir saate kaydır."
+            return L10n.text("decision_risky_message")
         case .avoid:
-            return "Bugün dışarıda uzun kalmak iyi bir fikir değil. Zorunlu planları kısa tut, mümkünse daha güvenli bir saate taşı."
+            return L10n.text("decision_avoid_message")
         }
     }
 
@@ -166,14 +168,17 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         avoidWindows: [AvoidWindowRecommendation]
     ) -> String {
         let riskText = risks.isEmpty
-            ? "belirgin bir risk yok"
+            ? L10n.text("decision_no_risk")
             : risks.map { $0.title.lowercased() }.joined(separator: ", ")
         let avoidText = avoidWindows.isEmpty
-            ? "kaçınman gereken belirgin bir saat yok"
+            ? L10n.text("decision_no_avoid")
             : avoidWindows.map(\.window.shortDisplayText).joined(separator: ", ")
 
-        return "Skor \(score.displayValue)/10. Bu karar; hissedilen sıcaklık, yağış olasılığı, " +
-            "rüzgar, UV, nem ve saatlik değişimler birlikte değerlendirilerek verildi. " +
-            "Öne çıkan risk: \(riskText). Dikkat etmen gereken zaman: \(avoidText)."
+        let scorePrefix = L10n.text("decision_score_explanation")
+        let factors = L10n.text("decision_explanation_factors")
+        let mainRisk = L10n.text("decision_main_risk")
+        let avoidTime = L10n.text("decision_avoid_time")
+
+        return "\(scorePrefix) \(score.displayValue)/10. \(factors) \(mainRisk) \(riskText). \(avoidTime) \(avoidText)."
     }
 }

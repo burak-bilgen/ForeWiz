@@ -62,7 +62,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
                 profile: profile,
                 now: now,
                 isCached: true,
-                warningMessage: "Canlı tahmin alınamadı; en son kayıtlı hava gösteriliyor."
+                warningMessage: L10n.text("error_live_forecast")
             )
         }
     }

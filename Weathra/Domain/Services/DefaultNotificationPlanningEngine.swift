@@ -91,10 +91,10 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
             category: .morningBriefing,
             fireDate: fireDate,
-            title: "Gunaydin!",
+            title: L10n.text("notification_morning_title"),
             body: body,
             priority: 70,
-            reason: "Sabah ozeti"
+            reason: L10n.text("notification_morning_reason")
         )
     }
 
@@ -103,22 +103,23 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
         switch recommendation.outdoorDecision {
         case .good:
-            parts.append("Disari harika!")
+            parts.append(L10n.text("notification_outdoor_great"))
         case .moderate:
-            parts.append("Idare eder.")
+            parts.append(L10n.text("notification_outdoor_moderate"))
         case .risky:
-            parts.append("Dikkatli ol.")
+            parts.append(L10n.text("notification_outdoor_risky"))
         case .avoid:
-            parts.append("Disari sorunlu.")
+            parts.append(L10n.text("notification_outdoor_bad"))
         }
 
         if let bestWindow = recommendation.bestOutdoorWindow {
-            parts.append("En rahat: \(bestWindow.shortDisplayText)")
+            let prefix = L10n.text("notification_best_window")
+            parts.append("\(prefix) \(bestWindow.shortDisplayText)")
         }
 
         let critical = recommendation.risks.first { $0.severity >= .high }
         if let risk = critical {
-            parts.append("Dikkat: \(risk.title)")
+            parts.append("\(L10n.text("decision_caution")): \(risk.title)")
         }
 
         return parts.joined(separator: " - ")
@@ -151,10 +152,10 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .outfitSuggestion, fireDate: fireDate, calendar: calendar),
             category: .outfitSuggestion,
             fireDate: fireDate,
-            title: "Ne giyeyim?",
+            title: L10n.text("notification_outfit_title"),
             body: body,
             priority: 60,
-            reason: "Kiyafet oneri"
+            reason: L10n.text("notification_outfit_reason")
         )
     }
 
@@ -172,18 +173,23 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let body: String
 
         if activityRecommendation.score.rawValue >= 80 {
-            body = "Tam ideal! \(time)"
+            let ideal = L10n.text("notification_ideal")
+            body = "\(ideal) \(time)"
         } else if activityRecommendation.score.rawValue >= 60 {
-            body = "Uygun. \(time)"
+            let suitable = L10n.text("notification_suitable")
+            body = "\(suitable) \(time)"
         } else {
-            body = "En iyi: \(time)"
+            let best = L10n.text("notification_best")
+            body = "\(best) \(time)"
         }
 
+        let activityTitle = activityRecommendation.activityType.localizedTitle
+        let timeSuffix = L10n.text("notification_activity_time")
         return NotificationPlan(
             id: stableID(category: .bestRunWindow, fireDate: fireDate, calendar: calendar),
             category: .bestRunWindow,
             fireDate: fireDate,
-            title: "\(activityRecommendation.activityType.localizedTitle) zamani",
+            title: "\(activityTitle) \(timeSuffix)",
             body: body,
             priority: 80,
             reason: activityRecommendation.reason

@@ -53,11 +53,11 @@ struct WeeklyForecastCard: View {
 
     private var title: String {
         if isPremium && dailyForecasts.count > 7 {
-            return "\(maxPremiumDays) Gunluk Tahmin"
+            return "\(maxPremiumDays) \(L10n.text("widget_forecast_days"))"
         } else if isPremium {
-            return "7 Gunluk Tahmin"
+            return "7 \(L10n.text("widget_forecast_days"))"
         }
-        return "3 Gunluk Tahmin"
+        return "3 \(L10n.text("widget_forecast_days"))"
     }
 
     private var displayedForecasts: [DailyForecastItem] {

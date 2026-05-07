@@ -4,7 +4,7 @@ struct UnitSystemPicker: View {
     @Binding var unitSystem: UnitSystem
 
     var body: some View {
-        Picker("Birimler", selection: $unitSystem) {
+        Picker(L10n.text("settings_units"), selection: $unitSystem) {
             ForEach(UnitSystem.allCases, id: \.self) { system in
                 Text(system.localizedTitle).tag(system)
             }

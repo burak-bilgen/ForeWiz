@@ -150,7 +150,7 @@ private struct CurrentWeatherHero: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(isUsingCached ? "Son Veri" : "Canli")
+                    Text(isUsingCached ? L10n.text("weather_latest_forecast") : L10n.text("home_live"))
                         .font(AppTypography.caption2)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
@@ -177,8 +177,8 @@ private struct CurrentWeatherHero: View {
             }
 
             HStack(spacing: 16) {
-                HeroMetric(icon: "figure.walk", title: "Skor", value: "\(recommendation.outdoorScore.displayValue)/10")
-                HeroMetric(icon: "clock.fill", title: "En Iyi", value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "-")
+                HeroMetric(icon: "figure.walk", title: L10n.text("home_score"), value: "\(recommendation.outdoorScore.displayValue)/10")
+                HeroMetric(icon: "clock.fill", title: L10n.text("home_best_time"), value: recommendation.bestOutdoorWindow?.shortDisplayText ?? "-")
             }
         }
         .foregroundStyle(.white)

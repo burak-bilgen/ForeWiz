@@ -80,8 +80,6 @@ struct DefaultWeatherRiskClassifier {
             heatRisk(for: hour, calendar: calendar),
             uvRisk(for: hour, calendar: calendar),
             rainRisk(for: hour),
-            windRisk(for: hour),
-            humidityRisk(for: hour),
             coldRisk(for: hour)
         ].compactMap { $0 }
     }
@@ -139,8 +137,8 @@ struct DefaultWeatherRiskClassifier {
             return WeatherRisk(
                 type: .heat,
                 severity: hour.apparentTemperatureCelsius >= 35 ? .high : .medium,
-                title: "Hissedilen sıcaklık yükseliyor",
-                message: "Bu aralıkta hissedilen sıcaklık yüksek. Uzun yürüyüş veya koşu planını daha serin saate al."
+                title: L10n.text("risk_feels_like_rising"),
+                message: L10n.text("risk_feels_like_high")
             )
         }
 
@@ -148,8 +146,8 @@ struct DefaultWeatherRiskClassifier {
             return WeatherRisk(
                 type: .uv,
                 severity: .high,
-                title: "Güneş koruması gerekiyor",
-                message: "UV seviyesi yükseliyor. Gölge, şapka ve güneş koruması planına dahil edilmeli."
+                title: L10n.text("risk_sun_protection"),
+                message: L10n.text("risk_uv_high")
             )
         }
 
@@ -157,8 +155,8 @@ struct DefaultWeatherRiskClassifier {
             return WeatherRisk(
                 type: .rain,
                 severity: .high,
-                title: "Yağmur planı aksatabilir",
-                message: "Yağmur ihtimali dış planı aksatabilir. Açık alan planında esnek saat veya kapalı alternatif bırak."
+                title: L10n.text("risk_rain_disrupt"),
+                message: L10n.text("risk_rain_message")
             )
         }
 
@@ -184,8 +182,8 @@ struct DefaultWeatherRiskClassifier {
         return WeatherRisk(
             type: .poorComfort,
             severity: .medium,
-            title: "Dışarıda konfor düşük",
-            message: "Bu saatlerde dışarıda konfor düşük. Zorunlu değilse planı daha rahat bir aralığa taşı."
+            title: L10n.text("risk_poor_comfort"),
+            message: L10n.text("risk_poor_comfort_message")
         )
     }
 
@@ -197,8 +195,8 @@ struct DefaultWeatherRiskClassifier {
         return WeatherRisk(
             type: .storm,
             severity: severeWeatherRisk,
-            title: "Şiddetli hava riski",
-            message: "Şiddetli hava riski var; dış planı ertelemek daha güvenli."
+            title: L10n.text("risk_severe_weather"),
+            message: L10n.text("risk_severe_weather_message")
         )
     }
 
@@ -209,8 +207,8 @@ struct DefaultWeatherRiskClassifier {
             return WeatherRisk(
                 type: .heat,
                 severity: hour.apparentTemperatureCelsius >= 39 ? .extreme : .high,
-                title: "Sıcaklık yorucu seviyede",
-                message: "Hissedilen sıcaklık yüksek. Uzun dış planı kısalt, su ve gölge molası bırak."
+                title: L10n.text("risk_hot_exhausting"),
+                message: L10n.text("risk_feels_high_message")
             )
         }
 
@@ -218,8 +216,8 @@ struct DefaultWeatherRiskClassifier {
             return WeatherRisk(
                 type: .heat,
                 severity: .medium,
-                title: "Öğlen sıcaklık artıyor",
-                message: "Öğle saatlerinde sıcaklık konforu düşürüyor. Efor gerektiren işleri sabah veya akşama almak daha iyi."
+                title: L10n.text("risk_midday_heating"),
+                message: L10n.text("risk_midday_message")
             )
         }
 
@@ -232,11 +230,11 @@ struct DefaultWeatherRiskClassifier {
             return nil
         }
 
-        return WeatherRisk(
+return WeatherRisk(
             type: .uv,
             severity: uvIndex >= 9 ? .high : .medium,
-            title: "UV koruması gerekli",
-            message: "UV yüksek. Kısa süreli planlarda bile güneş koruması ve gölge önemli."
+            title: L10n.text("risk_uv_need"),
+            message: L10n.text("risk_uv_message")
         )
     }
 
@@ -250,34 +248,8 @@ struct DefaultWeatherRiskClassifier {
         return WeatherRisk(
             type: .rain,
             severity: precipitationChance >= 0.75 ? .high : .medium,
-            title: "Yağmur ihtimali yüksek",
-            message: "Yağmur ihtimali yüksek. Şemsiye/yağmurluk al ve açık alan planını kısa tut."
-        )
-    }
-
-    private func windRisk(for hour: HourlyWeatherPoint) -> WeatherRisk? {
-        guard let windSpeed = hour.windSpeedKph, windSpeed >= 30 else {
-            return nil
-        }
-
-        return WeatherRisk(
-            type: .wind,
-            severity: windSpeed >= 45 ? .high : .medium,
-            title: "Rüzgar açık alanı zorlayabilir",
-            message: "Rüzgar açık alan, bisiklet ve sahil gibi korumasız rotaları zorlayabilir."
-        )
-    }
-
-    private func humidityRisk(for hour: HourlyWeatherPoint) -> WeatherRisk? {
-        guard let humidity = hour.humidity, humidity >= 0.78, hour.apparentTemperatureCelsius >= 28 else {
-            return nil
-        }
-
-        return WeatherRisk(
-            type: .humidity,
-            severity: humidity >= 0.88 ? .high : .medium,
-            title: "Nem sıcaklığı yorucu hissettirir",
-            message: "Yüksek nem sıcaklığı daha yorucu hissettirebilir. Eforu azaltmak ve mola vermek iyi olur."
+            title: L10n.text("risk_rain_high"),
+            message: L10n.text("risk_rain_message2")
         )
     }
 
@@ -289,8 +261,8 @@ struct DefaultWeatherRiskClassifier {
         return WeatherRisk(
             type: .cold,
             severity: hour.apparentTemperatureCelsius <= 0 ? .high : .medium,
-            title: "Soğuk hissediliyor",
-            message: "Hissedilen sıcaklık düşük. Dışarıda uzun kalacaksan ekstra katman ve kapalı ayakkabı iyi olur."
+            title: L10n.text("risk_cold_feels"),
+            message: L10n.text("risk_cold_message")
         )
     }
 }

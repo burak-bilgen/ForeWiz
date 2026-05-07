@@ -39,15 +39,15 @@ enum SevereWeatherEvent: String, Codable, CaseIterable, Hashable, Sendable {
 
     var turkishName: String {
         switch self {
-        case .tornado: return "Kasırga"
-        case .flashFlood: return "Ani Sel"
-        case .severeThunderstorm: return "Şiddetli Fırtına"
-        case .blizzard: return "Kar Fırtınası"
-        case .extremeHeat: return "Aşırı Sıcaklık"
-        case .extremeCold: return "Aşırı Soğuk"
-        case .highWind: return "Kuvvetli Rüzgar"
-        case .hail: return "Dolu"
-        case .denseFog: return "Kalın Sis"
+        case .tornado: return L10n.text("alert_tornado")
+        case .flashFlood: return L10n.text("alert_flashFlood")
+        case .severeThunderstorm: return L10n.text("weather_storm_severe")
+        case .blizzard: return L10n.text("alert_blizzard")
+        case .extremeHeat: return L10n.text("alert_extremeHeat")
+        case .extremeCold: return L10n.text("alert_extremeCold")
+        case .highWind: return L10n.text("alert_highWind")
+        case .hail: return L10n.text("alert_hail")
+        case .denseFog: return L10n.text("alert_denseFog")
         }
     }
 
@@ -101,7 +101,7 @@ final class SevereWeatherAlertService {
             id: "alert-\(risk.id)",
             event: event,
             severity: risk.severity,
-            headline: "\(event.emoji) \(event.turkishName) Uyarısı",
+            headline: "\(event.emoji) \(event.turkishName) \(L10n.text("alert_warning"))",
             description: risk.message,
             instruction: instruction(for: event),
             effective: Date(),
@@ -113,23 +113,23 @@ final class SevereWeatherAlertService {
     private func instruction(for event: SevereWeatherEvent) -> String {
         switch event {
         case .tornado:
-            return "En yakın sığınak veya bodrum kata git. Pencerelerden uzak dur."
+            return L10n.text("instruction_tornado")
         case .flashFlood:
-            return "Araçla veya yaya derelerden geçme. Yüksek noktalara çık."
+            return L10n.text("instruction_flashFlood")
         case .severeThunderstorm:
-            return "Dışarı çıkma. Sağlam bir yapının içinde kal."
+            return L10n.text("instruction_storm")
         case .blizzard:
-            return "Dışarı çıkma. Isı kaybını önle ve bol sıvı al."
+            return L10n.text("instruction_blizzard")
         case .extremeHeat:
-            return "Bol su iç, klimalı ortamda kal, yoğun fiziksel aktiviteden kaçın."
+            return L10n.text("instruction_heat")
         case .extremeCold:
-            return "Katmanlı giyin, dışarıda geçirme, evde ısıtma kullan."
+            return L10n.text("instruction_cold")
         case .highWind:
-            return "Ağaçlardan ve baskın yapılarından uzak dur. Bisikletten in."
+            return L10n.text("instruction_wind")
         case .hail:
-            return "Araçları kapalı alana park et. Dışarıda isen koruna."
+            return L10n.text("instruction_hail")
         case .denseFog:
-            return "Farları aç, hızını azalt, güvenli mesafeyi koru."
+            return L10n.text("instruction_fog")
         }
     }
 
