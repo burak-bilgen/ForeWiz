@@ -44,7 +44,7 @@ struct HomeView: View {
         case .idle, .loading:
             loadingView
         case .failed(let message):
-            ScreenErrorView(message: message, retryTitle: "Tekrar Dene", retry: viewModel.onAppear)
+            ScreenErrorView(message: message, retryTitle: L10n.text("home_error_retry"), retry: viewModel.onAppear)
         case .loaded(let state):
             ScrollView {
                 LazyVStack(spacing: 20) {
@@ -91,7 +91,7 @@ struct HomeView: View {
         VStack(spacing: 16) {
             ProgressView()
                 .controlSize(.large)
-            Text("Yukleniyor...")
+            Text(L10n.text("home_loading"))
                 .font(AppTypography.body)
                 .foregroundStyle(AppTheme.secondaryText)
         }
@@ -109,11 +109,11 @@ private struct HomeHeader: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Bugun Disarisi")
+                Text(String(localized: "home_title"))
                     .font(AppTypography.title)
 
                 HStack(spacing: 6) {
-                    Text("Gunluk Ozet")
+                    Text(String(localized: "home_daily_summary"))
                     Text("-").foregroundStyle(.secondary)
                     Text(lastUpdatedText)
                 }

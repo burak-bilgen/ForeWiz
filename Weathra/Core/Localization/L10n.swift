@@ -314,7 +314,6 @@ enum L10n {
         "location_being_determined": "GPS ile belirleniyor",
 
         // MARK: - Additional
-        "widget_best_time": "En İyi Zaman",
         "today_label": "BUGÜN",
         "premium_feature_hourly": "Saatlik",
 
