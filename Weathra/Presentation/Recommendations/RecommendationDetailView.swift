@@ -33,7 +33,7 @@ struct RecommendationDetailView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle(L10n.text("premium_feature_hourly"))
+        .navigationTitle(L10n.text("recommendation_detail_title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

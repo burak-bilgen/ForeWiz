@@ -58,6 +58,7 @@ final class DependencyContainer {
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
         self.subscriptionManager = subscriptionManager
+        self.adManager = adManager
     }
 
     static func live() -> DependencyContainer {

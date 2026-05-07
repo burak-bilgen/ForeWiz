@@ -68,7 +68,9 @@ struct HomeView: View {
                     WeeklyForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium)
 
                     if !isPremium {
-                        AdBannerView(adUnitID: nil).onTapGesture { showPaywall = true }
+                        AdBannerView(adUnitID: nil, isPremium: isPremium) {
+                            showPaywall = true
+                        }
                     }
 
                     ActivityWindowsSection(recommendations: state.recommendation.bestActivityWindows)

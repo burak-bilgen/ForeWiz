@@ -316,6 +316,8 @@ enum L10n {
         // MARK: - Additional
         "today_label": "BUGÜN",
         "widget_forecast_days": "Günlük Tahmin",
+        "recommendation_detail_title": "Detaylı İnceleme",
+        "home_see_details": "Detaylar",
 
         // MARK: - Risk Types (Doğru imla)
         "risk_heat": "Sıcaklık",
@@ -371,6 +373,8 @@ enum L10n {
         "settings_reset_subtitle": "Onboarding'ı yeniden başlat",
         "settings_reset_confirm": "Sıfırla",
         "settings_reset_message": "Onboarding sürecine yeniden başlayacaksınız. Bu işlem geri alınamaz.",
+        "settings_cancel": "İptal",
+        "settings_save": "Kaydet",
         "settings_open_ios_settings": "iOS Ayarlarını Aç",
         "settings_permission_location": "Konum",
         "settings_permission_location_desc": "Hava durumu için konum gerekir",

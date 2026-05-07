@@ -2,89 +2,94 @@ import Combine
 import Foundation
 import GoogleMobileAds
 
-protocol AdManager {
+protocol AdManager: Sendable {
     var isReady: Bool { get }
     func load() async
     func showInterstitial() async
     func showRewarded() async -> Bool
 }
 
-@MainActor
-final class GoogleAdManager: AdManager, ObservableObject {
-    @Published private(set) var isReady: Bool = false
-    
-    private var interstitial: GADInterstitialAd?
-    private var rewardedAd: GADRewardedAd?
-    
+final class GoogleAdManager: AdManager, @unchecked Sendable {
     private let interstitialAdUnitID = "ca-app-pub-3940256099942544/1033173712"
     private let rewardedAdUnitID = "ca-app-pub-3940256099942544/5224354917"
+    
+    private let isReadyLock = NSLock()
+    private var _isReady = false
+    
+    var isReady: Bool {
+        isReadyLock.lock()
+        defer { isReadyLock.unlock() }
+        return _isReady
+    }
     
     static let shared = GoogleAdManager()
     
     func load() async {
         await loadInterstitial()
         await loadRewarded()
-        isReady = interstitial != nil || rewardedAd != nil
+        
+        isReadyLock.lock()
+        _isReady = true
+        isReadyLock.unlock()
     }
     
     private func loadInterstitial() async {
         do {
-            let ad = try await GADInterstitialAd.load(
-                withAdUnitID: interstitialAdUnitID,
-                request: GADRequest()
+            _ = try await InterstitialAd.load(
+                with: interstitialAdUnitID,
+                request: Request()
             )
-            interstitial = ad
-            interstitial?.fullScreenContentDelegate = nil
         } catch {
-            interstitial = nil
+            // Ad failed to load
         }
     }
     
     private func loadRewarded() async {
         do {
-            let ad = try await GADRewardedAd.load(
-                withAdUnitID: rewardedAdUnitID,
-                request: GADRequest()
+            _ = try await RewardedAd.load(
+                with: rewardedAdUnitID,
+                request: Request()
             )
-            rewardedAd = ad
         } catch {
-            rewardedAd = nil
+            // Ad failed to load
         }
     }
     
     func showInterstitial() async {
-        guard let interstitial = interstitial else {
-            await loadInterstitial()
-            return
+        guard let interstitial = try? await InterstitialAd.load(
+            with: interstitialAdUnitID,
+            request: Request()
+        ) else { return }
+        
+        guard let rootVC = await MainActor.run(body: { getRootViewController() }) else { return }
+        
+        await MainActor.run {
+            interstitial.present(from: rootVC)
         }
-        
-        guard let rootVC = await getRootViewController() else { return }
-        
-        interstitial.present(from: rootVC)
-        self.interstitial = nil
     }
     
     func showRewarded() async -> Bool {
-        guard let rewardedAd = rewardedAd else {
-            await loadRewarded()
-            return false
-        }
+        guard let rewardedAd = try? await RewardedAd.load(
+            with: rewardedAdUnitID,
+            request: Request()
+        ) else { return false }
         
-        guard let rootVC = await getRootViewController() else { return false }
+        guard let rootVC = await MainActor.run(body: { getRootViewController() }) else { return false }
         
-        return await withCheckedContinuation { continuation in
+        await MainActor.run {
             rewardedAd.present(
-                fromRootViewController: rootVC,
+                from: rootVC,
                 userDidEarnRewardHandler: {
-                    continuation.resume(returning: true)
+                    // Reward granted
                 }
             )
-            self.rewardedAd = nil
         }
+        return true
     }
     
-    private func getRootViewController() async -> UIViewController? {
-        guard let windowScene = await UIApplication.shared.connectedScenes.first as? UIWindowScene,
+    @MainActor
+    private func getRootViewController() -> UIViewController? {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first(where: { $0.isKeyWindow }),
               let rootVC = window.rootViewController else {
             return nil

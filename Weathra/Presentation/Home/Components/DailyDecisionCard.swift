@@ -40,7 +40,7 @@ struct DailyDecisionCard: View {
 
                 Divider().opacity(0.4)
                 HStack {
-                    Label(L10n.text("premium_feature_hourly"), systemImage: "chevron.right.circle.fill")
+                    Label(L10n.text("home_see_details"), systemImage: "chevron.right.circle.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.accent)
                     Spacer()
