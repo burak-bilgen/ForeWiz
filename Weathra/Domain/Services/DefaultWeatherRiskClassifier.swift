@@ -19,7 +19,10 @@ struct DefaultWeatherRiskClassifier {
             uvIndex: current.uvIndex,
             conditionCode: current.conditionCode,
             isDaylight: current.isDaylight,
-            severeWeatherRisk: current.severeWeatherRisk
+            severeWeatherRisk: current.severeWeatherRisk,
+            pollenLevel: nil,
+            airQualityIndex: nil,
+            pm25Level: nil
         )
 
         let allRisks = ([currentAsHour] + hourly).flatMap { risks(for: $0, calendar: calendar) }

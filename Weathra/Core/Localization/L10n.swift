@@ -334,6 +334,22 @@ enum L10n {
         "risk_wind": "Rüzgâr",
         "risk_humidity": "Nem",
         "risk_cold": "Soğuk",
-        "risk_storm": "Fırtına"
+        "risk_storm": "Fırtına",
+        "risk_pollen_high": "Polen seviyesi yüksek",
+        "risk_pollen_message": "Polen seviyesi yükseliyor. Alerjisi olanlar dikkatli olmalı.",
+        "risk_air_quality": "Hava kalitesi düşük",
+        "risk_air_message": "Hava kalitesi sağlığı etkileyebilir. Dışarıda uzun süre kalmamaya çalış.",
+        "risk_pm25": "PM2.5 yüksek",
+        "risk_pm25_message": "PM2.5 seviyesi yüksek. Nefes problemi olanlar dikkatli olmalı.",
+        "allergy_pollen": "Polen",
+        "allergy_dust": "Toz",
+        "allergy_mold": "Küf",
+        "allergy_pet": "Ev hayvanı",
+        "allergy_smoke": "Duman",
+        "allergy_air": "Hava kalitesi",
+        "pollen_grass": "Çim",
+        "pollen_tree": "Ağaç",
+        "pollen_weed": "Ot",
+        "pollen_olive": "Zeytin",
     ]
 }

@@ -16,6 +16,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var savedLocations: [SavedLocation]
     var selectedLocationID: String
     var subscriptionTier: SubscriptionTier
+    var allergyProfile: AllergyProfile
 
     private enum CodingKeys: String, CodingKey {
         case temperatureSensitivity
@@ -33,6 +34,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         case savedLocations
         case selectedLocationID
         case subscriptionTier
+        case allergyProfile
     }
 
     init(
@@ -50,7 +52,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         wardrobe: WardrobePreferences = .default,
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
         selectedLocationID: String = "current-location",
-        subscriptionTier: SubscriptionTier = .free
+        subscriptionTier: SubscriptionTier = .free,
+        allergyProfile: AllergyProfile = .default
     ) {
         self.temperatureSensitivity = temperatureSensitivity
         self.preferredActivities = preferredActivities
@@ -67,6 +70,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.savedLocations = savedLocations
         self.selectedLocationID = selectedLocationID
         self.subscriptionTier = subscriptionTier
+        self.allergyProfile = allergyProfile
     }
 
     static var `default`: UserComfortProfile {
@@ -112,7 +116,8 @@ extension UserComfortProfile {
             wardrobe: try container.decodeIfPresent(WardrobePreferences.self, forKey: .wardrobe) ?? .default,
             savedLocations: try container.decodeIfPresent([SavedLocation].self, forKey: .savedLocations) ?? [SavedLocation.currentLocation],
             selectedLocationID: try container.decodeIfPresent(String.self, forKey: .selectedLocationID) ?? "current-location",
-            subscriptionTier: try container.decodeIfPresent(SubscriptionTier.self, forKey: .subscriptionTier) ?? .free
+            subscriptionTier: try container.decodeIfPresent(SubscriptionTier.self, forKey: .subscriptionTier) ?? .free,
+            allergyProfile: try container.decodeIfPresent(AllergyProfile.self, forKey: .allergyProfile) ?? .default
         )
     }
 }

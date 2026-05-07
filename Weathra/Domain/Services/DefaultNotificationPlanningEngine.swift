@@ -275,7 +275,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         case .uv: return .uvWarning
         case .rain: return .rainWarning
         case .wind: return .windWarning
-        case .humidity, .cold, .storm, .poorComfort: return nil
+        case .humidity, .cold, .storm, .poorComfort, .pollen, .airQuality: return nil
         }
     }
 

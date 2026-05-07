@@ -274,6 +274,10 @@ private struct DetailAvoidCard: View {
             "cloud.bolt.rain.fill"
         case .poorComfort:
             "exclamationmark.circle.fill"
+        case .pollen:
+            "leaf.fill"
+        case .airQuality:
+            "aqi.medium"
         }
     }
 }
