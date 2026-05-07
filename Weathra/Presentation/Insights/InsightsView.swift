@@ -4,6 +4,8 @@ struct InsightsView: View {
     let recommendation: DailyRecommendation
     let isPremium: Bool
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         ZStack {
             AppBackground()
@@ -12,11 +14,11 @@ struct InsightsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppSpacing.medium) {
                         VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                            Label(String(localized: "premium_feature_analytics"), systemImage: "chart.line.uptrend.xyaxis")
+                            Label(L10n.text( "premium_feature_analytics"), systemImage: "chart.line.uptrend.xyaxis")
                                 .font(AppTypography.largeTitle)
                                 .foregroundStyle(AppTheme.ink)
 
-                            Text(String(localized: "premium_feature_analytics_desc"))
+                            Text(L10n.text( "premium_feature_analytics_desc"))
                                 .font(AppTypography.body)
                                 .foregroundStyle(AppTheme.secondaryText)
                         }
@@ -36,22 +38,22 @@ struct InsightsView: View {
                         .font(.system(size: 56, weight: .bold))
                         .foregroundStyle(AppTheme.sunshine.opacity(0.6))
 
-                    Text(String(localized: "premium_feature_analytics"))
+                    Text(L10n.text( "premium_feature_analytics"))
                         .font(.system(.title2, design: .rounded, weight: .heavy))
                         .foregroundStyle(AppTheme.ink)
 
-                    Text(String(localized: "premium_feature_analytics_desc"))
+                    Text(L10n.text( "premium_feature_analytics_desc"))
                         .font(AppTypography.body)
                         .foregroundStyle(AppTheme.secondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, AppSpacing.xLarge)
 
                     Button(action: {}) {
-                        Label(String(localized: "premium_upgrade"), systemImage: "crown.fill")
+                        Label(L10n.text( "premium_upgrade"), systemImage: "crown.fill")
                             .font(AppTypography.headline)
                             .padding(.horizontal, AppSpacing.xLarge)
                             .padding(.vertical, AppSpacing.medium)
-                            .background(AppTheme.weatherGradient(for: .light), in: Capsule())
+                            .background(AppTheme.weatherGradient(for: colorScheme), in: Capsule())
                             .foregroundStyle(.white)
                     }
                     .buttonStyle(.plain)
@@ -60,7 +62,7 @@ struct InsightsView: View {
                 }
             }
         }
-        .navigationTitle(String(localized: "premium_feature_analytics"))
+        .navigationTitle(L10n.text( "premium_feature_analytics"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -71,7 +73,7 @@ private struct ScoreBreakdownCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "insights_score_breakdown"), systemImage: "chart.pie.fill")
+                Label(L10n.text( "insights_score_breakdown"), systemImage: "chart.pie.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -80,25 +82,25 @@ private struct ScoreBreakdownCard: View {
 
                     VStack(alignment: .leading, spacing: AppSpacing.small) {
                         ScoreRow(
-                            label: String(localized: "insights_temperature"),
+                            label: L10n.text( "insights_temperature"),
                             value: recommendation.outdoorScore.rawValue > 60
-                                ? String(localized: "insights_comfortable")
-                                : String(localized: "insights_uncomfortable"),
+                                ? L10n.text( "insights_comfortable")
+                                : L10n.text( "insights_uncomfortable"),
                             color: AppTheme.accent
                         )
                         ScoreRow(
-                            label: String(localized: "insights_precipitation"),
-                            value: String(localized: "insights_low_risk"),
+                            label: L10n.text( "insights_precipitation"),
+                            value: L10n.text( "insights_low_risk"),
                             color: AppTheme.success
                         )
                         ScoreRow(
-                            label: String(localized: "insights_wind"),
-                            value: String(localized: "insights_calm"),
+                            label: L10n.text( "insights_wind"),
+                            value: L10n.text( "insights_calm"),
                             color: AppTheme.teal
                         )
                         ScoreRow(
-                            label: String(localized: "insights_uv_index"),
-                            value: String(localized: "insights_moderate"),
+                            label: L10n.text( "insights_uv_index"),
+                            value: L10n.text( "insights_moderate"),
                             color: AppTheme.sunshine
                         )
                     }
@@ -135,7 +137,7 @@ private struct ActivitySummaryCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "insights_activity_scores"), systemImage: "figure.run")
+                Label(L10n.text( "insights_activity_scores"), systemImage: "figure.run")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -170,7 +172,7 @@ private struct WeeklyTrendPlaceholder: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "insights_weekly_trend"), systemImage: "chart.line.uptrend.xyaxis")
+                Label(L10n.text( "insights_weekly_trend"), systemImage: "chart.line.uptrend.xyaxis")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -184,7 +186,7 @@ private struct WeeklyTrendPlaceholder: View {
                 }
                 .frame(height: 80)
 
-                Text(String(localized: "insights_trend_description"))
+                Text(L10n.text( "insights_trend_description"))
                     .font(AppTypography.caption)
                     .foregroundStyle(AppTheme.secondaryText)
             }

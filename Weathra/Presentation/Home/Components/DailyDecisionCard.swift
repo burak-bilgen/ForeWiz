@@ -32,7 +32,7 @@ struct DailyDecisionCard: View {
                     Divider().opacity(0.4)
                     InsightRow(
                         icon: "clock.fill",
-                        title: String(localized: "widget_best_time"),
+                        title: L10n.text("widget_best_time"),
                         value: bestWindow.shortDisplayText,
                         tint: AppTheme.accent
                     )
@@ -40,7 +40,7 @@ struct DailyDecisionCard: View {
 
                 Divider().opacity(0.4)
                 HStack {
-                    Label(String(localized: "premium_feature_hourly"), systemImage: "chevron.right.circle.fill")
+                    Label(L10n.text("premium_feature_hourly"), systemImage: "chevron.right.circle.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.accent)
                     Spacer()
@@ -58,7 +58,7 @@ struct DailyDecisionCard: View {
 
     private var decisionText: some View {
         VStack(alignment: .leading, spacing: AppSpacing.small) {
-            Text(String(localized: "today_label"))
+            Text(L10n.text("today_label"))
                 .font(AppTypography.caption)
                 .foregroundStyle(AppTheme.secondaryText)
             Text(recommendation.outdoorDecision.localizedTitle)
@@ -89,10 +89,10 @@ private struct DecisionPill: View {
 
     private var labelText: String {
         switch decision {
-        case .good: String(localized: "decision_good")
-        case .moderate: String(localized: "decision_moderate")
-        case .risky: String(localized: "decision_risky")
-        case .avoid: String(localized: "decision_avoid")
+        case .good: L10n.text("decision_good")
+        case .moderate: L10n.text("decision_moderate")
+        case .risky: L10n.text("decision_risky")
+        case .avoid: L10n.text("decision_avoid")
         }
     }
 

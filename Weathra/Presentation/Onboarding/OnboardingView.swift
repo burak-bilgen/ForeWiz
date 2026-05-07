@@ -10,6 +10,7 @@ struct OnboardingView: View {
     @State private var currentPage = 0
     @State private var showConfetti = false
     @Namespace private var logoNamespace
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         NavigationStack {
@@ -45,7 +46,7 @@ struct OnboardingView: View {
                         .transition(.opacity)
                 }
             }
-            .navigationTitle(String(localized: "onboarding_welcome"))
+            .navigationTitle(L10n.text( "onboarding_welcome"))
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -74,6 +75,7 @@ private struct HeroPage: View {
     let logoNamespace: Namespace.ID
     let next: () -> Void
     @State private var animateContent = false
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ScrollView {
@@ -89,12 +91,12 @@ private struct HeroPage: View {
                     .accessibilityHidden(true)
 
                 VStack(spacing: AppSpacing.xSmall) {
-                    Text(String(localized: "onboarding_welcome"))
+                    Text(L10n.text( "onboarding_welcome"))
                         .font(.system(size: 32, weight: .heavy, design: .rounded))
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
 
-                    Text(String(localized: "onboarding_subtitle"))
+                    Text(L10n.text( "onboarding_subtitle"))
                         .font(AppTypography.body)
                         .foregroundStyle(.white.opacity(0.78))
                         .multilineTextAlignment(.center)
@@ -105,8 +107,8 @@ private struct HeroPage: View {
                     FeatureCard(
                         icon: "sparkles",
                         iconColor: AppTheme.sunshine,
-                        title: String(localized: "onboarding_feature_decision"),
-                        subtitle: String(localized: "onboarding_feature_decision_desc"),
+                        title: L10n.text( "onboarding_feature_decision"),
+                        subtitle: L10n.text( "onboarding_feature_decision_desc"),
                         delay: 0
                     )
                     .offset(y: animateContent ? 0 : 40)
@@ -115,8 +117,8 @@ private struct HeroPage: View {
                     FeatureCard(
                         icon: "heart.fill",
                         iconColor: AppTheme.teal,
-                        title: String(localized: "onboarding_feature_personal"),
-                        subtitle: String(localized: "onboarding_feature_personal_desc"),
+                        title: L10n.text( "onboarding_feature_personal"),
+                        subtitle: L10n.text( "onboarding_feature_personal_desc"),
                         delay: 0.1
                     )
                     .offset(y: animateContent ? 0 : 40)
@@ -125,8 +127,8 @@ private struct HeroPage: View {
                     FeatureCard(
                         icon: "bell.badge.fill",
                         iconColor: AppTheme.accent,
-                        title: String(localized: "onboarding_feature_notifications"),
-                        subtitle: String(localized: "onboarding_feature_notifications_desc"),
+                        title: L10n.text( "onboarding_feature_notifications"),
+                        subtitle: L10n.text( "onboarding_feature_notifications_desc"),
                         delay: 0.2
                     )
                     .offset(y: animateContent ? 0 : 40)
@@ -135,7 +137,7 @@ private struct HeroPage: View {
 
                 Button(action: next) {
                     HStack(spacing: AppSpacing.small) {
-                        Text(String(localized: "onboarding_continue"))
+                        Text(L10n.text( "onboarding_continue"))
                             .font(AppTypography.headline)
                         Image(systemName: "arrow.right")
                             .font(.system(size: 16, weight: .bold))
@@ -144,7 +146,7 @@ private struct HeroPage: View {
                     .padding(.vertical, AppSpacing.medium)
                     .foregroundStyle(.white)
                     .background(
-                        AppTheme.weatherGradient(for: .light),
+                        AppTheme.weatherGradient(for: colorScheme),
                         in: Capsule()
                     )
                     .shadow(color: AppTheme.accent.opacity(0.22), radius: 16, y: 10)
@@ -214,6 +216,7 @@ private struct WhyWeathraPage: View {
     let logoNamespace: Namespace.ID
     let next: () -> Void
     @State private var animateContent = false
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ScrollView {
@@ -228,12 +231,12 @@ private struct WhyWeathraPage: View {
                     .matchedGeometryEffect(id: "onboardingLogo", in: logoNamespace)
                     .accessibilityHidden(true)
 
-                Text(String(localized: "onboarding_why_weathra"))
+                Text(L10n.text( "onboarding_why_weathra"))
                     .font(.system(size: 28, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
 
-                Text(String(localized: "onboarding_why_subtitle"))
+                Text(L10n.text( "onboarding_why_subtitle"))
                     .font(AppTypography.caption)
                     .foregroundStyle(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
@@ -241,36 +244,36 @@ private struct WhyWeathraPage: View {
 
                 VStack(spacing: AppSpacing.medium) {
                     ComparisonCard(
-                        title: String(localized: "onboarding_comparison_what_todo"),
+                        title: L10n.text( "onboarding_comparison_what_todo"),
                         otherIcon: "thermometer.medium",
-                        otherText: String(localized: "onboarding_comparison_what_todo_other"),
+                        otherText: L10n.text( "onboarding_comparison_what_todo_other"),
                         weathraIcon: "checkmark.seal.fill",
                         weathraIconColor: AppTheme.success,
-                        weathraText: String(localized: "onboarding_comparison_what_todo_weathra"),
+                        weathraText: L10n.text( "onboarding_comparison_what_todo_weathra"),
                         delay: 0
                     )
                     .offset(y: animateContent ? 0 : 40)
                     .opacity(animateContent ? 1 : 0)
 
                     ComparisonCard(
-                        title: String(localized: "onboarding_comparison_what_wear"),
+                        title: L10n.text( "onboarding_comparison_what_wear"),
                         otherIcon: "wind",
-                        otherText: String(localized: "onboarding_comparison_what_wear_other"),
+                        otherText: L10n.text( "onboarding_comparison_what_wear_other"),
                         weathraIcon: "jacket.fill",
                         weathraIconColor: AppTheme.sunshine,
-                        weathraText: String(localized: "onboarding_comparison_what_wear_weathra"),
+                        weathraText: L10n.text( "onboarding_comparison_what_wear_weathra"),
                         delay: 0.1
                     )
                     .offset(y: animateContent ? 0 : 40)
                     .opacity(animateContent ? 1 : 0)
 
                     ComparisonCard(
-                        title: String(localized: "onboarding_comparison_best_time"),
+                        title: L10n.text( "onboarding_comparison_best_time"),
                         otherIcon: "clock",
-                        otherText: String(localized: "onboarding_comparison_best_time_other"),
+                        otherText: L10n.text( "onboarding_comparison_best_time_other"),
                         weathraIcon: "clock.badge.checkmark.fill",
                         weathraIconColor: AppTheme.accent,
-                        weathraText: String(localized: "onboarding_comparison_best_time_weathra"),
+                        weathraText: L10n.text( "onboarding_comparison_best_time_weathra"),
                         delay: 0.2
                     )
                     .offset(y: animateContent ? 0 : 40)
@@ -279,7 +282,7 @@ private struct WhyWeathraPage: View {
 
                 Button(action: next) {
                     HStack(spacing: AppSpacing.small) {
-                        Text(String(localized: "onboarding_lets_start"))
+                        Text(L10n.text( "onboarding_lets_start"))
                             .font(AppTypography.headline)
                         Image(systemName: "arrow.right")
                             .font(.system(size: 16, weight: .bold))
@@ -288,7 +291,7 @@ private struct WhyWeathraPage: View {
                     .padding(.vertical, AppSpacing.medium)
                     .foregroundStyle(.white)
                     .background(
-                        AppTheme.weatherGradient(for: .light),
+                        AppTheme.weatherGradient(for: colorScheme),
                         in: Capsule()
                     )
                     .shadow(color: AppTheme.accent.opacity(0.22), radius: 16, y: 10)
@@ -386,6 +389,7 @@ private struct SetupPage: View {
     let isCompleting: Bool
     let complete: () -> Void
     @State private var animateContent = false
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         ScrollView {
@@ -397,11 +401,11 @@ private struct SetupPage: View {
                     .foregroundStyle(AppTheme.accent)
                     .padding(.bottom, AppSpacing.xSmall)
 
-                Text(String(localized: "onboarding_setup_title"))
+                Text(L10n.text( "onboarding_setup_title"))
                     .font(.system(size: 26, weight: .heavy, design: .rounded))
                     .foregroundStyle(.white)
 
-                Text(String(localized: "onboarding_setup_subtitle"))
+                Text(L10n.text( "onboarding_setup_subtitle"))
                     .font(AppTypography.caption)
                     .foregroundStyle(.white.opacity(0.72))
                     .multilineTextAlignment(.center)
@@ -444,6 +448,7 @@ private struct CompleteButton: View {
     let isEnabled: Bool
     let isCompleting: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         Button(action: action) {
@@ -453,7 +458,7 @@ private struct CompleteButton: View {
                         .tint(.white)
                 }
                 Label(
-                    isEnabled ? String(localized: "onboarding_ready") : String(localized: "onboarding_location_required"),
+                    isEnabled ? L10n.text( "onboarding_ready") : L10n.text( "onboarding_location_required"),
                     systemImage: isEnabled ? "party.popper.fill" : "location.slash.fill"
                 )
                 .font(AppTypography.headline)
@@ -463,7 +468,7 @@ private struct CompleteButton: View {
             .foregroundStyle(.white)
             .background(
                 isEnabled
-                    ? AppTheme.weatherGradient(for: .light)
+                    ? AppTheme.weatherGradient(for: colorScheme)
                     : LinearGradient(colors: [.gray.opacity(0.45)], startPoint: .leading, endPoint: .trailing),
                 in: Capsule()
             )
@@ -536,14 +541,14 @@ private struct PermissionSetupSection: View {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 SectionHeader(
                     icon: "location.circle.fill",
-                    title: String(localized: "onboarding_permissions_title"),
-                    subtitle: String(localized: "onboarding_permissions_subtitle")
+                    title: L10n.text( "onboarding_permissions_title"),
+                    subtitle: L10n.text( "onboarding_permissions_subtitle")
                 )
 
                 CompactPermissionRow(
                     icon: "location.fill",
-                    title: String(localized: "onboarding_location_title"),
-                    message: String(localized: "onboarding_location_message"),
+                    title: L10n.text( "onboarding_location_title"),
+                    message: L10n.text( "onboarding_location_message"),
                     statusText: statusText(for: viewModel.locationStatus),
                     isRequired: true,
                     actionTitle: locationActionTitle,
@@ -552,8 +557,8 @@ private struct PermissionSetupSection: View {
 
                 CompactPermissionRow(
                     icon: "bell.badge.fill",
-                    title: String(localized: "onboarding_notification_title"),
-                    message: String(localized: "onboarding_notification_message"),
+                    title: L10n.text( "onboarding_notification_title"),
+                    message: L10n.text( "onboarding_notification_message"),
                     statusText: notificationText(for: viewModel.notificationStatus),
                     isRequired: false,
                     actionTitle: notificationActionTitle,
@@ -573,22 +578,22 @@ private struct PermissionSetupSection: View {
     private var locationActionTitle: String {
         switch viewModel.locationStatus {
         case .authorized:
-            String(localized: "permission_open")
+            L10n.text( "permission_open")
         case .denied, .restricted:
-            String(localized: "permission_settings")
+            L10n.text( "permission_settings")
         case .notDetermined:
-            String(localized: "permission_allow")
+            L10n.text( "permission_allow")
         }
     }
 
     private var notificationActionTitle: String {
         switch viewModel.notificationStatus {
         case .authorized, .provisional:
-            String(localized: "permission_open")
+            L10n.text( "permission_open")
         case .denied:
-            String(localized: "permission_settings")
+            L10n.text( "permission_settings")
         case .notDetermined:
-            String(localized: "permission_allow")
+            L10n.text( "permission_allow")
         }
     }
 
@@ -618,24 +623,24 @@ private struct PermissionSetupSection: View {
     private func statusText(for status: LocationAuthorizationStatus) -> String {
         switch status {
         case .notDetermined:
-            String(localized: "permission_pending")
+            L10n.text( "permission_pending")
         case .authorized:
-            String(localized: "permission_open")
+            L10n.text( "permission_open")
         case .denied, .restricted:
-            String(localized: "permission_closed")
+            L10n.text( "permission_closed")
         }
     }
 
     private func notificationText(for status: NotificationAuthorizationStatus) -> String {
         switch status {
         case .notDetermined:
-            String(localized: "permission_optional")
+            L10n.text( "permission_optional")
         case .authorized:
-            String(localized: "permission_open")
+            L10n.text( "permission_open")
         case .provisional:
-            String(localized: "permission_silent_on")
+            L10n.text( "permission_silent_on")
         case .denied:
-            String(localized: "permission_closed")
+            L10n.text( "permission_closed")
         }
     }
 }
@@ -650,11 +655,11 @@ private struct PersonalizationSection: View {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 SectionHeader(
                     icon: "slider.horizontal.3",
-                    title: String(localized: "onboarding_comfort_title"),
-                    subtitle: String(localized: "onboarding_comfort_subtitle")
+                    title: L10n.text( "onboarding_comfort_title"),
+                    subtitle: L10n.text( "onboarding_comfort_subtitle")
                 )
 
-                Picker(String(localized: "onboarding_temp_sensitivity"), selection: Binding(
+                Picker(L10n.text( "onboarding_temp_sensitivity"), selection: Binding(
                     get: { viewModel.selectedSensitivity },
                     set: { viewModel.selectSensitivity($0) }
                 )) {
@@ -665,7 +670,7 @@ private struct PersonalizationSection: View {
                 .pickerStyle(.segmented)
 
                 VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Text(String(localized: "onboarding_activities"))
+                    Text(L10n.text( "onboarding_activities"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.secondaryText)
 
@@ -736,7 +741,7 @@ private struct CompactPermissionRow: View {
                         .font(AppTypography.caption.weight(.bold))
                         .foregroundStyle(AppTheme.ink)
                     if isRequired {
-                        Text(String(localized: "permission_required"))
+                        Text(L10n.text( "permission_required"))
                             .font(.system(.caption2, design: .rounded, weight: .bold))
                             .foregroundStyle(AppTheme.warning)
                     }

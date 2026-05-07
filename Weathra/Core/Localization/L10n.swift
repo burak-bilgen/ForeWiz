@@ -353,6 +353,161 @@ enum L10n {
         "settings_allergy_title": "Alerjiler",
         "settings_allergy_subtitle": "Alerji türlerini seç",
         "settings_allergy_enable": "Alerji takibi aktif",
-        "premium_auto_renew": "Otomatik olarak yenilenir. İstediğin zaman Ayarlar'dan iptal edebilirsin."
+        "premium_auto_renew": "Otomatik olarak yenilenir. İstediğin zaman Ayarlar'dan iptal edebilirsin.",
+
+        // MARK: - Paywall
+        "paywall_title": "Weathra Premium",
+        "paywall_subtitle": "Tüm özellikleri aç",
+        "paywall_loading": "Yükleniyor...",
+        "paywall_restore": "Geri Yükle",
+        "paywall_purchases": "Satın Alma",
+        "paywall_ok": "Tamam",
+        "paywall_restore_success": "Başarıyla geri yüklendi.",
+        "paywall_restore_failed": "Premium bulunamadı.",
+
+        // MARK: - Settings Sections
+        "settings_section_appearance": "Görünüm",
+        "settings_section_premium": "Premium",
+        "settings_section_permissions": "İzinler",
+        "settings_section_locations": "Konumlar",
+        "settings_section_preferences": "Tercihler",
+        "settings_section_notifications": "Bildirimler",
+        "settings_section_app": "Uygulama",
+        "settings_title": "Ayarlar",
+        "settings_theme": "Tema",
+        "settings_language": "Dil",
+        "settings_reset_title": "Sıfırla",
+        "settings_reset_subtitle": "Onboarding'ı yeniden başlat",
+        "settings_reset_confirm": "Sıfırla",
+        "settings_reset_message": "Onboarding sürecine yeniden başlayacaksınız. Bu işlem geri alınamaz.",
+        "settings_cancel": "İptal",
+        "settings_save": "Kaydet",
+        "settings_open_ios_settings": "iOS Ayarlarını Aç",
+        "settings_permission_location": "Konum",
+        "settings_permission_location_desc": "Hava durumu için konum gerekir",
+        "settings_permission_notifications": "Bildirimler",
+        "settings_permission_notifications_desc": "Fırsatları kaçırma",
+        "settings_version": "Versiyon",
+        "settings_data_source": "Veri Kaynağı",
+        "settings_data_apple_weather": "Apple Weather",
+        "settings_privacy_note": "Konum verileri cihazda işlenir ve paylaşılmaz.",
+        "settings_about_title": "Hakkında",
+        "settings_about_subtitle": "Uygulama bilgileri",
+        "settings_add_location": "Konum Ekle",
+        "settings_new_location": "Yeni Konum",
+        "settings_search_location": "Konum ara...",
+        "settings_edit_location": "Düzenle",
+        "settings_location_name": "İsim",
+        "settings_address": "Adres",
+        "settings_coordinates": "Koordinatlar",
+        "settings_delete_location": "Sil",
+        "settings_activities": "Aktiviteler",
+        "settings_daily_limit": "Günlük limit",
+        "settings_premium_active": "Premium Aktif",
+        "settings_premium_active_subtitle": "Tüm özellikler açık",
+        "settings_premium_upgrade_subtitle": "Özellikleri açmak için yükselt",
+
+        // MARK: - Wardrobe
+        "wardrobe_umbrella": "Şemsiye",
+        "wardrobe_raincoat": "Yağmurluk",
+        "wardrobe_winter_coat": "Kışlık mont",
+        "wardrobe_sunglasses": "Güneş gözlüğü",
+        "wardrobe_gloves": "Eldiven/Atkı",
+        "wardrobe_thermals": "Termal içlik",
+
+        // MARK: - Onboarding
+        "onboarding_location_permission_title": "Konumunu görmemize izin ver",
+        "onboarding_location_permission_desc": "Hava durumunu ve dışarı çıkma önerilerini kişiselleştirmek için konumuna ihtiyacımız var.",
+        "onboarding_location_permission_note": "Konum verileri cihazda kalır ve başkalarıyla paylaşılmaz.",
+        "onboarding_notification_permission_title": "Bildirimlerini ister misin?",
+        "onboarding_notification_permission_desc": "En iyi dışarı çıkma zamanları ve hava değişiklikleri hakkında bilgi al.",
+        "onboarding_permission_allow": "İzin Ver",
+        "onboarding_permission_skip": "Şimdilik Yok",
+        "onboarding_notification_badge": "Bildirimler açık",
+
+        // MARK: - Components
+        "outfit_accessories": "Aksesuarlar",
+        "outfit_warning": "Uyarı",
+
+        // MARK: - Misc
+        "premium_feature_hourly": "Saatlik",
+
+        // MARK: - Premium Features
+        "premium_feature_locations": "Birden Fazla Konum",
+        "premium_feature_locations_desc": "Birden fazla şehri takip et",
+        "premium_feature_forecast_14day_desc": "İki hafta boyunca planla",
+        "premium_feature_hourly_desc": "Saatlik detaylı hava durumu",
+        "premium_feature_alerts_desc": "Fırtına ve sel uyarıları",
+        "premium_feature_widget": "Widget Özelleştirme",
+        "premium_feature_widget_desc": "Widget'ını kişiselleştir",
+        "premium_feature_analytics": "Gelişmiş Analitik",
+        "premium_feature_analytics_desc": "Geçmiş verileri incele",
+        "premium_feature_watch_desc": "Apple Watch'tan kontrol et",
+
+        // MARK: - Weekly Forecast
+        "forecast_7_days": "7 Gün",
+        "forecast_premium": "Premium Gerekli",
+        "weekly_score_accessor": "Skor",
+        "weekly_high_accessor": "Yüksek",
+        "weekly_low_accessor": "Düşük",
+
+        // MARK: - Permissions
+        "permission_location_not_requested": "Konum istenmedi",
+        "permission_location_granted": "Konum aktif",
+        "permission_open": "Aç",
+        "permission_settings": "Ayarlar",
+        "permission_allow": "İzin Ver",
+        "permission_pending": "Bekleniyor",
+        "permission_closed": "Kapalı",
+        "permission_optional": "İsteğe bağlı",
+        "permission_silent_on": "Sessiz açık",
+        "permission_required": "Gerekli",
+        "comfort_timeline_accessibility": "Konfor zaman çizelgesi",
+
+        // MARK: - Quiet Hours
+        "quiet_hours_title": "Sessiz Saatler",
+        "quiet_hours_description": "Belirli saatlerde bildirim alma",
+        "quiet_hours_start": "Başlangıç",
+        "quiet_hours_end": "Bitiş",
+
+        // MARK: - Ads
+        "ad_label_text": "Reklam",
+        "ad_space_text": "Reklam alanı",
+
+        // MARK: - Launch
+        "launch_preparing": "Hazırlanıyor...",
+
+        // MARK: - Tabs
+        "tab_today": "Bugün",
+        "tab_settings": "Ayarlar",
+
+        // MARK: - Premium
+        "premium_product_not_found": "Ürün bulunamadı",
+        "premium_pending": "Satın alma bekleniyor",
+        "premium_network_error": "Ağ hatası",
+
+        // MARK: - Errors
+        "error_weatherkit_unknown": "Bilinmeyen hata",
+        "error_weatherkit_auth": "WeatherKit izni gerekli",
+        "error_weatherkit_failed": "WeatherKit hatası",
+        "error_persistence": "Kaydetme hatası",
+        "settings_save_success": "Başarıyla kaydedildi",
+
+        // MARK: - Widget
+        "widget_no_data": "Veri yok",
+        "widget_open_app": "Uygulamayı aç",
+        "widget_name": "Weathra",
+        "widget_description": "Bugünün hava durumu ve dışarı çıkma önerisi",
+        "outfit_light_and_comfortable": "Hafif ve rahat",
+
+        // MARK: - Misc Enums
+        "tier_free": "Ücretsiz",
+        "tier_premium": "Premium",
+        "palette_sky": "Gökyüzü",
+        "palette_mint": "Nane",
+        "palette_ember": "Kömür",
+        "units_metric": "Metrik",
+        "units_imperial": "İngilizce",
+        "activity_best_time_suffix": "için en iyi zaman"
     ]
 }

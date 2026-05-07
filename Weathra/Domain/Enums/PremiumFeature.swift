@@ -13,25 +13,25 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .multipleLocations: String(localized: "premium_feature_locations")
-        case .fourteenDayForecast: String(localized: "premium_feature_forecast_14day")
-        case .hourlyTimeline: String(localized: "premium_feature_hourly")
-        case .severeWeatherAlerts: String(localized: "premium_feature_alerts")
-        case .widgetCustomization: String(localized: "premium_feature_widget")
-        case .advancedAnalytics: String(localized: "premium_feature_analytics")
-        case .appleWatchCompanion: String(localized: "premium_feature_watch")
+        case .multipleLocations: L10n.text("premium_feature_locations")
+        case .fourteenDayForecast: L10n.text("premium_feature_forecast_14day")
+        case .hourlyTimeline: L10n.text("premium_feature_hourly")
+        case .severeWeatherAlerts: L10n.text("premium_feature_alerts")
+        case .widgetCustomization: L10n.text("premium_feature_widget")
+        case .advancedAnalytics: L10n.text("premium_feature_analytics")
+        case .appleWatchCompanion: L10n.text("premium_feature_watch")
         }
     }
 
     var localizedDescription: String {
         switch self {
-        case .multipleLocations: String(localized: "premium_feature_locations_desc")
-        case .fourteenDayForecast: String(localized: "premium_feature_forecast_14day_desc")
-        case .hourlyTimeline: String(localized: "premium_feature_hourly_desc")
-        case .severeWeatherAlerts: String(localized: "premium_feature_alerts_desc")
-        case .widgetCustomization: String(localized: "premium_feature_widget_desc")
-        case .advancedAnalytics: String(localized: "premium_feature_analytics_desc")
-        case .appleWatchCompanion: String(localized: "premium_feature_watch_desc")
+        case .multipleLocations: L10n.text("premium_feature_locations_desc")
+        case .fourteenDayForecast: L10n.text("premium_feature_forecast_14day_desc")
+        case .hourlyTimeline: L10n.text("premium_feature_hourly_desc")
+        case .severeWeatherAlerts: L10n.text("premium_feature_alerts_desc")
+        case .widgetCustomization: L10n.text("premium_feature_widget_desc")
+        case .advancedAnalytics: L10n.text("premium_feature_analytics_desc")
+        case .appleWatchCompanion: L10n.text("premium_feature_watch_desc")
         }
     }
 

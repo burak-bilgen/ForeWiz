@@ -9,6 +9,6 @@ struct FeatureGate {
     }
     
     static func premiumPrompt(for feature: PremiumFeature) -> String {
-        String(localized: "premium_upgrade") + " — " + feature.localizedTitle
+        L10n.text("premium_upgrade") + " — " + feature.localizedTitle
     }
 }

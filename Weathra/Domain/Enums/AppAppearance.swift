@@ -7,9 +7,9 @@ enum AppAppearance: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .system: String(localized: "appearance_system")
-        case .light: String(localized: "appearance_light")
-        case .dark: String(localized: "appearance_dark")
+        case .system: L10n.text("appearance_system")
+        case .light: L10n.text("appearance_light")
+        case .dark: L10n.text("appearance_dark")
         }
     }
 }

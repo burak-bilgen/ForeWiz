@@ -42,7 +42,7 @@ struct ScoreRingView: View {
 
     private var scoreAccessibilityLabel: String {
         let scoreValue = score.displayValue.formatted(.number.precision(.fractionLength(1)))
-        return String(localized: "widget_outdoor_score") + " \(scoreValue) / 10"
+        return L10n.text("widget_outdoor_score") + " \(scoreValue) / 10"
     }
 
     private var scoreColor: Color {

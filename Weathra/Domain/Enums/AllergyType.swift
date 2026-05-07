@@ -10,12 +10,12 @@ enum AllergyType: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .pollen: String(localized: "allergy_pollen")
-        case .dust: String(localized: "allergy_dust")
-        case .mold: String(localized: "allergy_mold")
-        case .petDander: String(localized: "allergy_pet")
-        case .smoke: String(localized: "allergy_smoke")
-        case .airQuality: String(localized: "allergy_air")
+        case .pollen: L10n.text("allergy_pollen")
+        case .dust: L10n.text("allergy_dust")
+        case .mold: L10n.text("allergy_mold")
+        case .petDander: L10n.text("allergy_pet")
+        case .smoke: L10n.text("allergy_smoke")
+        case .airQuality: L10n.text("allergy_air")
         }
     }
 
@@ -59,10 +59,10 @@ enum PollenType: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .grass: String(localized: "pollen_grass")
-        case .tree: String(localized: "pollen_tree")
-        case .weed: String(localized: "pollen_weed")
-        case .olive: String(localized: "pollen_olive")
+        case .grass: L10n.text("pollen_grass")
+        case .tree: L10n.text("pollen_tree")
+        case .weed: L10n.text("pollen_weed")
+        case .olive: L10n.text("pollen_olive")
         }
     }
 }

@@ -5,7 +5,7 @@ import WidgetKit
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published private(set) var state: LoadableState<HomeViewState> = .idle
-    @Published private(set) var selectedLocationName: String = String(localized: "home_current_location")
+    @Published private(set) var selectedLocationName: String = L10n.text( "home_current_location")
 
     private let loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase
     private let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
@@ -23,7 +23,7 @@ final class HomeViewModel: ObservableObject {
         preferencesRepository: PreferencesRepository,
         widgetRepository: WidgetRepository,
         dateProvider: DateProvider = SystemDateProvider(),
-        selectedLocationName: String = String(localized: "home_current_location")
+        selectedLocationName: String = L10n.text( "home_current_location")
     ) {
         self.loadHomeRecommendationUseCase = loadHomeRecommendationUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
@@ -112,7 +112,7 @@ final class HomeViewModel: ObservableObject {
     ) -> HomeCurrentWeatherViewState {
         HomeCurrentWeatherViewState(
             temperatureText: temperatureText(current.temperatureCelsius, unitSystem: unitSystem),
-            feelsLikeText: String(localized: "weather_feels_like") + " " + temperatureText(
+            feelsLikeText: L10n.text( "weather_feels_like") + " " + temperatureText(
                 current.apparentTemperatureCelsius,
                 unitSystem: unitSystem
             ),
@@ -141,30 +141,30 @@ final class HomeViewModel: ObservableObject {
         let condition = conditionCode?.lowercased() ?? ""
 
         if condition.contains("thunder") || condition.contains("storm") {
-            return String(localized: "weather_storm")
+            return L10n.text( "weather_storm")
         }
 
         if condition.contains("rain") || condition.contains("drizzle") {
-            return String(localized: "weather_rain")
+            return L10n.text( "weather_rain")
         }
 
         if condition.contains("snow") || condition.contains("sleet") {
-            return String(localized: "weather_snow")
+            return L10n.text( "weather_snow")
         }
 
         if condition.contains("cloud") {
-            return String(localized: "weather_cloudy")
+            return L10n.text( "weather_cloudy")
         }
 
         if condition.contains("fog") || condition.contains("haze") {
-            return String(localized: "weather_foggy")
+            return L10n.text( "weather_foggy")
         }
 
         if condition.contains("clear") || condition.contains("sun") {
-            return String(localized: "weather_clear")
+            return L10n.text( "weather_clear")
         }
 
-        return String(localized: "weather_current")
+        return L10n.text( "weather_current")
     }
 
     private func symbolName(for conditionCode: String?, isDaylight: Bool?) -> String {
@@ -215,7 +215,7 @@ final class HomeViewModel: ObservableObject {
 
             let dayName: String
             if isToday {
-                dayName = String(localized: "today_label")
+                dayName = L10n.text( "today_label")
             } else {
                 dayName = formatter.string(from: point.date).capitalized
             }

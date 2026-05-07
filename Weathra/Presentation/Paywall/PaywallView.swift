@@ -21,11 +21,11 @@ struct PaywallView: View {
                                 .foregroundStyle(AppTheme.sunshine)
                                 .shadow(color: AppTheme.sunshine.opacity(0.35), radius: 16, y: 8)
 
-                            Text(String(localized: "paywall_title"))
+                            Text(L10n.text("paywall_title"))
                                 .font(.system(size: 32, weight: .heavy, design: .rounded))
                                 .foregroundStyle(AppTheme.ink)
 
-                            Text(String(localized: "paywall_subtitle"))
+                            Text(L10n.text("paywall_subtitle"))
                                 .font(AppTypography.body)
                                 .foregroundStyle(AppTheme.secondaryText)
                                 .multilineTextAlignment(.center)
@@ -41,7 +41,7 @@ struct PaywallView: View {
                         .padding(.horizontal, AppSpacing.medium)
 
                         if store.isLoading && store.products.isEmpty {
-                            ProgressView(String(localized: "paywall_loading"))
+                            ProgressView(L10n.text("paywall_loading"))
                                 .padding()
                         } else {
                             VStack(spacing: AppSpacing.medium) {
@@ -68,7 +68,7 @@ struct PaywallView: View {
                         }
 
                         Button(action: restore) {
-                            Label(String(localized: "paywall_restore"), systemImage: "arrow.counterclockwise")
+                            Label(L10n.text("paywall_restore"), systemImage: "arrow.counterclockwise")
                                 .font(AppTypography.caption.weight(.semibold))
                         }
                         .buttonStyle(.plain)
@@ -100,12 +100,12 @@ struct PaywallView: View {
                 await store.loadProducts()
                 await store.refreshStatus()
             }
-            .alert(String(localized: "paywall_purchases"), isPresented: $showRestoreAlert) {
-                Button(String(localized: "paywall_ok"), role: .cancel) {}
+            .alert(L10n.text( "paywall_purchases"), isPresented: $showRestoreAlert) {
+                Button(L10n.text( "paywall_ok"), role: .cancel) {}
             } message: {
                 Text(restoreSuccess
-                     ? String(localized: "paywall_restore_success")
-                     : String(localized: "paywall_restore_failed"))
+                     ? L10n.text( "paywall_restore_success")
+                     : L10n.text( "paywall_restore_failed"))
             }
         }
     }
@@ -150,6 +150,8 @@ private struct PurchaseButton: View {
     let product: SubscriptionProduct
     let action: () -> Void
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         Button(action: action) {
             HStack {
@@ -158,7 +160,7 @@ private struct PurchaseButton: View {
                         .font(AppTypography.headline)
                     Text(product.description)
                         .font(AppTypography.caption)
-                        .foregroundStyle(.white.opacity(0.85))
+                        .foregroundStyle(.white.opacity(colorScheme == .dark ? 0.75 : 0.85))
                 }
 
                 Spacer()
@@ -168,7 +170,7 @@ private struct PurchaseButton: View {
             }
             .padding(AppSpacing.medium)
             .foregroundStyle(.white)
-            .background(AppTheme.weatherGradient(for: .light), in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+            .background(AppTheme.weatherGradient(for: colorScheme), in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
             .shadow(color: AppTheme.accent.opacity(0.22), radius: 16, y: 8)
         }
         .buttonStyle(.plain)

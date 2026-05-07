@@ -28,13 +28,13 @@ extension DailyRecommendation {
             bestActivityWindows: [],
             avoidWindows: [],
             outfit: OutfitRecommendation(
-                title: String(localized: "outfit_light_and_comfortable"),
-                items: [String(localized: "activity_running")],
+                title: L10n.text("outfit_light_and_comfortable"),
+                items: [L10n.text("activity_running")],
                 accessories: [],
                 warning: nil
             ),
             risks: [],
-            summaryText: String(localized: "decision_good"),
+            summaryText: L10n.text("decision_good"),
             explanation: "85/100"
         )
     }

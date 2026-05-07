@@ -33,7 +33,7 @@ struct RecommendationDetailView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle(String(localized: "premium_feature_hourly"))
+        .navigationTitle(L10n.text("premium_feature_hourly"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -52,7 +52,7 @@ private struct DetailHeroCard: View {
 
                     Text(recommendation.summaryText)
                         .font(AppTypography.body)
-                        .foregroundStyle(.white.opacity(0.88))
+                        .foregroundStyle(.white.opacity(colorScheme == .dark ? 0.78 : 0.88))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
@@ -67,18 +67,18 @@ private struct DetailHeroCard: View {
                     Image(systemName: "clock.fill")
                         .font(.caption.weight(.bold))
                         .frame(width: 24, height: 24)
-                        .background(.white.opacity(0.18), in: Circle())
+                        .background(.white.opacity(colorScheme == .dark ? 0.25 : 0.18), in: Circle())
 
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(String(localized: "widget_best_time"))
+                        Text(L10n.text("widget_best_time"))
                             .font(AppTypography.caption)
-                            .foregroundStyle(.white.opacity(0.76))
+                            .foregroundStyle(.white.opacity(colorScheme == .dark ? 0.65 : 0.76))
                         Text(bestWindow.shortDisplayText)
                             .font(AppTypography.headline)
                     }
                 }
                 .padding(AppSpacing.small)
-                .background(.white.opacity(0.14), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
+                .background(.white.opacity(colorScheme == .dark ? 0.18 : 0.14), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous))
             }
         }
         .foregroundStyle(.white)
@@ -94,7 +94,7 @@ private struct DetailExplanationCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
-                Label(String(localized: "decision_moderate"), systemImage: "lightbulb.fill")
+                Label(L10n.text("decision_moderate"), systemImage: "lightbulb.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -113,7 +113,7 @@ private struct DetailActivityTimeline: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "notification_best_run"), systemImage: "figure.run")
+                Label(L10n.text("notification_best_run"), systemImage: "figure.run")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -189,7 +189,7 @@ private struct DetailOutfitCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "notification_outfit"), systemImage: "tshirt.fill")
+                Label(L10n.text("notification_outfit"), systemImage: "tshirt.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -215,7 +215,7 @@ private struct DetailOutfitCard: View {
                 if outfit.accessories.isEmpty == false {
                     InsightRow(
                         icon: "sparkles",
-                        title: String(localized: "wardrobe_umbrella"),
+                        title: L10n.text("wardrobe_umbrella"),
                         value: outfit.accessories.joined(separator: " • "),
                         tint: AppTheme.teal
                     )
@@ -224,7 +224,7 @@ private struct DetailOutfitCard: View {
                 if let warning = outfit.warning {
                     InsightRow(
                         icon: "exclamationmark.triangle.fill",
-                        title: String(localized: "risk_high"),
+                        title: L10n.text("risk_high"),
                         value: warning,
                         tint: AppTheme.warning
                     )
@@ -240,7 +240,7 @@ private struct DetailAvoidCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "decision_risky"), systemImage: "exclamationmark.octagon.fill")
+                Label(L10n.text("decision_risky"), systemImage: "exclamationmark.octagon.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
@@ -288,7 +288,7 @@ private struct DetailRiskList: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "decision_risky"), systemImage: "exclamationmark.triangle.fill")
+                Label(L10n.text("decision_risky"), systemImage: "exclamationmark.triangle.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 

@@ -68,9 +68,9 @@ struct WeathraWidgetEntryView: View {
                     Image(systemName: "cloud.sun.fill")
                         .font(.title2)
                         .foregroundColor(.secondary)
-                    Text(String(localized: "widget_no_data"))
+                    Text(L10n.text( "widget_no_data"))
                         .font(.caption.weight(.semibold))
-                    Text(String(localized: "widget_open_app"))
+                    Text(L10n.text( "widget_open_app"))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -123,8 +123,8 @@ struct WeathraWidget: Widget {
                     .background()
             }
         }
-        .configurationDisplayName(String(localized: "widget_name"))
-        .description(String(localized: "widget_description"))
+        .configurationDisplayName(L10n.text( "widget_name"))
+        .description(L10n.text( "widget_description"))
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
@@ -144,13 +144,13 @@ extension DailyRecommendation {
             bestActivityWindows: [],
             avoidWindows: [],
             outfit: OutfitRecommendation(
-                title: String(localized: "outfit_light_and_comfortable"),
-                items: [String(localized: "activity_running")],
+                title: L10n.text( "outfit_light_and_comfortable"),
+                items: [L10n.text( "activity_running")],
                 accessories: [],
                 warning: nil
             ),
             risks: [],
-            summaryText: String(localized: "decision_good"),
+            summaryText: L10n.text( "decision_good"),
             explanation: "85/100"
         )
     }

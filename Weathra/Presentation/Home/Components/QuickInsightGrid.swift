@@ -11,7 +11,7 @@ struct QuickInsightGrid: View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: AppSpacing.small) {
             MetricTile(
                 icon: "figure.walk",
-                title: String(localized: "widget_outdoor_score"),
+                title: L10n.text( "widget_outdoor_score"),
                 value: scoreText,
                 note: outdoorDecisionNote,
                 tint: AppTheme.color(for: recommendation.outdoorDecision)
@@ -19,15 +19,15 @@ struct QuickInsightGrid: View {
 
             MetricTile(
                 icon: "clock.badge.checkmark",
-                title: String(localized: "widget_best_time"),
-                value: recommendation.bestOutdoorWindow?.shortDisplayText ?? String(localized: "forecast_no_best_window"),
-                note: recommendation.bestOutdoorWindow == nil ? String(localized: "decision_moderate") : String(localized: "decision_good"),
+                title: L10n.text( "widget_best_time"),
+                value: recommendation.bestOutdoorWindow?.shortDisplayText ?? L10n.text( "forecast_no_best_window"),
+                note: recommendation.bestOutdoorWindow == nil ? L10n.text( "decision_moderate") : L10n.text( "decision_good"),
                 tint: AppTheme.accent
             )
 
             MetricTile(
                 icon: "exclamationmark.triangle.fill",
-                title: String(localized: "decision_risky"),
+                title: L10n.text( "decision_risky"),
                 value: avoidWindowText,
                 note: avoidWindowNote,
                 tint: recommendation.avoidWindows.isEmpty ? AppTheme.success : AppTheme.warning
@@ -35,7 +35,7 @@ struct QuickInsightGrid: View {
 
             MetricTile(
                 icon: "bell.badge.fill",
-                title: String(localized: "notification_uv"),
+                title: L10n.text( "notification_uv"),
                 value: notificationReasonText,
                 note: notificationReasonNote,
                 tint: recommendation.risks.isEmpty ? AppTheme.success : AppTheme.danger
@@ -49,16 +49,16 @@ struct QuickInsightGrid: View {
 
     private var outdoorDecisionNote: String {
         switch recommendation.outdoorDecision {
-        case .good: String(localized: "decision_good")
-        case .moderate: String(localized: "decision_moderate")
-        case .risky: String(localized: "decision_risky")
-        case .avoid: String(localized: "decision_avoid")
+        case .good: L10n.text( "decision_good")
+        case .moderate: L10n.text( "decision_moderate")
+        case .risky: L10n.text( "decision_risky")
+        case .avoid: L10n.text( "decision_avoid")
         }
     }
 
     private var avoidWindowText: String {
         guard let avoidWindow = recommendation.avoidWindows.first else {
-            return String(localized: "risk_low")
+            return L10n.text( "risk_low")
         }
 
         return avoidWindow.window.shortDisplayText
@@ -66,7 +66,7 @@ struct QuickInsightGrid: View {
 
     private var avoidWindowNote: String {
         guard let avoidWindow = recommendation.avoidWindows.first else {
-            return String(localized: "decision_good")
+            return L10n.text( "decision_good")
         }
 
         return avoidWindow.risk.title
@@ -74,7 +74,7 @@ struct QuickInsightGrid: View {
 
     private var notificationReasonText: String {
         guard let risk = recommendation.risks.first(where: { $0.severity >= .medium }) else {
-            return String(localized: "risk_low")
+            return L10n.text( "risk_low")
         }
 
         return risk.title
@@ -82,7 +82,7 @@ struct QuickInsightGrid: View {
 
     private var notificationReasonNote: String {
         guard let risk = recommendation.risks.first(where: { $0.severity >= .medium }) else {
-            return String(localized: "decision_good")
+            return L10n.text( "decision_good")
         }
 
         return risk.severity.localizedTitle

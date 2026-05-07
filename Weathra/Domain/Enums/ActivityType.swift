@@ -8,10 +8,10 @@ enum ActivityType: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .running: String(localized: "activity_running")
-        case .walking: String(localized: "activity_walking")
-        case .cycling: String(localized: "activity_cycling")
-        case .goingOutside: String(localized: "activity_outside")
+        case .running: L10n.text("activity_running")
+        case .walking: L10n.text("activity_walking")
+        case .cycling: L10n.text("activity_cycling")
+        case .goingOutside: L10n.text("activity_outside")
         }
     }
 }

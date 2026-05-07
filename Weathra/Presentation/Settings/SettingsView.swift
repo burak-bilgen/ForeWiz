@@ -14,31 +14,31 @@ struct SettingsView: View {
                     HeaderSection(saveMessage: viewModel.saveMessage)
                         .padding(.bottom, AppSpacing.xSmall)
 
-                    SectionDivider(label: String(localized: "settings_section_appearance"))
+                    SectionDivider(label: L10n.text("settings_section_appearance"))
                     AppearanceSection(profile: $viewModel.profile)
                     LanguageSection(profile: $viewModel.profile)
 
-                    SectionDivider(label: String(localized: "settings_section_premium"))
+                    SectionDivider(label: L10n.text( "settings_section_premium"))
                     PremiumSection(
                         isPremium: viewModel.isPremium,
                         onUpgrade: viewModel.openPaywall
                     )
 
-                    SectionDivider(label: String(localized: "settings_section_permissions"))
+                    SectionDivider(label: L10n.text( "settings_section_permissions"))
                     PermissionManagementSection()
 
-                    SectionDivider(label: String(localized: "settings_section_locations"))
+                    SectionDivider(label: L10n.text( "settings_section_locations"))
                     SavedLocationsSection(profile: $viewModel.profile)
 
-                    SectionDivider(label: String(localized: "settings_section_preferences"))
+                    SectionDivider(label: L10n.text( "settings_section_preferences"))
                     PersonalPreferencesSection(profile: $viewModel.profile)
                     WardrobeSettingsSection(profile: $viewModel.profile)
                     AllergySettingsSection(profile: $viewModel.profile)
 
-                    SectionDivider(label: String(localized: "settings_section_notifications"))
+                    SectionDivider(label: L10n.text( "settings_section_notifications"))
                     NotificationSettingsSection(profile: $viewModel.profile)
 
-                    SectionDivider(label: String(localized: "settings_section_app"))
+                    SectionDivider(label: L10n.text( "settings_section_app"))
                     AboutSection()
                     ResetSection(showConfirmation: $showResetConfirmation)
                 }
@@ -47,7 +47,7 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .navigationTitle(String(localized: "settings_title"))
+        .navigationTitle(L10n.text("settings_title"))
         .navigationBarTitleDisplayMode(.inline)
         .onChange(of: viewModel.profile) {
             viewModel.save()
@@ -56,16 +56,16 @@ struct SettingsView: View {
             PaywallView(store: viewModel.subscriptionManager)
         }
         .confirmationDialog(
-            String(localized: "settings_reset_title"),
+            L10n.text( "settings_reset_title"),
             isPresented: $showResetConfirmation,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "settings_reset_confirm"), role: .destructive) {
+            Button(L10n.text( "settings_reset_confirm"), role: .destructive) {
                 viewModel.resetOnboarding()
             }
-            Button(String(localized: "settings_cancel"), role: .cancel) {}
+            Button(L10n.text( "settings_cancel"), role: .cancel) {}
         } message: {
-            Text(String(localized: "settings_reset_message"))
+            Text(L10n.text( "settings_reset_message"))
         }
     }
 }
@@ -75,12 +75,12 @@ private struct HeaderSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-            Text(String(localized: "settings_header_title"))
+            Text(L10n.text( "settings_header_title"))
                 .font(AppTypography.largeTitle)
                 .foregroundStyle(AppTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text(saveMessage ?? String(localized: "settings_header_subtitle"))
+            Text(saveMessage ?? L10n.text( "settings_header_subtitle"))
                 .font(AppTypography.body)
                 .foregroundStyle(AppTheme.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -95,10 +95,10 @@ private struct AppearanceSection: View {
     var body: some View {
         SettingsCard(
             icon: "circle.lefthalf.filled",
-            title: String(localized: "settings_appearance_title"),
-            subtitle: String(localized: "settings_appearance_subtitle")
+            title: L10n.text( "settings_appearance_title"),
+            subtitle: L10n.text( "settings_appearance_subtitle")
         ) {
-            Picker(String(localized: "settings_theme"), selection: $profile.appearance) {
+            Picker(L10n.text( "settings_theme"), selection: $profile.appearance) {
                 ForEach(AppAppearance.allCases, id: \.self) { appearance in
                     Text(appearance.localizedTitle).tag(appearance)
                 }
@@ -114,10 +114,10 @@ private struct LanguageSection: View {
     var body: some View {
         SettingsCard(
             icon: "globe",
-            title: String(localized: "settings_language_title"),
-            subtitle: String(localized: "settings_language_subtitle")
+            title: L10n.text( "settings_language_title"),
+            subtitle: L10n.text( "settings_language_subtitle")
         ) {
-            Picker(String(localized: "settings_language"), selection: $profile.language) {
+            Picker(L10n.text( "settings_language"), selection: $profile.language) {
                 ForEach(AppLanguage.allCases, id: \.self) { language in
                     Text(language.localizedTitle).tag(language)
                 }
@@ -134,17 +134,17 @@ private struct PremiumSection: View {
     var body: some View {
         SettingsCard(
             icon: "crown.fill",
-            title: String(localized: "settings_premium_title"),
+            title: L10n.text( "settings_premium_title"),
             subtitle: isPremium
-                ? String(localized: "settings_premium_active_subtitle")
-                : String(localized: "settings_premium_upgrade_subtitle")
+                ? L10n.text( "settings_premium_active_subtitle")
+                : L10n.text( "settings_premium_upgrade_subtitle")
         ) {
             VStack(spacing: AppSpacing.medium) {
                 if isPremium {
                     HStack {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundStyle(AppTheme.success)
-                        Text(String(localized: "settings_premium_active"))
+                        Text(L10n.text( "settings_premium_active"))
                             .font(AppTypography.headline)
                             .foregroundStyle(AppTheme.success)
                     }
@@ -167,7 +167,7 @@ private struct PremiumSection: View {
                     }
 
                     Button(action: onUpgrade) {
-                        Label(String(localized: "settings_premium_upgrade"), systemImage: "crown.fill")
+                        Label(L10n.text( "settings_premium_upgrade"), systemImage: "crown.fill")
                             .font(AppTypography.caption.weight(.semibold))
                             .frame(maxWidth: .infinity)
                     }
@@ -185,24 +185,24 @@ private struct PermissionManagementSection: View {
     var body: some View {
         SettingsCard(
             icon: "hand.raised.fill",
-            title: String(localized: "settings_permissions_title"),
-            subtitle: String(localized: "settings_permissions_subtitle")
+            title: L10n.text( "settings_permissions_title"),
+            subtitle: L10n.text( "settings_permissions_subtitle")
         ) {
             VStack(spacing: AppSpacing.small) {
                 SettingsInfoRow(
                     icon: "location.fill",
-                    title: String(localized: "settings_permission_location"),
-                    value: String(localized: "settings_permission_location_desc")
+                    title: L10n.text( "settings_permission_location"),
+                    value: L10n.text( "settings_permission_location_desc")
                 )
 
                 SettingsInfoRow(
                     icon: "bell.badge.fill",
-                    title: String(localized: "settings_permission_notifications"),
-                    value: String(localized: "settings_permission_notifications_desc")
+                    title: L10n.text( "settings_permission_notifications"),
+                    value: L10n.text( "settings_permission_notifications_desc")
                 )
 
                 Button(action: openSystemSettings) {
-                    Label(String(localized: "settings_open_ios_settings"), systemImage: "arrow.up.forward.app.fill")
+                    Label(L10n.text( "settings_open_ios_settings"), systemImage: "arrow.up.forward.app.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .frame(maxWidth: .infinity)
                 }
@@ -227,18 +227,18 @@ private struct PersonalPreferencesSection: View {
     var body: some View {
         SettingsCard(
             icon: "person.crop.circle.badge.checkmark",
-            title: String(localized: "settings_comfort_title"),
-            subtitle: String(localized: "settings_comfort_subtitle")
+            title: L10n.text( "settings_comfort_title"),
+            subtitle: L10n.text( "settings_comfort_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Picker(String(localized: "settings_units"), selection: $profile.unitSystem) {
+                Picker(L10n.text( "settings_units"), selection: $profile.unitSystem) {
                     ForEach(UnitSystem.allCases, id: \.self) { system in
                         Text(system.localizedTitle).tag(system)
                     }
                 }
                 .pickerStyle(.segmented)
 
-                Picker(String(localized: "settings_temp_sensitivity"), selection: $profile.temperatureSensitivity) {
+                Picker(L10n.text( "settings_temp_sensitivity"), selection: $profile.temperatureSensitivity) {
                     ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
                         Text(sensitivity.localizedTitle).tag(sensitivity)
                     }
@@ -246,7 +246,7 @@ private struct PersonalPreferencesSection: View {
                 .pickerStyle(.segmented)
 
                 VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Text(String(localized: "settings_activities"))
+                    Text(L10n.text( "settings_activities"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.secondaryText)
 
@@ -319,37 +319,37 @@ private struct WardrobeSettingsSection: View {
     var body: some View {
         SettingsCard(
             icon: "hanger",
-            title: String(localized: "settings_wardrobe_title"),
-            subtitle: String(localized: "settings_wardrobe_subtitle")
+            title: L10n.text( "settings_wardrobe_title"),
+            subtitle: L10n.text( "settings_wardrobe_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Toggle(isOn: $profile.wardrobe.hasUmbrella) {
-                    Label(String(localized: "wardrobe_umbrella"), systemImage: "umbrella.fill")
+                    Label(L10n.text( "wardrobe_umbrella"), systemImage: "umbrella.fill")
                 }
                 .tint(AppTheme.accent)
 
                 Toggle(isOn: $profile.wardrobe.hasRaincoat) {
-                    Label(String(localized: "wardrobe_raincoat"), systemImage: "cloud.heavyrain.fill")
+                    Label(L10n.text( "wardrobe_raincoat"), systemImage: "cloud.heavyrain.fill")
                 }
                 .tint(AppTheme.accent)
 
                 Toggle(isOn: $profile.wardrobe.hasWinterCoat) {
-                    Label(String(localized: "wardrobe_winter_coat"), systemImage: "snowflake")
+                    Label(L10n.text( "wardrobe_winter_coat"), systemImage: "snowflake")
                 }
                 .tint(AppTheme.accent)
 
                 Toggle(isOn: $profile.wardrobe.hasSunglasses) {
-                    Label(String(localized: "wardrobe_sunglasses"), systemImage: "sunglasses")
+                    Label(L10n.text( "wardrobe_sunglasses"), systemImage: "sunglasses")
                 }
                 .tint(AppTheme.accent)
 
                 Toggle(isOn: $profile.wardrobe.hasGloves) {
-                    Label(String(localized: "wardrobe_gloves"), systemImage: "hand.raised.fill")
+                    Label(L10n.text( "wardrobe_gloves"), systemImage: "hand.raised.fill")
                 }
                 .tint(AppTheme.accent)
 
                 Toggle(isOn: $profile.wardrobe.hasThermals) {
-                    Label(String(localized: "wardrobe_thermals"), systemImage: "flame.fill")
+                    Label(L10n.text( "wardrobe_thermals"), systemImage: "flame.fill")
                 }
                 .tint(AppTheme.accent)
             }
@@ -363,12 +363,12 @@ private struct AllergySettingsSection: View {
     var body: some View {
         SettingsCard(
             icon: "allergens",
-            title: String(localized: "settings_allergy_title"),
-            subtitle: String(localized: "settings_allergy_subtitle")
+            title: L10n.text( "settings_allergy_title"),
+            subtitle: L10n.text( "settings_allergy_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Toggle(
-                    String(localized: "settings_allergy_enable"),
+                    L10n.text( "settings_allergy_enable"),
                     isOn: $profile.allergyProfile.isEnabled
                 )
                 .font(AppTypography.body)
@@ -427,12 +427,12 @@ private struct NotificationSettingsSection: View {
     var body: some View {
         SettingsCard(
             icon: "bell.badge.fill",
-            title: String(localized: "settings_notifications_title"),
-            subtitle: String(localized: "settings_notifications_subtitle")
+            title: L10n.text( "settings_notifications_title"),
+            subtitle: L10n.text( "settings_notifications_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 Stepper(
-                    String(localized: "settings_daily_limit") + " \(profile.maximumDailyNotifications)",
+                    L10n.text( "settings_daily_limit") + " \(profile.maximumDailyNotifications)",
                     value: $profile.maximumDailyNotifications,
                     in: 1...3
                 )
@@ -533,12 +533,12 @@ private struct AboutSection: View {
     var body: some View {
         SettingsCard(
             icon: "info.circle.fill",
-            title: String(localized: "settings_about_title"),
-            subtitle: String(localized: "settings_about_subtitle")
+            title: L10n.text( "settings_about_title"),
+            subtitle: L10n.text( "settings_about_subtitle")
         ) {
             VStack(alignment: .leading, spacing: AppSpacing.small) {
                 HStack {
-                    Text(String(localized: "settings_version"))
+                    Text(L10n.text( "settings_version"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.ink)
                     Spacer()
@@ -548,16 +548,16 @@ private struct AboutSection: View {
                 }
 
                 HStack {
-                    Text(String(localized: "settings_data_source"))
+                    Text(L10n.text( "settings_data_source"))
                         .font(AppTypography.caption.weight(.semibold))
                         .foregroundStyle(AppTheme.ink)
                     Spacer()
-                    Text(String(localized: "settings_data_apple_weather"))
+                    Text(L10n.text( "settings_data_apple_weather"))
                         .font(AppTypography.caption)
                         .foregroundStyle(AppTheme.secondaryText)
                 }
 
-                Text(String(localized: "settings_privacy_note"))
+                Text(L10n.text( "settings_privacy_note"))
                     .font(.system(.caption2, design: .rounded))
                     .foregroundStyle(AppTheme.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -600,8 +600,8 @@ private struct SavedLocationsSection: View {
     var body: some View {
         SettingsCard(
             icon: "mappin.and.ellipse",
-            title: String(localized: "settings_saved_locations_title"),
-            subtitle: String(localized: "settings_saved_locations_subtitle")
+            title: L10n.text( "settings_saved_locations_title"),
+            subtitle: L10n.text( "settings_saved_locations_subtitle")
         ) {
             VStack(spacing: AppSpacing.small) {
                 ForEach(profile.savedLocations) { location in
@@ -620,7 +620,7 @@ private struct SavedLocationsSection: View {
                 Divider()
 
                 Button(action: addLocation) {
-                    Label(String(localized: "settings_add_location"), systemImage: "plus.circle.fill")
+                    Label(L10n.text( "settings_add_location"), systemImage: "plus.circle.fill")
                         .font(AppTypography.caption.weight(.semibold))
                         .frame(maxWidth: .infinity)
                 }
@@ -652,10 +652,10 @@ private struct SavedLocationsSection: View {
 
     private func addLocation() {
         let newLocation = SavedLocation(
-            name: String(localized: "settings_new_location"),
+            name: L10n.text( "settings_new_location"),
             latitude: 0,
             longitude: 0,
-            address: String(localized: "settings_search_location")
+            address: L10n.text( "settings_search_location")
         )
 
         profile.savedLocations.append(newLocation)
@@ -726,17 +726,17 @@ private struct SavedLocationDetailView: View {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
                 GlassCard {
                     VStack(spacing: AppSpacing.medium) {
-                        LabeledContent(String(localized: "settings_location_name")) {
-                            TextField(String(localized: "settings_location_name"), text: $name)
+                        LabeledContent(L10n.text( "settings_location_name")) {
+                            TextField(L10n.text( "settings_location_name"), text: $name)
                                 .multilineTextAlignment(.trailing)
                         }
 
-                        LabeledContent(String(localized: "settings_address")) {
-                            TextField(String(localized: "settings_address"), text: $address)
+                        LabeledContent(L10n.text( "settings_address")) {
+                            TextField(L10n.text( "settings_address"), text: $address)
                                 .multilineTextAlignment(.trailing)
                         }
 
-                        LabeledContent(String(localized: "settings_coordinates")) {
+                        LabeledContent(L10n.text( "settings_coordinates")) {
                             let formattedLat = location.latitude.formatted(
                                 .number.precision(.fractionLength(4))
                             )
@@ -755,7 +755,7 @@ private struct SavedLocationDetailView: View {
                         onDelete()
                         dismiss()
                     } label: {
-                        Label(String(localized: "settings_delete_location"), systemImage: "trash")
+                        Label(L10n.text( "settings_delete_location"), systemImage: "trash")
                             .font(AppTypography.caption.weight(.semibold))
                             .frame(maxWidth: .infinity)
                     }
@@ -766,11 +766,11 @@ private struct SavedLocationDetailView: View {
             .frame(maxWidth: 720)
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle(String(localized: "settings_edit_location"))
+        .navigationTitle(L10n.text( "settings_edit_location"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button(String(localized: "settings_save")) {
+                Button(L10n.text( "settings_save")) {
                     var updated = location
                     updated.name = name
                     updated.address = address
@@ -789,11 +789,11 @@ private struct ResetSection: View {
     var body: some View {
         SettingsCard(
             icon: "arrow.counterclockwise.circle.fill",
-            title: String(localized: "settings_reset_title"),
-            subtitle: String(localized: "settings_reset_subtitle")
+            title: L10n.text( "settings_reset_title"),
+            subtitle: L10n.text( "settings_reset_subtitle")
         ) {
             Button(action: { showConfirmation = true }) {
-                Label(String(localized: "settings_reset_confirm"), systemImage: "arrow.counterclockwise")
+                Label(L10n.text( "settings_reset_confirm"), systemImage: "arrow.counterclockwise")
                     .font(AppTypography.caption.weight(.semibold))
                     .frame(maxWidth: .infinity)
             }

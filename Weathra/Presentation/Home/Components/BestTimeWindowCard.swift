@@ -10,7 +10,7 @@ struct BestTimeWindowCard: View {
             InsightRow(
                 icon: "sun.max.fill",
                 title: title,
-                value: window?.shortDisplayText ?? String(localized: "forecast_no_best_window"),
+                value: window?.shortDisplayText ?? L10n.text("forecast_no_best_window"),
                 tint: AppTheme.accent
             )
         }

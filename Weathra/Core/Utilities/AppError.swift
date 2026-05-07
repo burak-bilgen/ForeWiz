@@ -14,23 +14,23 @@ enum AppError: Error, Equatable {
     var userMessage: String {
         switch self {
         case .locationPermissionDenied:
-            String(localized: "error_location_denied")
+            L10n.text("error_location_denied")
         case .locationUnavailable:
-            String(localized: "error_location_unavailable")
+            L10n.text("error_location_unavailable")
         case .weatherUnavailable:
-            String(localized: "error_weather_unavailable")
+            L10n.text("error_weather_unavailable")
         case .weatherKitPermissionMissing:
-            String(localized: "error_weatherkit_auth")
+            L10n.text("error_weatherkit_auth")
         case .weatherKitFailed(let reason):
-            String(localized: "error_weatherkit_failed") + " " + reason
+            L10n.text("error_weatherkit_failed") + " " + reason
         case .cacheUnavailable:
-            String(localized: "error_cache_unavailable")
+            L10n.text("error_cache_unavailable")
         case .notificationPermissionDenied:
-            String(localized: "error_notification_denied")
+            L10n.text("error_notification_denied")
         case .persistenceFailed:
-            String(localized: "error_persistence")
+            L10n.text("error_persistence")
         case .unknown:
-            String(localized: "error_unknown")
+            L10n.text("error_unknown")
         }
     }
 }

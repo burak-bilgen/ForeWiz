@@ -77,11 +77,11 @@ private struct PremiumForecastLockCell: View {
                 .font(.title3)
                 .foregroundStyle(AppTheme.sunshine.opacity(0.6))
 
-            Text(String(localized: "forecast_7_days"))
+            Text(L10n.text("forecast_7_days"))
                 .font(.system(.caption2, design: .rounded, weight: .semibold))
                 .foregroundStyle(AppTheme.sunshine)
 
-            Text(String(localized: "forecast_premium"))
+            Text(L10n.text("forecast_premium"))
                 .font(.system(.caption2, design: .rounded))
                 .foregroundStyle(AppTheme.secondaryText)
         }
@@ -147,6 +147,6 @@ private struct DailyForecastCell: View {
                 .stroke(item.isToday ? AppTheme.accent.opacity(0.35) : Color.clear, lineWidth: 1.5)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(item.dayName), \(String(localized: "weekly_score_accessor")) \(item.outdoorScore), \(String(localized: "weekly_high_accessor")) \(Int(item.highTemp)) \(String(localized: "weekly_low_accessor")) \(Int(item.lowTemp))")
+        .accessibilityLabel("\(item.dayName), \(L10n.text("weekly_score_accessor")) \(item.outdoorScore), \(L10n.text("weekly_high_accessor")) \(Int(item.highTemp)) \(L10n.text("weekly_low_accessor")) \(Int(item.lowTemp))")
     }
 }

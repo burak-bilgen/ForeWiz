@@ -6,8 +6,8 @@ enum SubscriptionTier: String, Codable, CaseIterable, Sendable {
     
     var localizedTitle: String {
         switch self {
-        case .free: String(localized: "tier_free")
-        case .premium: String(localized: "tier_premium")
+        case .free: L10n.text("tier_free")
+        case .premium: L10n.text("tier_premium")
         }
     }
 }

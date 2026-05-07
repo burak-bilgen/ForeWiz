@@ -6,12 +6,12 @@ struct AvoidHoursCard: View {
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                Label(String(localized: "avoid_hours_title"), systemImage: "exclamationmark.octagon.fill")
+                Label(L10n.text("avoid_hours_title"), systemImage: "exclamationmark.octagon.fill")
                     .font(AppTypography.headline)
                     .foregroundStyle(AppTheme.ink)
 
                 if avoidWindows.isEmpty {
-                    Text(String(localized: "avoid_hours_none"))
+                    Text(L10n.text("avoid_hours_none"))
                         .font(AppTypography.body)
                         .foregroundStyle(AppTheme.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)

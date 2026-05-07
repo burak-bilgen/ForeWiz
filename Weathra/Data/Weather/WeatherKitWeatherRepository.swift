@@ -39,7 +39,7 @@ func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnaps
             throw AppError.weatherKitPermissionMissing
         } catch WeatherError.unknown {
             AppLogger.weather.error("WeatherKit failed with WeatherError.unknown")
-            throw AppError.weatherKitFailed(String(localized: "error_weatherkit_unknown"))
+            throw AppError.weatherKitFailed(L10n.text("error_weatherkit_unknown"))
         } catch {
             let diagnostic = Self.diagnosticDescription(for: error)
             AppLogger.weather.error("WeatherKit request failed: \(diagnostic, privacy: .public)")

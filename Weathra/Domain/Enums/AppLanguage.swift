@@ -7,9 +7,9 @@ enum AppLanguage: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .system: String(localized: "language_system")
-        case .turkish: String(localized: "language_turkish")
-        case .english: String(localized: "language_english")
+        case .system: L10n.text("language_system")
+        case .turkish: L10n.text("language_turkish")
+        case .english: L10n.text("language_english")
         }
     }
 

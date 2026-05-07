@@ -7,9 +7,9 @@ enum AppAccentPalette: String, CaseIterable, Codable, Hashable, Sendable {
 
     var localizedTitle: String {
         switch self {
-        case .sky: String(localized: "palette_sky")
-        case .mint: String(localized: "palette_mint")
-        case .ember: String(localized: "palette_ember")
+        case .sky: L10n.text("palette_sky")
+        case .mint: L10n.text("palette_mint")
+        case .ember: L10n.text("palette_ember")
         }
     }
 }

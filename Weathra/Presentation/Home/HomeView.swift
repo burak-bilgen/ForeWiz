@@ -109,11 +109,11 @@ private struct HomeHeader: View {
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "home_title"))
+                Text(L10n.text("home_title"))
                     .font(AppTypography.title)
 
                 HStack(spacing: 6) {
-                    Text(String(localized: "home_daily_summary"))
+                    Text(L10n.text("home_daily_summary"))
                     Text("-").foregroundStyle(.secondary)
                     Text(lastUpdatedText)
                 }
@@ -146,6 +146,8 @@ private struct CurrentWeatherHero: View {
     let recommendation: DailyRecommendation
     let isUsingCached: Bool
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top) {
@@ -154,14 +156,14 @@ private struct CurrentWeatherHero: View {
                         .font(AppTypography.caption2)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 4)
-                        .background(.white.opacity(0.15), in: Capsule())
+                        .background(cardBackground, in: Capsule())
 
                     Text(weather.temperatureText)
                         .font(.system(size: 60, weight: .bold, design: .rounded))
 
                     Text(weather.feelsLikeText)
                         .font(AppTypography.body)
-                        .foregroundStyle(.white.opacity(0.85))
+                        .foregroundStyle(cardForeground)
                 }
 
                 Spacer()
@@ -183,14 +185,26 @@ private struct CurrentWeatherHero: View {
         }
         .foregroundStyle(.white)
         .padding(24)
-        .background(AppTheme.weatherGradient(for: .light), in: RoundedRectangle(cornerRadius: 28))
+        .background(AppTheme.weatherGradient(for: colorScheme), in: RoundedRectangle(cornerRadius: 28))
         .overlay(alignment: .topTrailing) {
             Image(systemName: "cloud.fill")
                 .font(.system(size: 100, weight: .bold))
-                .foregroundStyle(.white.opacity(0.1))
+                .foregroundStyle(cardOverlay)
                 .offset(x: 20, y: -30)
                 .accessibilityHidden(true)
         }
+    }
+
+    private var cardBackground: Color {
+        .white.opacity(colorScheme == .dark ? 0.2 : 0.15)
+    }
+
+    private var cardForeground: Color {
+        .white.opacity(colorScheme == .dark ? 0.75 : 0.85)
+    }
+
+    private var cardOverlay: Color {
+        .white.opacity(colorScheme == .dark ? 0.05 : 0.1)
     }
 }
 
@@ -199,12 +213,14 @@ private struct HeroMetric: View {
     let title: String
     let value: String
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.subheadline)
                 .frame(width: 28, height: 28)
-                .background(.white.opacity(0.15), in: Circle())
+                .background(metricBackground, in: Circle())
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(.caption2)
@@ -212,7 +228,11 @@ private struct HeroMetric: View {
             }
         }
         .padding(10)
-        .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+        .background(metricBackground.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var metricBackground: Color {
+        .white.opacity(colorScheme == .dark ? 0.2 : 0.15)
     }
 }
 

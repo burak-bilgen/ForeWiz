@@ -41,7 +41,7 @@ private struct LaunchingView: View {
     var body: some View {
         ZStack {
             AppBackground()
-            ProgressView(String(localized: "launch_preparing"))
+            ProgressView(L10n.text( "launch_preparing"))
                 .font(AppTypography.body)
         }
     }
@@ -59,7 +59,7 @@ private struct MainTabView: View {
                     preferencesRepository: coordinator.container.preferencesRepository,
                     widgetRepository: coordinator.container.widgetRepository,
                     dateProvider: coordinator.container.dateProvider,
-                    selectedLocationName: coordinator.profile.savedLocations.first(where: { $0.id == coordinator.profile.selectedLocationID })?.name ?? String(localized: "home_current_location")
+                    selectedLocationName: coordinator.profile.savedLocations.first(where: { $0.id == coordinator.profile.selectedLocationID })?.name ?? L10n.text( "home_current_location")
                 ),
                 savedLocations: $coordinator.profile.savedLocations,
                 selectedLocationID: $coordinator.profile.selectedLocationID,
@@ -70,7 +70,7 @@ private struct MainTabView: View {
                 }
             )
             .tabItem {
-                Label(String(localized: "tab_today"), systemImage: "sun.max.fill")
+                Label(L10n.text( "tab_today"), systemImage: "sun.max.fill")
             }
 
             NavigationStack {
@@ -91,7 +91,7 @@ private struct MainTabView: View {
                 )
             }
             .tabItem {
-                Label(String(localized: "premium_feature_analytics"), systemImage: "chart.bar")
+                Label(L10n.text( "premium_feature_analytics"), systemImage: "chart.bar")
             }
 
             NavigationStack {
@@ -106,7 +106,7 @@ private struct MainTabView: View {
                 )
             }
             .tabItem {
-                Label(String(localized: "tab_settings"), systemImage: "gearshape.fill")
+                Label(L10n.text( "tab_settings"), systemImage: "gearshape.fill")
             }
         }
     }
