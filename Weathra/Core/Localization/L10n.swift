@@ -352,6 +352,7 @@ enum L10n {
         "pollen_olive": "Zeytin",
         "settings_allergy_title": "Alerjiler",
         "settings_allergy_subtitle": "Alerji türlerini seç",
-        "settings_allergy_enable": "Alerji takibi aktif"
+        "settings_allergy_enable": "Alerji takibi aktif",
+        "premium_auto_renew": "Otomatik olarak yenilenir. İstediğin zaman Ayarlar'dan iptal edebilirsin."
     ]
 }

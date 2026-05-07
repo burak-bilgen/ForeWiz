@@ -75,7 +75,7 @@ struct PaywallView: View {
                         .foregroundStyle(AppTheme.secondaryText)
                         .padding(.top, AppSpacing.small)
 
-                        Text("Otomatik olarak yenilenir. İstediğin zaman Ayarlar’dan iptal edebilirsin.")
+                        Text(L10n.text("premium_auto_renew"))
                             .font(.system(.caption2, design: .rounded))
                             .foregroundStyle(AppTheme.secondaryText.opacity(0.8))
                             .multilineTextAlignment(.center)
