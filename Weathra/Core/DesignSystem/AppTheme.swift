@@ -10,8 +10,9 @@ enum AppTheme {
     static let success = Color(red: 0.08, green: 0.58, blue: 0.40)
     static let warning = Color(red: 0.90, green: 0.50, blue: 0.15)
     static let danger = Color(red: 0.85, green: 0.22, blue: 0.28)
-    static let ink = Color.primary
-    static let secondaryText = Color.secondary
+
+    static let ink = Color(uiColor: .label)
+    static let secondaryText = Color(uiColor: .secondaryLabel)
 
     static let surface = Color(uiColor: .secondarySystemGroupedBackground)
     static let elevatedSurface = Color(uiColor: .tertiarySystemGroupedBackground)
