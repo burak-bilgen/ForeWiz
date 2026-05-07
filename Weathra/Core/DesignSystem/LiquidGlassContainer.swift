@@ -9,8 +9,14 @@ struct LiquidGlassContainer<Content: View>: View {
 
     var body: some View {
         content
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
-            .background(AppTheme.surface.opacity(0.70), in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous))
+            .background(.ultraThinMaterial, in: RoundedRectangle(
+                cornerRadius: AppTheme.cardRadius,
+                style: .continuous
+            ))
+            .background(
+                AppTheme.surface.opacity(0.70),
+                in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
+            )
             .overlay {
                 RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
                     .stroke(.white.opacity(0.26), lineWidth: 1)

@@ -410,7 +410,13 @@ private struct SettingsCard<Content: View>: View {
                     Image(systemName: icon)
                         .font(.headline)
                         .frame(width: 32, height: 32)
-                        .background(AppTheme.softBubbleGradient(tint: AppTheme.accent), in: RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous))
+                        .background(
+                            AppTheme.softBubbleGradient(tint: AppTheme.accent),
+                            in: RoundedRectangle(
+                                cornerRadius: AppTheme.iconBubbleRadius,
+                                style: .continuous
+                            )
+                        )
                         .foregroundStyle(AppTheme.accent)
 
                     VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
@@ -666,7 +672,13 @@ private struct SavedLocationDetailView: View {
                         }
 
                         LabeledContent(String(localized: "settings_coordinates")) {
-                            Text("\(location.latitude.formatted(.number.precision(.fractionLength(4)))), \(location.longitude.formatted(.number.precision(.fractionLength(4))))")
+                            let formattedLat = location.latitude.formatted(
+                                .number.precision(.fractionLength(4))
+                            )
+                            let formattedLon = location.longitude.formatted(
+                                .number.precision(.fractionLength(4))
+                            )
+                            Text("\(formattedLat), \(formattedLon)")
                                 .font(AppTypography.caption)
                                 .foregroundStyle(AppTheme.secondaryText)
                         }

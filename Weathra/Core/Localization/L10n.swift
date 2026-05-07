@@ -77,11 +77,13 @@ enum L10n {
 
         // MARK: - Weather Risks
         "risk_feels_like_rising": "Hissedilen sıcaklık yükseliyor",
-        "risk_feels_like_high": "Bu aralıkta hissedilen sıcaklık yüksek. Uzun yürüyüş veya koşu planını daha serin saate al.",
+        "risk_feels_like_high": "Bu aralıkta hissedilen sıcaklık yüksek. Uzun yürüyüş veya koşu " +
+            "planını daha serin saate al.",
         "risk_sun_protection": "Güneş koruması gerekiyor",
         "risk_uv_high": "UV seviyesi yükseliyor. Gölge, şapka ve güneş koruması planına dahil edilmeli.",
         "risk_rain_disrupt": "Yağmur planı aksatabilir",
-        "risk_rain_message": "Yağmur ihtimali dış planı aksatabilir. Açık alan planında esnek saat veya kapalı alternatif bırak.",
+        "risk_rain_message": "Yağmur ihtimali dış planı aksatabilir. Açık alan planında esnek saat veya kapalı " +
+            "alternatif bırak.",
         "risk_feels_high_message": "Hissedilen sıcaklık yüksek. Uzun dış planı kısalt, su ve gölge molası bırak.",
         "risk_feels_low_message": "Hissedilen sıcaklık düşük. Dışarıda uzun kalacaksan ekstra katman ve kapalı ayakkabı iyi olur.",
         "risk_hot_exhausting": "Sıcaklık yorucu seviyede",
@@ -125,7 +127,8 @@ enum L10n {
         "decision_risk_high_message": "Dışarıda geçireceğin vakti kısa tut, saatini değiştirebileceğin bir alternatifin olsun.",
         "decision_no_risk": "belirgin bir risk yok",
         "decision_no_avoid": "kaçınman gereken belirgin bir saat yok",
-        "decision_explanation_factors": "Bu karar; hissedilen sıcaklık, yağış olasılığı, rüzgar, UV, nem ve saatlik değişimler birlikte değerlendirilerek verildi.",
+        "decision_explanation_factors": "Bu karar; hissedilen sıcaklık, yağış olasılığı, rüzgar, UV, nem ve saatlik değişimler " +
+            "birlikte değerlendirilerek verildi.",
         "decision_main_risk": "Öne çıkan risk:",
         "decision_avoid_time": "Dikkat etmen gereken zaman:",
         "scoring_best_range": "için günün en rahat aralığı",
@@ -331,6 +334,6 @@ enum L10n {
         "risk_wind": "Rüzgâr",
         "risk_humidity": "Nem",
         "risk_cold": "Soğuk",
-        "risk_storm": "Fırtına",
+        "risk_storm": "Fırtına"
     ]
 }
