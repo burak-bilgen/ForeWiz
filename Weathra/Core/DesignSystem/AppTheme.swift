@@ -175,8 +175,8 @@ struct AppBackground: View {
 
             WeatherBackgroundSymbol(
                 name: "cloud.sun.fill",
-                size: 160,
-                opacity: colorScheme == .dark ? 0.08 : 0.14,
+                size: 180,
+                opacity: colorScheme == .dark ? 0.35 : 0.45,
                 alignment: .topTrailing,
                 xOffset: 40,
                 yOffset: -40,
@@ -185,8 +185,8 @@ struct AppBackground: View {
 
             WeatherBackgroundSymbol(
                 name: "cloud.rain.fill",
-                size: 110,
-                opacity: colorScheme == .dark ? 0.06 : 0.10,
+                size: 130,
+                opacity: colorScheme == .dark ? 0.12 : 0.18,
                 alignment: .bottomLeading,
                 xOffset: -30,
                 yOffset: 20,

@@ -13,37 +13,42 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                AppBackground()
-
-                TabView(selection: $currentPage) {
+            TabView(selection: $currentPage) {
+                ZStack {
+                    AppBackground()
                     HeroPage(
                         logoNamespace: logoNamespace,
                         next: { withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentPage = 1 } }
                     )
-                    .tag(0)
+                }
+                .tag(0)
 
+                ZStack {
+                    AppBackground()
                     WhyWeathraPage(
                         logoNamespace: logoNamespace,
                         next: { withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) { currentPage = 2 } }
                     )
-                    .tag(1)
+                }
+                .tag(1)
 
+                ZStack {
+                    AppBackground()
                     SetupPage(
                         viewModel: viewModel,
                         isCompleting: isCompleting,
                         complete: complete
                     )
-                    .tag(2)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentPage)
+                .tag(2)
+            }
+            .tabViewStyle(.page(indexDisplayMode: .always))
+            .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentPage)
 
-                if showConfetti {
-                    ConfettiOverlay()
-                        .allowsHitTesting(false)
-                        .transition(.opacity)
-                }
+            if showConfetti {
+                ConfettiOverlay()
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
             }
             .navigationTitle(L10n.text("onboarding_welcome"))
             .navigationBarTitleDisplayMode(.inline)
