@@ -49,6 +49,7 @@ private struct LaunchingView: View {
 
 private struct MainTabView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @State private var showInsightsPaywall = false
 
     var body: some View {
         TabView {
@@ -87,8 +88,12 @@ private struct MainTabView: View {
                         summaryText: "",
                         explanation: ""
                     ),
-                    isPremium: coordinator.container.subscriptionManager.isPremium
+                    isPremium: coordinator.container.subscriptionManager.isPremium,
+                    showPaywall: $showInsightsPaywall
                 )
+                .sheet(isPresented: $showInsightsPaywall) {
+                    PaywallView(store: coordinator.container.subscriptionManager)
+                }
             }
             .tabItem {
                 Label(L10n.text( "premium_feature_analytics"), systemImage: "chart.bar")

@@ -3,6 +3,7 @@ import SwiftUI
 struct InsightsView: View {
     let recommendation: DailyRecommendation
     let isPremium: Bool
+    @Binding var showPaywall: Bool
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -48,7 +49,7 @@ struct InsightsView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, AppSpacing.xLarge)
 
-                    Button(action: {}) {
+                    Button(action: { showPaywall = true }) {
                         Label(L10n.text( "premium_upgrade"), systemImage: "crown.fill")
                             .font(AppTypography.headline)
                             .padding(.horizontal, AppSpacing.xLarge)
@@ -196,6 +197,6 @@ private struct WeeklyTrendPlaceholder: View {
 
 #Preview {
     NavigationStack {
-        InsightsView(recommendation: .placeholder, isPremium: true)
+        InsightsView(recommendation: .placeholder, isPremium: true, showPaywall: .constant(false))
     }
 }
