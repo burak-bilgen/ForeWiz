@@ -4,9 +4,15 @@ struct PrimaryButton: View {
     let title: String
     let systemImage: String
     let action: () -> Void
+    var useHaptic: Bool = true
 
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            if useHaptic {
+                HapticManager.medium()
+            }
+            action()
+        }) {
             Label(title, systemImage: systemImage)
                 .font(AppTypography.headline)
                 .frame(maxWidth: .infinity)
