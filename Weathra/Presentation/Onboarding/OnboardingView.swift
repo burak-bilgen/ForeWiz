@@ -44,15 +44,18 @@ struct OnboardingView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .animation(.spring(response: 0.5, dampingFraction: 0.8), value: currentPage)
-
-            if showConfetti {
-                ConfettiOverlay()
-                    .allowsHitTesting(false)
-                    .transition(.opacity)
-            }
-            .navigationTitle(L10n.text("onboarding_welcome"))
-            .navigationBarTitleDisplayMode(.inline)
         }
+        .navigationTitle(L10n.text("onboarding_welcome"))
+        .navigationBarTitleDisplayMode(.inline)
+        .overlay(
+            Group {
+                if showConfetti {
+                    ConfettiOverlay()
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+                }
+            }
+        )
     }
 
     private func complete() {
