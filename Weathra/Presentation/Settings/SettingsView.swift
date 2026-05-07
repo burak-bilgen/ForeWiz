@@ -33,6 +33,7 @@ struct SettingsView: View {
                     SectionDivider(label: String(localized: "settings_section_preferences"))
                     PersonalPreferencesSection(profile: $viewModel.profile)
                     WardrobeSettingsSection(profile: $viewModel.profile)
+                    AllergySettingsSection(profile: $viewModel.profile)
 
                     SectionDivider(label: String(localized: "settings_section_notifications"))
                     NotificationSettingsSection(profile: $viewModel.profile)
@@ -352,6 +353,70 @@ private struct WardrobeSettingsSection: View {
                 }
                 .tint(AppTheme.accent)
             }
+        }
+    }
+}
+
+private struct AllergySettingsSection: View {
+    @Binding var profile: UserComfortProfile
+
+    var body: some View {
+        SettingsCard(
+            icon: "allergens",
+            title: String(localized: "settings_allergy_title"),
+            subtitle: String(localized: "settings_allergy_subtitle")
+        ) {
+            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                Toggle(
+                    String(localized: "settings_allergy_enable"),
+                    isOn: $profile.allergyProfile.isEnabled
+                )
+                .font(AppTypography.body)
+
+                if profile.allergyProfile.isEnabled {
+                    VStack(alignment: .leading, spacing: AppSpacing.small) {
+                        ForEach(AllergyType.allCases, id: \.self) { allergyType in
+                            AllergyTypeToggle(
+                                allergyType: allergyType,
+                                isSelected: profile.allergyProfile.allergies.contains(allergyType)
+                            ) {
+                                if profile.allergyProfile.allergies.contains(allergyType) {
+                                    profile.allergyProfile.allergies.remove(allergyType)
+                                } else {
+                                    profile.allergyProfile.allergies.insert(allergyType)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct AllergyTypeToggle: View {
+    let allergyType: AllergyType
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack {
+                Image(systemName: allergyType.icon)
+                    .font(.body)
+                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.secondaryText)
+                    .frame(width: 24)
+
+                Text(allergyType.localizedTitle)
+                    .font(AppTypography.body)
+                    .foregroundStyle(isSelected ? AppTheme.ink : AppTheme.secondaryText)
+
+                Spacer()
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.secondaryText)
+            }
+            .padding(.vertical, AppSpacing.xSmall)
         }
     }
 }

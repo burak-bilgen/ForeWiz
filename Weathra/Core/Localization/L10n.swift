@@ -351,5 +351,8 @@ enum L10n {
         "pollen_tree": "Ağaç",
         "pollen_weed": "Ot",
         "pollen_olive": "Zeytin",
+        "settings_allergy_title": "Alerjiler",
+        "settings_allergy_subtitle": "Alerji türlerini seç",
+        "settings_allergy_enable": "Alerji takibi aktif"
     ]
 }

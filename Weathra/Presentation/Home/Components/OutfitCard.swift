@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OutfitCard: View {
     let outfit: OutfitRecommendation
+    @State private var isAppeared = false
 
     var body: some View {
         GlassCard {
@@ -45,6 +46,13 @@ struct OutfitCard: View {
                         tint: AppTheme.warning
                     )
                 }
+            }
+        }
+        .opacity(isAppeared ? 1 : 0)
+        .offset(y: isAppeared ? 0 : 20)
+        .onAppear {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                isAppeared = true
             }
         }
     }
