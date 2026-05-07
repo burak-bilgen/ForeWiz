@@ -279,6 +279,9 @@ enum L10n {
         "insights_calm": "Sakin",
         "insights_moderate": "Orta",
         "insights_trend_description": "Bu hafta stabil.",
+        "insights_good": "İyi",
+        "insights_fair": "Orta",
+        "insights_poor": "Kötü",
 
         // MARK: - Avoid Hours
         "avoid_hours_title": "Kaçınılacak Saatler",
@@ -319,6 +322,14 @@ enum L10n {
         "recommendation_detail_title": "Detaylı İnceleme",
         "home_see_details": "Detaylar",
         "forecast_more_days": "%d gün daha",
+        "home_best_time": "En İyi Zaman",
+        "home_score": "Puan",
+        "home_live": "Canlı",
+        "home_loading": "Yükleniyor...",
+        "home_error_retry": "Tekrar Dene",
+        "home_title": "Bugün",
+        "home_daily_summary": "Günlük Özet",
+        "home_current_location": "Mevcut Konum",
 
         // MARK: - Risk Types (Doğru imla)
         "risk_heat": "Sıcaklık",

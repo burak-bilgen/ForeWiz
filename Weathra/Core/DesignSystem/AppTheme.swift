@@ -11,6 +11,10 @@ enum AppTheme {
     static let warning = Color(red: 0.90, green: 0.50, blue: 0.15)
     static let danger = Color(red: 0.85, green: 0.22, blue: 0.28)
 
+    static let purple = Color(red: 0.55, green: 0.35, blue: 0.85)
+    static let pink = Color(red: 0.95, green: 0.45, blue: 0.65)
+    static let coral = Color(red: 0.98, green: 0.45, blue: 0.40)
+
     static let ink = Color(uiColor: .label)
     static let secondaryText = Color(uiColor: .secondaryLabel)
 
@@ -107,6 +111,10 @@ enum AppTheme {
         case .high, .extreme: return danger
         }
     }
+
+    static let springAnimation: Animation = .spring(response: 0.6, dampingFraction: 0.8)
+    static let smoothAnimation: Animation = .easeInOut(duration: 0.3)
+    static let quickAnimation: Animation = .easeOut(duration: 0.2)
 }
 
 struct AppBackground: View {
