@@ -58,11 +58,11 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             .filter { isQuiet($0.fireDate, quietHours: profile.quietHours, calendar: calendar) == false }
             .filter { isWorthNotifying(plan: $0, now: now) }
 
-        let sorted = filtered.sorted { plan0, plan1 in
-            if plan0.priority == plan1.priority {
-                return plan0.fireDate < plan1.fireDate
+        let sorted = filtered.sorted { p0, p1 in
+            if p0.priority == p1.priority {
+                return p0.fireDate < p1.fireDate
             }
-            return plan0.priority > plan1.priority
+            return p0.priority > p1.priority
         }
 
         return Array(sorted.prefix(profile.maximumDailyNotifications.clamped(to: 1...3)))
@@ -85,17 +85,16 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             return nil
         }
 
-        let title = "Gunaydin! Bugun Nasil?"
         let body = buildSmartMorningBody(recommendation: recommendation)
 
         return NotificationPlan(
             id: stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
             category: .morningBriefing,
             fireDate: fireDate,
-            title: title,
+            title: "Gunaydin!",
             body: body,
             priority: 70,
-            reason: "Sabah ozeti tercihi acik."
+            reason: "Sabah ozeti"
         )
     }
 
@@ -104,13 +103,13 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
         switch recommendation.outdoorDecision {
         case .good:
-            parts.append("Disari harika bir gun!")
+            parts.append("Disari harika!")
         case .moderate:
-            parts.append("Disari idare eder.")
+            parts.append("Idare eder.")
         case .risky:
-            parts.append("Dikkatli olmalisin.")
+            parts.append("Dikkatli ol.")
         case .avoid:
-            parts.append("Bugun disari sorunlu.")
+            parts.append("Disari sorunlu.")
         }
 
         if let bestWindow = recommendation.bestOutdoorWindow {
@@ -121,8 +120,6 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         if let risk = critical {
             parts.append("Dikkat: \(risk.title)")
         }
-
-        parts.append("Kiyafet: \(recommendation.outfit.title)")
 
         return parts.joined(separator: " - ")
     }
@@ -154,10 +151,10 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .outfitSuggestion, fireDate: fireDate, calendar: calendar),
             category: .outfitSuggestion,
             fireDate: fireDate,
-            title: "Bugun Ne Giyeyim?",
+            title: "Ne giyeyim?",
             body: body,
             priority: 60,
-            reason: "Kiyafet oneroisi."
+            reason: "Kiyafet oneri"
         )
     }
 
@@ -171,25 +168,13 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             return nil
         }
 
-        let emoji: String
-        switch activityRecommendation.activityType {
-        case .running:
-            emoji = "Kosu"
-        case .walking:
-            emoji = "Yuruyus"
-        case .cycling:
-            emoji = "Bisiklet"
-        case .goingOutside:
-            emoji = "Disari"
-        }
-
         let time = activityRecommendation.bestWindow.shortDisplayText
         let body: String
 
         if activityRecommendation.score.rawValue >= 80 {
-            body = "Harika zaman! \(time) tam ideal."
+            body = "Tam ideal! \(time)"
         } else if activityRecommendation.score.rawValue >= 60 {
-            body = "Uygun pencere: \(time)"
+            body = "Uygun. \(time)"
         } else {
             body = "En iyi: \(time)"
         }
@@ -198,7 +183,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .bestRunWindow, fireDate: fireDate, calendar: calendar),
             category: .bestRunWindow,
             fireDate: fireDate,
-            title: "\(emoji) Zamani!",
+            title: "\(activityRecommendation.activityType.localizedTitle) zamani",
             body: body,
             priority: 80,
             reason: activityRecommendation.reason
@@ -211,11 +196,11 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         now: Date,
         calendar: Calendar
     ) -> [NotificationPlan] {
-        let eligible = recommendation.avoidWindows.filter { avoidWindow in
-            guard let category = notificationCategory(for: avoidWindow.risk.type),
+        let eligible = recommendation.avoidWindows.filter { window in
+            guard let category = notificationCategory(for: window.risk.type),
                   enabledCategories.contains(category),
-                  avoidWindow.severity >= .medium,
-                  avoidWindow.window.start >= now else {
+                  window.severity >= .medium,
+                  window.window.start >= now else {
                 return false
             }
             return true
@@ -272,9 +257,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         var seen = Set<String>()
         return plans.filter { plan in
             let key = "\(plan.category)-\(plan.title.prefix(10))"
-            if seen.contains(key) {
-                return false
-            }
+            if seen.contains(key) { return false }
             seen.insert(key)
             return true
         }
@@ -282,29 +265,20 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
     private func notificationCategory(for riskType: WeatherRiskType) -> NotificationCategory? {
         switch riskType {
-        case .heat:
-            return .avoidHeatWindow
-        case .uv:
-            return .uvWarning
-        case .rain:
-            return .rainWarning
-        case .wind:
-            return .windWarning
-        case .humidity, .cold, .storm, .poorComfort:
-            return nil
+        case .heat: return .avoidHeatWindow
+        case .uv: return .uvWarning
+        case .rain: return .rainWarning
+        case .wind: return .windWarning
+        case .humidity, .cold, .storm, .poorComfort: return nil
         }
     }
 
     private func priorityForSeverity(_ severity: RiskLevel) -> Int {
         switch severity {
-        case .extreme:
-            return 100
-        case .high:
-            return 90
-        case .medium:
-            return 75
-        case .low:
-            return 50
+        case .extreme: return 100
+        case .high: return 90
+        case .medium: return 75
+        case .low: return 50
         }
     }
 

@@ -2,30 +2,30 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    static let accent = Color(red: 0.10, green: 0.43, blue: 0.82)
-    static let sky = Color(red: 0.32, green: 0.67, blue: 0.93)
-    static let teal = Color(red: 0.04, green: 0.62, blue: 0.58)
-    static let sunshine = Color(red: 0.95, green: 0.64, blue: 0.18)
-    static let rain = Color(red: 0.25, green: 0.50, blue: 0.78)
-    static let success = Color(red: 0.07, green: 0.55, blue: 0.38)
-    static let warning = Color(red: 0.86, green: 0.48, blue: 0.14)
-    static let danger = Color(red: 0.82, green: 0.20, blue: 0.26)
+    static let accent = Color(red: 0.12, green: 0.45, blue: 0.85)
+    static let sky = Color(red: 0.35, green: 0.70, blue: 0.95)
+    static let teal = Color(red: 0.05, green: 0.65, blue: 0.60)
+    static let sunshine = Color(red: 0.98, green: 0.65, blue: 0.20)
+    static let rain = Color(red: 0.30, green: 0.55, blue: 0.82)
+    static let success = Color(red: 0.08, green: 0.58, blue: 0.40)
+    static let warning = Color(red: 0.90, green: 0.50, blue: 0.15)
+    static let danger = Color(red: 0.85, green: 0.22, blue: 0.28)
     static let ink = Color.primary
     static let secondaryText = Color.secondary
+
     static let surface = Color(uiColor: .secondarySystemGroupedBackground)
     static let elevatedSurface = Color(uiColor: .tertiarySystemGroupedBackground)
-    static let cardRadius: CGFloat = 22
-    static let compactRadius: CGFloat = 14
-    static let iconBubbleRadius: CGFloat = 10
+
+    static let cardRadius: CGFloat = 24
+    static let compactRadius: CGFloat = 16
+    static let iconBubbleRadius: CGFloat = 12
+    static let pillRadius: CGFloat = 20
 
     static func accent(for palette: AppAccentPalette) -> Color {
         switch palette {
-        case .sky:
-            accent
-        case .mint:
-            teal
-        case .ember:
-            warning
+        case .sky: return accent
+        case .mint: return teal
+        case .ember: return warning
         }
     }
 
@@ -35,15 +35,15 @@ enum AppTheme {
         switch colorScheme {
         case .dark:
             colors = [
-                Color(red: 0.04, green: 0.07, blue: 0.10),
-                Color(red: 0.06, green: 0.12, blue: 0.16),
-                Color(red: 0.12, green: 0.12, blue: 0.13)
+                Color(red: 0.06, green: 0.08, blue: 0.12),
+                Color(red: 0.08, green: 0.14, blue: 0.18),
+                Color(red: 0.14, green: 0.14, blue: 0.16)
             ]
         case .light:
             colors = [
-                Color(red: 0.90, green: 0.96, blue: 0.98),
-                Color(red: 0.98, green: 0.99, blue: 0.97),
-                Color(red: 0.96, green: 0.93, blue: 0.87)
+                Color(red: 0.93, green: 0.97, blue: 0.99),
+                Color(red: 0.99, green: 0.995, blue: 0.98),
+                Color(red: 0.97, green: 0.94, blue: 0.89)
             ]
         @unknown default:
             colors = [Color(uiColor: .systemGroupedBackground)]
@@ -62,15 +62,15 @@ enum AppTheme {
         switch colorScheme {
         case .dark:
             colors = [
-                Color(red: 0.08, green: 0.22, blue: 0.42),
-                Color(red: 0.05, green: 0.43, blue: 0.48),
-                Color(red: 0.54, green: 0.37, blue: 0.16)
+                Color(red: 0.10, green: 0.24, blue: 0.45),
+                Color(red: 0.06, green: 0.45, blue: 0.50),
+                Color(red: 0.56, green: 0.40, blue: 0.18)
             ]
         case .light:
             colors = [
-                Color(red: 0.11, green: 0.44, blue: 0.80),
-                Color(red: 0.04, green: 0.62, blue: 0.58),
-                Color(red: 0.95, green: 0.64, blue: 0.18)
+                Color(red: 0.14, green: 0.48, blue: 0.85),
+                Color(red: 0.06, green: 0.65, blue: 0.62),
+                Color(red: 0.98, green: 0.68, blue: 0.22)
             ]
         @unknown default:
             colors = [accent, sky]
@@ -82,8 +82,8 @@ enum AppTheme {
     static func softBubbleGradient(tint: Color) -> LinearGradient {
         LinearGradient(
             colors: [
-                tint.opacity(0.22),
-                tint.opacity(0.08)
+                tint.opacity(0.18),
+                tint.opacity(0.06)
             ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
@@ -92,25 +92,18 @@ enum AppTheme {
 
     static func color(for decision: OutdoorDecision) -> Color {
         switch decision {
-        case .good:
-            success
-        case .moderate:
-            accent
-        case .risky:
-            warning
-        case .avoid:
-            danger
+        case .good: return success
+        case .moderate: return accent
+        case .risky: return warning
+        case .avoid: return danger
         }
     }
 
     static func color(for severity: RiskLevel) -> Color {
         switch severity {
-        case .low:
-            teal
-        case .medium:
-            warning
-        case .high, .extreme:
-            danger
+        case .low: return teal
+        case .medium: return warning
+        case .high, .extreme: return danger
         }
     }
 }
@@ -124,20 +117,20 @@ struct AppBackground: View {
 
             WeatherBackgroundSymbol(
                 name: "cloud.sun.fill",
-                size: 170,
-                opacity: colorScheme == .dark ? 0.10 : 0.18,
+                size: 160,
+                opacity: colorScheme == .dark ? 0.08 : 0.14,
                 alignment: .topTrailing,
-                xOffset: 34,
-                yOffset: -34
+                xOffset: 40,
+                yOffset: -40
             )
 
             WeatherBackgroundSymbol(
                 name: "cloud.rain.fill",
-                size: 120,
-                opacity: colorScheme == .dark ? 0.08 : 0.12,
+                size: 110,
+                opacity: colorScheme == .dark ? 0.06 : 0.10,
                 alignment: .bottomLeading,
-                xOffset: -28,
-                yOffset: 18
+                xOffset: -30,
+                yOffset: 20
             )
         }
         .ignoresSafeArea()
@@ -146,8 +139,8 @@ struct AppBackground: View {
 
 private struct WeatherBackgroundSymbol: View {
     private enum Constant {
-        static let minAnimationDuration: Double = 4
-        static let maxAnimationDuration: Double = 6
+        static let minDuration: Double = 5
+        static let maxDuration: Double = 8
     }
 
     let name: String
@@ -160,24 +153,19 @@ private struct WeatherBackgroundSymbol: View {
     @State private var isAnimating = false
 
     var body: some View {
-        GeometryReader { proxy in
-            Image(systemName: name)
-                .font(.system(size: size, weight: .bold))
-                .foregroundStyle(.white.opacity(opacity))
-                .frame(width: proxy.size.width, height: proxy.size.height, alignment: alignment)
-                .offset(x: xOffset, y: isAnimating ? yOffset - 12 : yOffset + 12)
-                .animation(
-                    .easeInOut(duration: animationDuration).repeatForever(autoreverses: true),
-                    value: isAnimating
-                )
-                .onAppear {
-                    isAnimating = true
-                }
-                .accessibilityHidden(true)
-        }
+        Image(systemName: name)
+            .font(.system(size: size, weight: .bold))
+            .foregroundStyle(.white.opacity(opacity))
+            .offset(x: xOffset, y: isAnimating ? yOffset - 10 : yOffset + 10)
+            .animation(
+                .easeInOut(duration: animationDuration).repeatForever(autoreverses: true),
+                value: isAnimating
+            )
+            .onAppear { isAnimating = true }
+            .accessibilityHidden(true)
     }
 
     private var animationDuration: Double {
-        Double.random(in: Constant.minAnimationDuration...Constant.maxAnimationDuration)
+        Double.random(in: Constant.minDuration...Constant.maxDuration)
     }
 }
