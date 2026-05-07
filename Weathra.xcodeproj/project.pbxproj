@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AE4F77CCD1348595FB9DE527 /* Pods_Weathra.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24A94B7EF329AC703D4E8563 /* Pods_Weathra.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		67305E882F9E05220034CAA8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,24 +28,33 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		24A94B7EF329AC703D4E8563 /* Pods_Weathra.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Weathra.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E752F9E05210034CAA8 /* Weathra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weathra.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E872F9E05220034CAA8 /* WeathraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeathraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E912F9E05220034CAA8 /* WeathraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeathraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		81244283AA60AE9A37EA6039 /* Pods-Weathra.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weathra.release.xcconfig"; path = "Target Support Files/Pods-Weathra/Pods-Weathra.release.xcconfig"; sourceTree = "<group>"; };
+		8DFD2BEA1073FF5707756752 /* Pods-Weathra.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weathra.debug.xcconfig"; path = "Target Support Files/Pods-Weathra/Pods-Weathra.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		67305E772F9E05210034CAA8 /* Weathra */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = Weathra;
 			sourceTree = "<group>";
 		};
 		67305E8A2F9E05220034CAA8 /* WeathraTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = WeathraTests;
 			sourceTree = "<group>";
 		};
 		67305E942F9E05220034CAA8 /* WeathraUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = WeathraUITests;
 			sourceTree = "<group>";
 		};
@@ -52,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE4F77CCD1348595FB9DE527 /* Pods_Weathra.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +86,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		47839D3D2C8FEA4642D436A1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8DFD2BEA1073FF5707756752 /* Pods-Weathra.debug.xcconfig */,
+				81244283AA60AE9A37EA6039 /* Pods-Weathra.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		67305E6C2F9E05210034CAA8 = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +103,8 @@
 				67305E8A2F9E05220034CAA8 /* WeathraTests */,
 				67305E942F9E05220034CAA8 /* WeathraUITests */,
 				67305E762F9E05210034CAA8 /* Products */,
+				47839D3D2C8FEA4642D436A1 /* Pods */,
+				9512017FC71C88537BDEC9F0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -92,6 +118,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		9512017FC71C88537BDEC9F0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				24A94B7EF329AC703D4E8563 /* Pods_Weathra.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -99,9 +133,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 67305E9B2F9E05220034CAA8 /* Build configuration list for PBXNativeTarget "Weathra" */;
 			buildPhases = (
+				3A90922FE82DB27323E81F48 /* [CP] Check Pods Manifest.lock */,
 				67305E712F9E05210034CAA8 /* Sources */,
 				67305E722F9E05210034CAA8 /* Frameworks */,
 				67305E732F9E05210034CAA8 /* Resources */,
+				1109902121EB3E7F19ABB2A2 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -111,8 +147,6 @@
 				67305E772F9E05210034CAA8 /* Weathra */,
 			);
 			name = Weathra;
-			packageProductDependencies = (
-			);
 			productName = Weathra;
 			productReference = 67305E752F9E05210034CAA8 /* Weathra.app */;
 			productType = "com.apple.product-type.application";
@@ -134,8 +168,6 @@
 				67305E8A2F9E05220034CAA8 /* WeathraTests */,
 			);
 			name = WeathraTests;
-			packageProductDependencies = (
-			);
 			productName = WeathraTests;
 			productReference = 67305E872F9E05220034CAA8 /* WeathraTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -157,8 +189,6 @@
 				67305E942F9E05220034CAA8 /* WeathraUITests */,
 			);
 			name = WeathraUITests;
-			packageProductDependencies = (
-			);
 			productName = WeathraUITests;
 			productReference = 67305E912F9E05220034CAA8 /* WeathraUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -231,6 +261,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1109902121EB3E7F19ABB2A2 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Weathra/Pods-Weathra-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Weathra/Pods-Weathra-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Weathra/Pods-Weathra-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3A90922FE82DB27323E81F48 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Weathra-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		67305E712F9E05210034CAA8 /* Sources */ = {
@@ -393,6 +465,7 @@
 		};
 		67305E9C2F9E05220034CAA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8DFD2BEA1073FF5707756752 /* Pods-Weathra.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -442,6 +515,7 @@
 		};
 		67305E9D2F9E05220034CAA8 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 81244283AA60AE9A37EA6039 /* Pods-Weathra.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
