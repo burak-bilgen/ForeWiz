@@ -100,7 +100,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             return WeatherScore(rawValue: 40, label: L10n.text("weather_limited_data"))
         }
 
-        var score = daylightScores.reduce(0, +) / daylightScores.count
+        let average = Double(daylightScores.reduce(0, +)) / Double(daylightScores.count)
+        var score = Int(average.rounded())
 
         if risks.contains(where: { $0.severity == .extreme }) {
             score = min(score, 34)

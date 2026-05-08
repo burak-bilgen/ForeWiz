@@ -98,14 +98,12 @@ private struct HomeBackground: View {
     var symbolName: String = "cloud.fill"
 
     private var accentColor: Color {
-        switch symbolName {
-        case let s where s.contains("sun"): return Color(red: 1.0, green: 0.65, blue: 0.2)
-        case let s where s.contains("rain") || s.contains("drizzle"): return Color(red: 0.3, green: 0.55, blue: 0.9)
-        case let s where s.contains("snow") || s.contains("sleet"): return Color(red: 0.7, green: 0.85, blue: 1.0)
-        case let s where s.contains("storm") || s.contains("thunder"): return Color(red: 0.55, green: 0.3, blue: 0.9)
-        case let s where s.contains("fog") || s.contains("mist"): return Color(red: 0.6, green: 0.65, blue: 0.75)
-        default: return Color(red: 0.3, green: 0.5, blue: 0.9)
-        }
+        if symbolName.contains("storm") || symbolName.contains("thunder") { return Color(red: 0.55, green: 0.3, blue: 0.9) }
+        if symbolName.contains("snow") || symbolName.contains("sleet")    { return Color(red: 0.7, green: 0.85, blue: 1.0) }
+        if symbolName.contains("rain") || symbolName.contains("drizzle")  { return Color(red: 0.3, green: 0.55, blue: 0.9) }
+        if symbolName.contains("fog")  || symbolName.contains("mist")     { return Color(red: 0.6, green: 0.65, blue: 0.75) }
+        if symbolName.contains("sun")  || symbolName.contains("clear")    { return Color(red: 1.0, green: 0.65, blue: 0.2) }
+        return Color(red: 0.3, green: 0.5, blue: 0.9)
     }
 
     var body: some View {
@@ -368,7 +366,7 @@ private struct HomeHeroCard: View {
                     .fill(Color.white.opacity(0.08))
                     .frame(height: 1)
 
-                HStack(alignment: .top) {
+                HStack(alignment: .center) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(recommendation.outdoorDecision.localizedTitle)
                             .font(.system(size: 16, weight: .semibold))
@@ -388,15 +386,8 @@ private struct HomeHeroCard: View {
                         }
                     }
                     Spacer()
-                    VStack(spacing: 2) {
-                        Text(String(format: "%.0f", recommendation.outdoorScore.displayValue))
-                            .font(.system(size: 38, weight: .thin, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.white)
-                        Text(L10n.text("home_score_label"))
-                            .font(.system(size: 10))
-                            .foregroundStyle(Color.white.opacity(0.35))
-                    }
+                    ScoreRingView(score: recommendation.outdoorScore, size: 76)
+                        .environment(\.colorScheme, .dark)
                 }
             }
         }

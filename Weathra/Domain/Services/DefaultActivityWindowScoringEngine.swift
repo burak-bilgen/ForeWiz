@@ -63,14 +63,14 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             return nil
         }
 
-        let candidateCount = min(3, scoredHours.count)
+        let windowSize = min(3, scoredHours.count)
         var bestSlice: ArraySlice<(hour: HourlyWeatherPoint, score: WeatherScore)>?
         var bestAverage = -1
 
         for startIndex in scoredHours.indices {
-            let endIndex = min(startIndex + candidateCount, scoredHours.endIndex)
+            let endIndex = min(startIndex + windowSize, scoredHours.endIndex)
             let slice = scoredHours[startIndex..<endIndex]
-            guard slice.count >= min(2, candidateCount) else {
+            guard slice.isEmpty == false else {
                 continue
             }
 

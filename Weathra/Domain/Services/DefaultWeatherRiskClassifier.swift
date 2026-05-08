@@ -233,7 +233,7 @@ struct DefaultWeatherRiskClassifier {
             return nil
         }
 
-return WeatherRisk(
+        return WeatherRisk(
             type: .uv,
             severity: uvIndex >= 9 ? .high : .medium,
             title: L10n.text("risk_uv_need"),

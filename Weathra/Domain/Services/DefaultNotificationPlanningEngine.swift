@@ -264,17 +264,17 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
     private func isWorthNotifying(plan: NotificationPlan, now: Date, calendar: Calendar) -> Bool {
         let hour = calendar.component(.hour, from: now)
         
-        // Gece saatlerinde sadece yüksek öncelikli bildirimler
+        // Late night: only high-priority notifications
         if hour >= 22 || hour < 6 {
             return plan.priority >= 90
         }
-        
-        // Öğlen saatlerinde (12-14) düşük öncelikli bildirimleri filtrele
+
+        // Midday (12-14): suppress low-priority notifications
         if hour >= 12 && hour < 14 {
             return plan.priority >= 60
         }
-        
-        // Sabah (7-9) ve akşam (17-19) tüm bildirimlere izin ver
+
+        // Morning (7-9) and evening (17-19): allow all
         return true
     }
 
@@ -283,11 +283,11 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         now: Date,
         calendar: Calendar
     ) -> Date {
-        // Risk severity'ye göre warning lead time değişir
+        // Lead time varies by risk severity
         let warningLeadMinutes: Int
         switch window.severity {
         case .extreme:
-            warningLeadMinutes = 60 // 1 saat önce uyar
+            warningLeadMinutes = 60 // warn 1 hour in advance
         case .high:
             warningLeadMinutes = 45
         case .medium:
