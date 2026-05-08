@@ -10,4 +10,5 @@ struct DailyForecastItem: Identifiable, Equatable, Sendable {
     let outdoorScore: Int
     let outdoorDecision: OutdoorDecision
     let isToday: Bool
+    let precipitationChance: Double
 }

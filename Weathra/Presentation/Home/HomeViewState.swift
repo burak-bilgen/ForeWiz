@@ -21,4 +21,9 @@ struct HomeCurrentWeatherViewState: Equatable {
     let feelsLikeText: String
     let conditionText: String
     let symbolName: String
+    let humidityText: String
+    let windText: String
+    let uvIndexText: String
+    let highTempText: String
+    let lowTempText: String
 }

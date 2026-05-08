@@ -66,21 +66,12 @@ struct SettingsView: View {
                         }
                     }
 
-                    // MARK: Appearance & language
+                    // MARK: Language
                     SettingsSection(
-                        title: L10n.text("settings_section_appearance"),
-                        icon: "paintpalette.fill",
-                        color: Color(red: 0.75, green: 0.5, blue: 1.0)
+                        title: L10n.text("settings_language"),
+                        icon: "globe",
+                        color: Color(red: 0.4, green: 0.7, blue: 1.0)
                     ) {
-                        SettingsPickerRow(
-                            icon: "circle.lefthalf.filled",
-                            iconColor: Color(red: 0.75, green: 0.5, blue: 1.0),
-                            title: L10n.text("settings_theme"),
-                            selection: $viewModel.profile.appearance,
-                            options: AppAppearance.allCases,
-                            label: { $0.localizedTitle }
-                        )
-                        SettingsDivider()
                         SettingsPickerRow(
                             icon: "globe",
                             iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),

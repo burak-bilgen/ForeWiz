@@ -23,7 +23,7 @@ struct AppRootView: View {
                 MainTabView(coordinator: coordinator)
             }
         }
-        .preferredColorScheme(coordinator.profile.appearance.colorScheme)
+        .preferredColorScheme(.dark)
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
         .task {

@@ -90,7 +90,8 @@ final class HomeViewModel: ObservableObject {
                     recommendation: result.recommendation,
                     currentWeather: currentWeatherViewState(
                         from: result.currentWeather,
-                        unitSystem: profile.unitSystem
+                        unitSystem: profile.unitSystem,
+                        dailyPoints: result.dailyPoints
                     ),
                     dailyForecasts: makeDailyForecastItems(from: result.dailyPoints, unitSystem: profile.unitSystem),
                     hourlyScores: makeHourlyScores(base: result.recommendation.outdoorScore.rawValue),
@@ -123,16 +124,45 @@ final class HomeViewModel: ObservableObject {
 
     private func currentWeatherViewState(
         from current: CurrentWeatherPoint,
-        unitSystem: UnitSystem
+        unitSystem: UnitSystem,
+        dailyPoints: [DailyWeatherPoint]
     ) -> HomeCurrentWeatherViewState {
-        HomeCurrentWeatherViewState(
+        let humidityText: String
+        if let h = current.humidity {
+            humidityText = String(format: "%.0f%%", h * 100)
+        } else {
+            humidityText = "–"
+        }
+
+        let windText: String
+        if let w = current.windSpeedKph {
+            switch unitSystem {
+            case .metric:   windText = String(format: "%.0f km/h", w)
+            case .imperial: windText = String(format: "%.0f mph",  w / 1.60934)
+            }
+        } else {
+            windText = "–"
+        }
+
+        let uvText = current.uvIndex.map { String($0) } ?? "–"
+
+        let today = dailyPoints.first
+        let highText = today.map { temperatureText($0.highTemperatureCelsius, unitSystem: unitSystem) } ?? "–"
+        let lowText  = today.map { temperatureText($0.lowTemperatureCelsius,  unitSystem: unitSystem) } ?? "–"
+
+        return HomeCurrentWeatherViewState(
             temperatureText: temperatureText(current.temperatureCelsius, unitSystem: unitSystem),
-            feelsLikeText: L10n.text( "weather_feels_like") + " " + temperatureText(
+            feelsLikeText: L10n.text("weather_feels_like") + " " + temperatureText(
                 current.apparentTemperatureCelsius,
                 unitSystem: unitSystem
             ),
             conditionText: conditionText(for: current.conditionCode),
-            symbolName: symbolName(for: current.conditionCode, isDaylight: current.isDaylight)
+            symbolName: symbolName(for: current.conditionCode, isDaylight: current.isDaylight),
+            humidityText: humidityText,
+            windText: windText,
+            uvIndexText: uvText,
+            highTempText: highText,
+            lowTempText: lowText
         )
     }
 
@@ -258,7 +288,8 @@ final class HomeViewModel: ObservableObject {
                 conditionSymbol: conditionSymbol,
                 outdoorScore: score,
                 outdoorDecision: decision,
-                isToday: isToday
+                isToday: isToday,
+                precipitationChance: point.precipitationChance ?? 0
             )
         }
     }
