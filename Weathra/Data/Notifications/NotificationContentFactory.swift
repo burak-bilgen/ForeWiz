@@ -31,8 +31,6 @@ enum NotificationContentFactory {
             body += "\n\n🌧️ Şemsiye almayı unutma"
         case .windWarning:
             body += "\n\n💨 Rüzgarlı"
-        default:
-            break
         }
 
         return body

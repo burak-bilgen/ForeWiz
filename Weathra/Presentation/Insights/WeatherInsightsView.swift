@@ -26,9 +26,11 @@ struct WeatherInsightsView: View {
 
                 Spacer(minLength: 40)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.vertical, 16)
         }
+        .safeAreaPadding(.bottom, 12)
+        .dynamicTypeSize(.large ... .xxxLarge)
         .navigationTitle(L10n.text("insights_title"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
@@ -69,15 +71,17 @@ struct WeatherInsightsView: View {
     @ViewBuilder
     private var chartSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text(selectedMetric.localizedTitle)
-                    .font(.headline)
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    chartTitle
+                    Spacer(minLength: 12)
+                    chartValue
+                }
 
-                Spacer()
-
-                Text(selectedMetric.currentValue(from: snapshot))
-                    .font(.title2.bold())
-                    .foregroundStyle(selectedMetric.color)
+                VStack(alignment: .leading, spacing: 4) {
+                    chartTitle
+                    chartValue
+                }
             }
 
             chartView
@@ -87,6 +91,21 @@ struct WeatherInsightsView: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: .black.opacity(0.05), radius: 8)
+    }
+
+    private var chartTitle: some View {
+        Text(selectedMetric.localizedTitle)
+            .font(.headline)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var chartValue: some View {
+        Text(selectedMetric.currentValue(from: snapshot))
+            .font(.title2.bold())
+            .foregroundStyle(selectedMetric.color)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
     }
 
     @ViewBuilder
@@ -109,8 +128,8 @@ struct WeatherInsightsView: View {
                     .foregroundStyle(selectedMetric.color.opacity(0.1))
                 }
 
-                if let currentHour = Calendar.current.component(.hour, from: Date()) as Int?,
-                   let currentValue = chartData.first(where: { $0.hour == currentHour })?.value {
+                let currentHour = Calendar.current.component(.hour, from: Date())
+                if chartData.contains(where: { $0.hour == currentHour }) {
                     RuleMark(x: .value("Now", currentHour))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
                         .foregroundStyle(.gray)
@@ -518,6 +537,9 @@ struct MetricButton: View {
                 Text(metric.localizedTitle)
                     .font(.caption)
                     .foregroundStyle(isSelected ? .white : .primary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.75)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -558,10 +580,14 @@ struct StatisticCard: View {
                 Text("\(value)\(unit)")
                     .font(.title3.bold())
                     .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.70)
 
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -584,12 +610,17 @@ struct TrendRow: View {
 
             Text(title)
                 .font(.subheadline)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
 
-            Spacer()
+            Spacer(minLength: 8)
 
             HStack(spacing: 4) {
                 Image(systemName: trend.icon)
                 Text(trend.description)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.trailing)
             }
             .font(.caption)
             .foregroundStyle(trend.color)
@@ -613,8 +644,10 @@ struct ComfortWindowRow: View {
             Text("\(startText) - \(endText)")
                 .font(.subheadline)
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
 
-            Spacer()
+            Spacer(minLength: 8)
 
             HStack(spacing: 4) {
                 Circle()
@@ -623,6 +656,8 @@ struct ComfortWindowRow: View {
 
                 Text(window.level.description)
                     .font(.caption)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.trailing)
             }
             .foregroundStyle(window.level.color)
             .padding(.horizontal, 8)

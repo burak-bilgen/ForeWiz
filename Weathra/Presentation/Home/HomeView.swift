@@ -307,10 +307,11 @@ private struct HomeLoadedContent: View {
                         .cardEntrance(appeared: appeared, delay: 0.33)
                 }
             }
-            .padding(.horizontal, 18)
+            .padding(.horizontal, 16)
             .padding(.vertical, 14)
         }
         .scrollIndicators(.hidden)
+        .safeAreaPadding(.bottom, 12)
         .refreshable { await refresh() }
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) { appeared = true }
@@ -337,7 +338,7 @@ private struct GlassCard<Content: View>: View {
 
     var body: some View {
         content()
-            .padding(18)
+            .padding(16)
             .background {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(Color.white.opacity(0.055))
@@ -370,6 +371,8 @@ private struct CardSectionHeader: View {
                 .foregroundStyle(Color.white.opacity(0.45))
                 .textCase(.uppercase)
                 .tracking(0.7)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
         }
     }
 }
@@ -386,46 +389,19 @@ private struct HomeHeroCard: View {
     var body: some View {
         GlassCard(accentColor: sky) {
             VStack(spacing: 0) {
-                // Top: temperature + icon
-                HStack(alignment: .top, spacing: 0) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(weather.temperatureText)
-                            .font(.system(size: 76, weight: .thin, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.white)
-                        HStack(spacing: 10) {
-                            Text(weather.conditionText)
-                                .font(.system(size: 17, weight: .medium))
-                                .foregroundStyle(Color.white.opacity(0.8))
-                            HStack(spacing: 4) {
-                                Text("H:\(weather.highTempText)")
-                                Text("L:\(weather.lowTempText)")
-                            }
-                            .font(.system(size: 13))
-                            .foregroundStyle(Color.white.opacity(0.4))
-                        }
-                        Text(weather.feelsLikeText)
-                            .font(.system(size: 13))
-                            .foregroundStyle(Color.white.opacity(0.35))
-                            .padding(.top, 1)
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: 12) {
+                        weatherSummary
+                        Spacer(minLength: 12)
+                        weatherIcon
                     }
-                    Spacer()
-                    VStack(alignment: .trailing, spacing: 6) {
-                        Image(systemName: weather.symbolName)
-                            .font(.system(size: 60))
-                            .symbolRenderingMode(.hierarchical)
-                            .foregroundStyle(sky)
-                            .shadow(color: sky.opacity(0.45), radius: 20, x: 0, y: 8)
-                            .floating(amplitude: 6, duration: 3.2)
-                        if isUsingCached {
-                            HStack(spacing: 4) {
-                                Image(systemName: "clock.arrow.circlepath")
-                                    .font(.system(size: 9))
-                                Text(L10n.text("home_cached_label"))
-                                    .font(.system(size: 10))
-                            }
-                            .foregroundStyle(Color.white.opacity(0.3))
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .top) {
+                            weatherSummary
+                            Spacer(minLength: 8)
                         }
+                        weatherIcon
                     }
                 }
 
@@ -450,32 +426,18 @@ private struct HomeHeroCard: View {
                 Rectangle().fill(Color.white.opacity(0.07)).frame(height: 1).padding(.top, 16)
 
                 // Decision row
-                HStack(alignment: .center, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        HStack(spacing: 6) {
-                            Circle()
-                                .fill(decisionColor)
-                                .frame(width: 8, height: 8)
-                                .shadow(color: decisionColor.opacity(0.7), radius: 4)
-                            Text(recommendation.outdoorDecision.localizedTitle)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(.white)
-                        }
-                        Text(recommendation.summaryText)
-                            .font(.system(size: 13))
-                            .foregroundStyle(Color.white.opacity(0.45))
-                            .lineLimit(2)
-                        if let best = recommendation.bestOutdoorWindow {
-                            HStack(spacing: 4) {
-                                Image(systemName: "clock.fill").font(.system(size: 10))
-                                Text(best.shortDisplayText).font(.system(size: 12))
-                            }
-                            .foregroundStyle(sky)
-                        }
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .center, spacing: 14) {
+                        decisionCopy
+                        Spacer(minLength: 10)
+                        scoreRing
                     }
-                    Spacer()
-                    ScoreRingView(score: recommendation.outdoorScore, size: 72, showOutOf100: true)
-                        .environment(\.colorScheme, .dark)
+
+                    VStack(alignment: .leading, spacing: 14) {
+                        decisionCopy
+                        scoreRing
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
                 }
                 .padding(.top, 16)
             }
@@ -483,6 +445,114 @@ private struct HomeHeroCard: View {
     }
 
     private var decisionColor: Color { AppTheme.color(for: recommendation.outdoorDecision) }
+
+    private var weatherSummary: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(weather.temperatureText)
+                .font(.system(size: 68, weight: .thin, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.58)
+
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) {
+                    conditionText
+                    highLowText
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    conditionText
+                    highLowText
+                }
+            }
+
+            Text(weather.feelsLikeText)
+                .font(.system(size: 13))
+                .foregroundStyle(Color.white.opacity(0.35))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 1)
+        }
+        .layoutPriority(1)
+    }
+
+    private var conditionText: some View {
+        Text(weather.conditionText)
+            .font(.system(size: 17, weight: .medium))
+            .foregroundStyle(Color.white.opacity(0.8))
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var highLowText: some View {
+        HStack(spacing: 4) {
+            Text("H:\(weather.highTempText)")
+            Text("L:\(weather.lowTempText)")
+        }
+        .font(.system(size: 13))
+        .foregroundStyle(Color.white.opacity(0.4))
+        .lineLimit(1)
+        .minimumScaleFactor(0.75)
+    }
+
+    private var weatherIcon: some View {
+        VStack(alignment: .trailing, spacing: 6) {
+            Image(systemName: weather.symbolName)
+                .font(.system(size: 56))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(sky)
+                .shadow(color: sky.opacity(0.45), radius: 20, x: 0, y: 8)
+                .floating(amplitude: 6, duration: 3.2)
+            if isUsingCached {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 9))
+                    Text(L10n.text("home_cached_label"))
+                        .font(.system(size: 10))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                }
+                .foregroundStyle(Color.white.opacity(0.3))
+            }
+        }
+    }
+
+    private var decisionCopy: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(decisionColor)
+                    .frame(width: 8, height: 8)
+                    .shadow(color: decisionColor.opacity(0.7), radius: 4)
+                Text(recommendation.outdoorDecision.localizedTitle)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(recommendation.summaryText)
+                .font(.system(size: 13))
+                .foregroundStyle(Color.white.opacity(0.45))
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+            if let best = recommendation.bestOutdoorWindow {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock.fill").font(.system(size: 10))
+                    Text(best.shortDisplayText).font(.system(size: 12))
+                }
+                .foregroundStyle(sky)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+            }
+        }
+        .layoutPriority(1)
+    }
+
+    private var scoreRing: some View {
+        ScoreRingView(score: recommendation.outdoorScore, size: 72, showOutOf100: true)
+            .environment(\.colorScheme, .dark)
+    }
 }
 
 private struct MetricPill: View {
@@ -499,6 +569,8 @@ private struct MetricPill: View {
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.white.opacity(0.65))
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.70)
         }
         .frame(maxWidth: .infinity)
     }
@@ -522,6 +594,7 @@ private struct HomeWarningBanner: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.white.opacity(0.78))
                 .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
         }
         .padding(14)
         .background(Color(red: 1.0, green: 0.55, blue: 0.15).opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -679,51 +752,58 @@ private struct ForecastRow: View {
     private let rain = Color(red: 0.35, green: 0.55, blue: 0.9)
 
     var body: some View {
-        HStack(spacing: 10) {
-            // Day name
-            Text(forecast.dayName)
-                .font(.system(size: 15, weight: forecast.isToday ? .semibold : .regular))
-                .foregroundStyle(forecast.isToday ? .white : Color.white.opacity(0.7))
-                .frame(width: 44, alignment: .leading)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Text(forecast.dayName)
+                    .font(.system(size: 15, weight: forecast.isToday ? .semibold : .regular))
+                    .foregroundStyle(forecast.isToday ? .white : Color.white.opacity(0.7))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(minWidth: 36, alignment: .leading)
 
-            // Condition icon
-            Image(systemName: forecast.conditionSymbol)
-                .font(.system(size: 17))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(sky)
-                .frame(width: 26)
+                Image(systemName: forecast.conditionSymbol)
+                    .font(.system(size: 17))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(sky)
+                    .frame(width: 24)
 
-            // Precipitation chance (if notable)
-            if forecast.precipitationChance >= 0.2 {
-                HStack(spacing: 2) {
-                    Image(systemName: "drop.fill").font(.system(size: 9))
-                    Text(String(format: "%.0f%%", forecast.precipitationChance * 100)).font(.system(size: 11))
-                }
-                .foregroundStyle(rain.opacity(0.8))
-                .frame(width: 38, alignment: .leading)
-            } else {
-                Color.clear.frame(width: 38)
+                precipitationView
+
+                Spacer(minLength: 8)
+
+                temperatureText
             }
 
-            Spacer()
-
-            // Temp bar
             TempRangeBar(low: forecast.lowTemp, high: forecast.highTemp, range: range)
-                .frame(width: 80, height: 5)
-
-            // Low / High
-            HStack(spacing: 6) {
-                Text(forecast.lowTemp.formatted(.number.precision(.fractionLength(0))) + "°")
-                    .foregroundStyle(Color.white.opacity(0.3))
-                    .frame(width: 30, alignment: .trailing)
-                Text(forecast.highTemp.formatted(.number.precision(.fractionLength(0))) + "°")
-                    .foregroundStyle(.white)
-                    .frame(width: 30, alignment: .trailing)
-            }
-            .font(.system(size: 15, weight: .medium))
-            .monospacedDigit()
+                .frame(height: 5)
         }
         .padding(.vertical, 10)
+    }
+
+    @ViewBuilder
+    private var precipitationView: some View {
+        if forecast.precipitationChance >= 0.2 {
+            HStack(spacing: 2) {
+                Image(systemName: "drop.fill").font(.system(size: 9))
+                Text(String(format: "%.0f%%", forecast.precipitationChance * 100)).font(.system(size: 11))
+            }
+            .foregroundStyle(rain.opacity(0.8))
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+        }
+    }
+
+    private var temperatureText: some View {
+        HStack(spacing: 6) {
+            Text(forecast.lowTemp.formatted(.number.precision(.fractionLength(0))) + "°")
+                .foregroundStyle(Color.white.opacity(0.3))
+            Text(forecast.highTemp.formatted(.number.precision(.fractionLength(0))) + "°")
+                .foregroundStyle(.white)
+        }
+        .font(.system(size: 15, weight: .medium))
+        .monospacedDigit()
+        .lineLimit(1)
+        .minimumScaleFactor(0.75)
     }
 }
 
@@ -809,12 +889,16 @@ private struct ActivityRow: View {
                 Text(rec.activityType.localizedTitle)
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
                 Text(rec.bestWindow.shortDisplayText)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.white.opacity(0.4))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
+            .layoutPriority(1)
 
-            Spacer()
+            Spacer(minLength: 8)
 
             // Score gauge arc
             ZStack {
@@ -896,6 +980,8 @@ private struct OutfitChip: View {
             Text(text)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.white.opacity(0.8))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
@@ -961,13 +1047,15 @@ private struct RiskRow: View {
                 Text(risk.title)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
                 Text(risk.message)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.white.opacity(0.42))
-                    .lineLimit(2)
+                    .lineLimit(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer()
+            .layoutPriority(1)
+            Spacer(minLength: 8)
             // Severity dot
             Circle()
                 .fill(color)
@@ -995,4 +1083,3 @@ private struct HomeAttributionView: View {
         .padding(.bottom, 8)
     }
 }
-

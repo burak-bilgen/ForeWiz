@@ -38,7 +38,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         if enabledCategories.contains(.bestRunWindow),
            let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .running }),
            let plan = makeActivityPlan(activityRecommendation: runningWindow, now: now, calendar: calendar),
-           isWorthNotifying(plan: plan, now: now, calendar: calendar) {
+           isWorthNotifying(plan: plan, calendar: calendar) {
             candidates.append(plan)
         }
 
@@ -56,7 +56,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let filtered = deduplicated
             .filter { $0.fireDate >= now }
             .filter { isQuiet($0.fireDate, quietHours: profile.quietHours, calendar: calendar) == false }
-            .filter { isWorthNotifying(plan: $0, now: now, calendar: calendar) }
+            .filter { isWorthNotifying(plan: $0, calendar: calendar) }
 
         let sorted = filtered.sorted { p0, p1 in
             if p0.priority == p1.priority {
@@ -81,7 +81,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 30)
 
         guard let fireDate = calendar.nextDate(
-            after: calendar.startOfDay(for: now).addingTimeInterval(-1),
+            after: now,
             matching: preferredTime,
             matchingPolicy: .nextTime
         ) else {
@@ -138,7 +138,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 45)
 
         guard let fireDate = calendar.nextDate(
-            after: calendar.startOfDay(for: now).addingTimeInterval(-1),
+            after: now,
             matching: preferredTime,
             matchingPolicy: .nextTime
         ) else {
@@ -261,8 +261,8 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         return "\(time): \(risks)"
     }
 
-    private func isWorthNotifying(plan: NotificationPlan, now: Date, calendar: Calendar) -> Bool {
-        let hour = calendar.component(.hour, from: now)
+    private func isWorthNotifying(plan: NotificationPlan, calendar: Calendar) -> Bool {
+        let hour = calendar.component(.hour, from: plan.fireDate)
         
         // Late night: only high-priority notifications
         if hour >= 22 || hour < 6 {

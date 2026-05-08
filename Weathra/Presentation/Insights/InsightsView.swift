@@ -16,10 +16,11 @@ struct InsightsView: View {
                         InsightsActivityCard(recommendation: recommendation)
                         InsightsDayQualityCard(recommendation: recommendation)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                     .padding(.vertical, 16)
                 }
                 .scrollIndicators(.hidden)
+                .safeAreaPadding(.bottom, 12)
             } else {
                 InsightsLockedView(onUpgrade: { showPaywall = true })
             }
@@ -28,6 +29,7 @@ struct InsightsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .dynamicTypeSize(.large ... .xxxLarge)
     }
 }
 
@@ -56,10 +58,13 @@ private struct InsightsHeader: View {
                 Text(L10n.text("premium_feature_analytics"))
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.80)
             }
             Text(L10n.text("premium_feature_analytics_desc"))
                 .font(.system(size: 14))
                 .foregroundStyle(Color.white.opacity(0.45))
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
@@ -130,36 +135,54 @@ private struct InsightsScoreCard: View {
                     .tracking(0.5)
             }
 
-            HStack(alignment: .center, spacing: 20) {
-                ScoreRingView(score: recommendation.outdoorScore, size: 88, showOutOf100: true)
-                    .environment(\.colorScheme, .dark)
-
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(Array(factors.enumerated()), id: \.element.id) { index, row in
-                        HStack(spacing: 8) {
-                            Image(systemName: row.icon)
-                                .font(.system(size: 10))
-                                .foregroundStyle(row.color)
-                                .frame(width: 14)
-                            Text(row.label)
-                                .font(.system(size: 12))
-                                .foregroundStyle(Color.white.opacity(0.5))
-                            Spacer()
-                            Text(row.status)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(row.color)
-                                .lineLimit(1)
-                        }
-                        .staggerEntrance(index: index, appeared: appeared, baseDelay: 0.06)
-                    }
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 18) {
+                    scoreRing
+                    factorsList
                 }
-                .frame(maxWidth: .infinity)
+
+                VStack(alignment: .leading, spacing: 14) {
+                    scoreRing
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    factorsList
+                }
             }
         }
         .padding(18)
         .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.14), lineWidth: 1))
         .onAppear { withAnimation { appeared = true } }
+    }
+
+    private var scoreRing: some View {
+        ScoreRingView(score: recommendation.outdoorScore, size: 88, showOutOf100: true)
+            .environment(\.colorScheme, .dark)
+    }
+
+    private var factorsList: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(Array(factors.enumerated()), id: \.element.id) { index, row in
+                HStack(spacing: 8) {
+                    Image(systemName: row.icon)
+                        .font(.system(size: 10))
+                        .foregroundStyle(row.color)
+                        .frame(width: 14)
+                    Text(row.label)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.white.opacity(0.5))
+                        .lineLimit(2)
+                        .layoutPriority(1)
+                    Spacer(minLength: 8)
+                    Text(row.status)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(row.color)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.trailing)
+                }
+                .staggerEntrance(index: index, appeared: appeared, baseDelay: 0.06)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -200,11 +223,15 @@ private struct InsightsActivityCard: View {
                             Text(window.activityType.localizedTitle)
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.white)
-                            Spacer()
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .layoutPriority(1)
+                            Spacer(minLength: 8)
                             Text("\(window.score.rawValue)/100")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(Color(red: 0.4, green: 0.85, blue: 0.6))
                                 .monospacedDigit()
+                                .lineLimit(1)
                         }
                         .padding(.vertical, 6)
                         if window.id != recommendation.bestActivityWindows.last?.id {
@@ -304,7 +331,7 @@ private struct InsightsDayQualityCard: View {
                 }
             }
 
-            HStack(spacing: 16) {
+            FlowLayout(spacing: 10) {
                 legendDot(color: Color(red: 0.4, green: 0.85, blue: 0.6), label: L10n.text("insights_comfortable"))
                 legendDot(color: Color(red: 1.0, green: 0.45, blue: 0.45), label: L10n.text("insights_uncomfortable"))
                 legendDot(color: Color.white.opacity(0.2), label: L10n.text("insights_score_breakdown"))
@@ -337,6 +364,8 @@ private struct InsightsDayQualityCard: View {
             Text(label)
                 .font(.system(size: 10))
                 .foregroundStyle(Color.white.opacity(0.4))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -350,64 +379,72 @@ private struct InsightsLockedView: View {
     private let gold = Color(red: 1.0, green: 0.82, blue: 0.3)
 
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
-            ZStack {
-                Circle()
-                    .fill(blue.opacity(0.14))
-                    .frame(width: 130, height: 130)
-                    .blur(radius: 14)
-                Circle()
-                    .fill(blue.opacity(0.08))
-                    .frame(width: 100, height: 100)
-                Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 46))
-                    .foregroundStyle(blue)
-                    .symbolRenderingMode(.hierarchical)
-                    .shadow(color: blue.opacity(0.5), radius: 16, x: 0, y: 6)
-            }
-            .floating(amplitude: 7, duration: 3.2)
-            .pulseGlow(color: blue, radius: 20)
-            .opacity(appeared ? 1 : 0)
-            .scaleEffect(appeared ? 1 : 0.5)
-
-            VStack(spacing: 10) {
-                Text(L10n.text("premium_feature_analytics"))
-                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                Text(L10n.text("premium_feature_analytics_desc"))
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.white.opacity(0.50))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 28)
-            }
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 18)
-
-            Button(action: onUpgrade) {
-                HStack(spacing: 8) {
-                    Image(systemName: "crown.fill")
-                        .font(.system(size: 14))
-                    Text(L10n.text("premium_upgrade"))
-                        .font(.system(size: 16, weight: .bold))
+        ScrollView {
+            VStack(spacing: 28) {
+                ZStack {
+                    Circle()
+                        .fill(blue.opacity(0.14))
+                        .frame(width: 130, height: 130)
+                        .blur(radius: 14)
+                    Circle()
+                        .fill(blue.opacity(0.08))
+                        .frame(width: 100, height: 100)
+                    Image(systemName: "chart.bar.fill")
+                        .font(.system(size: 46))
+                        .foregroundStyle(blue)
+                        .symbolRenderingMode(.hierarchical)
+                        .shadow(color: blue.opacity(0.5), radius: 16, x: 0, y: 6)
                 }
-                .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
-                .padding(.horizontal, 32)
-                .padding(.vertical, 16)
-                .background(
-                    Capsule()
-                        .fill(LinearGradient(colors: [gold, Color(red: 1.0, green: 0.65, blue: 0.2)], startPoint: .leading, endPoint: .trailing))
-                )
-                .shadow(color: gold.opacity(0.45), radius: 14, x: 0, y: 6)
-                .shimmerEffect()
-            }
-            .buttonStyle(PressScaleButtonStyle(scale: 0.96))
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 12)
+                .floating(amplitude: 7, duration: 3.2)
+                .pulseGlow(color: blue, radius: 20)
+                .opacity(appeared ? 1 : 0)
+                .scaleEffect(appeared ? 1 : 0.5)
 
-            Spacer()
+                VStack(spacing: 10) {
+                    Text(L10n.text("premium_feature_analytics"))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.80)
+                    Text(L10n.text("premium_feature_analytics_desc"))
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.white.opacity(0.50))
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 18)
+
+                Button(action: onUpgrade) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "crown.fill")
+                            .font(.system(size: 14))
+                        Text(L10n.text("premium_upgrade"))
+                            .font(.system(size: 16, weight: .bold))
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.80)
+                    }
+                    .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 16)
+                    .background(
+                        Capsule()
+                            .fill(LinearGradient(colors: [gold, Color(red: 1.0, green: 0.65, blue: 0.2)], startPoint: .leading, endPoint: .trailing))
+                    )
+                    .shadow(color: gold.opacity(0.45), radius: 14, x: 0, y: 6)
+                    .shimmerEffect()
+                }
+                .buttonStyle(PressScaleButtonStyle(scale: 0.96))
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 12)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 48)
         }
+        .scrollIndicators(.hidden)
+        .safeAreaPadding(.bottom, 12)
         .onAppear {
             withAnimation(.spring(response: 0.65, dampingFraction: 0.72).delay(0.1)) { appeared = true }
         }

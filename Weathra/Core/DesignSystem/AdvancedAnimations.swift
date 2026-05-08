@@ -53,7 +53,7 @@ struct AnimatedMeshGradient: View {
                     }
                 }
             }
-            .onChange(of: timeline.date) { _ in
+            .onChange(of: timeline.date) { _, _ in
                 phase += 0.02
             }
         }
@@ -370,7 +370,6 @@ struct LiquidShape: Shape {
         var path = Path()
         let width = rect.width
         let height = rect.height
-        let midWidth = width / 2
         let midHeight = height / 2
 
         let waveHeight = height * 0.1 * progress
@@ -425,7 +424,7 @@ struct AuroraEffect: View {
                     context.fill(path, with: .color(color.opacity(0.3)))
                 }
             }
-            .onChange(of: phase) { _ in
+            .onChange(of: phase) { _, _ in
                 phase += 0.02
             }
         }
@@ -448,7 +447,7 @@ struct ConfettiEffect: View {
         TimelineView(.animation(minimumInterval: 1/60, paused: !isAnimating)) { _ in
             Canvas { context, size in
                 for piece in pieces {
-                    var transform = CGAffineTransform.identity
+                    let transform = CGAffineTransform.identity
                         .translatedBy(x: piece.x, y: piece.y)
                         .rotated(by: piece.rotation)
 
@@ -546,7 +545,7 @@ struct AnimatedNumberText: View {
             .onAppear {
                 animateValue()
             }
-            .onChange(of: value) { _ in
+            .onChange(of: value) { _, _ in
                 animateValue()
             }
     }

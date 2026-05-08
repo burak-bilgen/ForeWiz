@@ -44,6 +44,10 @@ struct PaywallView: View {
                                     .foregroundStyle(Color.white.opacity(0.45))
                             }
                             .padding(.vertical, 24)
+                        } else if store.products.isEmpty {
+                            PaywallUnavailableState {
+                                Task { await store.loadProducts() }
+                            }
                         } else {
                             VStack(spacing: 10) {
                                 ForEach(store.products) { product in
@@ -77,11 +81,13 @@ struct PaywallView: View {
                         }
                         .padding(.bottom, 24)
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                 }
                 .scrollIndicators(.hidden)
+                .safeAreaPadding(.bottom, 12)
             }
         }
+        .dynamicTypeSize(.large ... .xxxLarge)
         .task {
             await store.loadProducts()
             await store.refreshStatus()
@@ -101,6 +107,41 @@ struct PaywallView: View {
             restoreSuccess = await store.restorePurchases()
             showRestoreAlert = true
         }
+    }
+}
+
+private struct PaywallUnavailableState: View {
+    let retry: () -> Void
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "wifi.exclamationmark")
+                .font(.system(size: 26, weight: .semibold))
+                .foregroundStyle(Color(red: 1.0, green: 0.82, blue: 0.30))
+            Text(L10n.text("premium_product_not_found"))
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+            Button(action: retry) {
+                Text(L10n.text("home_error_retry"))
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .background(
+                        Color(red: 1.0, green: 0.82, blue: 0.30),
+                        in: Capsule()
+                    )
+            }
+            .buttonStyle(PressScaleButtonStyle(scale: 0.96))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(18)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.white.opacity(0.10), lineWidth: 1)
+        )
     }
 }
 
@@ -151,6 +192,8 @@ private struct PaywallHeroSection: View {
                 .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
+                .lineLimit(3)
+                .minimumScaleFactor(0.80)
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 16)
 
@@ -158,6 +201,7 @@ private struct PaywallHeroSection: View {
                 .font(.system(size: 15))
                 .foregroundStyle(Color.white.opacity(0.60))
                 .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 12)
         }
@@ -198,11 +242,15 @@ private struct PaywallFeatureList: View {
                         Text(feature.localizedTitle)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundStyle(.white)
+                            .lineLimit(2)
                         Text(feature.localizedDescription)
                             .font(.system(size: 13))
                             .foregroundStyle(Color.white.opacity(0.45))
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Spacer()
+                    .layoutPriority(1)
+                    Spacer(minLength: 8)
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 16))
                         .foregroundStyle(color.opacity(0.9))
@@ -234,22 +282,16 @@ private struct PaywallPurchaseButton: View {
             HapticManager.medium()
             action()
         }) {
-            HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(product.displayName)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(dark)
-                    Text(product.description)
-                        .font(.system(size: 12))
-                        .foregroundStyle(dark.opacity(0.65))
-                        .lineLimit(2)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 16) {
+                    productCopy
+                    Spacer(minLength: 10)
+                    productPrice
                 }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 1) {
-                    Text(product.price)
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundStyle(dark)
-                        .monospacedDigit()
+
+                VStack(alignment: .leading, spacing: 10) {
+                    productCopy
+                    productPrice
                 }
             }
             .padding(.horizontal, 20)
@@ -263,5 +305,30 @@ private struct PaywallPurchaseButton: View {
             .shimmerEffect()
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+    }
+
+    private var productCopy: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(product.displayName)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(dark)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(product.description)
+                .font(.system(size: 12))
+                .foregroundStyle(dark.opacity(0.65))
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .layoutPriority(1)
+    }
+
+    private var productPrice: some View {
+        Text(product.price)
+            .font(.system(size: 18, weight: .bold, design: .rounded))
+            .foregroundStyle(dark)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.70)
     }
 }

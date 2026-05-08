@@ -32,9 +32,19 @@ final class StoreKitSubscriptionManager: ObservableObject {
         logger.info("Loading products...")
         do {
             storeProducts = try await Product.products(for: productIDs)
-            let mappedProducts = storeProducts.map { SubscriptionProduct(from: $0) }
+            let mappedProducts = storeProducts
+                .map { SubscriptionProduct(from: $0) }
+                .sorted { lhs, rhs in
+                    productSortIndex(lhs.id) < productSortIndex(rhs.id)
+                }
             products = mappedProducts
-            logger.info("Products loaded successfully: \(mappedProducts.count) products")
+
+            if mappedProducts.isEmpty {
+                errorMessage = L10n.text("premium_product_not_found")
+                logger.error("No StoreKit products returned for configured IDs")
+            } else {
+                logger.info("Products loaded successfully: \(mappedProducts.count) products")
+            }
         } catch {
             let error = localizedError(error)
             errorMessage = error
@@ -128,6 +138,10 @@ final class StoreKitSubscriptionManager: ObservableObject {
     private func saveCachedTier(_ tier: SubscriptionTier) {
         UserDefaults.standard.set(tier.rawValue, forKey: cacheKey)
         logger.debug("Saved cached tier: \(tier.rawValue)")
+    }
+
+    private func productSortIndex(_ id: String) -> Int {
+        productIDs.firstIndex(of: id) ?? Int.max
     }
 
     private func listenForTransactions() -> Task<Void, Error> {

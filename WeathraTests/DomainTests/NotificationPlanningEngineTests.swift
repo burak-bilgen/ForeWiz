@@ -39,4 +39,27 @@ struct NotificationPlanningEngineTests {
         #expect(plans.contains { quietHours.containsClockTime(of: $0.fireDate, calendar: calendar) } == false)
         #expect(plans.contains { $0.category == .avoidHeatWindow } == false)
     }
+
+    @Test func notificationPlannerSchedulesDailyPreferencesForTomorrowAfterPreferredTime() {
+        let calendar = WeatherTestFixtures.calendar
+        let now = WeatherTestFixtures.date(month: 7, day: 10, hour: 9)
+        var profile = WeatherTestFixtures.profile(maximumDailyNotifications: 3)
+        profile.notificationPreferences = NotificationCategory.allCases.map { category in
+            let enabled = category == .morningBriefing || category == .outfitSuggestion
+            let preferredTime = category == .morningBriefing
+                ? DateComponents(hour: 8, minute: 0)
+                : DateComponents(hour: 7, minute: 45)
+            return NotificationPreference(category: category, isEnabled: enabled, preferredTime: preferredTime)
+        }
+
+        let plans = notificationEngine.makePlans(
+            recommendation: .placeholder,
+            profile: profile,
+            now: now,
+            calendar: calendar
+        )
+
+        #expect(Set(plans.map(\.category)) == [.morningBriefing, .outfitSuggestion])
+        #expect(plans.allSatisfy { calendar.isDate($0.fireDate, inSameDayAs: WeatherTestFixtures.date(month: 7, day: 11, hour: 0)) })
+    }
 }

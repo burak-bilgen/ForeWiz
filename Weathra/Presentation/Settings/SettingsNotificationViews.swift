@@ -19,7 +19,10 @@ struct NotificationSettingsSection: View {
             Text(L10n.text("settings_daily_limit"))
                 .font(.system(size: 15))
                 .foregroundStyle(.white)
-            Spacer()
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
+            Spacer(minLength: 8)
             HStack(spacing: 0) {
                 Button {
                     if profile.maximumDailyNotifications > 1 {

@@ -262,15 +262,17 @@ struct SettingsView: View {
                     }
                     .padding(.bottom, 32)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .padding(.top, 12)
             }
             .scrollIndicators(.hidden)
+            .safeAreaPadding(.bottom, 12)
         }
         .navigationTitle(L10n.text("settings_title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .dynamicTypeSize(.large ... .xxxLarge)
         .onChange(of: viewModel.profile) { viewModel.save() }
         .sheet(isPresented: $viewModel.showPaywall) {
             PaywallView(store: viewModel.subscriptionManager)
@@ -377,6 +379,8 @@ private struct SettingsSection<Content: View>: View {
                     .foregroundStyle(Color.white.opacity(0.45))
                     .textCase(.uppercase)
                     .tracking(0.6)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.75)
             }
             .padding(.leading, 4)
             VStack(spacing: 0) {
@@ -429,6 +433,7 @@ private struct SettingsRow: View {
                 Text(title)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
                 if let subtitle {
                     Text(subtitle)
                         .font(.system(size: 12))
@@ -436,7 +441,8 @@ private struct SettingsRow: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            Spacer()
+            .layoutPriority(1)
+            Spacer(minLength: 8)
         }
         .padding(.vertical, 10)
     }
@@ -446,16 +452,36 @@ private struct SettingsAboutRow: View {
     let label: String
     let value: String
     var body: some View {
-        HStack {
-            Text(label)
-                .font(.system(size: 15))
-                .foregroundStyle(.white)
-            Spacer()
-            Text(value)
-                .font(.system(size: 14))
-                .foregroundStyle(Color.white.opacity(0.45))
+        ViewThatFits(in: .horizontal) {
+            HStack {
+                aboutLabel
+                Spacer(minLength: 12)
+                aboutValue
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                aboutLabel
+                aboutValue
+            }
         }
         .padding(.vertical, 10)
+    }
+
+    private var aboutLabel: some View {
+        Text(label)
+            .font(.system(size: 15))
+            .foregroundStyle(.white)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var aboutValue: some View {
+        Text(value)
+            .font(.system(size: 14))
+            .foregroundStyle(Color.white.opacity(0.45))
+            .lineLimit(2)
+            .multilineTextAlignment(.trailing)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -470,7 +496,10 @@ private struct SettingsToggleRow: View {
             Text(title)
                 .font(.system(size: 15))
                 .foregroundStyle(.white)
-            Spacer()
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
+            Spacer(minLength: 8)
             Toggle("", isOn: $isOn)
                 .tint(iconColor)
                 .labelsHidden()
@@ -493,7 +522,10 @@ private struct SettingsPickerRow<T: Hashable>: View {
             Text(title)
                 .font(.system(size: 15))
                 .foregroundStyle(.white)
-            Spacer()
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
+            Spacer(minLength: 8)
             Picker("", selection: $selection) {
                 ForEach(options, id: \.self) { option in
                     Text(label(option)).tag(option)
@@ -520,8 +552,10 @@ private struct SettingsChipPickerRow<T: Hashable>: View {
                 Text(title)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            HStack(spacing: 8) {
+            FlowLayout(spacing: 8) {
                 ForEach(options, id: \.self) { option in
                     let selected = option == selection
                     Button {
@@ -531,6 +565,8 @@ private struct SettingsChipPickerRow<T: Hashable>: View {
                         Text(label(option))
                             .font(.system(size: 13, weight: selected ? .semibold : .regular))
                             .foregroundStyle(selected ? iconColor : Color.white.opacity(0.5))
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
                             .background(
@@ -565,7 +601,7 @@ private struct SettingsSensitivitySelector: View {
     ]
 
     var body: some View {
-        HStack(spacing: 8) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], spacing: 8) {
             ForEach(options, id: \.0) { sensitivity, icon, key in
                 let selected = selection == sensitivity
                 Button {
@@ -579,8 +615,9 @@ private struct SettingsSensitivitySelector: View {
                         Text(L10n.text(key))
                             .font(.system(size: 12, weight: selected ? .semibold : .regular))
                             .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.75)
+                            .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
@@ -616,7 +653,10 @@ private struct SettingsActivityRow: View {
                 Text(activity.localizedTitle)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
-                Spacer()
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
+                Spacer(minLength: 8)
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 20))
                     .foregroundStyle(isSelected ? Color(red: 0.4, green: 0.85, blue: 0.6) : Color.white.opacity(0.2))
@@ -650,7 +690,10 @@ private struct SettingsAllergyRow: View {
                 Text(allergyType.localizedTitle)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
-                Spacer()
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .layoutPriority(1)
+                Spacer(minLength: 8)
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 20))
                     .foregroundStyle(isSelected ? Color(red: 1.0, green: 0.7, blue: 0.3) : Color.white.opacity(0.2))

@@ -23,7 +23,7 @@ struct AppRootView: View {
                 MainTabView(coordinator: coordinator)
             }
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(coordinator.profile.appearance.colorScheme)
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
         .task {
@@ -62,11 +62,13 @@ private struct LaunchingView: View {
 
 private struct MainTabView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @ObservedObject private var subscriptionManager: StoreKitSubscriptionManager
     @StateObject private var homeViewModel: HomeViewModel
     @State private var showInsightsPaywall = false
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
+        self.subscriptionManager = coordinator.container.subscriptionManager
         let name = coordinator.profile.savedLocations
             .first { $0.id == coordinator.profile.selectedLocationID }?
             .name ?? L10n.text("home_current_location")
@@ -91,8 +93,8 @@ private struct MainTabView: View {
                 viewModel: homeViewModel,
                 savedLocations: $coordinator.profile.savedLocations,
                 selectedLocationID: $coordinator.profile.selectedLocationID,
-                isPremium: coordinator.container.subscriptionManager.isPremium,
-                store: coordinator.container.subscriptionManager,
+                isPremium: subscriptionManager.isPremium,
+                store: subscriptionManager,
                 onRecommendationLoaded: { recommendation in
                     coordinator.updateRecommendation(recommendation)
                 }
@@ -105,11 +107,11 @@ private struct MainTabView: View {
                 if let recommendation = coordinator.latestRecommendation {
                     InsightsView(
                         recommendation: recommendation,
-                        isPremium: coordinator.container.subscriptionManager.isPremium,
+                        isPremium: subscriptionManager.isPremium,
                         showPaywall: $showInsightsPaywall
                     )
                     .sheet(isPresented: $showInsightsPaywall) {
-                        PaywallView(store: coordinator.container.subscriptionManager)
+                        PaywallView(store: subscriptionManager)
                     }
                 } else {
                     InsightsPlaceholderView()
@@ -124,7 +126,7 @@ private struct MainTabView: View {
                     viewModel: SettingsViewModel(
                         profile: coordinator.profile,
                         updateUserPreferencesUseCase: coordinator.container.updateUserPreferencesUseCase,
-                        subscriptionManager: coordinator.container.subscriptionManager,
+                        subscriptionManager: subscriptionManager,
                         onProfileSaved: coordinator.applyProfile,
                         onResetOnboarding: coordinator.resetToOnboarding
                     )

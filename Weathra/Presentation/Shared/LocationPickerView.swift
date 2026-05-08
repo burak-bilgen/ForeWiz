@@ -64,6 +64,7 @@ struct LocationPickerView: View {
         .sheet(isPresented: $showAddLocation) {
             AddLocationView(savedLocations: $savedLocations)
         }
+        .dynamicTypeSize(.large ... .xxxLarge)
     }
 
     private func select(_ location: SavedLocation) {
@@ -115,6 +116,8 @@ private struct LocationPickerNavBar: View {
                     Text(isEditing ? L10n.text("location_picker_done") : L10n.text("location_picker_edit"))
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.80)
                 }
             }
             Spacer()
@@ -188,15 +191,19 @@ private struct LocationRow: View {
                         Text(location.name)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundStyle(.white)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
                         if !location.address.isEmpty {
                             Text(location.address)
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.white.opacity(0.4))
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.75)
                         }
                     }
+                    .layoutPriority(1)
 
-                    Spacer()
+                    Spacer(minLength: 8)
 
                     if isSelected {
                         Image(systemName: "checkmark.circle.fill")
@@ -237,29 +244,35 @@ private struct AddLocationView: View {
             ).ignoresSafeArea()
 
             VStack(spacing: 0) {
-                HStack {
-                    Button(L10n.text("location_picker_cancel")) {
-                        dismiss()
-                    }
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.white.opacity(0.5))
+                VStack(spacing: 10) {
+                    HStack {
+                        Button(L10n.text("location_picker_cancel")) {
+                            dismiss()
+                        }
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color.white.opacity(0.5))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.80)
 
-                    Spacer()
+                        Spacer(minLength: 12)
+
+                        Button(L10n.text("location_picker_add_button")) { addLocation() }
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(
+                                name.trimmingCharacters(in: .whitespaces).isEmpty
+                                ? Color.white.opacity(0.25)
+                                : Color(red: 0.4, green: 0.7, blue: 1.0)
+                            )
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.80)
+                            .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
 
                     Text(L10n.text("location_picker_add_title"))
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(.white)
-
-                    Spacer()
-
-                    Button(L10n.text("location_picker_add_button")) { addLocation() }
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(
-                            name.trimmingCharacters(in: .whitespaces).isEmpty
-                            ? Color.white.opacity(0.25)
-                            : Color(red: 0.4, green: 0.7, blue: 1.0)
-                        )
-                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
@@ -289,6 +302,7 @@ private struct AddLocationView: View {
                             .font(.system(size: 12))
                             .foregroundStyle(Color.white.opacity(0.3))
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(20)
                 }

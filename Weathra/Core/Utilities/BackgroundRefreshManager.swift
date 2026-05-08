@@ -20,11 +20,13 @@ final class BackgroundRefreshManager {
         guard !isRegistered else { return }
 
         BGTaskScheduler.shared.register(forTaskWithIdentifier: refreshTaskIdentifier, using: nil) { task in
-            self.handleAppRefresh(task: task as! BGAppRefreshTask)
+            guard let task = task as? BGAppRefreshTask else { return }
+            self.handleAppRefresh(task: task)
         }
 
         BGTaskScheduler.shared.register(forTaskWithIdentifier: processingTaskIdentifier, using: nil) { task in
-            self.handleProcessingTask(task: task as! BGProcessingTask)
+            guard let task = task as? BGProcessingTask else { return }
+            self.handleProcessingTask(task: task)
         }
 
         isRegistered = true
@@ -67,63 +69,43 @@ final class BackgroundRefreshManager {
 
         scheduleAppRefresh()
 
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
-
-        let refreshOperation = BlockOperation {
-            Task {
-                await self.performBackgroundRefresh()
-            }
+        let refreshTask = Task {
+            let success = await self.performBackgroundRefresh()
+            task.setTaskCompleted(success: success && !Task.isCancelled)
+            self.logger.info("Background refresh completed with success: \(success)")
         }
 
         task.expirationHandler = { [weak self] in
             self?.logger.warning("Background refresh task expired")
-            queue.cancelAllOperations()
+            refreshTask.cancel()
         }
-
-        refreshOperation.completionBlock = { [weak self] in
-            let success = !refreshOperation.isCancelled
-            task.setTaskCompleted(success: success)
-            self?.logger.info("Background refresh completed with success: \(success)")
-        }
-
-        queue.addOperations([refreshOperation], waitUntilFinished: false)
     }
 
     private func handleProcessingTask(task: BGProcessingTask) {
         logger.info("Handling background processing task")
 
-        let queue = OperationQueue()
-        queue.maxConcurrentOperationCount = 1
+        scheduleProcessingTask()
 
-        let processingOperation = BlockOperation {
-            Task {
-                await self.performBackgroundProcessing()
-            }
+        let processingTask = Task {
+            let success = await self.performBackgroundProcessing()
+            task.setTaskCompleted(success: success && !Task.isCancelled)
+            self.logger.info("Background processing completed with success: \(success)")
         }
 
         task.expirationHandler = { [weak self] in
             self?.logger.warning("Background processing task expired")
-            queue.cancelAllOperations()
+            processingTask.cancel()
         }
-
-        processingOperation.completionBlock = { [weak self] in
-            let success = !processingOperation.isCancelled
-            task.setTaskCompleted(success: success)
-            self?.logger.info("Background processing completed with success: \(success)")
-        }
-
-        queue.addOperations([processingOperation], waitUntilFinished: false)
     }
 
     @MainActor
-    private func performBackgroundRefresh() async {
+    private func performBackgroundRefresh() async -> Bool {
         do {
             let container = await ContainerProvider.shared.container
 
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
 
-            try await container.scheduleSmartNotificationsUseCase.execute(
+            _ = try await container.scheduleSmartNotificationsUseCase.execute(
                 recommendation: result.recommendation,
                 profile: try await container.preferencesRepository.loadProfile()
             )
@@ -131,13 +113,15 @@ final class BackgroundRefreshManager {
             WidgetCenter.shared.reloadAllTimelines()
 
             logger.info("Background refresh completed successfully")
+            return true
         } catch {
             logger.error("Background refresh failed: \(error.localizedDescription)")
+            return false
         }
     }
 
     @MainActor
-    private func performBackgroundProcessing() async {
+    private func performBackgroundProcessing() async -> Bool {
         logger.info("Performing background processing")
 
         do {
@@ -149,15 +133,17 @@ final class BackgroundRefreshManager {
                 logger.info("No cached weather data, performing refresh")
                 let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
 
-                try await container.widgetRepository.save(recommendation: result.recommendation)
+                try container.widgetRepository.save(recommendation: result.recommendation)
                 WidgetCenter.shared.reloadAllTimelines()
             }
 
             cleanupOldCacheData()
 
             logger.info("Background processing completed")
+            return true
         } catch {
             logger.error("Background processing failed: \(error.localizedDescription)")
+            return false
         }
     }
 
@@ -202,6 +188,7 @@ final class AppLifecycleManager {
         }
 
         BackgroundRefreshManager.shared.scheduleAppRefresh()
+        BackgroundRefreshManager.shared.scheduleProcessingTask()
 
         logStateTransition(from: .active, to: .background)
     }
@@ -299,6 +286,12 @@ final class RefreshController {
 
     private init() {}
 
+    private enum RefreshStartDecision {
+        case started
+        case alreadyRefreshing
+        case throttled(TimeInterval)
+    }
+
     var canRefresh: Bool {
         guard let lastRefresh = lastRefreshTime else { return true }
         return Date().timeIntervalSince(lastRefresh) >= minimumRefreshInterval
@@ -311,30 +304,18 @@ final class RefreshController {
     }
 
     func performRefresh(force: Bool = false) async -> Bool {
-        refreshLock.lock()
-
-        guard !isRefreshing else {
-            refreshLock.unlock()
+        switch beginRefresh(force: force) {
+        case .started:
+            break
+        case .alreadyRefreshing:
             logger.warning("Refresh already in progress, skipping")
             return false
-        }
-
-        if !force && !canRefresh {
-            let waitTime = timeUntilNextRefresh
-            refreshLock.unlock()
+        case .throttled(let waitTime):
             logger.info("Refresh throttled, must wait \(Int(waitTime)) seconds")
             return false
         }
 
-        isRefreshing = true
-        refreshLock.unlock()
-
-        defer {
-            refreshLock.lock()
-            isRefreshing = false
-            lastRefreshTime = Date()
-            refreshLock.unlock()
-        }
+        defer { finishRefresh() }
 
         do {
             logger.info("Starting manual refresh")
@@ -353,6 +334,29 @@ final class RefreshController {
             logger.error("Manual refresh failed: \(error.localizedDescription)")
             return false
         }
+    }
+
+    private func beginRefresh(force: Bool) -> RefreshStartDecision {
+        refreshLock.lock()
+        defer { refreshLock.unlock() }
+
+        guard !isRefreshing else {
+            return .alreadyRefreshing
+        }
+
+        if !force && !canRefresh {
+            return .throttled(timeUntilNextRefresh)
+        }
+
+        isRefreshing = true
+        return .started
+    }
+
+    private func finishRefresh() {
+        refreshLock.lock()
+        isRefreshing = false
+        lastRefreshTime = Date()
+        refreshLock.unlock()
     }
 
     func scheduleRefresh(after delay: TimeInterval) {
@@ -524,7 +528,7 @@ final class BatteryAwareRefreshManager {
     }
 }
 
-extension UIDevice.BatteryState: CustomStringConvertible {
+extension UIDevice.BatteryState: @retroactive CustomStringConvertible {
     public var description: String {
         switch self {
         case .unknown: return "unknown"

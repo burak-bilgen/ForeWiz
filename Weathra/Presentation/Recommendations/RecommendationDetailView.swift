@@ -28,15 +28,17 @@ struct RecommendationDetailView: View {
                             .staggerEntrance(index: 5, appeared: appeared)
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 16)
             }
             .scrollIndicators(.hidden)
+            .safeAreaPadding(.bottom, 12)
         }
         .navigationTitle(L10n.text("recommendation_detail_title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .dynamicTypeSize(.large ... .xxxLarge)
         .onAppear { withAnimation { appeared = true } }
     }
 }
@@ -84,6 +86,8 @@ private struct DetailSectionLabel: View {
                 .foregroundStyle(Color.white.opacity(0.45))
                 .textCase(.uppercase)
                 .tracking(0.5)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
         }
     }
 }
@@ -103,27 +107,18 @@ private struct DetailHeroCard: View {
     var body: some View {
         DetailCard(accentColor: sky) {
             VStack(spacing: 18) {
-                HStack(alignment: .top, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 8) {
-                            Circle()
-                                .fill(decisionColor)
-                                .frame(width: 10, height: 10)
-                                .shadow(color: decisionColor.opacity(0.8), radius: 5)
-                                .pulseGlow(color: decisionColor, radius: 6)
-                            Text(recommendation.outdoorDecision.localizedTitle)
-                                .font(.system(size: 22, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                        }
-                        Text(recommendation.summaryText)
-                            .font(.system(size: 14))
-                            .foregroundStyle(Color.white.opacity(0.55))
-                            .lineLimit(3)
-                            .fixedSize(horizontal: false, vertical: true)
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: 16) {
+                        heroCopy
+                        Spacer(minLength: 12)
+                        scoreRing
                     }
-                    Spacer(minLength: 12)
-                    ScoreRingView(score: recommendation.outdoorScore, size: 76, showOutOf100: true)
-                        .environment(\.colorScheme, .dark)
+
+                    VStack(alignment: .leading, spacing: 14) {
+                        heroCopy
+                        scoreRing
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                    }
                 }
                 if let bestWindow = recommendation.bestOutdoorWindow {
                     HStack(spacing: 6) {
@@ -141,6 +136,35 @@ private struct DetailHeroCard: View {
             }
         }
     }
+
+    private var heroCopy: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(decisionColor)
+                    .frame(width: 10, height: 10)
+                    .shadow(color: decisionColor.opacity(0.8), radius: 5)
+                    .pulseGlow(color: decisionColor, radius: 6)
+                Text(recommendation.outdoorDecision.localizedTitle)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.80)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(recommendation.summaryText)
+                .font(.system(size: 14))
+                .foregroundStyle(Color.white.opacity(0.55))
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .layoutPriority(1)
+    }
+
+    private var scoreRing: some View {
+        ScoreRingView(score: recommendation.outdoorScore, size: 76, showOutOf100: true)
+            .environment(\.colorScheme, .dark)
+    }
 }
 
 // MARK: - Explanation card
@@ -155,6 +179,7 @@ private struct DetailExplanationCard: View {
                     .font(.system(size: 14))
                     .foregroundStyle(Color.white.opacity(0.6))
                     .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -175,11 +200,15 @@ private struct DetailActivityCard: View {
                                 Text(activity.activityType.localizedTitle)
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundStyle(.white)
+                                    .lineLimit(2)
                                 Text(activity.bestWindow.shortDisplayText)
                                     .font(.system(size: 12))
                                     .foregroundStyle(Color.white.opacity(0.4))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.75)
                             }
-                            Spacer()
+                            .layoutPriority(1)
+                            Spacer(minLength: 8)
                             Text(String(format: "%.0f", activity.score.displayValue))
                                 .font(.system(size: 20, weight: .thin, design: .rounded))
                                 .monospacedDigit()
@@ -207,6 +236,7 @@ private struct DetailOutfitCard: View {
                 Text(outfit.title)
                     .font(.system(size: 14))
                     .foregroundStyle(Color.white.opacity(0.55))
+                    .fixedSize(horizontal: false, vertical: true)
                 if !outfit.items.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(outfit.items, id: \.self) { item in
@@ -214,7 +244,10 @@ private struct DetailOutfitCard: View {
                                 Image(systemName: "checkmark.circle.fill")
                                     .font(.system(size: 13))
                                     .foregroundStyle(Color(red: 0.8, green: 0.65, blue: 1.0))
-                                Text(item).font(.system(size: 14)).foregroundStyle(Color.white.opacity(0.75))
+                                Text(item)
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Color.white.opacity(0.75))
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
                     }
@@ -226,7 +259,10 @@ private struct DetailOutfitCard: View {
                                 Image(systemName: "sparkles")
                                     .font(.system(size: 13))
                                     .foregroundStyle(Color(red: 0.8, green: 0.65, blue: 1.0))
-                                Text(accessory).font(.system(size: 14)).foregroundStyle(Color.white.opacity(0.75))
+                                Text(accessory)
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(Color.white.opacity(0.75))
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
                         }
                     }
@@ -236,7 +272,10 @@ private struct DetailOutfitCard: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 13))
                             .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
-                        Text(warning).font(.system(size: 14)).foregroundStyle(Color.white.opacity(0.7))
+                        Text(warning)
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.white.opacity(0.7))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(10)
                     .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -260,9 +299,11 @@ private struct DetailAvoidCard: View {
                             Text("\(warning.window.shortDisplayText) · \(warning.risk.title)")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.white)
+                                .fixedSize(horizontal: false, vertical: true)
                             Text(warning.reason)
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.white.opacity(0.45))
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding(.vertical, 6)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -299,12 +340,15 @@ private struct DetailRiskCard: View {
                                 Text(risk.title)
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundStyle(.white)
+                                    .lineLimit(2)
                                 Text(risk.message)
                                     .font(.system(size: 12))
                                     .foregroundStyle(Color.white.opacity(0.45))
-                                    .lineLimit(2)
+                                    .lineLimit(3)
+                                    .fixedSize(horizontal: false, vertical: true)
                             }
-                            Spacer()
+                            .layoutPriority(1)
+                            Spacer(minLength: 8)
                         }
                         .padding(.vertical, 6)
                         if risk.id != risks.last?.id {

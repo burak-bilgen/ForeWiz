@@ -20,11 +20,14 @@ struct QuietHoursPicker: View {
                     Text(L10n.text("quiet_hours_title"))
                         .font(.system(size: 15))
                         .foregroundStyle(.white)
+                        .lineLimit(2)
                     Text(L10n.text("quiet_hours_description"))
                         .font(.system(size: 12))
                         .foregroundStyle(Color.white.opacity(0.38))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer()
+                .layoutPriority(1)
+                Spacer(minLength: 8)
                 Toggle("", isOn: Binding(
                     get: { quietHours != nil },
                     set: { enabled in
@@ -38,7 +41,7 @@ struct QuietHoursPicker: View {
             .padding(.vertical, 8)
 
             if let binding = quietHoursBinding {
-                HStack(spacing: 16) {
+                VStack(spacing: 10) {
                     VStack(spacing: 6) {
                         Text(L10n.text("quiet_hours_start"))
                             .font(.system(size: 11, weight: .medium))
@@ -66,10 +69,6 @@ struct QuietHoursPicker: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
                     .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-
-                    Text("→")
-                        .font(.system(size: 16))
-                        .foregroundStyle(Color.white.opacity(0.3))
 
                     VStack(spacing: 6) {
                         Text(L10n.text("quiet_hours_end"))

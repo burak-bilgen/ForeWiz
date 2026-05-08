@@ -479,16 +479,20 @@ final class RateLimiter {
     }
 
     func executeAsync(_ operation: @escaping () async -> Void) async -> Bool {
+        guard markExecutionIfAllowed() else { return false }
+        await operation()
+        return true
+    }
+
+    private func markExecutionIfAllowed() -> Bool {
         lock.lock()
         defer { lock.unlock() }
 
         let now = Date()
-        if now.timeIntervalSince(lastExecution) >= interval {
-            lastExecution = now
-            await operation()
-            return true
-        }
-        return false
+        guard now.timeIntervalSince(lastExecution) >= interval else { return false }
+
+        lastExecution = now
+        return true
     }
 }
 
@@ -515,7 +519,7 @@ actor RequestDeduper<Key: Hashable> {
         return try await task.value as! T
     }
 
-    private func removeRequest(forKey key: Key) {
+    private func removeRequest(forKey key: Key) async {
         inFlightRequests.removeValue(forKey: key)
     }
 
@@ -543,31 +547,20 @@ final class Batcher<Key: Hashable, Value>: @unchecked Sendable {
     }
 
     func request(_ key: Key) async throws -> Value {
-        lock.lock()
-
-        if let task = inFlight[key] {
-            lock.unlock()
+        if let task = task(for: key) {
             return try await task.value
         }
 
-        lock.unlock()
-
         let task = Task<Value, Error> { [weak self] in
-            guard let self = self else { throw AppError.unknown }
+            guard let self else { throw AppError.unknown }
 
             defer {
-                self.lock.lock()
-                self.inFlight.removeValue(forKey: key)
-                self.lock.unlock()
+                self.removeTask(for: key)
             }
 
             try await Task.sleep(nanoseconds: UInt64(self.interval * 1_000_000_000))
 
-            self.lock.lock()
-            let batch = Array(self.pending)
-            self.pending.removeAll()
-            self.lock.unlock()
-
+            let batch = self.takePendingBatch()
             let results = await self.processor(batch)
             guard let value = results[key] else {
                 throw AppError.unknown
@@ -575,12 +568,35 @@ final class Batcher<Key: Hashable, Value>: @unchecked Sendable {
             return value
         }
 
+        store(task, for: key)
+        return try await task.value
+    }
+
+    private func task(for key: Key) -> Task<Value, Error>? {
+        lock.lock()
+        defer { lock.unlock() }
+        return inFlight[key]
+    }
+
+    private func store(_ task: Task<Value, Error>, for key: Key) {
         lock.lock()
         pending.insert(key)
         inFlight[key] = task
         lock.unlock()
+    }
 
-        return try await task.value
+    private func removeTask(for key: Key) {
+        lock.lock()
+        inFlight.removeValue(forKey: key)
+        lock.unlock()
+    }
+
+    private func takePendingBatch() -> [Key] {
+        lock.lock()
+        defer { lock.unlock() }
+        let batch = Array(pending)
+        pending.removeAll()
+        return batch
     }
 }
 

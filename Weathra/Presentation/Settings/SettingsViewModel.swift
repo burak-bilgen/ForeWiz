@@ -11,6 +11,7 @@ final class SettingsViewModel: ObservableObject {
     let subscriptionManager: StoreKitSubscriptionManager
     private let onProfileSaved: (UserComfortProfile) -> Void
     private let onResetOnboarding: (() -> Void)?
+    private var cancellables: Set<AnyCancellable> = []
 
     init(
         profile: UserComfortProfile,
@@ -24,6 +25,12 @@ final class SettingsViewModel: ObservableObject {
         self.subscriptionManager = subscriptionManager
         self.onProfileSaved = onProfileSaved
         self.onResetOnboarding = onResetOnboarding
+
+        subscriptionManager.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
     var isPremium: Bool {

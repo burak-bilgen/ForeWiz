@@ -21,27 +21,31 @@ struct OnboardingView: View {
 
             VStack(spacing: 0) {
                 OnboardingProgressBar(current: currentStep, total: totalSteps)
-                    .padding(.horizontal, 28)
-                    .padding(.top, 20)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
 
-                Spacer()
-
-                stepContent
-                    .transition(.asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
-                    ))
-                    .id(currentStep)
-                    .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
-
-                Spacer()
+                ScrollView {
+                    stepContent
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .trailing).combined(with: .opacity),
+                            removal: .move(edge: .leading).combined(with: .opacity)
+                        ))
+                        .id(currentStep)
+                        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
+                }
+                .scrollIndicators(.hidden)
 
                 bottomButton
-                    .padding(.horizontal, 28)
-                    .padding(.bottom, 48)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .padding(.bottom, 20)
             }
         }
         .navigationBarHidden(true)
+        .dynamicTypeSize(.large ... .xxxLarge)
         .onAppear {
             withAnimation(.easeOut(duration: 0.5).delay(0.1)) {
                 appeared = true
@@ -206,14 +210,14 @@ private struct HeroStep: View {
                 // Outer pulse ring
                 Circle()
                     .stroke(sky.opacity(0.10), lineWidth: 1.5)
-                    .frame(width: 220, height: 220)
+                    .frame(width: 190, height: 190)
                     .scaleEffect(ringScale2)
                     .opacity(ringOpacity2)
 
                 // Inner glow ring
                 Circle()
                     .fill(sky.opacity(0.09))
-                    .frame(width: 180, height: 180)
+                    .frame(width: 154, height: 154)
                     .scaleEffect(ringScale1)
                     .opacity(ringOpacity1)
                     .blur(radius: 12)
@@ -226,10 +230,10 @@ private struct HeroStep: View {
                             center: .center, startRadius: 20, endRadius: 80
                         )
                     )
-                    .frame(width: 150, height: 150)
+                    .frame(width: 128, height: 128)
 
                 Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 80))
+                    .font(.system(size: 68))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(sky)
                     .shadow(color: sky.opacity(0.5), radius: 24, x: 0, y: 8)
@@ -237,12 +241,15 @@ private struct HeroStep: View {
                     .opacity(iconOpacity)
                     .floating(amplitude: 8, duration: 3.5)
             }
-            .padding(.bottom, 52)
+            .padding(.bottom, 34)
 
             VStack(spacing: 16) {
                 Text(L10n.text("onboarding_welcome"))
-                    .font(.system(size: 52, weight: .bold, design: .rounded))
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.70)
+                    .multilineTextAlignment(.center)
                     .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
 
                 Text(L10n.text("onboarding_subtitle"))
@@ -250,11 +257,12 @@ private struct HeroStep: View {
                     .foregroundStyle(Color.white.opacity(0.70))
                     .multilineTextAlignment(.center)
                     .lineSpacing(5)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .opacity(titleOpacity)
             .offset(y: titleOffset)
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 20)
         .onAppear {
             withAnimation(.spring(response: 0.65, dampingFraction: 0.68).delay(0.1)) {
                 iconScale = 1.0
@@ -292,13 +300,17 @@ private struct FeaturesStep: View {
                 Text(L10n.text("onboarding_why_weathra"))
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.80)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(L10n.text("onboarding_why_subtitle"))
                     .font(.system(size: 16))
                     .foregroundStyle(Color.white.opacity(0.55))
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.bottom, 36)
-            .padding(.horizontal, 28)
+            .padding(.bottom, 28)
+            .padding(.horizontal, 20)
 
             VStack(spacing: 14) {
                 ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
@@ -311,7 +323,7 @@ private struct FeaturesStep: View {
                     )
                 }
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 20)
         }
     }
 }
@@ -340,14 +352,16 @@ private struct FeatureRow: View {
                 Text(title)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
                 Text(subtitle)
                     .font(.system(size: 13))
                     .foregroundStyle(Color.white.opacity(0.5))
-                    .lineLimit(2)
+                    .lineLimit(3)
                     .fixedSize(horizontal: false, vertical: true)
             }
+            .layoutPriority(1)
 
-            Spacer()
+            Spacer(minLength: 0)
         }
         .padding(16)
         .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -373,13 +387,17 @@ private struct PermissionsStep: View {
                 Text(L10n.text("onboarding_permissions_title"))
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.80)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(L10n.text("onboarding_permissions_subtitle"))
                     .font(.system(size: 16))
                     .foregroundStyle(Color.white.opacity(0.55))
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.bottom, 36)
-            .padding(.horizontal, 28)
+            .padding(.bottom, 28)
+            .padding(.horizontal, 20)
 
             VStack(spacing: 14) {
                 PermissionCard(
@@ -410,7 +428,7 @@ private struct PermissionsStep: View {
                     }
                 )
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 20)
 
             if let error = viewModel.errorMessage {
                 HStack(spacing: 8) {
@@ -420,7 +438,8 @@ private struct PermissionsStep: View {
                         .font(.caption)
                 }
                 .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
-                .padding(.horizontal, 28)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 20)
                 .padding(.top, 16)
             }
         }
@@ -460,7 +479,7 @@ private struct PermissionCard: View {
     @State private var appeared = false
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(alignment: .top, spacing: 16) {
             ZStack {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(accentColor.opacity(0.18))
@@ -470,32 +489,28 @@ private struct PermissionCard: View {
                     .foregroundStyle(accentColor)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Text(title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                    if isRequired {
-                        Text(L10n.text("onboarding_location_required"))
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.35))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
-                                Color(red: 1.0, green: 0.75, blue: 0.35).opacity(0.15),
-                                in: Capsule()
-                            )
+            VStack(alignment: .leading, spacing: 8) {
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 6) {
+                        titleView
+                        requiredBadge
+                    }
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        titleView
+                        requiredBadge
                     }
                 }
+
                 Text(subtitle)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.white.opacity(0.45))
-                    .lineLimit(2)
+                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                badgeView
             }
-
-            Spacer()
-
-            badgeView
+            .layoutPriority(1)
         }
         .padding(16)
         .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -516,21 +531,48 @@ private struct PermissionCard: View {
         }
     }
 
+    private var titleView: some View {
+        Text(title)
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(.white)
+            .lineLimit(2)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    @ViewBuilder
+    private var requiredBadge: some View {
+        if isRequired {
+            Text(L10n.text("onboarding_location_required"))
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.35))
+                .lineLimit(1)
+                .minimumScaleFactor(0.80)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(
+                    Color(red: 1.0, green: 0.75, blue: 0.35).opacity(0.15),
+                    in: Capsule()
+                )
+        }
+    }
+
     @ViewBuilder
     private var badgeView: some View {
         switch badge {
         case .granted:
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 22))
+            Label(L10n.text("permission_open"), systemImage: "checkmark.circle.fill")
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color(red: 0.35, green: 0.85, blue: 0.6))
         case .denied:
-            Image(systemName: "xmark.circle.fill")
-                .font(.system(size: 22))
+            Label(L10n.text("permission_closed"), systemImage: "xmark.circle.fill")
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
         case .pending:
             Text(L10n.text("onboarding_permission_allow"))
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(
