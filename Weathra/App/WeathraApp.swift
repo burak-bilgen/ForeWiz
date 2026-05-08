@@ -42,8 +42,14 @@ struct WeathraApp: App {
     @MainActor
     private func initializeCoordinator() {
         let context = modelContainer.mainContext
+        #if targetEnvironment(simulator)
+        coordinator = AppCoordinator(
+            container: DependencyContainer.simulator(modelContext: context)
+        )
+        #else
         coordinator = AppCoordinator(
             container: DependencyContainer.live(modelContext: context)
         )
+        #endif
     }
 }

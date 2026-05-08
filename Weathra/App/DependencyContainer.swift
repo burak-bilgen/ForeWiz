@@ -59,6 +59,62 @@ final class DependencyContainer {
         self.subscriptionManager = subscriptionManager
     }
 
+    static func simulator(modelContext: ModelContext) -> DependencyContainer {
+        let dateProvider = SystemDateProvider()
+        let activityEngine = DefaultActivityWindowScoringEngine()
+        let outfitEngine = DefaultOutfitDecisionEngine()
+        let weatherEngine = DefaultWeatherDecisionEngine(
+            activityWindowScoringEngine: activityEngine,
+            outfitDecisionEngine: outfitEngine
+        )
+        let notificationEngine = DefaultNotificationPlanningEngine()
+        let preferencesRepository = SwiftDataPreferencesRepository(modelContext: modelContext)
+        let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
+        let locationRepository = MockLocationRepository()
+        let weatherRepository = MockWeatherRepository(dateProvider: dateProvider)
+        let notificationRepository = UserNotificationRepository()
+        let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(
+            locationRepository: locationRepository,
+            weatherRepository: weatherRepository,
+            weatherCacheRepository: weatherCacheRepository,
+            preferencesRepository: preferencesRepository,
+            weatherDecisionEngine: weatherEngine,
+            dateProvider: dateProvider
+        )
+        let completeOnboardingUseCase = DefaultCompleteOnboardingUseCase(
+            preferencesRepository: preferencesRepository
+        )
+        let updateUserPreferencesUseCase = DefaultUpdateUserPreferencesUseCase(
+            preferencesRepository: preferencesRepository
+        )
+        let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
+            notificationRepository: notificationRepository,
+            notificationPlanningEngine: notificationEngine,
+            dateProvider: dateProvider
+        )
+        let subscriptionManager = StoreKitSubscriptionManager()
+
+        return DependencyContainer(
+            environment: .simulator,
+            dateProvider: dateProvider,
+            activityWindowScoringEngine: activityEngine,
+            outfitDecisionEngine: outfitEngine,
+            weatherDecisionEngine: weatherEngine,
+            notificationPlanningEngine: notificationEngine,
+            locationRepository: locationRepository,
+            weatherRepository: weatherRepository,
+            weatherCacheRepository: weatherCacheRepository,
+            preferencesRepository: preferencesRepository,
+            notificationRepository: notificationRepository,
+            widgetRepository: SharedWidgetRepository(),
+            loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
+            completeOnboardingUseCase: completeOnboardingUseCase,
+            updateUserPreferencesUseCase: updateUserPreferencesUseCase,
+            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
+            subscriptionManager: subscriptionManager
+        )
+    }
+
     static func live(modelContext: ModelContext) -> DependencyContainer {
         let dateProvider = SystemDateProvider()
         let activityEngine = DefaultActivityWindowScoringEngine()

@@ -62,7 +62,23 @@ private struct LaunchingView: View {
 
 private struct MainTabView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @StateObject private var homeViewModel: HomeViewModel
     @State private var showInsightsPaywall = false
+
+    init(coordinator: AppCoordinator) {
+        self.coordinator = coordinator
+        let name = coordinator.profile.savedLocations
+            .first { $0.id == coordinator.profile.selectedLocationID }?
+            .name ?? L10n.text("home_current_location")
+        _homeViewModel = StateObject(wrappedValue: HomeViewModel(
+            loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
+            scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
+            preferencesRepository: coordinator.container.preferencesRepository,
+            widgetRepository: coordinator.container.widgetRepository,
+            dateProvider: coordinator.container.dateProvider,
+            selectedLocationName: name
+        ))
+    }
 
     var body: some View {
         tabContent
@@ -72,14 +88,7 @@ private struct MainTabView: View {
     private var tabContent: some View {
         TabView {
             HomeView(
-                viewModel: HomeViewModel(
-                    loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
-                    scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
-                    preferencesRepository: coordinator.container.preferencesRepository,
-                    widgetRepository: coordinator.container.widgetRepository,
-                    dateProvider: coordinator.container.dateProvider,
-                    selectedLocationName: selectedLocationName
-                ),
+                viewModel: homeViewModel,
                 savedLocations: $coordinator.profile.savedLocations,
                 selectedLocationID: $coordinator.profile.selectedLocationID,
                 isPremium: coordinator.container.subscriptionManager.isPremium,
@@ -93,13 +102,17 @@ private struct MainTabView: View {
             }
 
             NavigationStack {
-                InsightsView(
-                    recommendation: coordinator.latestRecommendation ?? PreviewWeatherFactory.dailyRecommendation(),
-                    isPremium: coordinator.container.subscriptionManager.isPremium,
-                    showPaywall: $showInsightsPaywall
-                )
-                .sheet(isPresented: $showInsightsPaywall) {
-                    PaywallView(store: coordinator.container.subscriptionManager)
+                if let recommendation = coordinator.latestRecommendation {
+                    InsightsView(
+                        recommendation: recommendation,
+                        isPremium: coordinator.container.subscriptionManager.isPremium,
+                        showPaywall: $showInsightsPaywall
+                    )
+                    .sheet(isPresented: $showInsightsPaywall) {
+                        PaywallView(store: coordinator.container.subscriptionManager)
+                    }
+                } else {
+                    InsightsPlaceholderView()
                 }
             }
             .tabItem {
@@ -123,10 +136,30 @@ private struct MainTabView: View {
         }
     }
 
-    private var selectedLocationName: String {
-        coordinator.profile.savedLocations
-            .first { $0.id == coordinator.profile.selectedLocationID }?
-            .name ?? L10n.text("home_current_location")
+}
+
+private struct InsightsPlaceholderView: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            VStack(spacing: 16) {
+                Image(systemName: "chart.bar.xaxis")
+                    .font(.system(size: 48))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.5))
+                Text(L10n.text("home_loading"))
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.white.opacity(0.35))
+            }
+        }
+        .navigationTitle(L10n.text("premium_feature_analytics"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.clear, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }
 
