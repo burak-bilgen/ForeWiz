@@ -25,7 +25,7 @@ struct AppRootView: View {
         }
         .preferredColorScheme(coordinator.profile.appearance.colorScheme)
         .environment(\.locale, coordinator.profile.language.locale)
-        .tint(AppTheme.accent)
+        .tint(.blue)
         .task {
             guard didStart == false else {
                 return
@@ -42,17 +42,18 @@ private struct LaunchingView: View {
 
     var body: some View {
         ZStack {
-            AppBackground()
-            VStack(spacing: AppSpacing.medium) {
+            Color(UIColor.systemGroupedBackground)
+                .ignoresSafeArea()
+            VStack(spacing: 24) {
                 Image(systemName: "cloud.sun.fill")
                     .font(.system(size: 56, weight: .regular))
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(AppTheme.accent)
+                    .foregroundStyle(.blue)
                     .symbolEffect(.pulse, isActive: animate)
 
                 Text(L10n.text("launch_preparing"))
-                    .font(AppTypography.callout)
-                    .foregroundStyle(AppTheme.secondaryText)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
         }
         .onAppear { animate = true }

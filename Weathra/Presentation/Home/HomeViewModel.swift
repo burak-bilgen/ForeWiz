@@ -1,6 +1,19 @@
 import Combine
 import Foundation
 import WidgetKit
+import os.log
+
+struct DailyForecastItem: Identifiable, Equatable {
+    let id = UUID()
+    let dayName: String
+    let date: Date
+    let highTemp: Double
+    let lowTemp: Double
+    let conditionSymbol: String
+    let outdoorScore: Int
+    let outdoorDecision: OutdoorDecision
+    let isToday: Bool
+}
 
 @MainActor
 final class HomeViewModel: ObservableObject {
@@ -53,9 +66,13 @@ final class HomeViewModel: ObservableObject {
         selectedLocationID = location.id
         selectedLocationName = location.name
 
-        var updatedProfile = (try? await preferencesRepository.loadProfile()) ?? .default
-        updatedProfile.selectedLocationID = location.id
-        _ = try? await preferencesRepository.saveProfile(updatedProfile)
+        do {
+            var updatedProfile = try await preferencesRepository.loadProfile()
+            updatedProfile.selectedLocationID = location.id
+            try await preferencesRepository.saveProfile(updatedProfile)
+        } catch {
+            AppLogger.app.error("Failed to update location preference: \(error.localizedDescription)")
+        }
 
         didLoad = false
         await load(forceRefresh: true)
@@ -99,13 +116,21 @@ final class HomeViewModel: ObservableObject {
                 )
             )
 
-            _ = try? await scheduleSmartNotificationsUseCase.execute(
-                recommendation: result.recommendation,
-                profile: profile
-            )
+            do {
+                _ = try await scheduleSmartNotificationsUseCase.execute(
+                    recommendation: result.recommendation,
+                    profile: profile
+                )
+            } catch {
+                AppLogger.notifications.error("Failed to schedule notifications: \(error.localizedDescription)")
+            }
 
-            try? widgetRepository.save(recommendation: result.recommendation)
-            WidgetCenter.shared.reloadAllTimelines()
+            do {
+                try widgetRepository.save(recommendation: result.recommendation)
+                WidgetCenter.shared.reloadAllTimelines()
+            } catch {
+                AppLogger.app.error("Failed to save widget data: \(error.localizedDescription)")
+            }
         } catch {
             state = .failed(message(for: error))
         }

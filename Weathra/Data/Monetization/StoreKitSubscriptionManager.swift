@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import StoreKit
+import os
 
 @MainActor
 final class StoreKitSubscriptionManager: ObservableObject {
@@ -19,20 +20,28 @@ final class StoreKitSubscriptionManager: ObservableObject {
     private var storeProducts: [Product] = []
     private var updateListenerTask: Task<Void, Error>?
     private let cacheKey = "cached_subscription_tier"
+    private let logger = Logger(subsystem: "com.weathra.subscription", category: "StoreKitManager")
 
     init() {
         tier = loadCachedTier()
+        let currentTier = tier
+        logger.info("Subscription manager initialized with tier: \(currentTier.rawValue)")
         updateListenerTask = listenForTransactions()
     }
 
     func loadProducts() async {
         isLoading = true
         errorMessage = nil
+        logger.info("Loading products...")
         do {
             storeProducts = try await Product.products(for: productIDs)
-            products = storeProducts.map { SubscriptionProduct(from: $0) }
+            let mappedProducts = storeProducts.map { SubscriptionProduct(from: $0) }
+            products = mappedProducts
+            logger.info("Products loaded successfully: \(mappedProducts.count) products")
         } catch {
-            errorMessage = localizedError(error)
+            let error = localizedError(error)
+            errorMessage = error
+            logger.error("Failed to load products: \(error)")
         }
         isLoading = false
     }
@@ -40,28 +49,36 @@ final class StoreKitSubscriptionManager: ObservableObject {
     func purchase(_ product: SubscriptionProduct) async -> Bool {
         guard let storeProduct = storeProducts.first(where: { $0.id == product.id }) else {
             errorMessage = L10n.text("premium_product_not_found")
+            logger.error("Product not found: \(product.id)")
             return false
         }
 
         isLoading = true
         defer { isLoading = false }
 
+        logger.info("Starting purchase for product: \(product.id)")
         do {
             let result = try await storeProduct.purchase()
             switch result {
             case .success(let verification):
+                logger.info("Purchase successful, handling verification")
                 await handle(verification)
                 return isPremium
             case .userCancelled:
+                logger.info("Purchase cancelled by user")
                 return false
             case .pending:
                 errorMessage = L10n.text("premium_pending")
+                logger.warning("Purchase pending")
                 return false
             @unknown default:
+                logger.warning("Unknown purchase result")
                 return false
             }
         } catch {
-            errorMessage = localizedError(error)
+            let error = localizedError(error)
+            errorMessage = error
+            logger.error("Purchase failed: \(error)")
             return false
         }
     }
@@ -70,17 +87,23 @@ final class StoreKitSubscriptionManager: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
+        logger.info("Restoring purchases...")
         do {
             try await AppStore.sync()
             await refreshStatus()
-            return isPremium
+            let premiumStatus = isPremium
+            logger.info("Purchases restored successfully, isPremium: \(premiumStatus)")
+            return premiumStatus
         } catch {
-            errorMessage = localizedError(error)
+            let error = localizedError(error)
+            errorMessage = error
+            logger.error("Failed to restore purchases: \(error)")
             return false
         }
     }
 
     func refreshStatus() async {
+        logger.info("Refreshing subscription status...")
         do {
             let entitlements = try await Product.products(for: productIDs)
             for product in entitlements {
@@ -88,26 +111,32 @@ final class StoreKitSubscriptionManager: ObservableObject {
                 if status.state == .subscribed || status.state == .inGracePeriod {
                     tier = .premium
                     saveCachedTier(.premium)
+                    logger.info("Subscription is active (premium)")
                     return
                 }
             }
             tier = .free
             saveCachedTier(.free)
+            logger.info("Subscription is not active (free)")
         } catch {
             tier = .free
+            logger.error("Failed to refresh status, defaulting to free: \(error.localizedDescription)")
         }
     }
 
     private func loadCachedTier() -> SubscriptionTier {
         guard let rawValue = UserDefaults.standard.string(forKey: cacheKey),
               let cached = SubscriptionTier(rawValue: rawValue) else {
+            logger.debug("No cached tier found, defaulting to free")
             return .free
         }
+        logger.debug("Loaded cached tier: \(cached.rawValue)")
         return cached
     }
 
     private func saveCachedTier(_ tier: SubscriptionTier) {
         UserDefaults.standard.set(tier.rawValue, forKey: cacheKey)
+        logger.debug("Saved cached tier: \(tier.rawValue)")
     }
 
     private func listenForTransactions() -> Task<Void, Error> {
@@ -123,7 +152,9 @@ final class StoreKitSubscriptionManager: ObservableObject {
             let transaction = try result.payloadValue
             await transaction.finish()
             await refreshStatus()
+            logger.info("Transaction handled successfully")
         } catch {
+            logger.error("Failed to handle transaction: \(error.localizedDescription)")
         }
     }
 

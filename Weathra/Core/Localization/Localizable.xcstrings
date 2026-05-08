@@ -844,13 +844,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keep outdoor time short. Have an option to change your time."
+            "value" : "Keep outdoor time short. Have a fallback option for changing plans."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dışarıda geçireceğin vakti kısa tut, saatini değiştirebileceğin bir alternatifin olsun."
+            "value" : "Dışarıda az kal. Saatini değiştirebileceğin bir alternatifi hazırda tut."
           }
         }
       }
@@ -878,13 +878,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weather may be exhausting or risky at times. Don't stay out too long, take breaks, or shift to a better time."
+            "value" : "Conditions can be tough or risky at times. Don't stay out long; take breaks or shift to a better hour."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bugün hava bazı saatlerde yorucu veya riskli olabilir. Dışarıda uzun vakit geçirme, mola verip alternatif bir saate kaydır."
+            "value" : "Bazı saatlerde hava zorlayıcı veya riskli olabilir. Uzun kalma; mola ver ya da daha rahat bir saate kaydır."
           }
         }
       }
@@ -3241,13 +3241,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Let's Go!"
+            "value" : "I'm ready"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Başlayalım!"
+            "value" : "Hazırım"
           }
         }
       }
@@ -3258,13 +3258,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Let's simplify your experience."
+            "value" : "Decisions tailored to you."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deneyimini basitleştirelim."
+            "value" : "Sana göre kararlar."
           }
         }
       }
@@ -3292,13 +3292,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More than just weather."
+            "value" : "More than just the weather."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hava durumunu bilmekten daha fazlası."
+            "value" : "Sadece hava durumundan daha fazlası."
           }
         }
       }
@@ -3649,13 +3649,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A balanced outfit for today."
+            "value" : "A balanced outfit should work well today."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "bugün için dengeli bir kombin olur."
+            "value" : "Bugün için dengeli bir kombin iyi olur."
           }
         }
       }
@@ -3666,13 +3666,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Layer up and wear closed shoes."
+            "value" : "Layer up, wear closed-toe shoes."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sıcak tutan katmanlar ve kapalı ayakkabı soğuğu hissettirmez."
+            "value" : "Üst üste giyin, kapalı ayakkabı tercih et."
           }
         }
       }
@@ -3683,13 +3683,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wear light, breathable clothes."
+            "value" : "Light, breathable clothes work best."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hafif, nefes alan parçalar sıcakta daha rahat hissettirir."
+            "value" : "Hafif ve nefes alan parçalar daha rahat olur."
           }
         }
       }
@@ -3700,13 +3700,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "T-shirt and a light layer should do it."
+            "value" : "A t-shirt with a light layer should be fine."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tişört ve hafif bir katman yeterli."
+            "value" : "Tişört üstüne hafif bir katman yeterli."
           }
         }
       }
@@ -3717,13 +3717,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "T-shirt with a light jacket works."
+            "value" : "T-shirt plus a light jacket."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tişört ve ince ceket dengeli olur."
+            "value" : "Tişört üstüne ince bir ceket iyi olur."
           }
         }
       }
@@ -3802,13 +3802,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Might get cool in the evening. Pack a light layer?"
+            "value" : "It might cool down later. Bring a light layer."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Akşam serinleyebilir. Çantaya ince bir hırka ya da ceket atmak iyi olur."
+            "value" : "Akşama doğru serinleyebilir. Yanına ince bir ceket alman iyi olur."
           }
         }
       }
@@ -3819,13 +3819,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rain coming but no umbrella/raincoat - you'll get wet!"
+            "value" : "Rain is expected but you don't have an umbrella or raincoat."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yağmur görünüyor ancak şemsiye veya yağmurluğun yok, ıslanabilirsin!"
+            "value" : "Yağmur bekleniyor ama şemsiyen ya da yağmurluğun yok."
           }
         }
       }
@@ -3836,13 +3836,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rain expected!"
+            "value" : "Rain is expected today."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Yağmur bekleniyor."
+            "value" : "Bugün yağmur bekleniyor."
           }
         }
       }
@@ -3853,13 +3853,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wind might make it feel colder."
+            "value" : "Wind can make it feel colder."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rüzgar hissedilen sıcaklığı düşürebilir."
+            "value" : "Rüzgâr nedeniyle hava daha soğuk hissedilebilir."
           }
         }
       }
@@ -4420,7 +4420,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "İki hafta boyunca planla"
+            "value" : "İki haftaya kadar planla"
           }
         }
       }
@@ -5315,13 +5315,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Severe weather risk. Better to postpone outdoor plans."
+            "value" : "Severe weather is likely. Postponing outdoor plans is safer."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Şiddetli hava riski var; dış planı ertelemek daha güvenli."
+            "value" : "Şiddetli hava ihtimali var. Dış planını ertelemek daha güvenli."
           }
         }
       }
@@ -5389,7 +5389,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UV seviyesi yükseliyor. Gölge, şapka ve güneş koruması planına dahil edilmeli."
+            "value" : "UV seviyesi yükseliyor. Şapka, gölge ve günem koruyucuyu yanına al."
           }
         }
       }
@@ -5400,13 +5400,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UV is high! Even in short plans, shade and sun protection matter."
+            "value" : "UV is high. Even short trips need shade and sun protection."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UV yüksek. Kısa süreli planlarda bile güneş koruması ve gölge önemli."
+            "value" : "UV yüksek. Kısa sürelerde bile gölge ve günem koruyucu önemli."
           }
         }
       }
@@ -5417,13 +5417,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UV protection needed"
+            "value" : "Sun protection recommended"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "UV koruması gerekli"
+            "value" : "Günem koruması öneriliyor"
           }
         }
       }
@@ -5457,7 +5457,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kuvvetli rüzgar açık alanlarda zorlayıcı. Kapalı güzergah tercih et."
+            "value" : "Kuvvetli rüzgar açık alanı zorlayabilir. Kapalı güzergah tercih et."
           }
         }
       }
@@ -6148,13 +6148,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Needed for weather"
+            "value" : "Required to fetch local weather."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hava durumu için konum gerekir"
+            "value" : "Bulunduğun yere ait hava durumu için gerekli."
           }
         }
       }
@@ -6182,13 +6182,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Don't miss opportunities"
+            "value" : "So we can let you know about good windows."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fırsatları kaçırma"
+            "value" : "Uygun saatleri sana hatırlatabilmemiz için."
           }
         }
       }
@@ -6199,13 +6199,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App permissions"
+            "value" : "Manage what Weathra can access."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App izinleri"
+            "value" : "Weathra'nın eriştiklerini yönet."
           }
         }
       }
@@ -6233,13 +6233,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium Active"
+            "value" : "Premium is active"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium Aktif"
+            "value" : "Premium aktif"
           }
         }
       }
@@ -6352,13 +6352,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "You'll go through onboarding again. Continue?"
+            "value" : "You'll go through onboarding again. This can't be undone."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Onboarding sürecine yeniden başlayacaksınız. Bu işlem geri alınamaz."
+            "value" : "Onboarding sürecini baştan göreceksin. Bu işlem geri alınamaz."
           }
         }
       }

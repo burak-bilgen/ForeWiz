@@ -15,10 +15,11 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppBackground()
+                Color(UIColor.systemGroupedBackground)
+                    .ignoresSafeArea()
                 content
             }
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .toolbar { toolbarContent }
             .task { viewModel.onAppear() }
             .sheet(isPresented: $showLocationPicker) {
@@ -37,28 +38,18 @@ struct HomeView: View {
                 }
             }
         }
+        .dynamicTypeSize(.large ... .xxxLarge)
     }
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(L10n.text("home_title"))
-                    .font(AppTypography.headline)
-                Text(lastUpdatedSubtitle)
-                    .font(.caption2)
-                    .foregroundStyle(AppTheme.secondaryText)
-            }
-        }
         ToolbarItem(placement: .topBarTrailing) {
             Button {
-                HapticManager.medium()
+                HapticManager.light()
                 showLocationPicker = true
             } label: {
-                Label(viewModel.selectedLocationName, systemImage: "location.fill")
-                    .labelStyle(.titleAndIcon)
-                    .font(AppTypography.caption2)
-                    .lineLimit(1)
+                Image(systemName: "location.fill")
+                    .foregroundStyle(.blue)
             }
         }
     }
@@ -75,21 +66,17 @@ struct HomeView: View {
                 retry: viewModel.onAppear
             )
         case .loaded(let state):
-            HomeLoadedScroll(
+            HomeLoadedContent(
                 state: state,
                 isPremium: isPremium,
                 onUpgradeTap: { showPaywall = true },
                 refresh: { await viewModel.refresh() }
             )
-            .transition(.opacity.combined(with: .move(edge: .bottom)))
+            .transition(.asymmetric(
+                insertion: .opacity.combined(with: .move(edge: .trailing)),
+                removal: .opacity.combined(with: .move(edge: .leading))
+            ))
         }
-    }
-
-    private var lastUpdatedSubtitle: String {
-        if case .loaded(let state) = viewModel.state {
-            return state.lastUpdatedText
-        }
-        return ""
     }
 }
 
@@ -97,21 +84,21 @@ struct HomeView: View {
 
 private struct HomeLoadingView: View {
     var body: some View {
-        VStack(spacing: AppSpacing.large) {
-            LoadingCardPlaceholder(height: 220, cornerRadius: AppTheme.cardRadius)
-            LoadingCardPlaceholder(height: 120, cornerRadius: AppTheme.cardRadius)
-            LoadingCardPlaceholder(height: 160, cornerRadius: AppTheme.cardRadius)
+        VStack(spacing: 20) {
+            ProgressView()
+                .scaleEffect(1.2)
+            Text(L10n.text("home_loading"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
         }
-        .padding(.horizontal, AppSpacing.medium)
-        .padding(.top, AppSpacing.medium)
-        .frame(maxHeight: .infinity, alignment: .top)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityLabel(L10n.text("home_loading"))
     }
 }
 
-// MARK: - Loaded scroll
+// MARK: - Loaded content
 
-private struct HomeLoadedScroll: View {
+private struct HomeLoadedContent: View {
     let state: HomeViewState
     let isPremium: Bool
     let onUpgradeTap: () -> Void
@@ -119,38 +106,38 @@ private struct HomeLoadedScroll: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: AppSpacing.medium) {
-                CurrentWeatherHero(
+            VStack(spacing: 24) {
+                ModernWeatherHero(
                     weather: state.currentWeather,
                     recommendation: state.recommendation,
                     isUsingCached: state.isUsingCachedWeather
                 )
 
                 if let warning = state.warningMessage {
-                    HomeWarningBanner(message: warning)
+                    ModernWarningBanner(message: warning)
                 }
 
-                QuickInsightGrid(recommendation: state.recommendation)
+                ModernInsightGrid(recommendation: state.recommendation)
 
-                WeeklyForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium)
+                ModernForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium, onUpgradeTap: onUpgradeTap)
 
                 if !isPremium {
                     AdBannerView(adUnitID: nil, isPremium: isPremium, onRemoveAdsTapped: onUpgradeTap)
                 }
 
                 if !state.recommendation.bestActivityWindows.isEmpty {
-                    ActivityWindowsSection(recommendations: state.recommendation.bestActivityWindows)
+                    ModernActivitySection(recommendations: state.recommendation.bestActivityWindows)
                 }
 
-                OutfitCard(outfit: state.recommendation.outfit)
+                ModernHourlyForecastCard(hourlyScores: hourlyScores(for: state.recommendation))
+
+                ModernOutfitCard(outfit: state.recommendation.outfit)
 
                 if !state.recommendation.risks.isEmpty {
-                    WeatherRiskSection(risks: state.recommendation.risks)
+                    ModernRiskSection(risks: state.recommendation.risks)
                 }
             }
-            .padding(.horizontal, AppSpacing.medium)
-            .padding(.top, AppSpacing.small)
-            .padding(.bottom, AppSpacing.xxLarge)
+            .padding(20)
         }
         .scrollIndicators(.hidden)
         .refreshable { await refresh() }
@@ -159,164 +146,445 @@ private struct HomeLoadedScroll: View {
 
 // MARK: - Warning banner
 
-private struct HomeWarningBanner: View {
+private struct ModernWarningBanner: View {
     let message: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.small) {
+        HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(AppTheme.warning)
+                .foregroundStyle(.orange)
+                .font(.title3)
             Text(message)
-                .font(AppTypography.caption)
-                .foregroundStyle(AppTheme.ink)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
         }
-        .padding(AppSpacing.medium)
+        .padding(16)
         .background(
-            AppTheme.warning.opacity(0.10),
-            in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 12)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
-                .stroke(AppTheme.warning.opacity(0.25), lineWidth: 0.5)
+    }
+}
+
+// MARK: - Modern insight grid
+
+private struct ModernInsightGrid: View {
+    let recommendation: DailyRecommendation
+
+    var body: some View {
+        LazyVGrid(columns: [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ], spacing: 12) {
+            ModernInsightCard(
+                icon: "thermometer",
+                title: "Karar",
+                value: recommendation.outdoorDecision.localizedTitle
+            )
+            ModernInsightCard(
+                icon: "star.fill",
+                title: "Skor",
+                value: String(format: "%.1f", recommendation.outdoorScore.displayValue)
+            )
         }
     }
 }
 
-// MARK: - Current weather hero
+private struct ModernInsightCard: View {
+    let icon: String
+    let title: String
+    let value: String
 
-/// Single combined hero: condition icon, big temperature, decision pill, score ring,
-/// best-time chip. Sits on a tinted gradient that follows the day's outdoor decision.
-private struct CurrentWeatherHero: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(.blue)
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.medium)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(16)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
+    }
+}
+
+// MARK: - Modern weather hero
+
+private struct ModernWeatherHero: View {
     let weather: HomeCurrentWeatherViewState
     let recommendation: DailyRecommendation
     let isUsingCached: Bool
 
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-            // Top row: condition + temperature
-            HStack(alignment: .top) {
+        VStack(spacing: 16) {
+            HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    if isUsingCached {
-                        HeroChip(
-                            text: L10n.text("weather_latest_forecast"),
-                            systemImage: "clock.arrow.circlepath"
-                        )
-                    }
                     Text(weather.temperatureText)
-                        .font(AppTypography.heroNumber)
+                        .font(.system(size: 56, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
                     Text(weather.conditionText)
-                        .font(AppTypography.title3)
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
                     Text(weather.feelsLikeText)
-                        .font(AppTypography.callout)
-                        .foregroundStyle(.white.opacity(0.78))
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
                 }
-                Spacer(minLength: 0)
+                Spacer()
                 Image(systemName: weather.symbolName)
-                    .font(.system(size: 64, weight: .regular))
+                    .font(.system(size: 72))
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.white)
-                    .symbolEffect(.variableColor.iterative, options: .repeating)
-                    .accessibilityHidden(true)
+                    .foregroundStyle(.blue)
             }
 
             Divider()
-                .overlay(.white.opacity(0.25))
 
-            // Bottom row: decision summary + score ring
-            HStack(alignment: .center, spacing: AppSpacing.medium) {
-                VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+            HStack {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(recommendation.outdoorDecision.localizedTitle)
-                        .font(AppTypography.title2)
+                        .font(.headline)
                     Text(recommendation.summaryText)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(.white.opacity(0.82))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                         .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
                     if let bestWindow = recommendation.bestOutdoorWindow {
-                        HeroChip(
-                            text: bestWindow.shortDisplayText,
-                            systemImage: "clock.fill"
-                        )
+                        Text(bestWindow.shortDisplayText)
+                            .font(.caption)
+                            .foregroundStyle(.blue)
                     }
                 }
-                Spacer(minLength: 0)
-                HeroScoreRing(score: recommendation.outdoorScore)
+                Spacer()
+                VStack(spacing: 4) {
+                    Text(String(format: "%.1f", recommendation.outdoorScore.displayValue))
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .monospacedDigit()
+                    Text("Skor")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
-        .foregroundStyle(.white)
-        .padding(AppSpacing.large)
+        .padding(24)
         .background(
-            AppTheme.heroGradient(for: recommendation.outdoorDecision, colorScheme: colorScheme),
-            in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
         )
-        .overlay {
-            RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
-                .stroke(.white.opacity(0.15), lineWidth: 0.5)
+    }
+}
+
+// MARK: - Modern forecast card
+
+private struct ModernForecastCard: View {
+    let dailyForecasts: [DailyForecastItem]
+    let isPremium: Bool
+    let onUpgradeTap: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Hava Tahmini")
+                .font(.headline)
+
+            VStack(spacing: 8) {
+                ForEach(dailyForecasts.prefix(isPremium ? 14 : 3)) { forecast in
+                    ModernForecastRow(forecast: forecast)
+                }
+
+                if !isPremium && dailyForecasts.count > 3 {
+                    Button {
+                        HapticManager.medium()
+                        onUpgradeTap()
+                    } label: {
+                        Text("14 günlük tahmini görmek için Premium'a geç")
+                            .font(.subheadline)
+                            .foregroundStyle(.blue)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+            }
         }
-        .shadow(color: .black.opacity(colorScheme == .dark ? 0.30 : 0.10), radius: 16, y: 8)
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+    }
+}
+
+private struct ModernForecastRow: View {
+    let forecast: DailyForecastItem
+
+    var body: some View {
+        HStack {
+            Text(forecast.dayName)
+                .font(.subheadline)
+                .frame(width: 60, alignment: .leading)
+            Spacer()
+            Image(systemName: forecast.conditionSymbol)
+                .frame(width: 30)
+            Spacer()
+            Text(forecast.highTemp.formatted(.number.precision(.fractionLength(0))) + "°")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .monospacedDigit()
+            Text(forecast.lowTemp.formatted(.number.precision(.fractionLength(0))) + "°")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
+        }
+        .padding(.vertical, 8)
         .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(forecast.dayName), yüksek \(forecast.highTemp.formatted(.number.precision(.fractionLength(0)))) derece, düşük \(forecast.lowTemp.formatted(.number.precision(.fractionLength(0)))) derece")
     }
 }
 
-private struct HeroChip: View {
-    let text: String
-    let systemImage: String
+// MARK: - Modern activity section
+
+private struct ModernActivitySection: View {
+    let recommendations: [ActivityRecommendation]
 
     var body: some View {
-        Label(text, systemImage: systemImage)
-            .font(.caption2.weight(.semibold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(.white.opacity(0.18), in: Capsule(style: .continuous))
-            .overlay {
-                Capsule(style: .continuous).stroke(.white.opacity(0.25), lineWidth: 0.5)
-            }
-    }
-}
+        VStack(alignment: .leading, spacing: 12) {
+            Text("En İyi Zamanlar")
+                .font(.headline)
 
-/// Inline white-on-tint score ring tuned for the hero card.
-private struct HeroScoreRing: View {
-    let score: WeatherScore
-    @State private var progress: Double = 0
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(.white.opacity(0.25), lineWidth: 7)
-            Circle()
-                .trim(from: 0, to: progress)
-                .stroke(.white, style: StrokeStyle(lineWidth: 7, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-            VStack(spacing: 0) {
-                Text(score.displayValue, format: .number.precision(.fractionLength(1)))
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                Text("/10")
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.78))
+            if recommendations.isEmpty {
+                Text("Uygun zaman bulunamadı")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(recommendations.prefix(3)) { recommendation in
+                        ModernActivityRow(recommendation: recommendation)
+                    }
+                }
             }
         }
-        .frame(width: 76, height: 76)
-        .onAppear { animate() }
-        .onChange(of: score) { _, _ in animate() }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+    }
+}
+
+private struct ModernActivityRow: View {
+    let recommendation: ActivityRecommendation
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(recommendation.activityType.localizedTitle)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                Text(recommendation.bestWindow.shortDisplayText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text(String(format: "%.1f", recommendation.score.displayValue))
+                .font(.headline)
+                .foregroundStyle(.blue)
+        }
+        .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(recommendation.activityType.localizedTitle), skor \(String(format: "%.1f", recommendation.score.displayValue)), en iyi zaman \(recommendation.bestWindow.shortDisplayText)")
+    }
+}
+
+// MARK: - Modern outfit card
+
+private struct ModernOutfitCard: View {
+    let outfit: OutfitRecommendation
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Kıyafet Önerisi")
+                .font(.headline)
+
+            Text(outfit.title)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            if let warning = outfit.warning {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                        .frame(width: 20)
+                    Text(warning)
+                        .font(.subheadline)
+                }
+            }
+
+            if !outfit.items.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(outfit.items, id: \.self) { item in
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.blue)
+                                .frame(width: 20)
+                            Text(item)
+                                .font(.subheadline)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+    }
+}
+
+// MARK: - Modern risk section
+
+private struct ModernRiskSection: View {
+    let risks: [WeatherRisk]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Riskler")
+                .font(.headline)
+
+            if risks.isEmpty {
+                Text("Risk yok")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(risks) { risk in
+                        ModernRiskRow(risk: risk)
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+    }
+}
+
+private struct ModernHourlyForecastCard: View {
+    let hourlyScores: [WeatherScore]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Saatlik Tahmin")
+                .font(.headline)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: 8) {
+                    ForEach(Array(hourlyScores.prefix(24).enumerated()), id: \.offset) { index, score in
+                        VStack(spacing: 4) {
+                            Capsule()
+                                .fill(scoreColor(for: score))
+                                .frame(width: 8, height: max(8, CGFloat(score.rawValue)))
+                            Text(hourLabel(for: index))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(width: 40)
+                    }
+                }
+            }
+            .frame(height: 100)
+        }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
     }
 
-    private func animate() {
-        let target = score.displayValue / 10
-        if reduceMotion {
-            progress = target
-        } else {
-            withAnimation(.spring(response: 0.9, dampingFraction: 0.85)) {
-                progress = target
+    private func scoreColor(for score: WeatherScore) -> Color {
+        switch score.rawValue {
+        case 80...100: return .green
+        case 60..<80: return .blue
+        case 40..<60: return .orange
+        default: return .red
+        }
+    }
+
+    private func hourLabel(for index: Int) -> String {
+        var hour = Calendar.current.component(.hour, from: Date()) + index
+        if hour >= 24 { hour -= 24 }
+        return "\(hour):00"
+    }
+}
+
+private func hourlyScores(for recommendation: DailyRecommendation) -> [WeatherScore] {
+    let currentHour = Calendar.current.component(.hour, from: Date())
+    var scores: [WeatherScore] = []
+
+    for _ in currentHour..<min(currentHour + 12, 24) {
+        let score = recommendation.outdoorScore
+        scores.append(score)
+    }
+
+    return scores
+}
+
+private struct ModernRiskRow: View {
+    let risk: WeatherRisk
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: riskIcon(for: risk.type))
+                .font(.title3)
+                .foregroundStyle(color)
+                .frame(width: 32)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(risk.title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
             }
+        }
+        .padding(.vertical, 8)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(risk.title), şiddet \(severityLabel(for: risk.severity))")
+    }
+
+    private var color: Color {
+        switch risk.severity {
+        case .low: return .green
+        case .medium: return .orange
+        case .high: return .red
+        case .extreme: return .purple
+        }
+    }
+
+    private func riskIcon(for type: WeatherRiskType) -> String {
+        switch type {
+        case .heat: return "thermometer.sun.fill"
+        case .uv: return "sun.max.fill"
+        case .rain: return "cloud.rain.fill"
+        case .wind: return "wind"
+        case .humidity: return "humidity.fill"
+        case .cold: return "snowflake"
+        case .storm: return "cloud.bolt.rain.fill"
+        case .poorComfort: return "exclamationmark.circle.fill"
+        case .pollen: return "leaf.fill"
+        case .airQuality: return "aqi.medium"
+        }
+    }
+
+    private func severityLabel(for severity: RiskLevel) -> String {
+        switch severity {
+        case .low: return "düşük"
+        case .medium: return "orta"
+        case .high: return "yüksek"
+        case .extreme: return "aşırı"
         }
     }
 }

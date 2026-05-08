@@ -6,42 +6,45 @@ struct PermissionSetupSection: View {
     @ObservedObject var viewModel: OnboardingViewModel
 
     var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                SectionHeader(
-                    icon: "location.circle.fill",
-                    title: L10n.text("onboarding_permissions_title"),
-                    subtitle: L10n.text("onboarding_permissions_subtitle")
-                )
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(
+                icon: "location.circle.fill",
+                title: L10n.text("onboarding_permissions_title"),
+                subtitle: L10n.text("onboarding_permissions_subtitle")
+            )
 
-                CompactPermissionRow(
-                    icon: "location.fill",
-                    title: L10n.text("onboarding_location_title"),
-                    message: L10n.text("onboarding_location_message"),
-                    statusText: statusText(for: viewModel.locationStatus),
-                    isRequired: true,
-                    actionTitle: locationActionTitle,
-                    action: requestOrOpenSettingsForLocation
-                )
+            CompactPermissionRow(
+                icon: "location.fill",
+                title: L10n.text("onboarding_location_title"),
+                message: L10n.text("onboarding_location_message"),
+                statusText: statusText(for: viewModel.locationStatus),
+                isRequired: true,
+                actionTitle: locationActionTitle,
+                action: requestOrOpenSettingsForLocation
+            )
 
-                CompactPermissionRow(
-                    icon: "bell.badge.fill",
-                    title: L10n.text("onboarding_notification_title"),
-                    message: L10n.text("onboarding_notification_message"),
-                    statusText: notificationText(for: viewModel.notificationStatus),
-                    isRequired: false,
-                    actionTitle: notificationActionTitle,
-                    action: requestOrOpenSettingsForNotifications
-                )
+            CompactPermissionRow(
+                icon: "bell.badge.fill",
+                title: L10n.text("onboarding_notification_title"),
+                message: L10n.text("onboarding_notification_message"),
+                statusText: notificationText(for: viewModel.notificationStatus),
+                isRequired: false,
+                actionTitle: notificationActionTitle,
+                action: requestOrOpenSettingsForNotifications
+            )
 
-                if let errorMessage = viewModel.errorMessage {
-                    Text(errorMessage)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppTheme.danger)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
     }
 
     private var locationActionTitle: String {
@@ -120,41 +123,45 @@ struct PersonalizationSection: View {
     @ObservedObject var viewModel: OnboardingViewModel
 
     var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                SectionHeader(
-                    icon: "slider.horizontal.3",
-                    title: L10n.text("onboarding_comfort_title"),
-                    subtitle: L10n.text("onboarding_comfort_subtitle")
-                )
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeader(
+                icon: "slider.horizontal.3",
+                title: L10n.text("onboarding_comfort_title"),
+                subtitle: L10n.text("onboarding_comfort_subtitle")
+            )
 
-                Picker(L10n.text("onboarding_temp_sensitivity"), selection: Binding(
-                    get: { viewModel.selectedSensitivity },
-                    set: { viewModel.selectSensitivity($0) }
-                )) {
-                    ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
-                        Text(sensitivity.localizedTitle).tag(sensitivity)
-                    }
+            Picker(L10n.text("onboarding_temp_sensitivity"), selection: Binding(
+                get: { viewModel.selectedSensitivity },
+                set: { viewModel.selectSensitivity($0) }
+            )) {
+                ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
+                    Text(sensitivity.localizedTitle).tag(sensitivity)
                 }
-                .pickerStyle(.segmented)
+            }
+            .pickerStyle(.segmented)
 
-                VStack(alignment: .leading, spacing: AppSpacing.small) {
-                    Text(L10n.text("onboarding_activities"))
-                        .font(AppTypography.caption.weight(.semibold))
-                        .foregroundStyle(AppTheme.secondaryText)
+            VStack(alignment: .leading, spacing: 12) {
+                Text(L10n.text("onboarding_activities"))
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
 
-                    FlowLayout(spacing: AppSpacing.small) {
-                        ForEach(ActivityType.allCases, id: \.self) { activity in
-                            ActivityChip(
-                                activity: activity,
-                                isSelected: viewModel.preferredActivities.contains(activity)
-                            ) {
-                                viewModel.toggleActivity(activity)
-                            }
+                FlowLayout(spacing: 8) {
+                    ForEach(ActivityType.allCases, id: \.self) { activity in
+                        ActivityChip(
+                            activity: activity,
+                            isSelected: viewModel.preferredActivities.contains(activity)
+                        ) {
+                            viewModel.toggleActivity(activity)
                         }
                     }
                 }
             }
         }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
     }
 }

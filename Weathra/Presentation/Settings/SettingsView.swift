@@ -13,8 +13,8 @@ struct SettingsView: View {
             if let saveMessage = viewModel.saveMessage {
                 Section {
                     Label(saveMessage, systemImage: "checkmark.circle.fill")
-                        .font(AppTypography.callout)
-                        .foregroundStyle(AppTheme.success)
+                        .font(.callout)
+                        .foregroundStyle(.green)
                         .listRowBackground(Color.clear)
                 }
             }
@@ -36,25 +36,26 @@ struct SettingsView: View {
             // MARK: Premium
             Section {
                 if viewModel.isPremium {
-                    HStack(spacing: AppSpacing.small) {
+                    HStack(spacing: 12) {
                         Image(systemName: "checkmark.seal.fill")
-                            .foregroundStyle(AppTheme.success)
+                            .foregroundStyle(.green)
                         Text(L10n.text("settings_premium_active"))
-                            .font(AppTypography.bodyEmphasized)
+                            .font(.body)
+                            .fontWeight(.semibold)
                     }
                 } else {
                     ForEach(PremiumFeature.allCases) { feature in
                         Label {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(feature.localizedTitle)
-                                    .font(AppTypography.body)
+                                    .font(.body)
                                 Text(feature.localizedDescription)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         } icon: {
                             Image(systemName: feature.systemImage)
-                                .foregroundStyle(AppTheme.accent)
+                                .foregroundStyle(.blue)
                         }
                     }
                     Button {
@@ -64,7 +65,7 @@ struct SettingsView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(AppTheme.sunshine)
+                    .tint(.blue)
                     .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 }
             } header: {
@@ -229,7 +230,7 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .scrollContentBackground(.hidden)
-        .background { AppBackground() }
+        .background { Color(UIColor.systemGroupedBackground) }
         .navigationTitle(L10n.text("settings_title"))
         .navigationBarTitleDisplayMode(.large)
         .onChange(of: viewModel.profile) { viewModel.save() }
@@ -296,7 +297,7 @@ private struct LabeledRow: View {
             }
         } icon: {
             Image(systemName: icon)
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
         }
     }
 }
@@ -308,15 +309,14 @@ private struct ActivityRow: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: AppSpacing.small) {
+            HStack(spacing: 12) {
                 Image(systemName: iconName)
-                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.secondaryText)
+                    .foregroundStyle(isSelected ? .blue : .secondary)
                     .frame(width: 24)
                 Text(activity.localizedTitle)
-                    .foregroundStyle(AppTheme.ink)
                 Spacer()
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.tertiaryText)
+                    .foregroundStyle(isSelected ? .blue : .gray.opacity(0.5))
             }
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -341,7 +341,7 @@ private struct WardrobeToggle: View {
         Toggle(isOn: $isOn) {
             Label(title, systemImage: icon)
         }
-        .tint(AppTheme.accent)
+        .tint(.blue)
     }
 }
 
@@ -354,13 +354,12 @@ private struct AllergyRow: View {
         Button(action: onTap) {
             HStack {
                 Image(systemName: allergyType.icon)
-                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.secondaryText)
+                    .foregroundStyle(isSelected ? .blue : .secondary)
                     .frame(width: 24)
                 Text(allergyType.localizedTitle)
-                    .foregroundStyle(AppTheme.ink)
                 Spacer()
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.tertiaryText)
+                    .foregroundStyle(isSelected ? .blue : .gray.opacity(0.5))
             }
         }
         .accessibilityAddTraits(isSelected ? .isSelected : [])

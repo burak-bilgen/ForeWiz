@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import os
 
 final class UserNotificationRepository: NotificationRepository {
     private let center: UNUserNotificationCenter
@@ -15,7 +16,8 @@ final class UserNotificationRepository: NotificationRepository {
 
     func requestAuthorization() async -> NotificationAuthorizationStatus {
         do {
-            let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
+            let options: UNAuthorizationOptions = [.alert, .sound, .badge, .criticalAlert]
+            let granted = try await center.requestAuthorization(options: options)
             if granted {
                 return .authorized
             }
@@ -23,6 +25,7 @@ final class UserNotificationRepository: NotificationRepository {
             let settings = await center.notificationSettings()
             return map(settings.authorizationStatus)
         } catch {
+            AppLogger.notifications.error("Failed to request notification authorization: \(error.localizedDescription)")
             return .denied
         }
     }
@@ -36,6 +39,19 @@ final class UserNotificationRepository: NotificationRepository {
             content.title = titleAndBody.title
             content.body = titleAndBody.body
             content.sound = .default
+            content.badge = 1
+
+            // Category identifier'e göre category set et
+            content.categoryIdentifier = plan.category.rawValue
+
+            // Priority'e göre interruption level set et
+            if plan.priority >= 90 {
+                content.interruptionLevel = .critical
+            } else if plan.priority >= 70 {
+                content.interruptionLevel = .timeSensitive
+            } else {
+                content.interruptionLevel = .passive
+            }
 
             let components = Calendar.current.dateComponents(
                 [.year, .month, .day, .hour, .minute],

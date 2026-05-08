@@ -21,7 +21,7 @@ struct SavedLocationsSection: View {
 
         Button(action: addLocation) {
             Label(L10n.text("settings_add_location"), systemImage: "plus.circle.fill")
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
         }
     }
 
@@ -69,7 +69,7 @@ struct SavedLocationRow: View {
                     if isSelected {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.caption)
-                            .foregroundStyle(AppTheme.accent)
+                            .foregroundStyle(.blue)
                     }
                 }
                 Text(location.address)
@@ -81,7 +81,7 @@ struct SavedLocationRow: View {
             Image(systemName: location.id == "current-location"
                   ? "location.fill"
                   : "mappin.and.ellipse")
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
         }
     }
 }
@@ -105,51 +105,42 @@ struct SavedLocationDetailView: View {
     }
 
     var body: some View {
-        ZStack {
-            AppBackground()
-
-            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                GlassCard {
-                    VStack(spacing: AppSpacing.medium) {
-                        LabeledContent(L10n.text("settings_location_name")) {
-                            TextField(L10n.text("settings_location_name"), text: $name)
-                                .multilineTextAlignment(.trailing)
-                        }
-
-                        LabeledContent(L10n.text("settings_address")) {
-                            TextField(L10n.text("settings_address"), text: $address)
-                                .multilineTextAlignment(.trailing)
-                        }
-
-                        LabeledContent(L10n.text("settings_coordinates")) {
-                            let formattedLat = location.latitude.formatted(
-                                .number.precision(.fractionLength(4))
-                            )
-                            let formattedLon = location.longitude.formatted(
-                                .number.precision(.fractionLength(4))
-                            )
-                            Text("\(formattedLat), \(formattedLon)")
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppTheme.secondaryText)
-                        }
-                    }
+        Form {
+            Section {
+                LabeledContent(L10n.text("settings_location_name")) {
+                    TextField(L10n.text("settings_location_name"), text: $name)
+                        .multilineTextAlignment(.trailing)
                 }
 
-                if location.id != "current-location" {
+                LabeledContent(L10n.text("settings_address")) {
+                    TextField(L10n.text("settings_address"), text: $address)
+                        .multilineTextAlignment(.trailing)
+                }
+
+                LabeledContent(L10n.text("settings_coordinates")) {
+                    let formattedLat = location.latitude.formatted(
+                        .number.precision(.fractionLength(4))
+                    )
+                    let formattedLon = location.longitude.formatted(
+                        .number.precision(.fractionLength(4))
+                    )
+                    Text("\(formattedLat), \(formattedLon)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if location.id != "current-location" {
+                Section {
                     Button(role: .destructive) {
                         onDelete()
                         dismiss()
                     } label: {
                         Label(L10n.text("settings_delete_location"), systemImage: "trash")
-                            .font(AppTypography.caption.weight(.semibold))
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.bordered)
                 }
             }
-            .padding(AppSpacing.medium)
-            .frame(maxWidth: 720)
-            .frame(maxWidth: .infinity)
         }
         .navigationTitle(L10n.text("settings_edit_location"))
         .navigationBarTitleDisplayMode(.inline)
@@ -172,21 +163,16 @@ struct ResetSection: View {
     @Binding var showConfirmation: Bool
 
     var body: some View {
-        SettingsCard(
-            icon: "arrow.counterclockwise.circle.fill",
-            title: L10n.text("settings_reset_title"),
-            subtitle: L10n.text("settings_reset_subtitle")
-        ) {
-            Button(
-                action: { showConfirmation = true },
-                label: {
-                    Label(L10n.text("settings_reset_confirm"), systemImage: "arrow.counterclockwise")
-                        .font(AppTypography.caption.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                }
-            )
-            .buttonStyle(.bordered)
-            .tint(AppTheme.danger)
+        Section {
+            Button(role: .destructive) {
+                showConfirmation = true
+            } label: {
+                Label(L10n.text("settings_reset_confirm"), systemImage: "arrow.counterclockwise")
+            }
+        } header: {
+            Text(L10n.text("settings_reset_title"))
+        } footer: {
+            Text(L10n.text("settings_reset_subtitle"))
         }
     }
 }

@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 protocol WidgetRepository {
     func save(recommendation: DailyRecommendation) throws
@@ -7,18 +8,28 @@ protocol WidgetRepository {
 final class SharedWidgetRepository: WidgetRepository {
     private let userDefaults: UserDefaults?
     private let key = "weathra_latest_recommendation"
+    private let logger = Logger(subsystem: "com.weathra.widget", category: "WidgetRepository")
 
     init(suiteName: String = "group.weathra") {
         self.userDefaults = UserDefaults(suiteName: suiteName)
+        logger.info("Widget repository initialized with suite: \(suiteName)")
     }
 
     func save(recommendation: DailyRecommendation) throws {
         guard let userDefaults else {
+            logger.error("UserDefaults is nil, cannot save widget data")
             throw AppError.persistenceFailed
         }
 
-        let data = try JSONEncoder().encode(WidgetRecommendationPayload(recommendation: recommendation))
-        userDefaults.set(data, forKey: key)
+        do {
+            let payload = WidgetRecommendationPayload(recommendation: recommendation)
+            let data = try JSONEncoder().encode(payload)
+            userDefaults.set(data, forKey: key)
+            logger.info("Widget recommendation saved successfully")
+        } catch {
+            logger.error("Failed to encode widget recommendation: \(error.localizedDescription)")
+            throw AppError.persistenceFailed
+        }
     }
 }
 

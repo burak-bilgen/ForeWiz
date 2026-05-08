@@ -4,7 +4,7 @@ struct AdBannerView: View {
     let adUnitID: String?
     let isPremium: Bool
     let onRemoveAdsTapped: () -> Void
-    
+
     var body: some View {
         if isPremium {
             PremiumBannerView()
@@ -16,58 +16,70 @@ struct AdBannerView: View {
 
 private struct AdSpaceView: View {
     let onRemoveAdsTapped: () -> Void
-    
+
     var body: some View {
-        VStack(spacing: AppSpacing.small) {
-            HStack(spacing: AppSpacing.xSmall) {
+        VStack(spacing: 8) {
+            HStack(spacing: 4) {
                 Image(systemName: "sparkles")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(AppTheme.secondaryText.opacity(0.7))
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.secondary.opacity(0.7))
                 Text(L10n.text("ad_label_text"))
-                    .font(.system(.caption2, design: .rounded, weight: .bold))
-                    .foregroundStyle(AppTheme.secondaryText.opacity(0.7))
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.secondary.opacity(0.7))
                 Spacer()
             }
-            .padding(.horizontal, AppSpacing.small)
-            
-            RoundedRectangle(cornerRadius: AppTheme.compactRadius)
-                .fill(AppTheme.elevatedSurface.opacity(0.5))
+            .padding(.horizontal, 12)
+
+            RoundedRectangle(cornerRadius: 8)
+                .fill(.gray.opacity(0.1))
                 .frame(height: 60)
                 .overlay {
                     Text(L10n.text("ad_space_text"))
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppTheme.secondaryText.opacity(0.5))
+                        .font(.caption)
+                        .foregroundStyle(.secondary.opacity(0.5))
                 }
         }
-        .padding(AppSpacing.small)
-        .background(AppTheme.elevatedSurface.opacity(0.5), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius))
+        .padding(12)
+        .background(
+            .gray.opacity(0.05),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
         .overlay(alignment: .topTrailing) {
-            Button(action: onRemoveAdsTapped) {
+            Button(action: {
+                HapticManager.light()
+                onRemoveAdsTapped()
+            }) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.caption)
-                    .foregroundStyle(AppTheme.secondaryText.opacity(0.5))
+                    .foregroundStyle(.secondary.opacity(0.5))
             }
             .buttonStyle(.plain)
-            .padding(AppSpacing.xSmall)
+            .padding(8)
         }
     }
 }
 
 private struct PremiumBannerView: View {
     var body: some View {
-        HStack(spacing: AppSpacing.small) {
+        HStack(spacing: 12) {
             Image(systemName: "crown.fill")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(AppTheme.sunshine)
-            
+                .font(.caption)
+                .fontWeight(.bold)
+                .foregroundStyle(.yellow)
+
             Text(L10n.text("settings_premium_active"))
-                .font(AppTypography.caption)
-                .foregroundStyle(AppTheme.secondaryText)
-            
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
             Spacer()
         }
-        .padding(AppSpacing.small)
-        .background(AppTheme.sunshine.opacity(0.1), in: RoundedRectangle(cornerRadius: AppTheme.compactRadius))
+        .padding(12)
+        .background(
+            .yellow.opacity(0.1),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
     }
 }
 

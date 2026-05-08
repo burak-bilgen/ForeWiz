@@ -19,35 +19,34 @@ struct SettingsCard<Content: View>: View {
     }
 
     var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: AppSpacing.medium) {
-                HStack(alignment: .top, spacing: AppSpacing.small) {
-                    Image(systemName: icon)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: icon)
+                    .font(.headline)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        .blue.opacity(0.15),
+                        in: RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    )
+                    .foregroundStyle(.blue)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
                         .font(.headline)
-                        .frame(width: 32, height: 32)
-                        .background(
-                            AppTheme.softBubbleGradient(tint: AppTheme.accent),
-                            in: RoundedRectangle(
-                                cornerRadius: AppTheme.iconBubbleRadius,
-                                style: .continuous
-                            )
-                        )
-                        .foregroundStyle(AppTheme.accent)
-
-                    VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
-                        Text(title)
-                            .font(AppTypography.headline)
-                            .foregroundStyle(AppTheme.ink)
-                        Text(subtitle)
-                            .font(AppTypography.caption)
-                            .foregroundStyle(AppTheme.secondaryText)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-
-                content
             }
+
+            content
         }
+        .padding(20)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
     }
 }
 
@@ -57,27 +56,28 @@ struct SettingsInfoRow: View {
     let value: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.small) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: icon)
-                .font(.subheadline.weight(.semibold))
+                .font(.subheadline)
+                .fontWeight(.semibold)
                 .frame(width: 28, height: 28)
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(AppTypography.caption.weight(.bold))
-                    .foregroundStyle(AppTheme.ink)
+                    .font(.caption)
+                    .fontWeight(.bold)
                 Text(value)
-                    .font(.system(.caption2, design: .rounded))
-                    .foregroundStyle(AppTheme.secondaryText)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(AppSpacing.small)
+        .padding(12)
         .background(
-            AppTheme.elevatedSurface.opacity(0.86),
-            in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+            Color.gray.opacity(0.1),
+            in: RoundedRectangle(cornerRadius: 8, style: .continuous)
         )
     }
 }
@@ -89,30 +89,30 @@ struct AboutSection: View {
             title: L10n.text("settings_about_title"),
             subtitle: L10n.text("settings_about_subtitle")
         ) {
-            VStack(alignment: .leading, spacing: AppSpacing.small) {
+            VStack(alignment: .leading, spacing: 12) {
                 HStack {
                     Text(L10n.text("settings_version"))
-                        .font(AppTypography.caption.weight(.semibold))
-                        .foregroundStyle(AppTheme.ink)
+                        .font(.caption)
+                        .fontWeight(.semibold)
                     Spacer()
                     Text(appVersion)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 HStack {
                     Text(L10n.text("settings_data_source"))
-                        .font(AppTypography.caption.weight(.semibold))
-                        .foregroundStyle(AppTheme.ink)
+                        .font(.caption)
+                        .fontWeight(.semibold)
                     Spacer()
                     Text(L10n.text("settings_data_apple_weather"))
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 Text(L10n.text("settings_privacy_note"))
-                    .font(.system(.caption2, design: .rounded))
-                    .foregroundStyle(AppTheme.secondaryText)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -129,20 +129,21 @@ struct SectionDivider: View {
     let label: String
 
     var body: some View {
-        HStack(spacing: AppSpacing.small) {
+        HStack(spacing: 12) {
             Rectangle()
-                .fill(AppTheme.secondaryText.opacity(0.18))
+                .fill(.gray.opacity(0.2))
                 .frame(height: 1)
 
             Text(label)
-                .font(.system(.caption2, design: .rounded, weight: .bold))
-                .foregroundStyle(AppTheme.secondaryText)
+                .font(.caption2)
+                .fontWeight(.bold)
+                .foregroundStyle(.secondary)
                 .lineLimit(1)
 
             Rectangle()
-                .fill(AppTheme.secondaryText.opacity(0.18))
+                .fill(.gray.opacity(0.2))
                 .frame(height: 1)
         }
-        .padding(.horizontal, AppSpacing.xSmall)
+        .padding(.horizontal, 12)
     }
 }

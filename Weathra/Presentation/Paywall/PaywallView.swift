@@ -9,44 +9,43 @@ struct PaywallView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                AppBackground()
+                Color(UIColor.systemGroupedBackground)
+                    .ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: AppSpacing.large) {
-                        Spacer().frame(height: AppSpacing.medium)
+                    VStack(spacing: 24) {
+                        Spacer().frame(height: 20)
 
-                        VStack(spacing: AppSpacing.small) {
+                        VStack(spacing: 16) {
                             Image(systemName: "crown.fill")
-                                .font(.system(size: 48, weight: .semibold))
+                                .font(.system(size: 64))
                                 .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(AppTheme.sunshine)
+                                .foregroundStyle(.blue)
 
                             Text(L10n.text("paywall_title"))
-                                .font(AppTypography.title)
-                                .foregroundStyle(AppTheme.ink)
+                                .font(.system(size: 32, weight: .bold))
 
                             Text(L10n.text("paywall_subtitle"))
-                                .font(AppTypography.callout)
-                                .foregroundStyle(AppTheme.secondaryText)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
-                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(.horizontal, AppSpacing.large)
+                        .padding(.horizontal, 20)
 
-                        VStack(spacing: AppSpacing.medium) {
+                        VStack(spacing: 12) {
                             ForEach(PremiumFeature.allCases) { feature in
-                                PremiumBenefitRow(feature: feature)
+                                ModernBenefitRow(feature: feature)
                             }
                         }
-                        .padding(.horizontal, AppSpacing.medium)
+                        .padding(.horizontal, 20)
 
                         if store.isLoading && store.products.isEmpty {
                             ProgressView(L10n.text("paywall_loading"))
                                 .padding()
                         } else {
-                            VStack(spacing: AppSpacing.medium) {
+                            VStack(spacing: 12) {
                                 ForEach(store.products) { product in
-                                    PurchaseButton(product: product) {
+                                    ModernPurchaseButton(product: product) {
                                         Task {
                                             let success = await store.purchase(product)
                                             if success {
@@ -56,32 +55,31 @@ struct PaywallView: View {
                                     }
                                 }
                             }
-                            .padding(.horizontal, AppSpacing.medium)
+                            .padding(.horizontal, 20)
                         }
 
                         if let errorMessage = store.errorMessage {
                             Text(errorMessage)
-                                .font(AppTypography.caption)
-                                .foregroundStyle(AppTheme.danger)
+                                .font(.subheadline)
+                                .foregroundStyle(.red)
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal, AppSpacing.medium)
+                                .padding(.horizontal, 20)
                         }
 
                         Button(action: restore) {
-                            Label(L10n.text("paywall_restore"), systemImage: "arrow.counterclockwise")
-                                .font(AppTypography.caption.weight(.semibold))
+                            Text(L10n.text("paywall_restore"))
+                                .font(.subheadline)
+                                .foregroundStyle(.blue)
                         }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(AppTheme.secondaryText)
-                        .padding(.top, AppSpacing.small)
+                        .padding(.top, 8)
 
                         Text(L10n.text("premium_auto_renew"))
-                            .font(.system(.caption2, design: .rounded))
-                            .foregroundStyle(AppTheme.secondaryText.opacity(0.8))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
-                            .padding(.horizontal, AppSpacing.large)
+                            .padding(.horizontal, 20)
 
-                        Spacer().frame(height: AppSpacing.medium)
+                        Spacer().frame(height: 20)
                     }
                 }
             }
@@ -94,7 +92,7 @@ struct PaywallView: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.title3)
-                            .foregroundStyle(AppTheme.secondaryText)
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
@@ -113,6 +111,7 @@ struct PaywallView: View {
     }
 
     private func restore() {
+        HapticManager.light()
         Task {
             restoreSuccess = await store.restorePurchases()
             showRestoreAlert = true
@@ -120,72 +119,63 @@ struct PaywallView: View {
     }
 }
 
-private struct PremiumBenefitRow: View {
+private struct ModernBenefitRow: View {
     let feature: PremiumFeature
 
     var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.medium) {
-            ZStack {
-                RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous)
-                    .fill(AppTheme.softBubble(AppTheme.accent))
-                Image(systemName: feature.systemImage)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(AppTheme.accent)
-            }
-            .frame(width: 40, height: 40)
+        HStack(spacing: 16) {
+            Image(systemName: feature.systemImage)
+                .font(.title2)
+                .foregroundStyle(.blue)
+                .frame(width: 40)
 
-            VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(feature.localizedTitle)
-                    .font(AppTypography.headline)
-                    .foregroundStyle(AppTheme.ink)
+                    .font(.headline)
                 Text(feature.localizedDescription)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(AppTheme.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
 
-            Spacer(minLength: 0)
+            Spacer()
         }
+        .padding(16)
+        .background(
+            Color(UIColor.secondarySystemGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 12)
+        )
     }
 }
 
-private struct PurchaseButton: View {
+private struct ModernPurchaseButton: View {
     let product: SubscriptionProduct
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(alignment: .center, spacing: AppSpacing.medium) {
-                VStack(alignment: .leading, spacing: 2) {
+        Button(action: {
+            HapticManager.medium()
+            action()
+        }) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(product.displayName)
-                        .font(AppTypography.bodyEmphasized)
+                        .font(.headline)
+                        .foregroundStyle(.white)
                     Text(product.description)
-                        .font(AppTypography.caption)
-                        .foregroundStyle(.white.opacity(0.85))
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.8))
                         .lineLimit(2)
                 }
-                Spacer(minLength: 0)
+                Spacer()
                 Text(product.price)
-                    .font(AppTypography.metricNumber)
+                    .font(.headline)
+                    .foregroundStyle(.white)
                     .monospacedDigit()
             }
-            .foregroundStyle(.white)
-            .padding(AppSpacing.medium)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                LinearGradient(
-                    colors: [AppTheme.accent, AppTheme.accent.opacity(0.86)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: AppTheme.cardRadius, style: .continuous)
-            )
-            .shadow(color: AppTheme.accent.opacity(0.20), radius: 14, y: 8)
+            .padding(20)
+            .frame(maxWidth: .infinity)
+            .background(.blue, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
     }
-}
-
-#Preview {
-    PaywallView(store: StoreKitSubscriptionManager())
 }

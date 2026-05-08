@@ -17,7 +17,7 @@ struct LocationPickerView: View {
                     Button(isEditing ? L10n.text("location_picker_done") : L10n.text("location_picker_edit")) {
                         isEditing.toggle()
                     }
-                    .padding(.leading, AppSpacing.medium)
+                    .padding(.leading, 20)
                 }
                 Spacer()
                 Button {
@@ -25,29 +25,28 @@ struct LocationPickerView: View {
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.title3)
-                        .foregroundStyle(AppTheme.accent)
+                        .foregroundStyle(.blue)
                 }
                 Button(L10n.text("location_picker_close")) {
                     dismiss()
                 }
                 .fontWeight(.semibold)
-                .padding(.trailing, AppSpacing.medium)
+                .padding(.trailing, 20)
             }
-            .padding(.vertical, AppSpacing.small)
+            .padding(.vertical, 12)
             .background(.regularMaterial)
 
             if savedLocations.isEmpty {
                 Spacer()
-                VStack(spacing: AppSpacing.small) {
+                VStack(spacing: 12) {
                     Image(systemName: "mappin.slash")
                         .font(.system(size: 40))
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .foregroundStyle(.secondary)
                     Text(L10n.text("location_picker_empty"))
-                        .font(AppTypography.headline)
-                        .foregroundStyle(AppTheme.ink)
+                        .font(.headline)
                     Text(L10n.text("location_picker_empty_hint"))
-                        .font(AppTypography.caption)
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
             } else {
@@ -71,7 +70,7 @@ struct LocationPickerView: View {
                 .scrollContentBackground(.hidden)
             }
         }
-        .background(AppBackground())
+        .background(Color(UIColor.systemGroupedBackground))
         .sheet(isPresented: $showAddLocation) {
             AddLocationView(savedLocations: $savedLocations)
         }
@@ -99,33 +98,34 @@ private struct LocationRowContent: View {
     let isSelected: Bool
 
     var body: some View {
-        HStack(spacing: AppSpacing.small) {
+        HStack(spacing: 12) {
             Image(systemName: location.id == "current-location" ? "location.fill" : "mappin.and.ellipse")
                 .font(.title3)
                 .frame(width: 32, height: 32)
-                .foregroundStyle(location.id == "current-location" ? AppTheme.accent : AppTheme.ink)
+                .foregroundStyle(location.id == "current-location" ? .blue : .primary)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(location.name)
-                    .font(AppTypography.body.weight(.semibold))
-                    .foregroundStyle(AppTheme.ink)
+                    .font(.body)
+                    .fontWeight(.semibold)
                 if !location.address.isEmpty {
                     Text(location.address)
-                        .font(.system(.caption2, design: .rounded))
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
             }
 
-            Spacer(minLength: AppSpacing.small)
+            Spacer(minLength: 12)
 
             if isSelected {
                 Image(systemName: "checkmark")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(AppTheme.accent)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.blue)
             }
         }
-        .padding(.vertical, AppSpacing.xSmall)
+        .padding(.vertical, 8)
         .contentShape(Rectangle())
     }
 }
@@ -144,7 +144,7 @@ private struct AddLocationView: View {
                 Button(L10n.text("location_picker_cancel")) { dismiss() }
                 Spacer()
                 Text(L10n.text("location_picker_add_title"))
-                    .font(AppTypography.headline)
+                    .font(.headline)
                 Spacer()
                 Button(L10n.text("location_picker_add_button")) { addLocation() }
                     .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -167,13 +167,13 @@ private struct AddLocationView: View {
 
                 Section {
                     Text(L10n.text("location_picker_default_coords_note"))
-                        .font(.system(.caption2, design: .rounded))
+                        .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
             }
             .scrollContentBackground(.hidden)
         }
-        .background(AppBackground())
+        .background(Color(UIColor.systemGroupedBackground))
     }
 
     private func addLocation() {
