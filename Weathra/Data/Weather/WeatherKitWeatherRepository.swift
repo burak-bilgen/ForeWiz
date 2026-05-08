@@ -15,7 +15,7 @@ final class WeatherKitWeatherRepository: WeatherRepository {
         self.dateProvider = dateProvider
     }
 
-func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
+    func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
         do {
             let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
             AppLogger.weather.info(

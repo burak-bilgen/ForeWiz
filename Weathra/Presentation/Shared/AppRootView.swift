@@ -94,18 +94,7 @@ private struct MainTabView: View {
 
             NavigationStack {
                 InsightsView(
-                    recommendation: coordinator.latestRecommendation ?? DailyRecommendation(
-                        generatedAt: Date(),
-                        outdoorDecision: .good,
-                        outdoorScore: WeatherScore(rawValue: 0),
-                        bestOutdoorWindow: nil,
-                        bestActivityWindows: [],
-                        avoidWindows: [],
-                        outfit: OutfitRecommendation(title: "", items: [], accessories: [], warning: nil),
-                        risks: [],
-                        summaryText: "",
-                        explanation: ""
-                    ),
+                    recommendation: coordinator.latestRecommendation ?? PreviewWeatherFactory.dailyRecommendation(),
                     isPremium: coordinator.container.subscriptionManager.isPremium,
                     showPaywall: $showInsightsPaywall
                 )

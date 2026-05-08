@@ -10,7 +10,7 @@ struct SettingsView: View {
         ZStack {
             SettingsBackground().ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 24) {
+                VStack(spacing: 20) {
 
                     if let saveMessage = viewModel.saveMessage {
                         SettingsSaveBanner(message: saveMessage)
@@ -37,6 +37,9 @@ struct SettingsView: View {
                                     title: feature.localizedTitle,
                                     subtitle: feature.localizedDescription
                                 )
+                                if feature != PremiumFeature.allCases.last {
+                                    SettingsDivider()
+                                }
                             }
                             Button {
                                 HapticManager.medium()
@@ -50,7 +53,7 @@ struct SettingsView: View {
                                 }
                                 .foregroundStyle(Color(red: 0.06, green: 0.1, blue: 0.22))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, 15)
                                 .background(
                                     LinearGradient(
                                         colors: [Color(red: 1.0, green: 0.82, blue: 0.3), Color(red: 1.0, green: 0.65, blue: 0.2)],
@@ -59,7 +62,7 @@ struct SettingsView: View {
                                     in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 )
                             }
-                            .padding(.top, 4)
+                            .padding(.top, 8)
                         }
                     }
 
@@ -123,52 +126,44 @@ struct SettingsView: View {
                                     .font(.system(size: 12, weight: .semibold))
                                     .foregroundStyle(Color.white.opacity(0.3))
                             }
+                            .padding(.vertical, 4)
                         }
                     }
 
-                    // MARK: Saved locations
-                    SettingsSection(
-                        title: L10n.text("settings_section_locations"),
-                        icon: "mappin.and.ellipse",
-                        color: Color(red: 1.0, green: 0.45, blue: 0.45)
-                    ) {
-                        SavedLocationsSection(profile: $viewModel.profile)
-                    }
-
-                    // MARK: Personal preferences
+                    // MARK: Units
                     SettingsSection(
                         title: L10n.text("settings_units"),
                         icon: "ruler.fill",
                         color: Color(red: 0.4, green: 0.7, blue: 1.0)
                     ) {
-                        HStack(spacing: 12) {
-                            SettingsIcon(systemName: "thermometer.medium", color: Color(red: 0.4, green: 0.7, blue: 1.0))
-                            Picker(L10n.text("settings_units"), selection: $viewModel.profile.unitSystem) {
-                                ForEach(UnitSystem.allCases, id: \.self) { system in
-                                    Text(system.localizedTitle).tag(system)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                            .colorMultiply(Color.white)
-                        }
+                        SettingsChipPickerRow(
+                            icon: "thermometer.medium",
+                            iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                            title: L10n.text("settings_units"),
+                            selection: $viewModel.profile.unitSystem,
+                            options: UnitSystem.allCases,
+                            label: { $0.localizedTitle }
+                        )
                     }
 
+                    // MARK: Temperature sensitivity
                     SettingsSection(
                         title: L10n.text("settings_temp_sensitivity"),
                         icon: "thermometer.sun.fill",
                         color: Color(red: 1.0, green: 0.55, blue: 0.3)
                     ) {
-                        HStack(spacing: 12) {
-                            SettingsIcon(systemName: "thermometer.sun.fill", color: Color(red: 1.0, green: 0.55, blue: 0.3))
-                            Picker(L10n.text("settings_temp_sensitivity"), selection: $viewModel.profile.temperatureSensitivity) {
-                                ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
-                                    Text(sensitivity.localizedTitle).tag(sensitivity)
-                                }
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(spacing: 12) {
+                                SettingsIcon(systemName: "thermometer.sun.fill", color: Color(red: 1.0, green: 0.55, blue: 0.3))
+                                Text(L10n.text("settings_temp_sensitivity"))
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(.white)
                             }
-                            .pickerStyle(.segmented)
+                            SettingsSensitivitySelector(selection: $viewModel.profile.temperatureSensitivity)
                         }
                     }
 
+                    // MARK: Activities
                     SettingsSection(
                         title: L10n.text("settings_activities"),
                         icon: "figure.run",
@@ -190,12 +185,12 @@ struct SettingsView: View {
                         color: Color(red: 0.8, green: 0.65, blue: 1.0)
                     ) {
                         let items: [(icon: String, title: String, binding: Binding<Bool>)] = [
-                            ("umbrella.fill", L10n.text("wardrobe_umbrella"), $viewModel.profile.wardrobe.hasUmbrella),
-                            ("cloud.heavyrain.fill", L10n.text("wardrobe_raincoat"), $viewModel.profile.wardrobe.hasRaincoat),
-                            ("snowflake", L10n.text("wardrobe_winter_coat"), $viewModel.profile.wardrobe.hasWinterCoat),
-                            ("sunglasses", L10n.text("wardrobe_sunglasses"), $viewModel.profile.wardrobe.hasSunglasses),
-                            ("hand.raised.fill", L10n.text("wardrobe_gloves"), $viewModel.profile.wardrobe.hasGloves),
-                            ("flame.fill", L10n.text("wardrobe_thermals"), $viewModel.profile.wardrobe.hasThermals),
+                            ("umbrella.fill",        L10n.text("wardrobe_umbrella"),     $viewModel.profile.wardrobe.hasUmbrella),
+                            ("cloud.heavyrain.fill", L10n.text("wardrobe_raincoat"),     $viewModel.profile.wardrobe.hasRaincoat),
+                            ("snowflake",            L10n.text("wardrobe_winter_coat"),  $viewModel.profile.wardrobe.hasWinterCoat),
+                            ("sunglasses",           L10n.text("wardrobe_sunglasses"),   $viewModel.profile.wardrobe.hasSunglasses),
+                            ("hand.raised.fill",     L10n.text("wardrobe_gloves"),       $viewModel.profile.wardrobe.hasGloves),
+                            ("flame.fill",           L10n.text("wardrobe_thermals"),     $viewModel.profile.wardrobe.hasThermals),
                         ]
                         ForEach(Array(items.enumerated()), id: \.offset) { index, item in
                             if index > 0 { SettingsDivider() }
@@ -206,7 +201,7 @@ struct SettingsView: View {
                     // MARK: Allergies
                     SettingsSection(
                         title: L10n.text("settings_allergy_title"),
-                        icon: "allergens",
+                        icon: "cross.vial.fill",
                         color: Color(red: 1.0, green: 0.7, blue: 0.3)
                     ) {
                         SettingsToggleRow(
@@ -223,6 +218,7 @@ struct SettingsView: View {
                                     allergyType: allergyType,
                                     isSelected: viewModel.profile.allergyProfile.allergies.contains(allergyType)
                                 ) {
+                                    HapticManager.selection()
                                     if viewModel.profile.allergyProfile.allergies.contains(allergyType) {
                                         viewModel.profile.allergyProfile.allergies.remove(allergyType)
                                     } else {
@@ -267,13 +263,13 @@ struct SettingsView: View {
                         .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.1), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .background(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.2), lineWidth: 1))
                     }
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 32)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 8)
+                .padding(.top, 12)
             }
             .scrollIndicators(.hidden)
         }
@@ -311,6 +307,7 @@ struct SettingsView: View {
     }
 
     private func toggle(_ activity: ActivityType) {
+        HapticManager.selection()
         if viewModel.profile.preferredActivities.contains(activity) {
             viewModel.profile.preferredActivities.remove(activity)
         } else {
@@ -358,10 +355,11 @@ private struct SettingsSaveBanner: View {
             Image(systemName: "checkmark.circle.fill")
                 .foregroundStyle(Color(red: 0.35, green: 0.85, blue: 0.6))
             Text(message)
-                .font(.system(size: 14))
-                .foregroundStyle(Color.white.opacity(0.8))
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(Color.white.opacity(0.9))
         }
-        .padding(14)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.25), lineWidth: 1))
@@ -384,23 +382,25 @@ private struct SettingsSection<Content: View>: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 7) {
                 Image(systemName: icon)
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(color)
                 Text(title)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.5))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.45))
                     .textCase(.uppercase)
-                    .tracking(0.5)
+                    .tracking(0.6)
             }
+            .padding(.leading, 4)
             VStack(spacing: 0) {
                 content
             }
-            .padding(16)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(color.opacity(0.12), lineWidth: 1))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
+            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(color.opacity(0.10), lineWidth: 1))
         }
     }
 }
@@ -412,11 +412,11 @@ private struct SettingsIcon: View {
     let color: Color
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(color.opacity(0.18))
-                .frame(width: 32, height: 32)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(color.opacity(0.16))
+                .frame(width: 34, height: 34)
             Image(systemName: systemName)
-                .font(.system(size: 14, weight: .medium))
+                .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(color)
         }
     }
@@ -424,7 +424,10 @@ private struct SettingsIcon: View {
 
 private struct SettingsDivider: View {
     var body: some View {
-        Rectangle().fill(Color.white.opacity(0.07)).frame(height: 1).padding(.leading, 44)
+        Rectangle()
+            .fill(Color.white.opacity(0.06))
+            .frame(height: 1)
+            .padding(.leading, 50)
     }
 }
 
@@ -435,21 +438,22 @@ private struct SettingsRow: View {
     var subtitle: String? = nil
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             SettingsIcon(systemName: icon, color: iconColor)
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
                 if let subtitle {
                     Text(subtitle)
                         .font(.system(size: 12))
-                        .foregroundStyle(Color.white.opacity(0.4))
+                        .foregroundStyle(Color.white.opacity(0.38))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             Spacer()
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 10)
     }
 }
 
@@ -466,7 +470,7 @@ private struct SettingsAboutRow: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.white.opacity(0.45))
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 10)
     }
 }
 
@@ -476,7 +480,7 @@ private struct SettingsToggleRow: View {
     let title: String
     @Binding var isOn: Bool
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             SettingsIcon(systemName: icon, color: iconColor)
             Text(title)
                 .font(.system(size: 15))
@@ -486,7 +490,7 @@ private struct SettingsToggleRow: View {
                 .tint(iconColor)
                 .labelsHidden()
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 8)
     }
 }
 
@@ -499,7 +503,7 @@ private struct SettingsPickerRow<T: Hashable>: View {
     let label: (T) -> String
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 14) {
             SettingsIcon(systemName: icon, color: iconColor)
             Text(title)
                 .font(.system(size: 15))
@@ -510,9 +514,108 @@ private struct SettingsPickerRow<T: Hashable>: View {
                     Text(label(option)).tag(option)
                 }
             }
-            .tint(Color.white.opacity(0.6))
+            .tint(Color.white.opacity(0.55))
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 6)
+    }
+}
+
+private struct SettingsChipPickerRow<T: Hashable>: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    @Binding var selection: T
+    let options: [T]
+    let label: (T) -> String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 14) {
+                SettingsIcon(systemName: icon, color: iconColor)
+                Text(title)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.white)
+            }
+            HStack(spacing: 8) {
+                ForEach(options, id: \.self) { option in
+                    let selected = option == selection
+                    Button {
+                        HapticManager.selection()
+                        selection = option
+                    } label: {
+                        Text(label(option))
+                            .font(.system(size: 13, weight: selected ? .semibold : .regular))
+                            .foregroundStyle(selected ? iconColor : Color.white.opacity(0.5))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(
+                                selected
+                                    ? iconColor.opacity(0.15)
+                                    : Color.white.opacity(0.07),
+                                in: Capsule()
+                            )
+                            .overlay(
+                                Capsule().stroke(
+                                    selected ? iconColor.opacity(0.4) : Color.white.opacity(0.1),
+                                    lineWidth: 1
+                                )
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
+                }
+            }
+        }
+        .padding(.vertical, 10)
+    }
+}
+
+private struct SettingsSensitivitySelector: View {
+    @Binding var selection: TemperatureSensitivity
+
+    private let options: [(TemperatureSensitivity, String, String)] = [
+        (.getsColdEasily, "snowflake",          "sensitivity_cold"),
+        (.normal,         "thermometer.medium", "sensitivity_normal"),
+        (.getsHotEasily,  "sun.max.fill",       "sensitivity_hot"),
+    ]
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(options, id: \.0) { sensitivity, icon, key in
+                let selected = selection == sensitivity
+                Button {
+                    HapticManager.selection()
+                    selection = sensitivity
+                } label: {
+                    VStack(spacing: 6) {
+                        Image(systemName: icon)
+                            .font(.system(size: 16))
+                            .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
+                        Text(L10n.text(key))
+                            .font(.system(size: 12, weight: selected ? .semibold : .regular))
+                            .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(
+                        selected
+                            ? Color(red: 1.0, green: 0.55, blue: 0.3).opacity(0.14)
+                            : Color.white.opacity(0.05),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(
+                            selected ? Color(red: 1.0, green: 0.55, blue: 0.3).opacity(0.35) : Color.white.opacity(0.08),
+                            lineWidth: 1
+                        )
+                    )
+                }
+                .buttonStyle(.plain)
+                .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
+            }
+        }
     }
 }
 
@@ -523,18 +626,20 @@ private struct SettingsActivityRow: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 SettingsIcon(systemName: iconName, color: Color(red: 0.4, green: 0.85, blue: 0.6))
                 Text(activity.localizedTitle)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
                 Spacer()
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 18))
-                    .foregroundStyle(isSelected ? Color(red: 0.4, green: 0.85, blue: 0.6) : Color.white.opacity(0.25))
+                    .font(.system(size: 20))
+                    .foregroundStyle(isSelected ? Color(red: 0.4, green: 0.85, blue: 0.6) : Color.white.opacity(0.2))
+                    .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isSelected)
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 9)
         }
+        .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
@@ -555,18 +660,20 @@ private struct SettingsAllergyRow: View {
 
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 SettingsIcon(systemName: allergyType.icon, color: Color(red: 1.0, green: 0.7, blue: 0.3))
                 Text(allergyType.localizedTitle)
                     .font(.system(size: 15))
                     .foregroundStyle(.white)
                 Spacer()
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 18))
-                    .foregroundStyle(isSelected ? Color(red: 1.0, green: 0.7, blue: 0.3) : Color.white.opacity(0.25))
+                    .font(.system(size: 20))
+                    .foregroundStyle(isSelected ? Color(red: 1.0, green: 0.7, blue: 0.3) : Color.white.opacity(0.2))
+                    .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isSelected)
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 9)
         }
+        .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

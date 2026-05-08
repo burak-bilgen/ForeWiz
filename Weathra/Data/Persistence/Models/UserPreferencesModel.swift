@@ -101,8 +101,13 @@ final class UserPreferencesModel {
             self.quietHoursEndHour = calendar.component(.hour, from: quietHours.end)
             self.quietHoursEndMinute = calendar.component(.minute, from: quietHours.end)
             self.quietHoursEnabled = true
+        } else {
+            self.quietHoursEnabled = false
         }
-        
+
+        self.preferredLanguageRaw = profile.language.rawValue
+        self.preferredAppearanceRaw = profile.appearance.rawValue
+        self.preferredUnitSystemRaw = profile.unitSystem.rawValue
         self.updatedAt = Date()
     }
 }

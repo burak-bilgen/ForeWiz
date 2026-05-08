@@ -14,7 +14,7 @@ struct InsightsView: View {
                         InsightsHeader()
                         InsightsScoreCard(recommendation: recommendation)
                         InsightsActivityCard(recommendation: recommendation)
-                        InsightsTrendCard()
+                        InsightsDayQualityCard(recommendation: recommendation)
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 16)
@@ -76,22 +76,48 @@ private struct InsightsHeader: View {
 
 // MARK: - Score card
 
-private struct InsightsScoreRow: Identifiable {
-    let id: String
-    let label: String
-    let color: Color
-}
-
 private struct InsightsScoreCard: View {
     let recommendation: DailyRecommendation
 
-    private var rows: [InsightsScoreRow] {
-        [
-            InsightsScoreRow(id: "temp",  label: L10n.text("insights_temperature"),  color: Color(red: 0.4, green: 0.7, blue: 1.0)),
-            InsightsScoreRow(id: "precip",label: L10n.text("insights_precipitation"), color: Color(red: 0.35, green: 0.85, blue: 0.6)),
-            InsightsScoreRow(id: "wind",  label: L10n.text("insights_wind"),          color: Color(red: 0.55, green: 0.85, blue: 1.0)),
-            InsightsScoreRow(id: "uv",    label: L10n.text("insights_uv_index"),      color: Color(red: 1.0, green: 0.7, blue: 0.3)),
+    private struct FactorRow: Identifiable {
+        let id: String
+        let label: String
+        let icon: String
+        let status: String
+        let color: Color
+    }
+
+    private var factors: [FactorRow] {
+        let riskTypes: [(WeatherRiskType, String, String, Color)] = [
+            (.heat,     L10n.text("insights_temperature"),  "thermometer.sun.fill",  Color(red: 1.0, green: 0.55, blue: 0.3)),
+            (.rain,     L10n.text("insights_precipitation"), "cloud.rain.fill",        Color(red: 0.4, green: 0.7,  blue: 1.0)),
+            (.wind,     L10n.text("insights_wind"),          "wind",                   Color(red: 0.55, green: 0.85, blue: 1.0)),
+            (.uv,       L10n.text("insights_uv_index"),      "sun.max.fill",           Color(red: 1.0, green: 0.7,  blue: 0.3)),
+            (.cold,     L10n.text("insights_temperature"),   "snowflake",              Color(red: 0.7,  green: 0.85, blue: 1.0)),
+            (.humidity, L10n.text("insights_wind"),          "humidity.fill",          Color(red: 0.55, green: 0.85, blue: 1.0)),
         ]
+
+        var rows: [FactorRow] = []
+        var seenLabels = Set<String>()
+        for (type, label, icon, color) in riskTypes {
+            guard !seenLabels.contains(label) else { continue }
+            let risk = recommendation.risks.first { $0.type == type }
+            let status: String
+            let finalColor: Color
+            if let risk {
+                switch risk.severity {
+                case .low:     status = L10n.text("insights_comfortable");   finalColor = Color(red: 0.4, green: 0.85, blue: 0.6)
+                case .medium:  status = L10n.text("insights_uncomfortable"); finalColor = Color(red: 1.0, green: 0.7, blue: 0.3)
+                case .high, .extreme: status = risk.title;                   finalColor = Color(red: 1.0, green: 0.45, blue: 0.45)
+                }
+            } else {
+                status = L10n.text("insights_comfortable")
+                finalColor = color
+            }
+            seenLabels.insert(label)
+            rows.append(FactorRow(id: type.rawValue, label: label, icon: icon, status: status, color: finalColor))
+        }
+        return rows
     }
 
     var body: some View {
@@ -107,32 +133,25 @@ private struct InsightsScoreCard: View {
                     .tracking(0.5)
             }
 
-            HStack(alignment: .top, spacing: 24) {
-                VStack(spacing: 4) {
-                    Text(String(format: "%.0f", recommendation.outdoorScore.displayValue))
-                        .font(.system(size: 52, weight: .thin, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.white)
-                    Text(L10n.text("home_score_label"))
-                        .font(.system(size: 10))
-                        .foregroundStyle(Color.white.opacity(0.35))
-                }
+            HStack(alignment: .top, spacing: 20) {
+                ScoreRingView(score: recommendation.outdoorScore, size: 72)
+                    .environment(\.colorScheme, .dark)
 
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(rows) { row in
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(factors) { row in
                         HStack(spacing: 8) {
-                            Circle()
-                                .fill(row.color)
-                                .frame(width: 7, height: 7)
+                            Image(systemName: row.icon)
+                                .font(.system(size: 10))
+                                .foregroundStyle(row.color)
+                                .frame(width: 14)
                             Text(row.label)
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.white.opacity(0.5))
                             Spacer()
-                            Text(recommendation.outdoorScore.rawValue > 60
-                                 ? L10n.text("insights_comfortable")
-                                 : L10n.text("insights_uncomfortable"))
+                            Text(row.status)
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(row.color)
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -211,10 +230,43 @@ private struct InsightsActivityCard: View {
     }
 }
 
-// MARK: - Trend card
+// MARK: - Day quality card
 
-private struct InsightsTrendCard: View {
-    private let barHeights: [CGFloat] = [48, 36, 62, 70, 44, 55, 68]
+private struct InsightsDayQualityCard: View {
+    let recommendation: DailyRecommendation
+
+    private struct HourBlock: Identifiable {
+        let id: Int  // hour 0-23
+        let quality: Quality
+        enum Quality { case good, avoid, neutral }
+    }
+
+    private var hourBlocks: [HourBlock] {
+        let calendar = Calendar.current
+        let avoidHours: Set<Int> = Set(
+            recommendation.avoidWindows.flatMap { avoid -> [Int] in
+                let start = calendar.component(.hour, from: avoid.window.start)
+                let end   = calendar.component(.hour, from: avoid.window.end)
+                if start <= end { return Array(start...end) }
+                return Array(start...23) + Array(0...end)
+            }
+        )
+        let goodHours: Set<Int> = {
+            guard let best = recommendation.bestOutdoorWindow else { return [] }
+            let start = calendar.component(.hour, from: best.start)
+            let end   = calendar.component(.hour, from: best.end)
+            if start <= end { return Set(start...end) }
+            return Set(Array(start...23) + Array(0...end))
+        }()
+
+        return (6...22).map { hour in
+            let quality: HourBlock.Quality
+            if avoidHours.contains(hour)      { quality = .avoid }
+            else if goodHours.contains(hour)  { quality = .good }
+            else                               { quality = .neutral }
+            return HourBlock(id: hour, quality: quality)
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -229,29 +281,59 @@ private struct InsightsTrendCard: View {
                     .tracking(0.5)
             }
 
-            HStack(alignment: .bottom, spacing: 8) {
-                ForEach(Array(barHeights.enumerated()), id: \.offset) { _, height in
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(red: 0.75, green: 0.5, blue: 1.0), Color(red: 0.4, green: 0.7, blue: 1.0)],
-                                startPoint: .top, endPoint: .bottom
-                            )
-                        )
-                        .opacity(0.45)
-                        .frame(height: height)
-                        .frame(maxWidth: .infinity)
+            HStack(alignment: .bottom, spacing: 3) {
+                ForEach(hourBlocks) { block in
+                    VStack(spacing: 4) {
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .fill(barColor(block.quality))
+                            .frame(height: barHeight(block.quality))
+                            .frame(maxWidth: .infinity)
+                        if block.id % 4 == 0 {
+                            Text("\(block.id)h")
+                                .font(.system(size: 8))
+                                .foregroundStyle(Color.white.opacity(0.3))
+                        } else {
+                            Color.clear.frame(height: 10)
+                        }
+                    }
                 }
             }
-            .frame(height: 80)
+            .frame(height: 90)
 
-            Text(L10n.text("insights_trend_description"))
-                .font(.system(size: 12))
-                .foregroundStyle(Color.white.opacity(0.35))
+            HStack(spacing: 16) {
+                legendDot(color: Color(red: 0.4, green: 0.85, blue: 0.6), label: L10n.text("insights_comfortable"))
+                legendDot(color: Color(red: 1.0, green: 0.45, blue: 0.45), label: L10n.text("insights_uncomfortable"))
+                legendDot(color: Color.white.opacity(0.2), label: L10n.text("insights_score_breakdown"))
+            }
         }
         .padding(18)
         .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color(red: 0.75, green: 0.5, blue: 1.0).opacity(0.14), lineWidth: 1))
+    }
+
+    private func barHeight(_ quality: HourBlock.Quality) -> CGFloat {
+        switch quality {
+        case .good:    return 64
+        case .avoid:   return 32
+        case .neutral: return 48
+        }
+    }
+
+    private func barColor(_ quality: HourBlock.Quality) -> Color {
+        switch quality {
+        case .good:    return Color(red: 0.4, green: 0.85, blue: 0.6).opacity(0.7)
+        case .avoid:   return Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.6)
+        case .neutral: return Color.white.opacity(0.18)
+        }
+    }
+
+    private func legendDot(color: Color, label: String) -> some View {
+        HStack(spacing: 5) {
+            Circle().fill(color).frame(width: 6, height: 6)
+            Text(label)
+                .font(.system(size: 10))
+                .foregroundStyle(Color.white.opacity(0.4))
+        }
     }
 }
 

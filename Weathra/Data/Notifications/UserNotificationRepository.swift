@@ -16,7 +16,7 @@ final class UserNotificationRepository: NotificationRepository {
 
     func requestAuthorization() async -> NotificationAuthorizationStatus {
         do {
-            let options: UNAuthorizationOptions = [.alert, .sound, .badge, .criticalAlert]
+            let options: UNAuthorizationOptions = [.alert, .sound, .badge]
             let granted = try await center.requestAuthorization(options: options)
             if granted {
                 return .authorized
@@ -41,13 +41,10 @@ final class UserNotificationRepository: NotificationRepository {
             content.sound = .default
             content.badge = 1
 
-            // Category identifier'e göre category set et
             content.categoryIdentifier = plan.category.rawValue
 
-            // Priority'e göre interruption level set et
-            if plan.priority >= 90 {
-                content.interruptionLevel = .critical
-            } else if plan.priority >= 70 {
+            // Map priority to interruption level
+            if plan.priority >= 70 {
                 content.interruptionLevel = .timeSensitive
             } else {
                 content.interruptionLevel = .passive

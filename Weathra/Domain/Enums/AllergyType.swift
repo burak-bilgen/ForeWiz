@@ -22,7 +22,7 @@ enum AllergyType: String, CaseIterable, Codable, Hashable, Sendable {
     var icon: String {
         switch self {
         case .pollen: "leaf.fill"
-        case .dust: "dust.fill"
+        case .dust: "wind"
         case .mold: "drop.fill"
         case .petDander: "pawprint.fill"
         case .smoke: "smoke.fill"

@@ -67,11 +67,7 @@ final class HomeViewModel: ObservableObject {
     }
 
     private func load(forceRefresh: Bool) async {
-        if case .loaded = state {
-            state = .loading
-        } else {
-            state = .loading
-        }
+        state = .loading
 
         do {
             let targetLocation: LocationCoordinate?

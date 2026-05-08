@@ -51,19 +51,29 @@ struct HomeView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            Text("Weathra")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+        ToolbarItem(placement: .principal) {
+            Button {
+                HapticManager.light()
+                showLocationPicker = true
+            } label: {
+                HStack(spacing: 5) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text(viewModel.selectedLocationName)
+                        .font(.system(size: 15, weight: .semibold))
+                        .lineLimit(1)
+                }
+                .foregroundStyle(Color.white.opacity(0.9))
+            }
         }
         ToolbarItem(placement: .topBarTrailing) {
             Button {
                 HapticManager.light()
                 showLocationPicker = true
             } label: {
-                Image(systemName: "location.fill")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.8))
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(Color.white.opacity(0.7))
             }
         }
     }
@@ -77,7 +87,7 @@ struct HomeView: View {
         case .failed(let message):
             HomeErrorView(
                 message: message,
-                retry: viewModel.onAppear
+                retry: { Task { await viewModel.refresh() } }
             )
             .transition(.opacity)
         case .loaded(let state):
@@ -245,7 +255,7 @@ private struct HomeLoadedContent: View {
                 .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.20), value: appeared)
 
                 if !isPremium {
-                    HomeAdBanner(onUpgradeTap: onUpgradeTap)
+                    AdBannerView(isPremium: false, onRemoveAdsTapped: onUpgradeTap)
                         .offset(y: appeared ? 0 : 20)
                         .opacity(appeared ? 1 : 0)
                         .animation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.23), value: appeared)
@@ -544,33 +554,6 @@ private struct HomeForecastRow: View {
     }
 }
 
-// MARK: - Ad banner
-
-private struct HomeAdBanner: View {
-    let onUpgradeTap: () -> Void
-
-    var body: some View {
-        Button(action: onUpgradeTap) {
-            HStack(spacing: 12) {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color(red: 1.0, green: 0.8, blue: 0.3))
-                Text(L10n.text("ad_label_text"))
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.white.opacity(0.4))
-                Spacer()
-                Text(L10n.text("premium_upgrade"))
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color(red: 1.0, green: 0.8, blue: 0.3))
-            }
-            .padding(14)
-            .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color.white.opacity(0.07), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 // MARK: - Activity card
 
 private struct HomeActivityCard: View {
@@ -766,10 +749,10 @@ private struct HomeRiskRow: View {
 
     private var severityColor: Color {
         switch risk.severity {
-        case .low: return Color(red: 0.35, green: 0.85, blue: 0.6)
-        case .medium: return Color(red: 1.0, green: 0.7, blue: 0.3)
-        case .high: return Color(red: 1.0, green: 0.45, blue: 0.45)
-        case .extreme: return Color(red: 0.75, green: 0.35, blue: 1.0)
+        case .low:     return AppTheme.success
+        case .medium:  return AppTheme.warning
+        case .high:    return AppTheme.danger
+        case .extreme: return AppTheme.purple
         }
     }
 

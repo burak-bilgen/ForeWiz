@@ -101,24 +101,18 @@ final class StoreKitSubscriptionManager: ObservableObject {
 
     func refreshStatus() async {
         logger.info("Refreshing subscription status...")
-        do {
-            let entitlements = try await Product.products(for: productIDs)
-            for product in entitlements {
-                guard let status = try await product.subscription?.status.first else { continue }
-                if status.state == .subscribed || status.state == .inGracePeriod {
-                    tier = .premium
-                    saveCachedTier(.premium)
-                    logger.info("Subscription is active (premium)")
-                    return
-                }
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result else { continue }
+            if productIDs.contains(transaction.productID) && transaction.revocationDate == nil {
+                tier = .premium
+                saveCachedTier(.premium)
+                logger.info("Active entitlement found for \(transaction.productID) — premium")
+                return
             }
-            tier = .free
-            saveCachedTier(.free)
-            logger.info("Subscription is not active (free)")
-        } catch {
-            tier = .free
-            logger.error("Failed to refresh status, defaulting to free: \(error.localizedDescription)")
         }
+        tier = .free
+        saveCachedTier(.free)
+        logger.info("No active entitlements found — free")
     }
 
     private func loadCachedTier() -> SubscriptionTier {

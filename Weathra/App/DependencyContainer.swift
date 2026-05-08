@@ -20,7 +20,6 @@ final class DependencyContainer {
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
     let subscriptionManager: StoreKitSubscriptionManager
-    let adManager: GoogleAdManager
 
     init(
         environment: AppEnvironment,
@@ -39,8 +38,7 @@ final class DependencyContainer {
         completeOnboardingUseCase: CompleteOnboardingUseCase,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
         scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
-        subscriptionManager: StoreKitSubscriptionManager,
-        adManager: GoogleAdManager
+        subscriptionManager: StoreKitSubscriptionManager
     ) {
         self.environment = environment
         self.dateProvider = dateProvider
@@ -59,7 +57,6 @@ final class DependencyContainer {
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
         self.subscriptionManager = subscriptionManager
-        self.adManager = adManager
     }
 
     static func live(modelContext: ModelContext) -> DependencyContainer {
@@ -114,8 +111,7 @@ final class DependencyContainer {
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
             scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
-            subscriptionManager: subscriptionManager,
-            adManager: GoogleAdManager.shared
+            subscriptionManager: subscriptionManager
         )
     }
 }

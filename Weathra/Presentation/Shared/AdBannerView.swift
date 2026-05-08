@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct AdBannerView: View {
-    let adUnitID: String?
     let isPremium: Bool
     let onRemoveAdsTapped: () -> Void
 
@@ -93,7 +92,7 @@ private struct PremiumBannerView: View {
 #Preview("Free User") {
     ZStack {
         Color(red: 0.04, green: 0.08, blue: 0.18).ignoresSafeArea()
-        AdBannerView(adUnitID: nil, isPremium: false, onRemoveAdsTapped: {})
+        AdBannerView(isPremium: false, onRemoveAdsTapped: {})
             .padding()
     }
 }
@@ -101,7 +100,7 @@ private struct PremiumBannerView: View {
 #Preview("Premium User") {
     ZStack {
         Color(red: 0.04, green: 0.08, blue: 0.18).ignoresSafeArea()
-        AdBannerView(adUnitID: nil, isPremium: true, onRemoveAdsTapped: {})
+        AdBannerView(isPremium: true, onRemoveAdsTapped: {})
             .padding()
     }
 }

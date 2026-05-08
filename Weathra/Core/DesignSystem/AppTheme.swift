@@ -183,50 +183,6 @@ private extension Color {
     }
 }
 
-// MARK: - Backwards-compatible aliases (will be removed after redesign sweep)
-
-extension AppTheme {
-    static func backgroundGradient(for colorScheme: ColorScheme) -> LinearGradient {
-        ambientBackground(for: colorScheme)
-    }
-
-    static func weatherGradient(for colorScheme: ColorScheme) -> LinearGradient {
-        heroGradient(for: .moderate, colorScheme: colorScheme)
-    }
-
-    static func softBubbleGradient(tint: Color) -> LinearGradient {
-        softBubble(tint)
-    }
-
-    static func glassFill(for colorScheme: ColorScheme) -> Color {
-        switch colorScheme {
-        case .dark: Color.white.opacity(0.06)
-        default:    Color.white.opacity(0.55)
-        }
-    }
-
-    static func glassStroke(for colorScheme: ColorScheme) -> Color {
-        switch colorScheme {
-        case .dark: Color.white.opacity(0.14)
-        default:    Color.primary.opacity(0.06)
-        }
-    }
-
-    static func glassAccentShadow(for colorScheme: ColorScheme, isEnabled: Bool) -> Color {
-        guard isEnabled else { return .clear }
-        return colorScheme == .dark ? accent.opacity(0.16) : accent.opacity(0.08)
-    }
-
-    static func glassDepthShadow(for colorScheme: ColorScheme, isEnabled: Bool) -> Color {
-        guard isEnabled else { return .clear }
-        return colorScheme == .dark ? .black.opacity(0.18) : .black.opacity(0.04)
-    }
-
-    static var springAnimation: Animation { springSmooth }
-    static var smoothAnimation: Animation { smooth }
-    static var quickAnimation: Animation { quick }
-}
-
 // MARK: - App background
 
 /// Calm ambient background. No animated symbols (those felt dated).
