@@ -21,7 +21,7 @@ struct OnboardingView: View {
 
             VStack(spacing: 0) {
                 OnboardingProgressBar(current: currentStep, total: totalSteps)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                     .padding(.top, 16)
                     .padding(.bottom, 8)
 
@@ -29,17 +29,14 @@ struct OnboardingView: View {
                     stepContent
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
+                        .transition(.opacity.combined(with: .scale(scale: 0.98)))
                         .id(currentStep)
                         .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
                 }
                 .scrollIndicators(.hidden)
 
                 bottomButton
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                     .padding(.top, 8)
                     .padding(.bottom, 20)
             }
@@ -262,7 +259,7 @@ private struct HeroStep: View {
             .opacity(titleOpacity)
             .offset(y: titleOffset)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .onAppear {
             withAnimation(.spring(response: 0.65, dampingFraction: 0.68).delay(0.1)) {
                 iconScale = 1.0
@@ -310,7 +307,7 @@ private struct FeaturesStep: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.bottom, 28)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
 
             VStack(spacing: 14) {
                 ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
@@ -323,7 +320,7 @@ private struct FeaturesStep: View {
                     )
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
         }
     }
 }
@@ -397,7 +394,7 @@ private struct PermissionsStep: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.bottom, 28)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
 
             VStack(spacing: 14) {
                 PermissionCard(
@@ -428,7 +425,7 @@ private struct PermissionsStep: View {
                     }
                 )
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
 
             if let error = viewModel.errorMessage {
                 HStack(spacing: 8) {
@@ -439,7 +436,7 @@ private struct PermissionsStep: View {
                 }
                 .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .padding(.top, 16)
             }
         }

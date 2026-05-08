@@ -26,7 +26,7 @@ struct PaywallView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 16)
                 .padding(.top, 20)
 
                 ScrollView {
@@ -81,7 +81,7 @@ struct PaywallView: View {
                         }
                         .padding(.bottom, 24)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
                 }
                 .scrollIndicators(.hidden)
                 .safeAreaPadding(.bottom, 12)
@@ -294,7 +294,7 @@ private struct PaywallPurchaseButton: View {
                     productPrice
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.vertical, 18)
             .frame(maxWidth: .infinity)
             .background(

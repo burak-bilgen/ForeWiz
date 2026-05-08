@@ -13,41 +13,46 @@ struct AnimatedOrbBackground: View {
     @State private var phase: Double = 0
 
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [baseColor1, baseColor2],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
+        GeometryReader { geometry in
+            let width = max(geometry.size.width, 1)
+            let height = max(geometry.size.height, 1)
+            let base = min(width, height)
 
-            // Orb 1 — large, slow
-            Ellipse()
-                .fill(primary.opacity(0.20))
-                .frame(width: 440, height: 360)
-                .blur(radius: 85)
-                .offset(
-                    x: -80 + CGFloat(sin(phase * 0.7)) * 18,
-                    y: -190 + CGFloat(cos(phase * 0.5)) * 14
+            ZStack {
+                LinearGradient(
+                    colors: [baseColor1, baseColor2],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
                 )
 
-            // Orb 2 — medium, medium speed
-            Circle()
-                .fill(secondary.opacity(0.12))
-                .frame(width: 300)
-                .blur(radius: 70)
-                .offset(
-                    x: 140 + CGFloat(cos(phase * 0.9)) * 20,
-                    y: 250 + CGFloat(sin(phase * 0.6)) * 16
-                )
+                Ellipse()
+                    .fill(primary.opacity(0.20))
+                    .frame(width: base * 0.95, height: base * 0.78)
+                    .blur(radius: base * 0.16)
+                    .position(
+                        x: width * 0.20 + CGFloat(sin(phase * 0.7)) * 18,
+                        y: height * 0.05 + CGFloat(cos(phase * 0.5)) * 14
+                    )
 
-            // Orb 3 — small, fast
-            Circle()
-                .fill(tertiary.opacity(0.10))
-                .frame(width: 200)
-                .blur(radius: 55)
-                .offset(
-                    x: CGFloat(sin(phase * 1.2)) * 30 + 60,
-                    y: CGFloat(cos(phase * 0.8)) * 24 - 60
-                )
+                Circle()
+                    .fill(secondary.opacity(0.12))
+                    .frame(width: base * 0.62, height: base * 0.62)
+                    .blur(radius: base * 0.13)
+                    .position(
+                        x: width * 0.85 + CGFloat(cos(phase * 0.9)) * 20,
+                        y: height * 0.82 + CGFloat(sin(phase * 0.6)) * 16
+                    )
+
+                Circle()
+                    .fill(tertiary.opacity(0.10))
+                    .frame(width: base * 0.44, height: base * 0.44)
+                    .blur(radius: base * 0.10)
+                    .position(
+                        x: width * 0.58 + CGFloat(sin(phase * 1.2)) * 24,
+                        y: height * 0.34 + CGFloat(cos(phase * 0.8)) * 20
+                    )
+            }
+            .frame(width: width, height: height)
+            .clipped()
         }
         .onAppear {
             withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {

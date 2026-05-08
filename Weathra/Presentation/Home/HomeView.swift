@@ -148,7 +148,7 @@ private struct HomeLoadingView: View {
                 SkeletonCard(height: 100)
                     .staggerEntrance(index: 4, appeared: appeared)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             .padding(.vertical, 16)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -246,14 +246,14 @@ private struct HomeErrorView: View {
                         .font(.system(size: 15, weight: .semibold))
                 }
                 .foregroundStyle(.white)
-                .padding(.horizontal, 32)
+                .padding(.horizontal, 20)
                 .padding(.vertical, 14)
                 .background(Color.white.opacity(0.12), in: Capsule())
                 .overlay(Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1))
             }
             .buttonStyle(.plain)
         }
-        .padding(44)
+        .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

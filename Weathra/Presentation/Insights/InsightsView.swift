@@ -426,7 +426,7 @@ private struct InsightsLockedView: View {
                             .minimumScaleFactor(0.80)
                     }
                     .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, 20)
                     .padding(.vertical, 16)
                     .background(
                         Capsule()
@@ -440,7 +440,7 @@ private struct InsightsLockedView: View {
                 .offset(y: appeared ? 0 : 12)
             }
             .frame(maxWidth: .infinity)
-            .padding(.horizontal, 24)
+            .padding(.horizontal, 16)
             .padding(.vertical, 48)
         }
         .scrollIndicators(.hidden)

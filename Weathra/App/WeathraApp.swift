@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import os
 
 @main
 struct WeathraApp: App {
@@ -8,24 +9,41 @@ struct WeathraApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
+        modelContainer = Self.makeModelContainer()
+        BackgroundRefreshManager.shared.registerTasks()
+    }
+
+    private static func makeModelContainer() -> ModelContainer {
+        let schema = Schema([
+            UserPreferencesModel.self,
+            WeatherSnapshotModel.self
+        ])
+
         do {
-            let schema = Schema([
-                UserPreferencesModel.self,
-                WeatherSnapshotModel.self
-            ])
             let config = ModelConfiguration(
                 schema: schema,
                 isStoredInMemoryOnly: false
             )
-            modelContainer = try ModelContainer(
+            return try ModelContainer(
                 for: schema,
                 configurations: [config]
             )
         } catch {
-            fatalError("Failed to create ModelContainer: \(error)")
+            AppLogger.persistence.error("Persistent ModelContainer failed: \(error.localizedDescription)")
         }
 
-        BackgroundRefreshManager.shared.registerTasks()
+        do {
+            let fallbackConfig = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true
+            )
+            return try ModelContainer(
+                for: schema,
+                configurations: [fallbackConfig]
+            )
+        } catch {
+            fatalError("Failed to create fallback ModelContainer: \(error)")
+        }
     }
 
     var body: some Scene {

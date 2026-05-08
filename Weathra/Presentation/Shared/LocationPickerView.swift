@@ -53,7 +53,7 @@ struct LocationPickerView: View {
                                 )
                             }
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                         .padding(.top, 12)
                         .padding(.bottom, 24)
                     }
@@ -85,15 +85,24 @@ struct LocationPickerView: View {
 
 private struct LocationPickerBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            Circle()
-                .fill(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.07))
-                .frame(width: 250).blur(radius: 55)
-                .offset(x: 80, y: -180)
+        GeometryReader { geometry in
+            let width = max(geometry.size.width, 1)
+            let height = max(geometry.size.height, 1)
+            let orbSize = min(width, height) * 0.58
+
+            ZStack {
+                LinearGradient(
+                    colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+                Circle()
+                    .fill(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.07))
+                    .frame(width: orbSize, height: orbSize)
+                    .blur(radius: orbSize * 0.22)
+                    .position(x: width * 0.78, y: height * 0.08)
+            }
+            .frame(width: width, height: height)
+            .clipped()
         }
     }
 }
@@ -142,7 +151,7 @@ private struct LocationPickerNavBar: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .padding(.vertical, 14)
         .background(.ultraThinMaterial)
         .overlay(Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1), alignment: .bottom)
@@ -274,7 +283,7 @@ private struct AddLocationView: View {
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 16)
                 .overlay(Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1), alignment: .bottom)
 

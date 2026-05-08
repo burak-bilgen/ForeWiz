@@ -29,7 +29,7 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
     var systemImage: String {
         switch self {
         case .removeAds: "xmark.square.fill"
-        case .fourteenDayForecast: "calendar.badge.explosionmark"
+        case .fourteenDayForecast: "calendar.badge.plus"
         case .advancedAnalytics: "chart.line.uptrend.xyaxis"
         case .appleWatchCompanion: "applewatch.watchface"
         }

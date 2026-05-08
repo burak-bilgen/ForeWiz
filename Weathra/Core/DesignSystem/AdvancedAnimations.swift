@@ -245,6 +245,7 @@ struct ShimmerEffect: ViewModifier {
                     .offset(x: phase)
                     .blendMode(.screen)
                 }
+                .clipped()
                 .mask(content)
             )
             .onAppear {

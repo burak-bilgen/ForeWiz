@@ -4,18 +4,33 @@ import OSLog
 import UserMessagingPlatform
 
 enum AdMobConfiguration {
+    private static let debugApplicationID = "ca-app-pub-3940256099942544~1458002511"
     private static let debugBannerAdUnitID = "ca-app-pub-3940256099942544/2435281174"
 
-    static var bannerAdUnitID: String? {
+    static var applicationID: String? {
+        let configured = Bundle.main.object(forInfoDictionaryKey: "GADApplicationIdentifier") as? String
+        let trimmed = configured?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
         #if DEBUG
-        return debugBannerAdUnitID
+        return trimmed.isEmpty ? debugApplicationID : trimmed
         #else
-        guard let id = Bundle.main.object(forInfoDictionaryKey: "GADBannerAdUnitID") as? String,
-              id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
-            return nil
-        }
-        return id
+        return trimmed.isEmpty ? nil : trimmed
         #endif
+    }
+
+    static var bannerAdUnitID: String? {
+        let configured = Bundle.main.object(forInfoDictionaryKey: "GADBannerAdUnitID") as? String
+        let trimmed = configured?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        #if DEBUG
+        return trimmed.isEmpty ? debugBannerAdUnitID : trimmed
+        #else
+        return trimmed.isEmpty ? nil : trimmed
+        #endif
+    }
+
+    static var canLoadAds: Bool {
+        applicationID != nil && bannerAdUnitID != nil
     }
 }
 
@@ -24,6 +39,11 @@ enum AdsManager {
     private static var didStartMobileAds = false
 
     static func configure() {
+        guard AdMobConfiguration.canLoadAds else {
+            AppLogger.subscription.info("AdMob IDs are not configured; skipping ads startup")
+            return
+        }
+
         let parameters = RequestParameters()
         parameters.isTaggedForUnderAgeOfConsent = false
 
