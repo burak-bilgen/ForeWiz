@@ -123,39 +123,76 @@ private struct HomeBackground: View {
 // MARK: - Loading
 
 private struct HomeLoadingView: View {
-    @State private var rotation: Double = 0
-    @State private var pulse = false
+    @State private var appeared = false
 
     var body: some View {
-        VStack(spacing: 24) {
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.07), lineWidth: 3)
-                    .frame(width: 72, height: 72)
-                Circle()
-                    .trim(from: 0, to: 0.75)
-                    .stroke(
-                        LinearGradient(colors: [Color(red: 0.4, green: 0.7, blue: 1.0), Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0)], startPoint: .leading, endPoint: .trailing),
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
-                    )
-                    .frame(width: 72, height: 72)
-                    .rotationEffect(.degrees(rotation))
-                    .onAppear {
-                        withAnimation(.linear(duration: 1.1).repeatForever(autoreverses: false)) { rotation = 360 }
-                    }
-                Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 26))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
-                    .scaleEffect(pulse ? 1.08 : 0.96)
-                    .animation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true), value: pulse)
-                    .onAppear { pulse = true }
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
+                // Hero skeleton
+                SkeletonCard(height: 220)
+                    .staggerEntrance(index: 0, appeared: appeared)
+
+                // Hourly scroll skeleton
+                SkeletonCard(height: 110)
+                    .staggerEntrance(index: 1, appeared: appeared)
+
+                // Forecast skeleton
+                SkeletonCard(height: 180)
+                    .staggerEntrance(index: 2, appeared: appeared)
+
+                // Activity skeleton
+                SkeletonCard(height: 130)
+                    .staggerEntrance(index: 3, appeared: appeared)
+
+                // Outfit skeleton
+                SkeletonCard(height: 100)
+                    .staggerEntrance(index: 4, appeared: appeared)
             }
-            Text(L10n.text("home_loading"))
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.38))
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear { withAnimation { appeared = true } }
+    }
+}
+
+private struct SkeletonCard: View {
+    var height: CGFloat
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 22, style: .continuous)
+            .fill(Color.white.opacity(0.07))
+            .frame(maxWidth: .infinity)
+            .frame(height: height)
+            .overlay(
+                VStack(alignment: .leading, spacing: 12) {
+                    SkeletonLine(width: 0.4, height: 12)
+                    SkeletonLine(width: 0.7, height: 20)
+                    SkeletonLine(width: 0.55, height: 12)
+                    Spacer()
+                    SkeletonLine(width: 0.9, height: 10)
+                }
+                .padding(20)
+            )
+            .skeleton()
+            .overlay(
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
+            )
+    }
+}
+
+private struct SkeletonLine: View {
+    var width: CGFloat  // 0...1 fraction
+    var height: CGFloat = 12
+
+    var body: some View {
+        GeometryReader { geo in
+            RoundedRectangle(cornerRadius: height / 2, style: .continuous)
+                .fill(Color.white.opacity(0.10))
+                .frame(width: geo.size.width * width, height: height)
+        }
+        .frame(height: height)
     }
 }
 

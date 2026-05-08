@@ -74,7 +74,7 @@ struct OnboardingView: View {
         } label: {
             ZStack {
                 if isCompleting {
-                    ProgressView().tint(.white)
+                    PulsingDotsLoader(color: .white)
                 } else {
                     HStack(spacing: 8) {
                         Text(buttonLabel)

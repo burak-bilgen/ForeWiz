@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 // MARK: - Animated floating orb background
@@ -162,6 +163,70 @@ struct PulseGlowModifier: ViewModifier {
 extension View {
     func pulseGlow(color: Color, radius: CGFloat = 14) -> some View {
         modifier(PulseGlowModifier(color: color, radius: radius))
+    }
+}
+
+// MARK: - Pulsing dots loader
+
+struct PulsingDotsLoader: View {
+    var color: Color = .white
+    var dotSize: CGFloat = 7
+    @State private var phase: Int = 0
+
+    private let timer = Timer.publish(every: 0.35, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        HStack(spacing: 7) {
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .fill(color.opacity(phase == i ? 1.0 : 0.28))
+                    .frame(width: dotSize, height: dotSize)
+                    .scaleEffect(phase == i ? 1.4 : 1.0)
+                    .animation(.spring(response: 0.28, dampingFraction: 0.55), value: phase)
+            }
+        }
+        .onReceive(timer) { _ in
+            phase = (phase + 1) % 3
+        }
+    }
+}
+
+// MARK: - Skeleton shimmer modifier
+
+struct SkeletonModifier: ViewModifier {
+    @State private var phase: CGFloat = -1.0
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                GeometryReader { geo in
+                    LinearGradient(
+                        stops: [
+                            .init(color: Color.white.opacity(0), location: 0),
+                            .init(color: Color.white.opacity(0.09), location: 0.45),
+                            .init(color: Color.white.opacity(0.18), location: 0.50),
+                            .init(color: Color.white.opacity(0.09), location: 0.55),
+                            .init(color: Color.white.opacity(0), location: 1),
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: geo.size.width * 2)
+                    .offset(x: phase * (geo.size.width * 2))
+                }
+                .clipped()
+            )
+            .onAppear {
+                withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+                    phase = 1.0
+                }
+            }
+    }
+}
+
+extension View {
+    func skeleton() -> some View {
+        modifier(SkeletonModifier())
     }
 }
 

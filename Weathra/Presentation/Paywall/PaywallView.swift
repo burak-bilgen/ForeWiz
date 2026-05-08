@@ -37,13 +37,13 @@ struct PaywallView: View {
                         PaywallFeatureList()
 
                         if store.isLoading && store.products.isEmpty {
-                            HStack(spacing: 12) {
-                                ProgressView().tint(.white)
+                            VStack(spacing: 12) {
+                                PulsingDotsLoader(color: Color(red: 1.0, green: 0.82, blue: 0.30))
                                 Text(L10n.text("paywall_loading"))
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(Color.white.opacity(0.5))
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundStyle(Color.white.opacity(0.45))
                             }
-                            .padding(.vertical, 20)
+                            .padding(.vertical, 24)
                         } else {
                             VStack(spacing: 10) {
                                 ForEach(store.products) { product in
