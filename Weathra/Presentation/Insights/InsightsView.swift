@@ -396,11 +396,11 @@ private struct InsightsLockedView: View {
                 .padding(.horizontal, 32)
                 .padding(.vertical, 16)
                 .background(
-                    LinearGradient(colors: [gold, Color(red: 1.0, green: 0.65, blue: 0.2)], startPoint: .leading, endPoint: .trailing),
-                    in: Capsule()
+                    Capsule()
+                        .fill(LinearGradient(colors: [gold, Color(red: 1.0, green: 0.65, blue: 0.2)], startPoint: .leading, endPoint: .trailing))
                 )
                 .shadow(color: gold.opacity(0.45), radius: 14, x: 0, y: 6)
-                .shimmer()
+                .shimmerEffect()
             }
             .buttonStyle(PressScaleButtonStyle(scale: 0.96))
             .opacity(appeared ? 1 : 0)

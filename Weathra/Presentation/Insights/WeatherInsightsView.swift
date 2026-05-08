@@ -312,11 +312,11 @@ struct WeatherInsightsView: View {
             score -= Int(precip * 30)
         }
 
-        if point.windSpeedKph > 30 {
+        if let windSpeed = point.windSpeedKph, windSpeed > 30 {
             score -= 20
         }
 
-        if point.uvIndex > 8 {
+        if let uv = point.uvIndex, uv > 8 {
             score -= 15
         }
 

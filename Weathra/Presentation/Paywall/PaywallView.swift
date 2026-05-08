@@ -256,11 +256,11 @@ private struct PaywallPurchaseButton: View {
             .padding(.vertical, 18)
             .frame(maxWidth: .infinity)
             .background(
-                LinearGradient(colors: [gold, amber], startPoint: .topLeading, endPoint: .bottomTrailing),
-                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(LinearGradient(colors: [gold, amber], startPoint: .topLeading, endPoint: .bottomTrailing))
             )
             .shadow(color: amber.opacity(0.45), radius: 16, x: 0, y: 8)
-            .shimmer()
+            .shimmerEffect()
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
     }

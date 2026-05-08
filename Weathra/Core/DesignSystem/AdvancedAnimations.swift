@@ -522,7 +522,7 @@ extension View {
         modifier(BreathingEffect(minScale: minScale, maxScale: maxScale, duration: duration))
     }
 
-    func shimmer(duration: Double = 1.5) -> some View {
+    func shimmerEffect(duration: Double = 1.5) -> some View {
         modifier(ShimmerEffect(duration: duration))
     }
 
