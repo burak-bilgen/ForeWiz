@@ -76,6 +76,7 @@ struct HomeView: View {
                 insertion: .opacity.combined(with: .move(edge: .trailing)),
                 removal: .opacity.combined(with: .move(edge: .leading))
             ))
+            .animation(.easeInOut(duration: 0.3), value: state)
         }
     }
 }
@@ -112,29 +113,38 @@ private struct HomeLoadedContent: View {
                     recommendation: state.recommendation,
                     isUsingCached: state.isUsingCachedWeather
                 )
+                .transition(.scale.combined(with: .opacity))
 
                 if let warning = state.warningMessage {
                     ModernWarningBanner(message: warning)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
                 ModernInsightGrid(recommendation: state.recommendation)
+                    .transition(.scale.combined(with: .opacity))
 
                 ModernForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium, onUpgradeTap: onUpgradeTap)
+                    .transition(.scale.combined(with: .opacity))
 
                 if !isPremium {
                     AdBannerView(adUnitID: nil, isPremium: isPremium, onRemoveAdsTapped: onUpgradeTap)
+                        .transition(.opacity)
                 }
 
                 if !state.recommendation.bestActivityWindows.isEmpty {
                     ModernActivitySection(recommendations: state.recommendation.bestActivityWindows)
+                        .transition(.scale.combined(with: .opacity))
                 }
 
                 ModernHourlyForecastCard(hourlyScores: hourlyScores(for: state.recommendation))
+                    .transition(.scale.combined(with: .opacity))
 
                 ModernOutfitCard(outfit: state.recommendation.outfit)
+                    .transition(.scale.combined(with: .opacity))
 
                 if !state.recommendation.risks.isEmpty {
                     ModernRiskSection(risks: state.recommendation.risks)
+                        .transition(.scale.combined(with: .opacity))
                 }
             }
             .padding(20)
@@ -152,16 +162,28 @@ private struct ModernWarningBanner: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(.orange)
+                .foregroundStyle(.orange.gradient)
                 .font(.title3)
+                .symbolRenderingMode(.hierarchical)
             Text(message)
-                .font(.subheadline)
+                .font(.body)
                 .foregroundStyle(.primary)
         }
         .padding(16)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 12)
+            LinearGradient(
+                colors: [
+                    Color.orange.opacity(0.1),
+                    Color.orange.opacity(0.05)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            ),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.orange.opacity(0.2), lineWidth: 1)
         )
     }
 }
@@ -196,22 +218,35 @@ private struct ModernInsightCard: View {
     let value: String
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(.blue)
+                .font(.system(size: 28))
+                .foregroundStyle(.blue.gradient)
+                .symbolRenderingMode(.hierarchical)
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .textCase(.uppercase)
             Text(value)
-                .font(.subheadline)
+                .font(.title3)
                 .fontWeight(.medium)
         }
         .frame(maxWidth: .infinity)
-        .padding(16)
+        .padding(20)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 12)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.08),
+                    Color.blue.opacity(0.02)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.blue.opacity(0.15), lineWidth: 1)
         )
     }
 }
@@ -224,14 +259,15 @@ private struct ModernWeatherHero: View {
     let isUsingCached: Bool
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(weather.temperatureText)
-                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .font(.system(size: 64, weight: .light, design: .rounded))
                         .monospacedDigit()
+                        .foregroundStyle(.primary)
                     Text(weather.conditionText)
-                        .font(.title3)
+                        .font(.title2)
                         .foregroundStyle(.secondary)
                     Text(weather.feelsLikeText)
                         .font(.subheadline)
@@ -239,19 +275,21 @@ private struct ModernWeatherHero: View {
                 }
                 Spacer()
                 Image(systemName: weather.symbolName)
-                    .font(.system(size: 72))
+                    .font(.system(size: 80))
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(.blue.gradient)
             }
 
             Divider()
+                .opacity(0.3)
 
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(recommendation.outdoorDecision.localizedTitle)
-                        .font(.headline)
+                        .font(.title3)
+                        .fontWeight(.semibold)
                     Text(recommendation.summaryText)
-                        .font(.subheadline)
+                        .font(.body)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                     if let bestWindow = recommendation.bestOutdoorWindow {
@@ -262,9 +300,10 @@ private struct ModernWeatherHero: View {
                 }
                 Spacer()
                 VStack(spacing: 4) {
-                    Text(String(format: "%.1f", recommendation.outdoorScore.displayValue))
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                    Text(String(format: "%.0f", recommendation.outdoorScore.displayValue))
+                        .font(.system(size: 36, weight: .light, design: .rounded))
                         .monospacedDigit()
+                        .foregroundStyle(.primary)
                     Text("Skor")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -273,8 +312,20 @@ private struct ModernWeatherHero: View {
         }
         .padding(24)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 16)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.1),
+                    Color.blue.opacity(0.05),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.blue.opacity(0.2), lineWidth: 1)
         )
     }
 }
@@ -287,11 +338,12 @@ private struct ModernForecastCard: View {
     let onUpgradeTap: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Hava Tahmini")
-                .font(.headline)
+                .font(.title3)
+                .fontWeight(.semibold)
 
-            VStack(spacing: 8) {
+            VStack(spacing: 12) {
                 ForEach(dailyForecasts.prefix(isPremium ? 14 : 3)) { forecast in
                     ModernForecastRow(forecast: forecast)
                 }
@@ -301,18 +353,46 @@ private struct ModernForecastCard: View {
                         HapticManager.medium()
                         onUpgradeTap()
                     } label: {
-                        Text("14 günlük tahmini görmek için Premium'a geç")
-                            .font(.subheadline)
-                            .foregroundStyle(.blue)
-                            .frame(maxWidth: .infinity)
+                        HStack(spacing: 8) {
+                            Image(systemName: "sparkles")
+                                .font(.caption)
+                            Text("14 günlük tahmin için Premium")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundStyle(.blue)
+                        .frame(maxWidth: .infinity)
+                        .padding(12)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color.blue.opacity(0.1),
+                                    Color.blue.opacity(0.05)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            in: RoundedRectangle(cornerRadius: 12)
+                        )
                     }
                 }
             }
         }
-        .padding(20)
+        .padding(24)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 16)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.05),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 }
@@ -350,26 +430,38 @@ private struct ModernActivitySection: View {
     let recommendations: [ActivityRecommendation]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("En İyi Zamanlar")
-                .font(.headline)
+                .font(.title3)
+                .fontWeight(.semibold)
 
             if recommendations.isEmpty {
                 Text("Uygun zaman bulunamadı")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     ForEach(recommendations.prefix(3)) { recommendation in
                         ModernActivityRow(recommendation: recommendation)
                     }
                 }
             }
         }
-        .padding(20)
+        .padding(24)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 16)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.05),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 }
@@ -379,20 +471,21 @@ private struct ModernActivityRow: View {
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(recommendation.activityType.localizedTitle)
-                    .font(.subheadline)
+                    .font(.body)
                     .fontWeight(.medium)
                 Text(recommendation.bestWindow.shortDisplayText)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(String(format: "%.1f", recommendation.score.displayValue))
-                .font(.headline)
-                .foregroundStyle(.blue)
+            Text(String(format: "%.0f", recommendation.score.displayValue))
+                .font(.title3)
+                .fontWeight(.light)
+                .foregroundStyle(.blue.gradient)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 12)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(recommendation.activityType.localizedTitle), skor \(String(format: "%.1f", recommendation.score.displayValue)), en iyi zaman \(recommendation.bestWindow.shortDisplayText)")
     }
@@ -404,42 +497,59 @@ private struct ModernOutfitCard: View {
     let outfit: OutfitRecommendation
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Kıyafet Önerisi")
-                .font(.headline)
+                .font(.title3)
+                .fontWeight(.semibold)
 
             Text(outfit.title)
-                .font(.subheadline)
+                .font(.body)
                 .foregroundStyle(.secondary)
 
             if let warning = outfit.warning {
-                HStack(spacing: 8) {
+                HStack(spacing: 10) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
-                        .frame(width: 20)
-                    Text(warning)
                         .font(.subheadline)
+                    Text(warning)
+                        .font(.body)
                 }
+                .padding(12)
+                .background(
+                    Color.orange.opacity(0.1),
+                    in: RoundedRectangle(cornerRadius: 12)
+                )
             }
 
             if !outfit.items.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 8) {
                     ForEach(outfit.items, id: \.self) { item in
-                        HStack(spacing: 8) {
+                        HStack(spacing: 10) {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(.blue)
-                                .frame(width: 20)
-                            Text(item)
+                                .foregroundStyle(.blue.gradient)
                                 .font(.subheadline)
+                            Text(item)
+                                .font(.body)
                         }
                     }
                 }
             }
         }
-        .padding(20)
+        .padding(24)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 16)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.05),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 }
@@ -450,26 +560,38 @@ private struct ModernRiskSection: View {
     let risks: [WeatherRisk]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Riskler")
-                .font(.headline)
+                .font(.title3)
+                .fontWeight(.semibold)
 
             if risks.isEmpty {
                 Text("Risk yok")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
-                VStack(spacing: 8) {
+                VStack(spacing: 12) {
                     ForEach(risks) { risk in
                         ModernRiskRow(risk: risk)
                     }
                 }
             }
         }
-        .padding(20)
+        .padding(24)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 16)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.05),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 }
@@ -478,31 +600,43 @@ private struct ModernHourlyForecastCard: View {
     let hourlyScores: [WeatherScore]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text("Saatlik Tahmin")
-                .font(.headline)
+                .font(.title3)
+                .fontWeight(.semibold)
 
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 8) {
+                LazyHStack(spacing: 12) {
                     ForEach(Array(hourlyScores.prefix(24).enumerated()), id: \.offset) { index, score in
-                        VStack(spacing: 4) {
+                        VStack(spacing: 8) {
                             Capsule()
-                                .fill(scoreColor(for: score))
-                                .frame(width: 8, height: max(8, CGFloat(score.rawValue)))
+                                .fill(scoreColor(for: score).gradient)
+                                .frame(width: 10, height: max(10, CGFloat(score.rawValue)))
                             Text(hourLabel(for: index))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
-                        .frame(width: 40)
+                        .frame(width: 44)
                     }
                 }
             }
-            .frame(height: 100)
+            .frame(height: 120)
         }
-        .padding(20)
+        .padding(24)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 16)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.05),
+                    Color.clear
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 

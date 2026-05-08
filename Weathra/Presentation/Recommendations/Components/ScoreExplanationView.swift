@@ -5,7 +5,7 @@ struct ScoreExplanationView: View {
 
     var body: some View {
         Text(explanation)
-            .font(AppTypography.body)
+            .font(.body)
             .foregroundStyle(.secondary)
     }
 }

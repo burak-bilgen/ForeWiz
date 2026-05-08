@@ -59,19 +59,20 @@ private struct ModernHeroPage: View {
     let next: () -> Void
 
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 40) {
             Spacer()
 
             VStack(spacing: 24) {
                 Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 80))
-                    .foregroundStyle(.blue)
+                    .font(.system(size: 100))
+                    .foregroundStyle(.blue.gradient)
+                    .symbolRenderingMode(.hierarchical)
 
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     Text("Weathra")
-                        .font(.system(size: 42, weight: .bold))
+                        .font(.system(size: 48, weight: .light))
                     Text("Sadece hava durumundan daha fazlası")
-                        .font(.title3)
+                        .font(.title2)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
@@ -79,7 +80,7 @@ private struct ModernHeroPage: View {
 
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 ModernFeatureCard(
                     icon: "lightbulb.fill",
                     title: "Akıllı Kararlar",
@@ -97,17 +98,28 @@ private struct ModernHeroPage: View {
                 )
             }
 
-            Button(action: next) {
+            Button(action: {
+                HapticManager.medium()
+                next()
+            }) {
                 Text("Devam Et")
-                    .font(.headline)
+                    .font(.body)
+                    .fontWeight(.medium)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(.blue, in: RoundedRectangle(cornerRadius: 12))
+                    .padding(18)
+                    .background(
+                        LinearGradient(
+                            colors: [.blue, .blue.opacity(0.8)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        in: RoundedRectangle(cornerRadius: 16)
+                    )
             }
             .padding(.horizontal, 20)
         }
-        .padding(20)
+        .padding(24)
     }
 }
 
@@ -119,22 +131,35 @@ private struct ModernFeatureCard: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(.blue)
-                .frame(width: 40)
-            VStack(alignment: .leading, spacing: 4) {
+                .font(.system(size: 32))
+                .foregroundStyle(.blue.gradient)
+                .symbolRenderingMode(.hierarchical)
+                .frame(width: 44, height: 44)
+            VStack(alignment: .leading, spacing: 6) {
                 Text(title)
-                    .font(.headline)
+                    .font(.body)
+                    .fontWeight(.semibold)
                 Text(description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
             Spacer()
         }
-        .padding(16)
+        .padding(20)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 12)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.08),
+                    Color.blue.opacity(0.02)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            ),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 }
@@ -145,20 +170,20 @@ private struct ModernWhyPage: View {
     let next: () -> Void
 
     var body: some View {
-        VStack(spacing: 32) {
+        VStack(spacing: 40) {
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 Text("Neden Weathra?")
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.system(size: 40, weight: .light))
                 Text("Sana göre kararlar")
-                    .font(.title3)
+                    .font(.title2)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 ModernComparisonCard(
                     icon: "xmark.circle.fill",
                     title: "Diğer Hava Uygulamaları",
@@ -171,17 +196,28 @@ private struct ModernWhyPage: View {
                 )
             }
 
-            Button(action: next) {
+            Button(action: {
+                HapticManager.medium()
+                next()
+            }) {
                 Text("Başlayalım")
-                    .font(.headline)
+                    .font(.body)
+                    .fontWeight(.medium)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .padding(16)
-                    .background(.blue, in: RoundedRectangle(cornerRadius: 12))
+                    .padding(18)
+                    .background(
+                        LinearGradient(
+                            colors: [.blue, .blue.opacity(0.8)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        in: RoundedRectangle(cornerRadius: 16)
+                    )
             }
             .padding(.horizontal, 20)
         }
-        .padding(20)
+        .padding(24)
     }
 }
 
@@ -193,22 +229,34 @@ private struct ModernComparisonCard: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title)
-                .foregroundStyle(icon.contains("checkmark") ? .green : .red)
-                .frame(width: 40)
-            VStack(alignment: .leading, spacing: 4) {
+                .font(.system(size: 32))
+                .foregroundStyle(icon.contains("checkmark") ? Color.green.gradient : Color.red.gradient)
+                .symbolRenderingMode(.hierarchical)
+                .frame(width: 44, height: 44)
+            VStack(alignment: .leading, spacing: 6) {
                 Text(title)
-                    .font(.headline)
+                    .font(.body)
+                    .fontWeight(.semibold)
                 Text(description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
             Spacer()
         }
-        .padding(16)
+        .padding(20)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 12)
+            LinearGradient(
+                colors: icon.contains("checkmark")
+                    ? [Color.green.opacity(0.08), Color.green.opacity(0.02)]
+                    : [Color.red.opacity(0.08), Color.red.opacity(0.02)],
+                startPoint: .leading,
+                endPoint: .trailing
+            ),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke((icon.contains("checkmark") ? Color.green : Color.red).opacity(0.1), lineWidth: 1)
         )
     }
 }
@@ -221,20 +269,20 @@ private struct ModernSetupPage: View {
     let complete: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 32) {
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 Text("Kişiselleştir")
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.system(size: 40, weight: .light))
                 Text("Senin için ayarlayalım")
-                    .font(.title3)
+                    .font(.title2)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 ModernSetupRow(
                     title: "Konum İzni",
                     description: "Bulunduğun yere ait hava durumu için gerekli",
@@ -254,25 +302,36 @@ private struct ModernSetupPage: View {
                 )
             }
 
-            Button(action: complete) {
+            Button(action: {
+                HapticManager.medium()
+                complete()
+            }) {
                 HStack {
                     if isCompleting {
                         ProgressView()
                             .tint(.white)
                     } else {
                         Text("Hazırım")
-                            .font(.headline)
+                            .font(.body)
+                            .fontWeight(.medium)
                             .foregroundStyle(.white)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(16)
-                .background(viewModel.canContinue ? .blue : .gray, in: RoundedRectangle(cornerRadius: 12))
+                .padding(18)
+                .background(
+                    LinearGradient(
+                        colors: viewModel.canContinue ? [.blue, .blue.opacity(0.8)] : [.gray, .gray.opacity(0.8)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    in: RoundedRectangle(cornerRadius: 16)
+                )
             }
             .disabled(!viewModel.canContinue || isCompleting)
             .padding(.horizontal, 20)
         }
-        .padding(20)
+        .padding(24)
     }
 }
 
@@ -284,22 +343,35 @@ private struct ModernSetupRow: View {
     var body: some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(.blue)
-                .frame(width: 40)
-            VStack(alignment: .leading, spacing: 4) {
+                .font(.system(size: 32))
+                .foregroundStyle(.blue.gradient)
+                .symbolRenderingMode(.hierarchical)
+                .frame(width: 44, height: 44)
+            VStack(alignment: .leading, spacing: 6) {
                 Text(title)
-                    .font(.headline)
+                    .font(.body)
+                    .fontWeight(.semibold)
                 Text(description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
             Spacer()
         }
-        .padding(16)
+        .padding(20)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
-            in: RoundedRectangle(cornerRadius: 12)
+            LinearGradient(
+                colors: [
+                    Color.blue.opacity(0.08),
+                    Color.blue.opacity(0.02)
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            ),
+            in: RoundedRectangle(cornerRadius: 16)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(.blue.opacity(0.1), lineWidth: 1)
         )
     }
 }

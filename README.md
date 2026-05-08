@@ -122,3 +122,51 @@ are generated on device from weather recommendations.
 - Apple Watch companion app.
 - StoreKit subscriptions.
 - Calendar, HealthKit, and wardrobe-aware suggestions.
+
+## Recent Improvements (2026)
+
+### Code Modernization
+- Removed legacy UI components (GlassCard, AppBackground, AppTypography, AppTheme)
+- Modernized views with native SwiftUI components
+- Added Dynamic Type support
+- Implemented haptic feedback throughout the app
+
+### New Features
+- Hourly Forecast: Added ModernHourlyForecastCard with horizontal scroll and LazyHStack
+- VoiceOver accessibility labels added to key components
+
+### Notification System
+- Enhanced notification content with emojis and context
+- Dynamic warning lead time based on risk severity
+- Improved permission handling with criticalAlert support
+- Category and priority-based interruption levels
+
+### Ad System
+- Ad caching for better performance
+- Parallel loading with TaskGroup
+- Structured logging
+- Configuration-based ad unit IDs
+
+### Subscription System
+- Structured logging for subscription events
+- Configuration-based product IDs
+- Enhanced error handling
+
+### Architecture
+- MVVM architecture validation
+- DailyForecastItem moved to Domain layer
+- Centralized error handling with ErrorHandler utility
+- Configuration files for sensitive values (AdConfiguration, SubscriptionConfiguration)
+
+### Testing
+- Added ErrorHandlerTests
+- Added DailyForecastItemTests
+
+### Performance
+- Image caching with AsyncImageCache
+- ConditionSymbol cache optimization
+- Lazy loading improvements
+
+### Security
+- Configuration-based sensitive values
+- Test/production mode flags

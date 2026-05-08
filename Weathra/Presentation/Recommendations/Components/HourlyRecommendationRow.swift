@@ -4,13 +4,13 @@ struct HourlyRecommendationRow: View {
     let recommendation: ActivityRecommendation
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(recommendation.activityType.localizedTitle)
-                .font(AppTypography.headline)
+                .font(.headline)
             Text(recommendation.bestWindow.shortDisplayText)
-                .font(AppTypography.body)
+                .font(.body)
             Text(recommendation.reason)
-                .font(AppTypography.caption)
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
     }

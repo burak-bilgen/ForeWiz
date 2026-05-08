@@ -6,17 +6,17 @@ struct PermissionExplainerView: View {
     let message: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.medium) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: systemImage)
                 .font(.title3)
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
                 .frame(width: 32, height: 32)
 
-            VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(AppTypography.headline)
+                    .font(.headline)
                 Text(message)
-                    .font(AppTypography.body)
+                    .font(.body)
                     .foregroundStyle(.secondary)
             }
         }

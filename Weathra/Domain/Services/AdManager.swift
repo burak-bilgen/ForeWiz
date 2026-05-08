@@ -7,8 +7,8 @@ import GoogleMobileAds
 import UIKit
 
 final class GoogleAdManager: AdManager, @unchecked Sendable {
-    private let interstitialAdUnitID = "ca-app-pub-3940256099942544/1033173712"
-    private let rewardedAdUnitID = "ca-app-pub-3940256099942544/5224354917"
+    private let interstitialAdUnitID = AdConfiguration.interstitialAdUnitID
+    private let rewardedAdUnitID = AdConfiguration.rewardedAdUnitID
 
     private let isReadyLock = OSAllocatedUnfairLock(initialState: false)
     private let interstitialAdLock = OSAllocatedUnfairLock(initialState: nil as InterstitialAd?)

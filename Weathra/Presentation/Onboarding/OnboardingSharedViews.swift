@@ -6,23 +6,23 @@ struct SectionHeader: View {
     let subtitle: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: AppSpacing.small) {
+        HStack(alignment: .top, spacing: 8) {
             Image(systemName: icon)
                 .font(.headline)
                 .frame(width: 32, height: 32)
                 .background(
-                    AppTheme.softBubbleGradient(tint: AppTheme.accent),
-                    in: RoundedRectangle(cornerRadius: AppTheme.iconBubbleRadius, style: .continuous)
+                    .blue.opacity(0.15),
+                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                 )
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
 
-            VStack(alignment: .leading, spacing: AppSpacing.xSmall) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(AppTypography.headline)
-                    .foregroundStyle(AppTheme.ink)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
                 Text(subtitle)
-                    .font(AppTypography.caption)
-                    .foregroundStyle(AppTheme.secondaryText)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -40,51 +40,53 @@ struct CompactPermissionRow: View {
     let action: () -> Void
 
     var body: some View {
-        HStack(alignment: .center, spacing: AppSpacing.small) {
+        HStack(alignment: .center, spacing: 8) {
             Image(systemName: icon)
                 .font(.subheadline.weight(.bold))
                 .frame(width: 28, height: 28)
-                .foregroundStyle(AppTheme.accent)
+                .foregroundStyle(.blue)
 
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: AppSpacing.xSmall) {
+                HStack(spacing: 4) {
                     Text(title)
-                        .font(AppTypography.caption.weight(.bold))
-                        .foregroundStyle(AppTheme.ink)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.primary)
                     if isRequired {
                         Text(L10n.text("permission_required"))
-                            .font(.system(.caption2, design: .rounded, weight: .bold))
-                            .foregroundStyle(AppTheme.warning)
+                            .font(.caption2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.orange)
                     }
                     Text(statusText)
-                        .font(.system(.caption2, design: .rounded, weight: .semibold))
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .font(.caption2)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.secondary)
                 }
 
                 Text(message)
-                    .font(.system(.caption2, design: .rounded))
-                    .foregroundStyle(AppTheme.secondaryText)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Spacer(minLength: AppSpacing.small)
+            Spacer(minLength: 8)
 
             Button(action: action) {
                 Text(actionTitle)
-                    .font(AppTypography.caption.weight(.semibold))
+                    .font(.caption.weight(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.85)
-                    .padding(.horizontal, AppSpacing.small)
-                    .padding(.vertical, AppSpacing.xSmall)
-                    .background(AppTheme.accent.opacity(0.14), in: Capsule())
-                    .foregroundStyle(AppTheme.accent)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.blue.opacity(0.14), in: Capsule())
+                    .foregroundStyle(.blue)
             }
             .buttonStyle(.plain)
         }
-        .padding(AppSpacing.small)
+        .padding(8)
         .background(
-            AppTheme.elevatedSurface.opacity(0.86),
-            in: RoundedRectangle(cornerRadius: AppTheme.compactRadius, style: .continuous)
+            .gray.opacity(0.1),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
         )
         .accessibilityElement(children: .combine)
     }
@@ -98,14 +100,14 @@ struct ActivityChip: View {
     var body: some View {
         Button(action: action) {
             Label(activity.localizedTitle, systemImage: iconName)
-                .font(AppTypography.caption.weight(.semibold))
-                .padding(.horizontal, AppSpacing.small)
-                .padding(.vertical, AppSpacing.xSmall)
+                .font(.caption.weight(.semibold))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
                 .background(
-                    isSelected ? AppTheme.accent.opacity(0.16) : AppTheme.elevatedSurface,
+                    isSelected ? .blue.opacity(0.16) : .gray.opacity(0.1),
                     in: Capsule()
                 )
-                .foregroundStyle(isSelected ? AppTheme.accent : AppTheme.ink)
+                .foregroundStyle(isSelected ? .blue : .primary)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])

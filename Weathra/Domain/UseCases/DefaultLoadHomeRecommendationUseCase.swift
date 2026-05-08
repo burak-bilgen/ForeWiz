@@ -109,10 +109,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
     }
 
     private func normalized(_ error: any Error) -> AppError {
-        if let appError = error as? AppError {
-            return appError
-        }
-
-        return .unknown
+        ErrorHandler.normalized(error)
     }
 }

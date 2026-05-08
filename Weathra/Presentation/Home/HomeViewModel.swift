@@ -3,18 +3,6 @@ import Foundation
 import WidgetKit
 import os.log
 
-struct DailyForecastItem: Identifiable, Equatable {
-    let id = UUID()
-    let dayName: String
-    let date: Date
-    let highTemp: Double
-    let lowTemp: Double
-    let conditionSymbol: String
-    let outdoorScore: Int
-    let outdoorDecision: OutdoorDecision
-    let isToday: Bool
-}
-
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published private(set) var state: LoadableState<HomeViewState> = .idle
@@ -263,12 +251,14 @@ final class HomeViewModel: ObservableObject {
             let highTemp = convertTemperature(point.highTemperatureCelsius, unitSystem: unitSystem)
             let lowTemp = convertTemperature(point.lowTemperatureCelsius, unitSystem: unitSystem)
 
+            let conditionSymbol = symbolName(for: point.conditionCode, isDaylight: true)
+
             return DailyForecastItem(
                 dayName: dayName,
                 date: point.date,
                 highTemp: highTemp,
                 lowTemp: lowTemp,
-                conditionSymbol: symbolName(for: point.conditionCode, isDaylight: true),
+                conditionSymbol: conditionSymbol,
                 outdoorScore: score,
                 outdoorDecision: decision,
                 isToday: isToday

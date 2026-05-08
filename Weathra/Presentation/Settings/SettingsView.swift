@@ -26,6 +26,7 @@ struct SettingsView: View {
                         Text(appearance.localizedTitle).tag(appearance)
                     }
                 }
+
                 Picker(L10n.text("settings_language"), selection: languageSelection) {
                     ForEach(AppLanguage.allCases, id: \.self) { language in
                         Text(language.localizedTitle).tag(language)
@@ -224,6 +225,8 @@ struct SettingsView: View {
                 } label: {
                     Label(L10n.text("settings_reset_confirm"), systemImage: "arrow.counterclockwise")
                 }
+            } header: {
+                Text(L10n.text("settings_reset_title"))
             } footer: {
                 Text(L10n.text("settings_privacy_note"))
             }

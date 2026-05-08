@@ -16,7 +16,7 @@ struct PremiumGateModifier: ViewModifier {
                     .overlay(alignment: .topTrailing) {
                         Image(systemName: "lock.fill")
                             .font(.caption2)
-                            .foregroundStyle(AppTheme.warning)
+                            .foregroundStyle(.orange)
                             .padding(6)
                     }
                     .onTapGesture(perform: onTap)

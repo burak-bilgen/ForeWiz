@@ -12,10 +12,7 @@ final class StoreKitSubscriptionManager: ObservableObject {
 
     var isPremium: Bool { tier == .premium }
 
-    private let productIDs: [String] = [
-        "bilgenworks.weatherassistant.premium.monthly",
-        "bilgenworks.weatherassistant.premium.yearly"
-    ]
+    private let productIDs: [String] = SubscriptionConfiguration.productIDs
 
     private var storeProducts: [Product] = []
     private var updateListenerTask: Task<Void, Error>?

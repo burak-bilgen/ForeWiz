@@ -4,7 +4,7 @@ struct QuietHoursPicker: View {
     @Binding var quietHours: TimeWindow?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.small) {
+        VStack(alignment: .leading, spacing: 8) {
             Toggle(L10n.text("quiet_hours_title"), isOn: Binding(
                 get: { quietHours != nil },
                 set: { enabled in
@@ -13,11 +13,11 @@ struct QuietHoursPicker: View {
             ))
 
             Text(L10n.text("quiet_hours_description"))
-                .font(.system(.caption2, design: .rounded))
+                .font(.caption2)
                 .foregroundStyle(.secondary)
 
             if let binding = quietHoursBinding {
-                HStack(spacing: AppSpacing.medium) {
+                HStack(spacing: 12) {
                     DatePicker(
                         L10n.text("quiet_hours_start"),
                         selection: Binding(
@@ -35,8 +35,8 @@ struct QuietHoursPicker: View {
                     .labelsHidden()
 
                     Text("–")
-                        .font(AppTypography.body)
-                        .foregroundStyle(AppTheme.secondaryText)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
 
                     DatePicker(
                         L10n.text("quiet_hours_end"),
