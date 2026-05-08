@@ -49,19 +49,22 @@ struct SettingsView: View {
                                     Image(systemName: "crown.fill")
                                         .font(.system(size: 14))
                                     Text(L10n.text("settings_premium_upgrade"))
-                                        .font(.system(size: 15, weight: .semibold))
+                                        .font(.system(size: 15, weight: .bold))
                                 }
                                 .foregroundStyle(Color(red: 0.06, green: 0.1, blue: 0.22))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 15)
+                                .padding(.vertical, 16)
                                 .background(
                                     LinearGradient(
-                                        colors: [Color(red: 1.0, green: 0.82, blue: 0.3), Color(red: 1.0, green: 0.65, blue: 0.2)],
+                                        colors: [Color(red: 1.0, green: 0.85, blue: 0.32), Color(red: 1.0, green: 0.65, blue: 0.20)],
                                         startPoint: .leading, endPoint: .trailing
                                     ),
                                     in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 )
+                                .shadow(color: Color(red: 1.0, green: 0.70, blue: 0.20).opacity(0.40), radius: 12, x: 0, y: 5)
+                                .shimmer()
                             }
+                            .buttonStyle(PressScaleButtonStyle(scale: 0.97))
                             .padding(.top, 8)
                         }
                     }
@@ -320,20 +323,11 @@ struct SettingsView: View {
 
 private struct SettingsBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            Circle()
-                .fill(Color(red: 0.75, green: 0.5, blue: 1.0).opacity(0.07))
-                .frame(width: 300).blur(radius: 60)
-                .offset(x: 120, y: -200)
-            Circle()
-                .fill(Color.blue.opacity(0.07))
-                .frame(width: 240).blur(radius: 50)
-                .offset(x: -100, y: 300)
-        }
+        AnimatedOrbBackground(
+            primary:   Color(red: 0.55, green: 0.35, blue: 1.00),
+            secondary: Color(red: 0.25, green: 0.50, blue: 1.00),
+            tertiary:  Color(red: 0.20, green: 0.75, blue: 0.65)
+        )
     }
 }
 

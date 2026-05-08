@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RecommendationDetailView: View {
     let recommendation: DailyRecommendation
+    @State private var appeared = false
 
     var body: some View {
         ZStack {
@@ -9,16 +10,22 @@ struct RecommendationDetailView: View {
             ScrollView {
                 VStack(spacing: 18) {
                     DetailHeroCard(recommendation: recommendation)
+                        .staggerEntrance(index: 0, appeared: appeared)
                     DetailExplanationCard(explanation: recommendation.explanation)
+                        .staggerEntrance(index: 1, appeared: appeared)
                     if !recommendation.bestActivityWindows.isEmpty {
                         DetailActivityCard(activities: recommendation.bestActivityWindows)
+                            .staggerEntrance(index: 2, appeared: appeared)
                     }
                     DetailOutfitCard(outfit: recommendation.outfit)
+                        .staggerEntrance(index: 3, appeared: appeared)
                     if !recommendation.avoidWindows.isEmpty {
                         DetailAvoidCard(avoidWindows: recommendation.avoidWindows)
+                            .staggerEntrance(index: 4, appeared: appeared)
                     }
                     if !recommendation.risks.isEmpty {
                         DetailRiskCard(risks: recommendation.risks)
+                            .staggerEntrance(index: 5, appeared: appeared)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -30,6 +37,7 @@ struct RecommendationDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .onAppear { withAnimation { appeared = true } }
     }
 }
 
@@ -37,20 +45,11 @@ struct RecommendationDetailView: View {
 
 private struct DetailBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            Circle()
-                .fill(Color.blue.opacity(0.09))
-                .frame(width: 300).blur(radius: 65)
-                .offset(x: 100, y: -160)
-            Circle()
-                .fill(Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.06))
-                .frame(width: 220).blur(radius: 50)
-                .offset(x: -80, y: 280)
-        }
+        AnimatedOrbBackground(
+            primary:   Color(red: 0.30, green: 0.55, blue: 1.00),
+            secondary: Color(red: 0.60, green: 0.35, blue: 1.00),
+            tertiary:  Color(red: 0.20, green: 0.75, blue: 0.90)
+        )
     }
 }
 
@@ -93,39 +92,51 @@ private struct DetailSectionLabel: View {
 
 private struct DetailHeroCard: View {
     let recommendation: DailyRecommendation
+    private let sky = Color(red: 0.40, green: 0.72, blue: 1.0)
+    private let decisionColor: Color
+
+    init(recommendation: DailyRecommendation) {
+        self.recommendation = recommendation
+        self.decisionColor = AppTheme.color(for: recommendation.outdoorDecision)
+    }
+
     var body: some View {
-        DetailCard(accentColor: Color(red: 0.4, green: 0.7, blue: 1.0)) {
+        DetailCard(accentColor: sky) {
             VStack(spacing: 18) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(recommendation.outdoorDecision.localizedTitle)
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                HStack(alignment: .top, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(decisionColor)
+                                .frame(width: 10, height: 10)
+                                .shadow(color: decisionColor.opacity(0.8), radius: 5)
+                                .pulseGlow(color: decisionColor, radius: 6)
+                            Text(recommendation.outdoorDecision.localizedTitle)
+                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                        }
                         Text(recommendation.summaryText)
                             .font(.system(size: 14))
-                            .foregroundStyle(Color.white.opacity(0.5))
+                            .foregroundStyle(Color.white.opacity(0.55))
                             .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Spacer(minLength: 16)
-                    VStack(spacing: 2) {
-                        Text(String(format: "%.0f", recommendation.outdoorScore.displayValue))
-                            .font(.system(size: 42, weight: .thin, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.white)
-                        Text(L10n.text("home_score_label"))
-                            .font(.system(size: 10))
-                            .foregroundStyle(Color.white.opacity(0.35))
-                    }
+                    Spacer(minLength: 12)
+                    ScoreRingView(score: recommendation.outdoorScore, size: 76, showOutOf100: true)
+                        .environment(\.colorScheme, .dark)
                 }
                 if let bestWindow = recommendation.bestOutdoorWindow {
                     HStack(spacing: 6) {
                         Image(systemName: "clock.fill")
                             .font(.system(size: 12))
                         Text(bestWindow.shortDisplayText)
-                            .font(.system(size: 14))
+                            .font(.system(size: 14, weight: .medium))
                     }
-                    .foregroundStyle(Color(red: 0.4, green: 0.8, blue: 1.0))
+                    .foregroundStyle(sky)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(sky.opacity(0.08), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
             }
         }

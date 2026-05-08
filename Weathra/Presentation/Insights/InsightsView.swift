@@ -35,26 +35,18 @@ struct InsightsView: View {
 
 private struct InsightsBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            Circle()
-                .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.09))
-                .frame(width: 320).blur(radius: 70)
-                .offset(x: 120, y: -150)
-            Circle()
-                .fill(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.06))
-                .frame(width: 250).blur(radius: 55)
-                .offset(x: -100, y: 300)
-        }
+        AnimatedOrbBackground(
+            primary:   Color(red: 0.25, green: 0.55, blue: 1.0),
+            secondary: Color(red: 0.20, green: 0.80, blue: 0.60),
+            tertiary:  Color(red: 0.55, green: 0.35, blue: 1.0)
+        )
     }
 }
 
 // MARK: - Header
 
 private struct InsightsHeader: View {
+    @State private var appeared = false
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
@@ -71,6 +63,9 @@ private struct InsightsHeader: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
+        .opacity(appeared ? 1 : 0)
+        .offset(y: appeared ? 0 : 14)
+        .onAppear { withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.05)) { appeared = true } }
     }
 }
 
@@ -120,6 +115,8 @@ private struct InsightsScoreCard: View {
         return rows
     }
 
+    @State private var appeared = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
@@ -133,12 +130,12 @@ private struct InsightsScoreCard: View {
                     .tracking(0.5)
             }
 
-            HStack(alignment: .top, spacing: 20) {
-                ScoreRingView(score: recommendation.outdoorScore, size: 72)
+            HStack(alignment: .center, spacing: 20) {
+                ScoreRingView(score: recommendation.outdoorScore, size: 88, showOutOf100: true)
                     .environment(\.colorScheme, .dark)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(factors) { row in
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(Array(factors.enumerated()), id: \.element.id) { index, row in
                         HStack(spacing: 8) {
                             Image(systemName: row.icon)
                                 .font(.system(size: 10))
@@ -153,6 +150,7 @@ private struct InsightsScoreCard: View {
                                 .foregroundStyle(row.color)
                                 .lineLimit(1)
                         }
+                        .staggerEntrance(index: index, appeared: appeared, baseDelay: 0.06)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -161,6 +159,7 @@ private struct InsightsScoreCard: View {
         .padding(18)
         .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.14), lineWidth: 1))
+        .onAppear { withAnimation { appeared = true } }
     }
 }
 
@@ -282,23 +281,28 @@ private struct InsightsDayQualityCard: View {
             }
 
             HStack(alignment: .bottom, spacing: 3) {
+                ForEach(Array(hourBlocks.enumerated()), id: \.element.id) { index, block in
+                    AnimatedBar(
+                        height: barHeight(block.quality),
+                        color: barColor(block.quality),
+                        delay: Double(index) * 0.03
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .frame(height: 80)
+            HStack(alignment: .top, spacing: 3) {
                 ForEach(hourBlocks) { block in
-                    VStack(spacing: 4) {
-                        RoundedRectangle(cornerRadius: 4, style: .continuous)
-                            .fill(barColor(block.quality))
-                            .frame(height: barHeight(block.quality))
+                    if block.id % 4 == 0 {
+                        Text("\(block.id)h")
+                            .font(.system(size: 7))
+                            .foregroundStyle(Color.white.opacity(0.28))
                             .frame(maxWidth: .infinity)
-                        if block.id % 4 == 0 {
-                            Text("\(block.id)h")
-                                .font(.system(size: 8))
-                                .foregroundStyle(Color.white.opacity(0.3))
-                        } else {
-                            Color.clear.frame(height: 10)
-                        }
+                    } else {
+                        Color.clear.frame(maxWidth: .infinity, maxHeight: 10)
                     }
                 }
             }
-            .frame(height: 90)
 
             HStack(spacing: 16) {
                 legendDot(color: Color(red: 0.4, green: 0.85, blue: 0.6), label: L10n.text("insights_comfortable"))
@@ -341,51 +345,93 @@ private struct InsightsDayQualityCard: View {
 
 private struct InsightsLockedView: View {
     let onUpgrade: () -> Void
+    @State private var appeared = false
+    private let blue = Color(red: 0.40, green: 0.70, blue: 1.0)
+    private let gold = Color(red: 1.0, green: 0.82, blue: 0.3)
 
     var body: some View {
-        VStack(spacing: 28) {
+        VStack(spacing: 32) {
             Spacer()
             ZStack {
                 Circle()
-                    .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.1))
+                    .fill(blue.opacity(0.14))
+                    .frame(width: 130, height: 130)
+                    .blur(radius: 14)
+                Circle()
+                    .fill(blue.opacity(0.08))
                     .frame(width: 100, height: 100)
                 Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 40))
-                    .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
+                    .font(.system(size: 46))
+                    .foregroundStyle(blue)
                     .symbolRenderingMode(.hierarchical)
+                    .shadow(color: blue.opacity(0.5), radius: 16, x: 0, y: 6)
             }
-            VStack(spacing: 8) {
+            .floating(amplitude: 7, duration: 3.2)
+            .pulseGlow(color: blue, radius: 20)
+            .opacity(appeared ? 1 : 0)
+            .scaleEffect(appeared ? 1 : 0.5)
+
+            VStack(spacing: 10) {
                 Text(L10n.text("premium_feature_analytics"))
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .multilineTextAlignment(.center)
                 Text(L10n.text("premium_feature_analytics_desc"))
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.white.opacity(0.45))
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.white.opacity(0.50))
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, 28)
             }
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 18)
+
             Button(action: onUpgrade) {
                 HStack(spacing: 8) {
                     Image(systemName: "crown.fill")
                         .font(.system(size: 14))
                     Text(L10n.text("premium_upgrade"))
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 16, weight: .bold))
                 }
-                .foregroundStyle(Color(red: 0.06, green: 0.08, blue: 0.18))
-                .padding(.horizontal, 28)
-                .padding(.vertical, 14)
+                .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
+                .padding(.horizontal, 32)
+                .padding(.vertical, 16)
                 .background(
-                    LinearGradient(
-                        colors: [Color(red: 1.0, green: 0.82, blue: 0.3), Color(red: 1.0, green: 0.65, blue: 0.2)],
-                        startPoint: .leading, endPoint: .trailing
-                    ),
+                    LinearGradient(colors: [gold, Color(red: 1.0, green: 0.65, blue: 0.2)], startPoint: .leading, endPoint: .trailing),
                     in: Capsule()
                 )
+                .shadow(color: gold.opacity(0.45), radius: 14, x: 0, y: 6)
+                .shimmer()
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressScaleButtonStyle(scale: 0.96))
+            .opacity(appeared ? 1 : 0)
+            .offset(y: appeared ? 0 : 12)
+
             Spacer()
         }
+        .onAppear {
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.72).delay(0.1)) { appeared = true }
+        }
+    }
+}
+
+// MARK: - Animated bar
+
+private struct AnimatedBar: View {
+    let height: CGFloat
+    let color: Color
+    var delay: Double = 0
+
+    @State private var appeared = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                .fill(color)
+                .frame(height: appeared ? height : 4)
+                .animation(.spring(response: 0.55, dampingFraction: 0.75).delay(delay), value: appeared)
+        }
+        .onAppear { appeared = true }
     }
 }
 

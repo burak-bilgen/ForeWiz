@@ -31,37 +31,10 @@ struct PaywallView: View {
 
                 ScrollView {
                     VStack(spacing: 28) {
-                        VStack(spacing: 14) {
-                            ZStack {
-                                Circle()
-                                    .fill(LinearGradient(
-                                        colors: [Color(red: 1.0, green: 0.82, blue: 0.3), Color(red: 1.0, green: 0.6, blue: 0.15)],
-                                        startPoint: .topLeading, endPoint: .bottomTrailing
-                                    ))
-                                    .frame(width: 80, height: 80)
-                                    .shadow(color: Color(red: 1.0, green: 0.7, blue: 0.2).opacity(0.4), radius: 20, x: 0, y: 8)
-                                Image(systemName: "crown.fill")
-                                    .font(.system(size: 34))
-                                    .foregroundStyle(Color(red: 0.15, green: 0.1, blue: 0.0))
-                            }
+                        PaywallHeroSection()
+                            .padding(.top, 16)
 
-                            Text(L10n.text("paywall_title"))
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                                .multilineTextAlignment(.center)
-
-                            Text(L10n.text("paywall_subtitle"))
-                                .font(.system(size: 15))
-                                .foregroundStyle(Color.white.opacity(0.55))
-                                .multilineTextAlignment(.center)
-                        }
-                        .padding(.top, 16)
-
-                        VStack(spacing: 10) {
-                            ForEach(PremiumFeature.allCases) { feature in
-                                PaywallFeatureRow(feature: feature)
-                            }
-                        }
+                        PaywallFeatureList()
 
                         if store.isLoading && store.products.isEmpty {
                             HStack(spacing: 12) {
@@ -135,27 +108,71 @@ struct PaywallView: View {
 
 private struct PaywallBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.06, green: 0.06, blue: 0.14), Color(red: 0.08, green: 0.06, blue: 0.18)],
-                startPoint: .top, endPoint: .bottom
-            )
-            Circle()
-                .fill(Color(red: 1.0, green: 0.7, blue: 0.2).opacity(0.12))
-                .frame(width: 320).blur(radius: 80)
-                .offset(y: -180)
-            Circle()
-                .fill(Color.blue.opacity(0.06))
-                .frame(width: 250).blur(radius: 60)
-                .offset(y: 280)
+        AnimatedOrbBackground(
+            primary:   Color(red: 1.0, green: 0.70, blue: 0.15),
+            secondary: Color(red: 0.85, green: 0.40, blue: 0.10),
+            tertiary:  Color(red: 0.60, green: 0.40, blue: 1.00),
+            baseColor1: Color(red: 0.06, green: 0.05, blue: 0.14),
+            baseColor2: Color(red: 0.08, green: 0.06, blue: 0.18)
+        )
+    }
+}
+
+// MARK: - Hero section
+
+private struct PaywallHeroSection: View {
+    @State private var appeared = false
+    private let gold = Color(red: 1.0, green: 0.82, blue: 0.3)
+
+    var body: some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(gold.opacity(0.18))
+                    .frame(width: 110, height: 110)
+                    .blur(radius: 16)
+                Circle()
+                    .fill(LinearGradient(
+                        colors: [gold, Color(red: 1.0, green: 0.6, blue: 0.15)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    ))
+                    .frame(width: 80, height: 80)
+                    .shadow(color: gold.opacity(0.50), radius: 22, x: 0, y: 8)
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 34))
+                    .foregroundStyle(Color(red: 0.15, green: 0.08, blue: 0.00))
+            }
+            .floating(amplitude: 7, duration: 3.0)
+            .pulseGlow(color: gold, radius: 18)
+            .opacity(appeared ? 1 : 0)
+            .scaleEffect(appeared ? 1 : 0.5)
+
+            Text(L10n.text("paywall_title"))
+                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 16)
+
+            Text(L10n.text("paywall_subtitle"))
+                .font(.system(size: 15))
+                .foregroundStyle(Color.white.opacity(0.60))
+                .multilineTextAlignment(.center)
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 12)
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.72).delay(0.1)) {
+                appeared = true
+            }
         }
     }
 }
 
-// MARK: - Feature row
+// MARK: - Feature list
 
-private struct PaywallFeatureRow: View {
-    let feature: PremiumFeature
+private struct PaywallFeatureList: View {
+    @State private var appeared = false
 
     private static let colors: [Color] = [
         Color(red: 0.4, green: 0.7, blue: 1.0),
@@ -164,34 +181,41 @@ private struct PaywallFeatureRow: View {
         Color(red: 1.0, green: 0.7, blue: 0.3),
     ]
 
-    private var accentColor: Color {
-        let index = PremiumFeature.allCases.firstIndex(of: feature) ?? 0
-        return Self.colors[index % Self.colors.count]
-    }
-
     var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(accentColor.opacity(0.15))
-                    .frame(width: 40, height: 40)
-                Image(systemName: feature.systemImage)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(accentColor)
+        VStack(spacing: 10) {
+            ForEach(Array(PremiumFeature.allCases.enumerated()), id: \.offset) { index, feature in
+                let color = Self.colors[index % Self.colors.count]
+                HStack(spacing: 14) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(color.opacity(0.15))
+                            .frame(width: 40, height: 40)
+                        Image(systemName: feature.systemImage)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(color)
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(feature.localizedTitle)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white)
+                        Text(feature.localizedDescription)
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.white.opacity(0.45))
+                    }
+                    Spacer()
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(color.opacity(0.9))
+                }
+                .padding(14)
+                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(color.opacity(0.14), lineWidth: 1))
+                .staggerEntrance(index: index, appeared: appeared, baseDelay: 0.07)
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(feature.localizedTitle)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(.white)
-                Text(feature.localizedDescription)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.white.opacity(0.45))
-            }
-            Spacer()
         }
-        .padding(14)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(accentColor.opacity(0.12), lineWidth: 1))
+        .onAppear {
+            withAnimation { appeared = true }
+        }
     }
 }
 
@@ -201,6 +225,10 @@ private struct PaywallPurchaseButton: View {
     let product: SubscriptionProduct
     let action: () -> Void
 
+    private let dark = Color(red: 0.06, green: 0.06, blue: 0.14)
+    private let gold = Color(red: 1.0, green: 0.85, blue: 0.32)
+    private let amber = Color(red: 1.0, green: 0.65, blue: 0.20)
+
     var body: some View {
         Button(action: {
             HapticManager.medium()
@@ -209,31 +237,31 @@ private struct PaywallPurchaseButton: View {
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(product.displayName)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(dark)
                     Text(product.description)
                         .font(.system(size: 12))
-                        .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14).opacity(0.6))
+                        .foregroundStyle(dark.opacity(0.65))
                         .lineLimit(2)
                 }
                 Spacer()
-                Text(product.price)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
-                    .monospacedDigit()
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text(product.price)
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                        .foregroundStyle(dark)
+                        .monospacedDigit()
+                }
             }
             .padding(.horizontal, 20)
-            .padding(.vertical, 16)
+            .padding(.vertical, 18)
             .frame(maxWidth: .infinity)
             .background(
-                LinearGradient(
-                    colors: [Color(red: 1.0, green: 0.85, blue: 0.32), Color(red: 1.0, green: 0.65, blue: 0.2)],
-                    startPoint: .topLeading, endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                LinearGradient(colors: [gold, amber], startPoint: .topLeading, endPoint: .bottomTrailing),
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
             )
-            .shadow(color: Color(red: 1.0, green: 0.7, blue: 0.2).opacity(0.3), radius: 12, x: 0, y: 6)
+            .shadow(color: amber.opacity(0.45), radius: 16, x: 0, y: 8)
+            .shimmer()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
     }
 }

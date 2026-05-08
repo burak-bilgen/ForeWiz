@@ -93,7 +93,9 @@ struct OnboardingView: View {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(buttonBackground)
             }
+            .shimmer(isActive: !isCompleting && !(isLastStep && !viewModel.canContinue))
         }
+        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
         .disabled(isLastStep && !viewModel.canContinue || isCompleting)
         .animation(.easeInOut(duration: 0.2), value: viewModel.canContinue)
     }
@@ -149,42 +151,17 @@ struct OnboardingView: View {
 private struct OnboardingBackground: View {
     let step: Int
 
-    private var topColor: Color {
+    private var colors: (Color, Color, Color) {
         switch step {
-        case 0: Color(red: 0.05, green: 0.08, blue: 0.18)
-        case 1: Color(red: 0.04, green: 0.10, blue: 0.22)
-        default: Color(red: 0.04, green: 0.12, blue: 0.20)
-        }
-    }
-
-    private var bottomColor: Color {
-        switch step {
-        case 0: Color(red: 0.08, green: 0.14, blue: 0.30)
-        case 1: Color(red: 0.06, green: 0.16, blue: 0.34)
-        default: Color(red: 0.06, green: 0.18, blue: 0.30)
+        case 0:  return (Color(red: 0.25, green: 0.50, blue: 1.00), Color(red: 0.10, green: 0.30, blue: 0.85), Color(red: 0.50, green: 0.75, blue: 1.00))
+        case 1:  return (Color(red: 0.30, green: 0.65, blue: 1.00), Color(red: 0.15, green: 0.55, blue: 0.85), Color(red: 0.20, green: 0.80, blue: 0.65))
+        default: return (Color(red: 0.20, green: 0.45, blue: 0.90), Color(red: 0.40, green: 0.70, blue: 1.00), Color(red: 0.10, green: 0.60, blue: 0.85))
         }
     }
 
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [topColor, bottomColor],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-
-            Circle()
-                .fill(Color.blue.opacity(0.12))
-                .frame(width: 320, height: 320)
-                .blur(radius: 60)
-                .offset(x: -80, y: -200)
-
-            Circle()
-                .fill(Color.cyan.opacity(0.08))
-                .frame(width: 240, height: 240)
-                .blur(radius: 50)
-                .offset(x: 120, y: 180)
-        }
+        AnimatedOrbBackground(primary: colors.0, secondary: colors.1, tertiary: colors.2)
+            .animation(.easeInOut(duration: 0.8), value: step)
     }
 }
 
@@ -198,9 +175,12 @@ private struct OnboardingProgressBar: View {
         HStack(spacing: 6) {
             ForEach(0..<total, id: \.self) { index in
                 Capsule()
-                    .fill(index <= current ? Color.white : Color.white.opacity(0.25))
-                    .frame(height: 3)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.8), value: current)
+                    .fill(index <= current
+                        ? Color.white
+                        : Color.white.opacity(0.22))
+                    .frame(height: index == current ? 4 : 3)
+                    .scaleEffect(x: index == current ? 1.4 : 1.0, anchor: .leading)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.75), value: current)
             }
         }
     }
@@ -209,46 +189,88 @@ private struct OnboardingProgressBar: View {
 // MARK: - Step 0: Hero
 
 private struct HeroStep: View {
-    @State private var iconScale: CGFloat = 0.5
+    @State private var iconScale: CGFloat = 0.4
     @State private var iconOpacity: Double = 0
+    @State private var ringScale1: CGFloat = 0.6
+    @State private var ringOpacity1: Double = 0
+    @State private var ringScale2: CGFloat = 0.6
+    @State private var ringOpacity2: Double = 0
+    @State private var titleOpacity: Double = 0
+    @State private var titleOffset: CGFloat = 20
+
+    private let sky = Color(red: 0.55, green: 0.82, blue: 1.0)
 
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
+                // Outer pulse ring
                 Circle()
-                    .fill(Color.white.opacity(0.06))
-                    .frame(width: 160, height: 160)
+                    .stroke(sky.opacity(0.10), lineWidth: 1.5)
+                    .frame(width: 220, height: 220)
+                    .scaleEffect(ringScale2)
+                    .opacity(ringOpacity2)
 
+                // Inner glow ring
                 Circle()
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 200, height: 200)
+                    .fill(sky.opacity(0.09))
+                    .frame(width: 180, height: 180)
+                    .scaleEffect(ringScale1)
+                    .opacity(ringOpacity1)
+                    .blur(radius: 12)
+
+                // Core circle
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [sky.opacity(0.22), sky.opacity(0.04)],
+                            center: .center, startRadius: 20, endRadius: 80
+                        )
+                    )
+                    .frame(width: 150, height: 150)
 
                 Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 72))
+                    .font(.system(size: 80))
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(Color(red: 0.55, green: 0.8, blue: 1.0))
+                    .foregroundStyle(sky)
+                    .shadow(color: sky.opacity(0.5), radius: 24, x: 0, y: 8)
                     .scaleEffect(iconScale)
                     .opacity(iconOpacity)
+                    .floating(amplitude: 8, duration: 3.5)
             }
-            .padding(.bottom, 48)
+            .padding(.bottom, 52)
 
             VStack(spacing: 16) {
                 Text(L10n.text("onboarding_welcome"))
                     .font(.system(size: 52, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
 
                 Text(L10n.text("onboarding_subtitle"))
                     .font(.system(size: 18, weight: .regular))
-                    .foregroundStyle(Color.white.opacity(0.65))
+                    .foregroundStyle(Color.white.opacity(0.70))
                     .multilineTextAlignment(.center)
-                    .lineSpacing(4)
+                    .lineSpacing(5)
             }
+            .opacity(titleOpacity)
+            .offset(y: titleOffset)
         }
         .padding(.horizontal, 28)
         .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.15)) {
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.68).delay(0.1)) {
                 iconScale = 1.0
                 iconOpacity = 1.0
+            }
+            withAnimation(.easeOut(duration: 0.7).delay(0.05)) {
+                ringScale1 = 1.0
+                ringOpacity1 = 1.0
+            }
+            withAnimation(.easeOut(duration: 0.9).delay(0.0)) {
+                ringScale2 = 1.0
+                ringOpacity2 = 1.0
+            }
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.82).delay(0.3)) {
+                titleOpacity = 1.0
+                titleOffset = 0
             }
         }
     }

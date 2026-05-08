@@ -91,53 +91,32 @@ struct HomeView: View {
 private struct HomeBackground: View {
     var symbolName: String = "cloud.fill"
 
-    private var colors: (primary: Color, secondary: Color) {
+    private var orbColors: (Color, Color, Color) {
         if symbolName.contains("storm") || symbolName.contains("thunder") {
-            return (Color(red: 0.45, green: 0.25, blue: 0.85), Color(red: 0.3, green: 0.15, blue: 0.65))
+            return (Color(red: 0.45, green: 0.20, blue: 0.90), Color(red: 0.25, green: 0.10, blue: 0.70), Color(red: 0.60, green: 0.30, blue: 1.0))
         }
         if symbolName.contains("snow") || symbolName.contains("sleet") {
-            return (Color(red: 0.5, green: 0.75, blue: 0.95), Color(red: 0.3, green: 0.55, blue: 0.85))
+            return (Color(red: 0.55, green: 0.80, blue: 1.0), Color(red: 0.35, green: 0.60, blue: 0.90), Color(red: 0.80, green: 0.90, blue: 1.0))
         }
         if symbolName.contains("rain") || symbolName.contains("drizzle") {
-            return (Color(red: 0.25, green: 0.45, blue: 0.85), Color(red: 0.15, green: 0.3, blue: 0.7))
+            return (Color(red: 0.20, green: 0.40, blue: 0.85), Color(red: 0.10, green: 0.25, blue: 0.70), Color(red: 0.35, green: 0.55, blue: 1.0))
         }
         if symbolName.contains("fog") || symbolName.contains("mist") {
-            return (Color(red: 0.5, green: 0.55, blue: 0.65), Color(red: 0.35, green: 0.4, blue: 0.55))
+            return (Color(red: 0.50, green: 0.55, blue: 0.65), Color(red: 0.35, green: 0.40, blue: 0.55), Color(red: 0.60, green: 0.65, blue: 0.72))
         }
         if symbolName.contains("sun") || symbolName.contains("clear") {
-            return (Color(red: 1.0, green: 0.6, blue: 0.15), Color(red: 0.9, green: 0.4, blue: 0.1))
+            return (Color(red: 1.0, green: 0.60, blue: 0.10), Color(red: 0.90, green: 0.35, blue: 0.05), Color(red: 1.0, green: 0.80, blue: 0.30))
         }
-        return (Color(red: 0.3, green: 0.5, blue: 0.9), Color(red: 0.2, green: 0.35, blue: 0.75))
+        return (Color(red: 0.25, green: 0.48, blue: 0.92), Color(red: 0.15, green: 0.32, blue: 0.75), Color(red: 0.40, green: 0.65, blue: 1.0))
     }
 
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.06, blue: 0.14), Color(red: 0.05, green: 0.09, blue: 0.20)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            // top-left large orb
-            Ellipse()
-                .fill(colors.primary.opacity(0.18))
-                .frame(width: 420, height: 340)
-                .blur(radius: 80)
-                .offset(x: -80, y: -180)
-                .animation(.easeInOut(duration: 1.4), value: symbolName)
-            // bottom-right secondary orb
-            Circle()
-                .fill(colors.secondary.opacity(0.10))
-                .frame(width: 300)
-                .blur(radius: 65)
-                .offset(x: 130, y: 260)
-                .animation(.easeInOut(duration: 1.4), value: symbolName)
-            // center subtle glow
-            Circle()
-                .fill(colors.primary.opacity(0.06))
-                .frame(width: 200)
-                .blur(radius: 50)
-                .offset(x: 30, y: 30)
-                .animation(.easeInOut(duration: 1.4), value: symbolName)
-        }
+        AnimatedOrbBackground(
+            primary: orbColors.0,
+            secondary: orbColors.1,
+            tertiary: orbColors.2
+        )
+        .animation(.easeInOut(duration: 1.5), value: symbolName)
     }
 }
 
@@ -399,7 +378,8 @@ private struct HomeHeroCard: View {
                             .font(.system(size: 60))
                             .symbolRenderingMode(.hierarchical)
                             .foregroundStyle(sky)
-                            .shadow(color: sky.opacity(0.4), radius: 16, x: 0, y: 6)
+                            .shadow(color: sky.opacity(0.45), radius: 20, x: 0, y: 8)
+                            .floating(amplitude: 6, duration: 3.2)
                         if isUsingCached {
                             HStack(spacing: 4) {
                                 Image(systemName: "clock.arrow.circlepath")
@@ -457,7 +437,7 @@ private struct HomeHeroCard: View {
                         }
                     }
                     Spacer()
-                    ScoreRingView(score: recommendation.outdoorScore, size: 72)
+                    ScoreRingView(score: recommendation.outdoorScore, size: 72, showOutOf100: true)
                         .environment(\.colorScheme, .dark)
                 }
                 .padding(.top, 16)
