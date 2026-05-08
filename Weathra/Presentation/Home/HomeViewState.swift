@@ -4,10 +4,16 @@ struct HomeViewState: Equatable {
     let recommendation: DailyRecommendation
     let currentWeather: HomeCurrentWeatherViewState
     let dailyForecasts: [DailyForecastItem]
+    let hourlyScores: [HourlyScoreItem]
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
     let warningMessage: String?
     let attribution: WeatherAttributionInfo?
+}
+
+struct HourlyScoreItem: Equatable {
+    let hour: Int
+    let score: Int
 }
 
 struct HomeCurrentWeatherViewState: Equatable {

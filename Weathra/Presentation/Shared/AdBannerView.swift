@@ -14,79 +14,94 @@ struct AdBannerView: View {
     }
 }
 
+// MARK: - Free user banner
+
 private struct AdSpaceView: View {
     let onRemoveAdsTapped: () -> Void
 
     var body: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 4) {
-                Image(systemName: "sparkles")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.secondary.opacity(0.7))
-                Text(L10n.text("ad_label_text"))
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.secondary.opacity(0.7))
-                Spacer()
-            }
-            .padding(.horizontal, 12)
-
-            RoundedRectangle(cornerRadius: 8)
-                .fill(.gray.opacity(0.1))
-                .frame(height: 60)
-                .overlay {
-                    Text(L10n.text("ad_space_text"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary.opacity(0.5))
+        Button(action: {
+            HapticManager.light()
+            onRemoveAdsTapped()
+        }) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(Color(red: 1.0, green: 0.78, blue: 0.25).opacity(0.12))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "crown.fill")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color(red: 1.0, green: 0.78, blue: 0.25))
                 }
-        }
-        .padding(12)
-        .background(
-            .gray.opacity(0.05),
-            in: RoundedRectangle(cornerRadius: 12)
-        )
-        .overlay(alignment: .topTrailing) {
-            Button(action: {
-                HapticManager.light()
-                onRemoveAdsTapped()
-            }) {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.secondary.opacity(0.5))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("ad_label_text"))
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.65))
+                    Text(L10n.text("premium_upgrade"))
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color(red: 1.0, green: 0.78, blue: 0.25))
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.2))
             }
-            .buttonStyle(.plain)
-            .padding(8)
+            .padding(14)
+            .background(
+                Color(red: 1.0, green: 0.78, blue: 0.25).opacity(0.07),
+                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color(red: 1.0, green: 0.78, blue: 0.25).opacity(0.15), lineWidth: 1)
+            )
         }
+        .buttonStyle(.plain)
     }
 }
+
+// MARK: - Premium user banner
 
 private struct PremiumBannerView: View {
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "crown.fill")
-                .font(.caption)
-                .fontWeight(.bold)
-                .foregroundStyle(.yellow)
-
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.12))
+                    .frame(width: 32, height: 32)
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color(red: 0.35, green: 0.85, blue: 0.6))
+            }
             Text(L10n.text("settings_premium_active"))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Color(red: 0.35, green: 0.85, blue: 0.6))
             Spacer()
         }
-        .padding(12)
+        .padding(14)
         .background(
-            .yellow.opacity(0.1),
-            in: RoundedRectangle(cornerRadius: 12)
+            Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.07),
+            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.15), lineWidth: 1)
         )
     }
 }
 
 #Preview("Free User") {
-    AdBannerView(adUnitID: nil, isPremium: false, onRemoveAdsTapped: {})
+    ZStack {
+        Color(red: 0.04, green: 0.08, blue: 0.18).ignoresSafeArea()
+        AdBannerView(adUnitID: nil, isPremium: false, onRemoveAdsTapped: {})
+            .padding()
+    }
 }
 
 #Preview("Premium User") {
-    AdBannerView(adUnitID: nil, isPremium: true, onRemoveAdsTapped: {})
+    ZStack {
+        Color(red: 0.04, green: 0.08, blue: 0.18).ignoresSafeArea()
+        AdBannerView(adUnitID: nil, isPremium: true, onRemoveAdsTapped: {})
+            .padding()
+    }
 }

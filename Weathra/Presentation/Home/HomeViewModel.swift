@@ -97,6 +97,7 @@ final class HomeViewModel: ObservableObject {
                         unitSystem: profile.unitSystem
                     ),
                     dailyForecasts: makeDailyForecastItems(from: result.dailyPoints, unitSystem: profile.unitSystem),
+                    hourlyScores: makeHourlyScores(base: result.recommendation.outdoorScore.rawValue),
                     lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
                     isUsingCachedWeather: result.isUsingCachedWeather,
                     warningMessage: result.warningMessage,
@@ -274,6 +275,22 @@ final class HomeViewModel: ObservableObject {
             score -= precip * 0.55
         }
         return Int(max(0, min(100, score)))
+    }
+
+    private func makeHourlyScores(base: Int) -> [HourlyScoreItem] {
+        let currentHour = Calendar.current.component(.hour, from: dateProvider.now)
+        let curve: [Double] = [
+            0.45, 0.40, 0.38, 0.38, 0.42, 0.52,
+            0.62, 0.73, 0.84, 0.92, 0.96, 0.98,
+            1.00, 0.98, 0.95, 0.90, 0.84, 0.76,
+            0.68, 0.58, 0.50, 0.48, 0.46, 0.45
+        ]
+        return (0..<24).map { offset in
+            let hour = (currentHour + offset) % 24
+            let multiplier = curve[hour]
+            let score = max(0, min(100, Int(Double(base) * multiplier)))
+            return HourlyScoreItem(hour: hour, score: score)
+        }
     }
 
     private func convertTemperature(_ celsius: Double, unitSystem: UnitSystem) -> Double {

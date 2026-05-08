@@ -11,124 +11,215 @@ struct LocationPickerView: View {
     @State private var showAddLocation = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                if savedLocations.count > 1 {
-                    Button(isEditing ? L10n.text("location_picker_done") : L10n.text("location_picker_edit")) {
-                        isEditing.toggle()
-                    }
-                    .padding(.leading, 20)
-                }
-                Spacer()
-                Button {
-                    showAddLocation = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.blue)
-                }
-                Button(L10n.text("location_picker_close")) {
-                    dismiss()
-                }
-                .fontWeight(.semibold)
-                .padding(.trailing, 20)
-            }
-            .padding(.vertical, 12)
-            .background(.regularMaterial)
+        ZStack {
+            LocationPickerBackground().ignoresSafeArea()
+            VStack(spacing: 0) {
+                LocationPickerNavBar(
+                    isEditing: $isEditing,
+                    showMultipleLocations: savedLocations.count > 1,
+                    onAdd: { showAddLocation = true },
+                    onClose: { dismiss() }
+                )
 
-            if savedLocations.isEmpty {
-                Spacer()
-                VStack(spacing: 12) {
-                    Image(systemName: "mappin.slash")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.secondary)
-                    Text(L10n.text("location_picker_empty"))
-                        .font(.headline)
-                    Text(L10n.text("location_picker_empty_hint"))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-            } else {
-                List {
-                    ForEach(savedLocations) { location in
-                        Button {
-                            select(location)
-                        } label: {
-                            LocationRowContent(
-                                location: location,
-                                isSelected: location.id == selectedLocationID
-                            )
+                if savedLocations.isEmpty {
+                    Spacer()
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.06))
+                                .frame(width: 80, height: 80)
+                            Image(systemName: "mappin.slash")
+                                .font(.system(size: 32))
+                                .foregroundStyle(Color.white.opacity(0.35))
                         }
-                        .buttonStyle(.plain)
+                        Text(L10n.text("location_picker_empty"))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(.white)
+                        Text(L10n.text("location_picker_empty_hint"))
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.white.opacity(0.4))
                     }
-                    .onDelete { offsets in
-                        if isEditing { deleteLocations(at: offsets) }
+                    Spacer()
+                } else {
+                    ScrollView {
+                        VStack(spacing: 4) {
+                            ForEach(savedLocations) { location in
+                                LocationRow(
+                                    location: location,
+                                    isSelected: location.id == selectedLocationID,
+                                    isEditing: isEditing,
+                                    onTap: { select(location) },
+                                    onDelete: { deleteLocation(location) }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 12)
+                        .padding(.bottom, 24)
                     }
+                    .scrollIndicators(.hidden)
                 }
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
             }
         }
-        .background(Color(UIColor.systemGroupedBackground))
         .sheet(isPresented: $showAddLocation) {
             AddLocationView(savedLocations: $savedLocations)
         }
     }
 
     private func select(_ location: SavedLocation) {
-        guard isEditing == false else { return }
+        guard !isEditing else { return }
+        HapticManager.light()
         selectedLocationID = location.id
         onSelect(location)
         dismiss()
     }
 
-    private func deleteLocations(at offsets: IndexSet) {
-        let deletableIDs = offsets.compactMap { index in
-            savedLocations.indices.contains(index) ? savedLocations[index].id : nil
-        }
-        savedLocations.removeAll { location in
-            deletableIDs.contains(location.id) && location.id != "current-location"
+    private func deleteLocation(_ location: SavedLocation) {
+        guard location.id != "current-location" else { return }
+        savedLocations.removeAll { $0.id == location.id }
+    }
+}
+
+// MARK: - Background
+
+private struct LocationPickerBackground: View {
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
+                startPoint: .topLeading, endPoint: .bottomTrailing
+            )
+            Circle()
+                .fill(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.07))
+                .frame(width: 250).blur(radius: 55)
+                .offset(x: 80, y: -180)
         }
     }
 }
 
-private struct LocationRowContent: View {
-    let location: SavedLocation
-    let isSelected: Bool
+// MARK: - Nav bar
+
+private struct LocationPickerNavBar: View {
+    @Binding var isEditing: Bool
+    let showMultipleLocations: Bool
+    let onAdd: () -> Void
+    let onClose: () -> Void
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: location.id == "current-location" ? "location.fill" : "mappin.and.ellipse")
-                .font(.title3)
-                .frame(width: 32, height: 32)
-                .foregroundStyle(location.id == "current-location" ? .blue : .primary)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(location.name)
-                    .font(.body)
-                    .fontWeight(.semibold)
-                if !location.address.isEmpty {
-                    Text(location.address)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+            if showMultipleLocations {
+                Button {
+                    HapticManager.light()
+                    isEditing.toggle()
+                } label: {
+                    Text(isEditing ? L10n.text("location_picker_done") : L10n.text("location_picker_edit"))
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
                 }
             }
-
-            Spacer(minLength: 12)
-
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.blue)
+            Spacer()
+            Button(action: onAdd) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "plus")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+            }
+            Button(action: onClose) {
+                ZStack {
+                    Circle()
+                        .fill(Color.white.opacity(0.1))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color.white.opacity(0.6))
+                }
             }
         }
-        .padding(.vertical, 8)
-        .contentShape(Rectangle())
+        .padding(.horizontal, 20)
+        .padding(.vertical, 14)
+        .background(.ultraThinMaterial)
+        .overlay(Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1), alignment: .bottom)
     }
 }
+
+// MARK: - Location row
+
+private struct LocationRow: View {
+    let location: SavedLocation
+    let isSelected: Bool
+    let isEditing: Bool
+    let onTap: () -> Void
+    let onDelete: () -> Void
+
+    private var isCurrentLocation: Bool { location.id == "current-location" }
+
+    var body: some View {
+        HStack(spacing: 14) {
+            if isEditing && !isCurrentLocation {
+                Button(action: onDelete) {
+                    ZStack {
+                        Circle().fill(Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.15)).frame(width: 26, height: 26)
+                        Image(systemName: "minus").font(.system(size: 11, weight: .bold)).foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
+                    }
+                }
+                .transition(.scale.combined(with: .opacity))
+            }
+
+            Button(action: onTap) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(isCurrentLocation
+                                  ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.15)
+                                  : Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.12))
+                            .frame(width: 38, height: 38)
+                        Image(systemName: isCurrentLocation ? "location.fill" : "mappin.and.ellipse")
+                            .font(.system(size: 15))
+                            .foregroundStyle(isCurrentLocation
+                                             ? Color(red: 0.4, green: 0.7, blue: 1.0)
+                                             : Color(red: 1.0, green: 0.5, blue: 0.5))
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(location.name)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white)
+                        if !location.address.isEmpty {
+                            Text(location.address)
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.white.opacity(0.4))
+                                .lineLimit(1)
+                        }
+                    }
+
+                    Spacer()
+
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 18))
+                            .foregroundStyle(Color(red: 0.4, green: 0.85, blue: 0.6))
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(isSelected
+                        ? Color(red: 0.4, green: 0.85, blue: 0.6).opacity(0.25)
+                        : Color.white.opacity(0.07), lineWidth: 1)
+        )
+        .animation(.easeInOut(duration: 0.2), value: isEditing)
+    }
+}
+
+// MARK: - Add location sheet
 
 private struct AddLocationView: View {
     @Environment(\.dismiss) private var dismiss
@@ -139,50 +230,77 @@ private struct AddLocationView: View {
     @State private var longitudeText = "28.9784"
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button(L10n.text("location_picker_cancel")) { dismiss() }
-                Spacer()
-                Text(L10n.text("location_picker_add_title"))
-                    .font(.headline)
-                Spacer()
-                Button(L10n.text("location_picker_add_button")) { addLocation() }
-                    .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
-                    .fontWeight(.semibold)
+        ZStack {
+            LinearGradient(
+                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
+                startPoint: .top, endPoint: .bottom
+            ).ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                HStack {
+                    Button(L10n.text("location_picker_cancel")) {
+                        dismiss()
+                    }
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.white.opacity(0.5))
+
+                    Spacer()
+
+                    Text(L10n.text("location_picker_add_title"))
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    Button(L10n.text("location_picker_add_button")) { addLocation() }
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(
+                            name.trimmingCharacters(in: .whitespaces).isEmpty
+                            ? Color.white.opacity(0.25)
+                            : Color(red: 0.4, green: 0.7, blue: 1.0)
+                        )
+                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .overlay(Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1), alignment: .bottom)
+
+                ScrollView {
+                    VStack(spacing: 20) {
+                        AddLocationField(
+                            label: L10n.text("location_picker_name_section"),
+                            placeholder: L10n.text("location_picker_name_placeholder"),
+                            text: $name,
+                            keyboardType: .default
+                        )
+                        AddLocationField(
+                            label: L10n.text("location_picker_latitude"),
+                            placeholder: "41.0082",
+                            text: $latitudeText,
+                            keyboardType: .decimalPad
+                        )
+                        AddLocationField(
+                            label: L10n.text("location_picker_longitude"),
+                            placeholder: "28.9784",
+                            text: $longitudeText,
+                            keyboardType: .decimalPad
+                        )
+                        Text(L10n.text("location_picker_default_coords_note"))
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.3))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(20)
+                }
+                .scrollIndicators(.hidden)
             }
-            .padding()
-            .background(.regularMaterial)
-
-            Form {
-                Section(L10n.text("location_picker_name_section")) {
-                    TextField(L10n.text("location_picker_name_placeholder"), text: $name)
-                }
-
-                Section(L10n.text("location_picker_coordinates")) {
-                    TextField(L10n.text("location_picker_latitude"), text: $latitudeText)
-                        .keyboardType(.decimalPad)
-                    TextField(L10n.text("location_picker_longitude"), text: $longitudeText)
-                        .keyboardType(.decimalPad)
-                }
-
-                Section {
-                    Text(L10n.text("location_picker_default_coords_note"))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .scrollContentBackground(.hidden)
         }
-        .background(Color(UIColor.systemGroupedBackground))
     }
 
     private func addLocation() {
         guard let lat = Double(latitudeText.trimmingCharacters(in: .whitespaces)),
               let lon = Double(longitudeText.trimmingCharacters(in: .whitespaces)),
-              name.trimmingCharacters(in: .whitespaces).isEmpty == false else {
-            return
-        }
-
+              !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         let location = SavedLocation(
             name: name.trimmingCharacters(in: .whitespaces),
             latitude: lat,
@@ -191,5 +309,29 @@ private struct AddLocationView: View {
         )
         savedLocations.append(location)
         dismiss()
+    }
+}
+
+private struct AddLocationField: View {
+    let label: String
+    let placeholder: String
+    @Binding var text: String
+    let keyboardType: UIKeyboardType
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.45))
+                .textCase(.uppercase)
+                .tracking(0.5)
+            TextField(placeholder, text: $text)
+                .font(.system(size: 15))
+                .foregroundStyle(.white)
+                .keyboardType(keyboardType)
+                .padding(14)
+                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
+        }
     }
 }

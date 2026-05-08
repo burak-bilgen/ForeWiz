@@ -100,9 +100,9 @@ struct OnboardingView: View {
 
     private var buttonLabel: String {
         switch currentStep {
-        case 0: "Keşfet"
-        case 1: "Başla"
-        default: "Tamamla"
+        case 0: L10n.text("onboarding_continue")
+        case 1: L10n.text("onboarding_lets_start")
+        default: L10n.text("onboarding_ready")
         }
     }
 
@@ -233,11 +233,11 @@ private struct HeroStep: View {
             .padding(.bottom, 48)
 
             VStack(spacing: 16) {
-                Text("Weathra")
+                Text(L10n.text("onboarding_welcome"))
                     .font(.system(size: 52, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
-                Text("Hava durumunu anlayan\nkişisel asistanın")
+                Text(L10n.text("onboarding_subtitle"))
                     .font(.system(size: 18, weight: .regular))
                     .foregroundStyle(Color.white.opacity(0.65))
                     .multilineTextAlignment(.center)
@@ -257,21 +257,21 @@ private struct HeroStep: View {
 // MARK: - Step 1: Features
 
 private struct FeaturesStep: View {
-    private let features: [(icon: String, color: Color, title: String, subtitle: String)] = [
-        ("brain.head.profile", Color(red: 0.4, green: 0.7, blue: 1.0), "Akıllı Analiz", "Sadece sıcaklık değil, tüm hava koşullarını değerlendirir"),
-        ("figure.outdoor.cycle", Color(red: 0.4, green: 0.85, blue: 0.65), "Aktivite Skorları", "Çıkmak, koşmak veya bisiklet için en iyi saati bulur"),
-        ("tshirt.fill", Color(red: 0.8, green: 0.65, blue: 1.0), "Kıyafet Önerisi", "Günün havasına göre ne giymen gerektiğini söyler"),
-        ("bell.badge.fill", Color(red: 1.0, green: 0.75, blue: 0.35), "Akıllı Bildirimler", "Hava değişmeden önce seni uyarır"),
-    ]
+    private var features: [(icon: String, color: Color, title: String, subtitle: String)] {[
+        ("brain.head.profile", Color(red: 0.4, green: 0.7, blue: 1.0), L10n.text("onboarding_feature_decision"), L10n.text("onboarding_feature_decision_desc")),
+        ("figure.outdoor.cycle", Color(red: 0.4, green: 0.85, blue: 0.65), L10n.text("onboarding_feature_personal"), L10n.text("onboarding_feature_personal_desc")),
+        ("tshirt.fill", Color(red: 0.8, green: 0.65, blue: 1.0), L10n.text("onboarding_comparison_what_wear"), L10n.text("onboarding_comparison_what_wear_weathra")),
+        ("bell.badge.fill", Color(red: 1.0, green: 0.75, blue: 0.35), L10n.text("onboarding_feature_notifications"), L10n.text("onboarding_feature_notifications_desc")),
+    ]}
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Neden Weathra?")
+                Text(L10n.text("onboarding_why_weathra"))
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
-                Text("Diğer hava uygulamalarından farkı")
+                Text(L10n.text("onboarding_why_subtitle"))
                     .font(.system(size: 16))
                     .foregroundStyle(Color.white.opacity(0.55))
             }
@@ -348,11 +348,11 @@ private struct PermissionsStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 12) {
-                Text("İzinler")
+                Text(L10n.text("onboarding_permissions_title"))
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
-                Text("Sana özel deneyim için iki şeye ihtiyacımız var")
+                Text(L10n.text("onboarding_permissions_subtitle"))
                     .font(.system(size: 16))
                     .foregroundStyle(Color.white.opacity(0.55))
             }
@@ -454,7 +454,7 @@ private struct PermissionCard: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
                     if isRequired {
-                        Text("Zorunlu")
+                        Text(L10n.text("onboarding_location_required"))
                             .font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.35))
                             .padding(.horizontal, 6)
@@ -506,7 +506,7 @@ private struct PermissionCard: View {
                 .font(.system(size: 22))
                 .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
         case .pending:
-            Text("İzin Ver")
+            Text(L10n.text("onboarding_permission_allow"))
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 12)
