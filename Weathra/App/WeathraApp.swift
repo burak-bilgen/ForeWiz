@@ -66,6 +66,12 @@ struct WeathraApp: App {
             .onOpenURL { url in
                 deepLinkHandler.handle(url)
             }
+            .onContinueUserActivity("refresh") { _ in
+                AnalyticsManager.shared.track(.homeRefresh)
+            }
+            .onContinueUserActivity("settings") { _ in
+                AnalyticsManager.shared.track(.settingsOpened)
+            }
         }
     }
 

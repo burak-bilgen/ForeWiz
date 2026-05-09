@@ -77,5 +77,24 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>refresh</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Yenile</string>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeRefresh</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>settings</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Ayarlar</string>
+			<key>UIApplicationShortcutItemIconType</key>
+			<string>UIApplicationShortcutIconTypeSettings</string>
+		</dict>
+	</array>
 </dict>
 </plist>
