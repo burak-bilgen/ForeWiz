@@ -23,7 +23,7 @@ struct OnboardingView: View {
                 headerBar
 
                 TabView(selection: $currentStep) {
-                    ForEach(0..<totalSteps, id: \.self) { step in
+                    ForEach(0 ..< totalSteps, id: \.self) { step in
                         stepView(for: step)
                             .tag(step)
                     }
@@ -156,7 +156,9 @@ struct OnboardingView: View {
         }
     }
 
-    private var isLastStep: Bool { currentStep == totalSteps - 1 }
+    private var isLastStep: Bool {
+        currentStep == totalSteps - 1
+    }
 
     private func copy(tr: String, en: String) -> String {
         L10n.currentLanguageCode == "tr" ? tr : en
@@ -183,8 +185,8 @@ private struct OnboardingBackground: View {
 
     private var colors: (Color, Color, Color) {
         switch step {
-        case 0:  return (Color(red: 0.25, green: 0.50, blue: 1.00), Color(red: 0.10, green: 0.30, blue: 0.85), Color(red: 0.50, green: 0.75, blue: 1.00))
-        case 1:  return (Color(red: 0.30, green: 0.65, blue: 1.00), Color(red: 0.15, green: 0.55, blue: 0.85), Color(red: 0.20, green: 0.80, blue: 0.65))
+        case 0: return (Color(red: 0.25, green: 0.50, blue: 1.00), Color(red: 0.10, green: 0.30, blue: 0.85), Color(red: 0.50, green: 0.75, blue: 1.00))
+        case 1: return (Color(red: 0.30, green: 0.65, blue: 1.00), Color(red: 0.15, green: 0.55, blue: 0.85), Color(red: 0.20, green: 0.80, blue: 0.65))
         default: return (Color(red: 0.20, green: 0.45, blue: 0.90), Color(red: 0.40, green: 0.70, blue: 1.00), Color(red: 0.10, green: 0.60, blue: 0.85))
         }
     }
@@ -203,7 +205,7 @@ private struct OnboardingProgressBar: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            ForEach(0..<total, id: \.self) { index in
+            ForEach(0 ..< total, id: \.self) { index in
                 Capsule()
                     .fill(index == current ? Color.white : Color.white.opacity(0.3))
                     .frame(width: index == current ? 24 : 8, height: 4)
@@ -269,12 +271,14 @@ private struct HeroStep: View {
 // MARK: - Step 1: Features
 
 private struct FeaturesStep: View {
-    private var features: [(icon: String, color: Color, title: String, subtitle: String)] {[
-        ("brain.head.profile", Color(red: 0.4, green: 0.7, blue: 1.0), L10n.text("onboarding_feature_decision"), L10n.text("onboarding_feature_decision_desc")),
-        ("figure.outdoor.cycle", Color(red: 0.4, green: 0.85, blue: 0.65), L10n.text("onboarding_feature_personal"), L10n.text("onboarding_feature_personal_desc")),
-        ("tshirt.fill", Color(red: 0.8, green: 0.65, blue: 1.0), L10n.text("onboarding_comparison_what_wear"), L10n.text("onboarding_comparison_what_wear_weathra")),
-        ("bell.badge.fill", Color(red: 1.0, green: 0.75, blue: 0.35), L10n.text("onboarding_feature_notifications"), L10n.text("onboarding_feature_notifications_desc")),
-    ]}
+    private var features: [(icon: String, color: Color, title: String, subtitle: String)] {
+        [
+            ("brain.head.profile", Color(red: 0.4, green: 0.7, blue: 1.0), L10n.text("onboarding_feature_decision"), L10n.text("onboarding_feature_decision_desc")),
+            ("figure.outdoor.cycle", Color(red: 0.4, green: 0.85, blue: 0.65), L10n.text("onboarding_feature_personal"), L10n.text("onboarding_feature_personal_desc")),
+            ("tshirt.fill", Color(red: 0.8, green: 0.65, blue: 1.0), L10n.text("onboarding_comparison_what_wear"), L10n.text("onboarding_comparison_what_wear_weathra")),
+            ("bell.badge.fill", Color(red: 1.0, green: 0.75, blue: 0.35), L10n.text("onboarding_feature_notifications"), L10n.text("onboarding_feature_notifications_desc")),
+        ]
+    }
 
     var body: some View {
         ScrollView {

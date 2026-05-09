@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct PermissionSetupSection: View {
     @Environment(\.openURL) private var openURL
@@ -42,30 +41,24 @@ struct PermissionSetupSection: View {
         }
         .padding(20)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
+            AppTheme.elevatedSurface,
             in: RoundedRectangle(cornerRadius: 16)
         )
     }
 
     private var locationActionTitle: String {
         switch viewModel.locationStatus {
-        case .authorized:
-            L10n.text("permission_open")
-        case .denied, .restricted:
-            L10n.text("permission_settings")
-        case .notDetermined:
-            L10n.text("permission_allow")
+        case .authorized: L10n.text("permission_open")
+        case .denied, .restricted: L10n.text("permission_settings")
+        case .notDetermined: L10n.text("permission_allow")
         }
     }
 
     private var notificationActionTitle: String {
         switch viewModel.notificationStatus {
-        case .authorized, .provisional:
-            L10n.text("permission_open")
-        case .denied:
-            L10n.text("permission_settings")
-        case .notDetermined:
-            L10n.text("permission_allow")
+        case .authorized, .provisional: L10n.text("permission_open")
+        case .denied: L10n.text("permission_settings")
+        case .notDetermined: L10n.text("permission_allow")
         }
     }
 
@@ -86,33 +79,24 @@ struct PermissionSetupSection: View {
     }
 
     private func openSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else {
-            return
-        }
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         openURL(url)
     }
 
     private func statusText(for status: LocationAuthorizationStatus) -> String {
         switch status {
-        case .notDetermined:
-            L10n.text("permission_pending")
-        case .authorized:
-            L10n.text("permission_open")
-        case .denied, .restricted:
-            L10n.text("permission_closed")
+        case .notDetermined: L10n.text("permission_pending")
+        case .authorized: L10n.text("permission_open")
+        case .denied, .restricted: L10n.text("permission_closed")
         }
     }
 
     private func notificationText(for status: NotificationAuthorizationStatus) -> String {
         switch status {
-        case .notDetermined:
-            L10n.text("permission_optional")
-        case .authorized:
-            L10n.text("permission_open")
-        case .provisional:
-            L10n.text("permission_silent_on")
-        case .denied:
-            L10n.text("permission_closed")
+        case .notDetermined: L10n.text("permission_optional")
+        case .authorized: L10n.text("permission_open")
+        case .provisional: L10n.text("permission_silent_on")
+        case .denied: L10n.text("permission_closed")
         }
     }
 }
@@ -160,7 +144,7 @@ struct PersonalizationSection: View {
         }
         .padding(20)
         .background(
-            Color(UIColor.secondarySystemGroupedBackground),
+            AppTheme.elevatedSurface,
             in: RoundedRectangle(cornerRadius: 16)
         )
     }
