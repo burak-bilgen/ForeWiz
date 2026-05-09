@@ -9,7 +9,6 @@ struct OnboardingView: View {
 
     @State private var isCompleting = false
     @State private var currentStep = 0
-    @State private var appeared = false
     @State private var languageKey = 0
 
     private let totalSteps = 4
@@ -21,62 +20,90 @@ struct OnboardingView: View {
                 .animation(.easeInOut(duration: 0.6), value: currentStep)
 
             VStack(spacing: 0) {
-                OnboardingProgressBar(current: currentStep, total: totalSteps)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .padding(.bottom, 8)
-
-                ScrollView {
-                    stepContent
-                        .frame(maxWidth: .infinity)
-                        .padding(.top, 4)
-                        .padding(.bottom, 8)
-                        .transition(.opacity.combined(with: .scale(scale: 0.98)))
-                        .id(currentStep)
-                        .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
-                }
-                .scrollIndicators(.hidden)
-
-                bottomButton
-                    .padding(.horizontal, 16)
+                headerBar
+                    .padding(.horizontal, 20)
                     .padding(.top, 8)
+
+                TabView(selection: $currentStep) {
+                    ForEach(0..<totalSteps, id: \.self) { step in
+                        stepView(for: step)
+                            .tag(step)
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
+
+                navigationBar
+                    .padding(.horizontal, 20)
                     .padding(.bottom, 20)
             }
         }
         .navigationBarHidden(true)
         .dynamicTypeSize(.large ... .xxxLarge)
-        .onAppear {
-            withAnimation(.easeOut(duration: 0.5).delay(0.1)) {
-                appeared = true
+    }
+
+    // MARK: - Header
+
+    private var headerBar: some View {
+        HStack {
+            if currentStep > 0 {
+                Button {
+                    withAnimation { currentStep -= 1 }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .frame(width: 36, height: 36)
+                        .background(Color.white.opacity(0.1), in: Circle())
+                }
+            } else {
+                Color.clear.frame(width: 36, height: 36)
             }
+
+            Spacer()
+
+            OnboardingProgressBar(current: currentStep, total: totalSteps)
+
+            Spacer()
+
+Button {
+                withAnimation { currentStep = totalSteps - 1 }
+            } label: {
+                Text(copy(tr: "Atla", en: "Skip"))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            .opacity(currentStep < totalSteps - 1 ? 1 : 0)
+            .disabled(currentStep >= totalSteps - 1)
         }
     }
 
-    // MARK: - Step content
+    // MARK: - Step view
 
     @ViewBuilder
-    private var stepContent: some View {
-        switch currentStep {
+    private func stepView(for step: Int) -> some View {
+        switch step {
         case 0: HeroStep()
         case 1: FeaturesStep()
         case 2:
             PersonalizationStep(viewModel: viewModel, languageKey: languageKey)
                 .id(languageKey)
         case 3:
-            PermissionsStep(
-                viewModel: viewModel,
-                appeared: appeared
-            )
+            PermissionsStep(viewModel: viewModel)
         default: EmptyView()
         }
     }
 
-    // MARK: - Bottom button
+    // MARK: - Navigation
 
-    private var bottomButton: some View {
+    private var navigationBar: some View {
         Button {
             HapticManager.medium()
-            advance()
+            if currentStep < totalSteps - 1 {
+                withAnimation { currentStep += 1 }
+            } else {
+                complete()
+            }
         } label: {
             ZStack {
                 if isCompleting {
@@ -129,14 +156,8 @@ struct OnboardingView: View {
 
     private var isLastStep: Bool { currentStep == totalSteps - 1 }
 
-    private func advance() {
-        if currentStep < totalSteps - 1 {
-            withAnimation(.spring(response: 0.45, dampingFraction: 0.85)) {
-                currentStep += 1
-            }
-        } else {
-            complete()
-        }
+    private func copy(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
     }
 
     private func complete() {
@@ -309,36 +330,37 @@ private struct FeaturesStep: View {
     ]}
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(L10n.text("onboarding_why_weathra"))
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.80)
-                    .fixedSize(horizontal: false, vertical: true)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.text("onboarding_why_weathra"))
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.80)
+                        .fixedSize(horizontal: false, vertical: true)
 
-                Text(L10n.text("onboarding_why_subtitle"))
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.white.opacity(0.55))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.bottom, 28)
-            .padding(.horizontal, 16)
+                    Text(L10n.text("onboarding_why_subtitle"))
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.white.opacity(0.55))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
-            VStack(spacing: 14) {
-                ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
-                    FeatureRow(
-                        icon: feature.icon,
-                        accentColor: feature.color,
-                        title: feature.title,
-                        subtitle: feature.subtitle,
-                        delay: Double(index) * 0.07
-                    )
+                VStack(spacing: 14) {
+                    ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
+                        FeatureRow(
+                            icon: feature.icon,
+                            accentColor: feature.color,
+                            title: feature.title,
+                            subtitle: feature.subtitle,
+                            delay: Double(index) * 0.07
+                        )
+                    }
                 }
             }
             .padding(.horizontal, 16)
         }
+        .scrollIndicators(.hidden)
     }
 }
 
@@ -400,101 +422,101 @@ private struct PersonalizationStep: View {
     private let amber = Color(red: 1.0, green: 0.72, blue: 0.32)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(copy(tr: "Asistanı kendine göre ayarla", en: "Tune the assistant for you"))
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.78)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(copy(tr: "Asistanı kendine göre ayarla", en: "Tune the assistant for you"))
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(copy(
+                        tr: "Bu seçimler skorları, kıyafet önerilerini ve bildirim önceliklerini doğrudan etkiler.",
+                        en: "These choices directly shape scores, outfit guidance and notification priority."
+                    ))
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.white.opacity(0.55))
                     .fixedSize(horizontal: false, vertical: true)
-
-                Text(copy(
-                    tr: "Bu seçimler skorları, kıyafet önerilerini ve bildirim önceliklerini doğrudan etkiler.",
-                    en: "These choices directly shape scores, outfit guidance and notification priority."
-                ))
-                .font(.system(size: 16))
-                .foregroundStyle(Color.white.opacity(0.55))
-                .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.bottom, 22)
-            .padding(.horizontal, 16)
-
-            VStack(spacing: 14) {
-                OnboardingPersonalizationCard(
-                    icon: "thermometer.sun.fill",
-                    color: amber,
-                    title: copy(tr: "Sıcaklığı nasıl hissedersin?", en: "How do you feel temperature?"),
-                    subtitle: copy(tr: "Hissedilen sıcaklık skorunu kişiselleştirir.", en: "Personalizes the feels-like comfort score.")
-                ) {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], spacing: 8) {
-                        ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
-                            OnboardingOptionTile(
-                                icon: icon(for: sensitivity),
-                                title: sensitivity.localizedTitle,
-                                color: amber,
-                                isSelected: viewModel.selectedSensitivity == sensitivity
-                            ) {
-                                HapticManager.selection()
-                                viewModel.selectSensitivity(sensitivity)
-                            }
-                        }
-                    }
                 }
 
-                OnboardingPersonalizationCard(
-                    icon: "figure.walk",
-                    color: green,
-                    title: copy(tr: "Dışarıda ne yaparsın?", en: "What do you do outside?"),
-                    subtitle: copy(tr: "Ana ekran en iyi saatleri bu aktivitelere göre çıkarır.", en: "Home finds the best windows for these activities.")
-                ) {
-                    FlowLayout(spacing: 8) {
-                        ForEach(ActivityType.allCases, id: \.self) { activity in
-                            OnboardingChip(
-                                icon: icon(for: activity),
-                                title: activity.localizedTitle,
-                                color: green,
-                                isSelected: viewModel.preferredActivities.contains(activity)
-                            ) {
-                                HapticManager.selection()
-                                viewModel.toggleActivity(activity)
-                            }
-                        }
-                    }
-                }
-
-                OnboardingPersonalizationCard(
-                    icon: "heart.text.square.fill",
-                    color: blue,
-                    title: copy(tr: "Sağlık hassasiyetleri", en: "Health sensitivities"),
-                    subtitle: copy(tr: "Polen ve hava kalitesi riskleri ana ekranda ve bildirimlerde öne çıkar.", en: "Pollen and air-quality risks are promoted on Home and in alerts.")
-                ) {
-                    FlowLayout(spacing: 8) {
-                        ForEach([AllergyType.pollen, .airQuality, .smoke, .dust], id: \.self) { allergy in
-                            OnboardingChip(
-                                icon: allergy.icon,
-                                title: allergy.localizedTitle,
-                                color: blue,
-                                isSelected: viewModel.selectedAllergies.contains(allergy)
-                            ) {
-                                HapticManager.selection()
-                                viewModel.toggleAllergy(allergy)
-                            }
-                        }
-                    }
-
-                    if viewModel.selectedAllergies.contains(.pollen) {
-                        Divider().background(Color.white.opacity(0.08)).padding(.vertical, 8)
-                        FlowLayout(spacing: 8) {
-                            ForEach(PollenType.allCases, id: \.self) { pollenType in
-                                OnboardingChip(
-                                    icon: "leaf.fill",
-                                    title: pollenType.localizedTitle,
+                VStack(spacing: 14) {
+                    OnboardingPersonalizationCard(
+                        icon: "thermometer.sun.fill",
+                        color: amber,
+                        title: copy(tr: "Sıcaklığı nasıl hissedersin?", en: "How do you feel temperature?"),
+                        subtitle: copy(tr: "Hissedilen sıcaklık skorunu kişiselleştirir.", en: "Personalizes the feels-like comfort score.")
+                    ) {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], spacing: 8) {
+                            ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
+                                OnboardingOptionTile(
+                                    icon: icon(for: sensitivity),
+                                    title: sensitivity.localizedTitle,
                                     color: amber,
-                                    isSelected: viewModel.selectedPollenTypes.contains(pollenType)
+                                    isSelected: viewModel.selectedSensitivity == sensitivity
                                 ) {
                                     HapticManager.selection()
-                                    viewModel.togglePollenType(pollenType)
+                                    viewModel.selectSensitivity(sensitivity)
+                                }
+                            }
+                        }
+                    }
+
+                    OnboardingPersonalizationCard(
+                        icon: "figure.walk",
+                        color: green,
+                        title: copy(tr: "Dışarıda ne yaparsın?", en: "What do you do outside?"),
+                        subtitle: copy(tr: "Ana ekran en iyi saatleri bu aktivitelere göre çıkarır.", en: "Home finds the best windows for these activities.")
+                    ) {
+                        FlowLayout(spacing: 8) {
+                            ForEach(ActivityType.allCases, id: \.self) { activity in
+                                OnboardingChip(
+                                    icon: icon(for: activity),
+                                    title: activity.localizedTitle,
+                                    color: green,
+                                    isSelected: viewModel.preferredActivities.contains(activity)
+                                ) {
+                                    HapticManager.selection()
+                                    viewModel.toggleActivity(activity)
+                                }
+                            }
+                        }
+                    }
+
+                    OnboardingPersonalizationCard(
+                        icon: "heart.text.square.fill",
+                        color: blue,
+                        title: copy(tr: "Sağlık hassasiyetleri", en: "Health sensitivities"),
+                        subtitle: copy(tr: "Polen ve hava kalitesi riskleri ana ekranda ve bildirimlerde öne çıkar.", en: "Pollen and air-quality risks are promoted on Home and in alerts.")
+                    ) {
+                        FlowLayout(spacing: 8) {
+                            ForEach([AllergyType.pollen, .airQuality, .smoke, .dust], id: \.self) { allergy in
+                                OnboardingChip(
+                                    icon: allergy.icon,
+                                    title: allergy.localizedTitle,
+                                    color: blue,
+                                    isSelected: viewModel.selectedAllergies.contains(allergy)
+                                ) {
+                                    HapticManager.selection()
+                                    viewModel.toggleAllergy(allergy)
+                                }
+                            }
+                        }
+
+                        if viewModel.selectedAllergies.contains(.pollen) {
+                            Divider().background(Color.white.opacity(0.08)).padding(.vertical, 8)
+                            FlowLayout(spacing: 8) {
+                                ForEach(PollenType.allCases, id: \.self) { pollenType in
+                                    OnboardingChip(
+                                        icon: "leaf.fill",
+                                        title: pollenType.localizedTitle,
+                                        color: amber,
+                                        isSelected: viewModel.selectedPollenTypes.contains(pollenType)
+                                    ) {
+                                        HapticManager.selection()
+                                        viewModel.togglePollenType(pollenType)
+                                    }
                                 }
                             }
                         }
@@ -503,6 +525,7 @@ private struct PersonalizationStep: View {
             }
             .padding(.horizontal, 16)
         }
+        .scrollIndicators(.hidden)
     }
 
     private func icon(for sensitivity: TemperatureSensitivity) -> String {
@@ -640,11 +663,10 @@ private struct OnboardingChip: View {
     }
 }
 
-// MARK: - Step 2: Permissions
+// MARK: - Step 3: Permissions
 
 private struct PermissionsStep: View {
     @ObservedObject var viewModel: OnboardingViewModel
-    let appeared: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -662,7 +684,6 @@ private struct PermissionsStep: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.bottom, 28)
-            .padding(.horizontal, 16)
 
             VStack(spacing: 14) {
                 PermissionCard(
@@ -693,7 +714,6 @@ private struct PermissionsStep: View {
                     }
                 )
             }
-            .padding(.horizontal, 16)
 
             if let error = viewModel.errorMessage {
                 HStack(spacing: 8) {
@@ -704,10 +724,12 @@ private struct PermissionsStep: View {
                 }
                 .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 16)
                 .padding(.top, 16)
             }
+
+            Spacer(minLength: 20)
         }
+        .padding(.horizontal, 16)
     }
 
     private var locationBadge: PermissionBadge {
@@ -741,8 +763,6 @@ private struct PermissionCard: View {
     let isRequired: Bool
     let action: () -> Void
 
-    @State private var appeared = false
-
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             ZStack {
@@ -755,15 +775,19 @@ private struct PermissionCard: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 6) {
-                        titleView
-                        requiredBadge
-                    }
+                HStack(spacing: 6) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
 
-                    VStack(alignment: .leading, spacing: 5) {
-                        titleView
-                        requiredBadge
+                    if isRequired {
+                        Text("Required")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.35))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color(red: 1.0, green: 0.75, blue: 0.35).opacity(0.15), in: Capsule())
                     }
                 }
 
@@ -787,38 +811,6 @@ private struct PermissionCard: View {
         .onTapGesture {
             if !isGranted { action() }
         }
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 16)
-        .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(isRequired ? 0 : 0.1)) {
-                appeared = true
-            }
-        }
-    }
-
-    private var titleView: some View {
-        Text(title)
-            .font(.system(size: 15, weight: .semibold))
-            .foregroundStyle(.white)
-            .lineLimit(2)
-            .fixedSize(horizontal: false, vertical: true)
-    }
-
-    @ViewBuilder
-    private var requiredBadge: some View {
-        if isRequired {
-            Text(L10n.text("onboarding_location_required"))
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.35))
-                .lineLimit(1)
-                .minimumScaleFactor(0.80)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(
-                    Color(red: 1.0, green: 0.75, blue: 0.35).opacity(0.15),
-                    in: Capsule()
-                )
-        }
     }
 
     @ViewBuilder
@@ -840,10 +832,7 @@ private struct PermissionCard: View {
                 .minimumScaleFactor(0.85)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Color.white.opacity(0.15),
-                    in: Capsule()
-                )
+                .background(Color.white.opacity(0.15), in: Capsule())
         }
     }
 }
