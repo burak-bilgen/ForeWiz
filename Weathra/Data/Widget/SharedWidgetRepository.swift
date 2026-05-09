@@ -2,7 +2,7 @@ import Foundation
 import os
 
 protocol WidgetRepository {
-    func save(recommendation: DailyRecommendation) throws
+    func save(recommendation: DailyRecommendation, current: CurrentWeatherPoint, locationName: String) throws
 }
 
 final class SharedWidgetRepository: WidgetRepository {
@@ -15,14 +15,14 @@ final class SharedWidgetRepository: WidgetRepository {
         logger.info("Widget repository initialized with suite: \(suiteName)")
     }
 
-    func save(recommendation: DailyRecommendation) throws {
+    func save(recommendation: DailyRecommendation, current: CurrentWeatherPoint, locationName: String) throws {
         guard let userDefaults else {
             logger.error("UserDefaults is nil, cannot save widget data")
             throw AppError.persistenceFailed
         }
 
         do {
-            let payload = WidgetRecommendationPayload(recommendation: recommendation)
+            let payload = WidgetWeatherPayload.from(recommendation: recommendation, current: current, locationName: locationName)
             let data = try JSONEncoder().encode(payload)
             userDefaults.set(data, forKey: key)
             logger.info("Widget recommendation saved successfully")

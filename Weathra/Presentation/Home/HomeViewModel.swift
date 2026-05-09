@@ -112,7 +112,11 @@ final class HomeViewModel: ObservableObject {
             }
 
             do {
-                try widgetRepository.save(recommendation: result.recommendation)
+                try widgetRepository.save(
+                    recommendation: result.recommendation,
+                    current: result.currentWeather,
+                    locationName: selectedLocationName
+                )
                 WidgetCenter.shared.reloadAllTimelines()
             } catch {
                 AppLogger.app.error("Failed to save widget data: \(error.localizedDescription)")
