@@ -21,8 +21,6 @@ struct OnboardingView: View {
 
             VStack(spacing: 0) {
                 headerBar
-                    .padding(.horizontal, 20)
-                    .padding(.top, 8)
 
                 TabView(selection: $currentStep) {
                     ForEach(0..<totalSteps, id: \.self) { step in
@@ -35,7 +33,7 @@ struct OnboardingView: View {
 
                 navigationBar
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 24)
             }
         }
         .navigationBarHidden(true)
@@ -51,13 +49,13 @@ struct OnboardingView: View {
                     withAnimation { currentStep -= 1 }
                 } label: {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .frame(width: 36, height: 36)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .frame(width: 32, height: 32)
                         .background(Color.white.opacity(0.1), in: Circle())
                 }
             } else {
-                Color.clear.frame(width: 36, height: 36)
+                Color.clear.frame(width: 32, height: 32)
             }
 
             Spacer()
@@ -66,16 +64,20 @@ struct OnboardingView: View {
 
             Spacer()
 
-            Button {
-                withAnimation { currentStep = totalSteps - 1 }
-            } label: {
-                Text(copy(tr: "Atla", en: "Skip"))
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.5))
+            if currentStep < totalSteps - 1 {
+                Button {
+                    withAnimation { currentStep = totalSteps - 1 }
+                } label: {
+                    Text(copy(tr: "Atla", en: "Skip"))
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            } else {
+                Color.clear.frame(width: 40, height: 20)
             }
-            .opacity(currentStep < totalSteps - 1 ? 1 : 0)
-            .disabled(currentStep >= totalSteps - 1)
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
     }
 
     // MARK: - Step view
