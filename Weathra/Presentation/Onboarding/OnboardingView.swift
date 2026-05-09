@@ -179,15 +179,15 @@ private struct OnboardingProgressBar: View {
     let total: Int
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             ForEach(0..<total, id: \.self) { index in
-                Capsule()
+                RoundedRectangle(cornerRadius: 2)
                     .fill(index <= current
                         ? Color.white
-                        : Color.white.opacity(0.22))
-                    .frame(height: index == current ? 4 : 3)
-                    .scaleEffect(x: index == current ? 1.4 : 1.0, anchor: .leading)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.75), value: current)
+                        : Color.white.opacity(0.25))
+                    .frame(height: 4)
+                    .opacity(index <= current ? 1 : 0.5)
+                    .animation(.easeInOut(duration: 0.3), value: current)
             }
         }
     }
@@ -209,15 +209,15 @@ private struct HeroStep: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Spacer(minLength: 20)
+
             ZStack {
-                // Outer pulse ring
                 Circle()
                     .stroke(sky.opacity(0.10), lineWidth: 1.5)
                     .frame(width: 190, height: 190)
                     .scaleEffect(ringScale2)
                     .opacity(ringOpacity2)
 
-                // Inner glow ring
                 Circle()
                     .fill(sky.opacity(0.09))
                     .frame(width: 154, height: 154)
@@ -225,7 +225,6 @@ private struct HeroStep: View {
                     .opacity(ringOpacity1)
                     .blur(radius: 12)
 
-                // Core circle
                 Circle()
                     .fill(
                         RadialGradient(
@@ -244,11 +243,11 @@ private struct HeroStep: View {
                     .opacity(iconOpacity)
                     .floating(amplitude: 8, duration: 3.5)
             }
-            .padding(.bottom, 34)
+            .padding(.bottom, 32)
 
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 Text(L10n.text("onboarding_welcome"))
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .font(.system(size: 40, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .minimumScaleFactor(0.70)
@@ -256,14 +255,26 @@ private struct HeroStep: View {
                     .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
 
                 Text(L10n.text("onboarding_subtitle"))
-                    .font(.system(size: 18, weight: .regular))
+                    .font(.system(size: 16, weight: .regular))
                     .foregroundStyle(Color.white.opacity(0.70))
                     .multilineTextAlignment(.center)
-                    .lineSpacing(5)
+                    .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
+
+                HStack(spacing: 8) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 12))
+                    Text(L10n.text("home_current_location"))
+                        .font(.system(size: 13))
+                }
+                .foregroundStyle(Color.white.opacity(0.45))
+                .padding(.top, 8)
             }
+            .padding(.horizontal, 24)
             .opacity(titleOpacity)
             .offset(y: titleOffset)
+
+            Spacer(minLength: 40)
         }
         .padding(.horizontal, 16)
         .onAppear {
