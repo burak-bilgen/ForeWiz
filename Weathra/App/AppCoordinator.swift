@@ -11,9 +11,12 @@ final class AppCoordinator: ObservableObject {
 
     let container: DependencyContainer
 
-    @Published private(set) var rootFlow: RootFlow
+    @Published var rootFlow: RootFlow
     @Published var profile: UserComfortProfile = .default
     @Published var latestRecommendation: DailyRecommendation?
+    @Published var showSettings = false
+    @Published var showPaywall = false
+    @Published var selectedTab = 0
 
     init(container: DependencyContainer, rootFlow: RootFlow = .launching) {
         self.container = container

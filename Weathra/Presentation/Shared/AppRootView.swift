@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppRootView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @ObservedObject var deepLinkHandler: DeepLinkHandler
     @State private var didStart = false
 
     var body: some View {
@@ -34,6 +35,30 @@ struct AppRootView: View {
             didStart = true
             await coordinator.start()
         }
+        .onChange(of: deepLinkHandler.pendingLink) { _, newLink in
+            handleDeepLink(newLink)
+        }
+    }
+
+    private func handleDeepLink(_ link: DeepLink?) {
+        guard let link = link else { return }
+
+        switch link {
+        case .settings:
+            coordinator.showSettings = true
+        case .insights:
+            coordinator.selectedTab = 1
+        case .paywall:
+            coordinator.showPaywall = true
+        case .onboarding:
+            coordinator.rootFlow = .onboarding
+        case .home:
+            coordinator.selectedTab = 0
+        case .recommendationDetail:
+            break
+        }
+
+        deepLinkHandler.clear()
     }
 }
 

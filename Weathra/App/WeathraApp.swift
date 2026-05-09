@@ -6,7 +6,9 @@ import os
 struct WeathraApp: App {
     private let modelContainer: ModelContainer
     @State private var coordinator: AppCoordinator?
+    @State private var deepLinkHandler = DeepLinkHandler()
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
 
     init() {
         modelContainer = Self.makeModelContainer()
@@ -50,7 +52,7 @@ struct WeathraApp: App {
         WindowGroup {
             ZStack {
                 if let coordinator {
-                    AppRootView(coordinator: coordinator)
+                    AppRootView(coordinator: coordinator, deepLinkHandler: deepLinkHandler)
                         .modelContainer(modelContainer)
                 } else {
                     AppSplashView()
@@ -60,6 +62,9 @@ struct WeathraApp: App {
             .task { AdsManager.configure() }
             .onChange(of: scenePhase) { _, phase in
                 handleScenePhaseChange(phase)
+            }
+            .onOpenURL { url in
+                deepLinkHandler.handle(url)
             }
         }
     }
