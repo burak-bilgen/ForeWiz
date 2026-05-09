@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Install pods
+        run: pod install --project-directory=Weathra
+      - name: Build
+        run: xcodebuild build -scheme Weathra -destination 'platform=iOS Simulator,name=iPhone 15'
+      - name: Run Tests
+        run: xcodebuild test -scheme WeathraTests -destination 'platform=iOS Simulator,name=iPhone 15'

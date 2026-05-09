@@ -166,7 +166,9 @@ struct WeatherInsightsView: View {
                 case .next24Hours:
                     return point.date >= now && point.date <= now.addingTimeInterval(24 * 3600)
                 case .tomorrow:
-                    let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
+                    guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) else {
+                        return false
+                    }
                     return calendar.isDate(point.date, inSameDayAs: tomorrow)
                 }
             }

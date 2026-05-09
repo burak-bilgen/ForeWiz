@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2D949CBF07F659F7559AC99F /* Pods_WeathraTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71C2F66ABF8E71A8132DB78F /* Pods_WeathraTests.framework */; };
+		67A870F52FAF23C3005B23F5 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67A870F42FAF23C3005B23F5 /* WidgetKit.framework */; };
+		67A870F72FAF23C3005B23F5 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 67A870F62FAF23C3005B23F5 /* SwiftUI.framework */; };
+		67A871082FAF23C4005B23F5 /* Weathra WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B2F5FD89E9A5416F9E92918A /* Pods_Weathra.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5234476D47123F0CA2B87C6B /* Pods_Weathra.framework */; };
 /* End PBXBuildFile section */
 
@@ -26,7 +29,28 @@
 			remoteGlobalIDString = 67305E742F9E05210034CAA8;
 			remoteInfo = Weathra;
 		};
+		67A871062FAF23C4005B23F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 67305E6D2F9E05210034CAA8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 67A870F22FAF23C3005B23F5;
+			remoteInfo = "Weathra WidgetExtension";
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		67A871092FAF23C4005B23F5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				67A871082FAF23C4005B23F5 /* Weathra WidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0EA4A779D04C7C15318EF323 /* Pods-WeathraTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WeathraTests.debug.xcconfig"; path = "Target Support Files/Pods-WeathraTests/Pods-WeathraTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -35,12 +59,22 @@
 		67305E752F9E05210034CAA8 /* Weathra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weathra.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E872F9E05220034CAA8 /* WeathraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeathraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E912F9E05220034CAA8 /* WeathraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeathraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Weathra WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		67A870F42FAF23C3005B23F5 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		67A870F62FAF23C3005B23F5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		6C6E999BB5CBA201EE4F3316 /* Pods-Weathra.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weathra.debug.xcconfig"; path = "Target Support Files/Pods-Weathra/Pods-Weathra.debug.xcconfig"; sourceTree = "<group>"; };
 		71C2F66ABF8E71A8132DB78F /* Pods_WeathraTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_WeathraTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD9217DC022E5746A41B638C /* Pods-Weathra.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Weathra.release.xcconfig"; path = "Target Support Files/Pods-Weathra/Pods-Weathra.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		67A8710D2FAF23C4005B23F5 /* Exceptions for "Weathra Widget" folder in "Weathra WidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 67A870F22FAF23C3005B23F5 /* Weathra WidgetExtension */;
+		};
 		B1F0A16E3A734D4D8B7C0A01 /* Exceptions for "Weathra" folder in "Weathra" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -69,6 +103,14 @@
 			path = WeathraUITests;
 			sourceTree = "<group>";
 		};
+		67A870F82FAF23C3005B23F5 /* Weathra Widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				67A8710D2FAF23C4005B23F5 /* Exceptions for "Weathra Widget" folder in "Weathra WidgetExtension" target */,
+			);
+			path = "Weathra Widget";
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +137,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		67A870F02FAF23C3005B23F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				67A870F72FAF23C3005B23F5 /* SwiftUI.framework in Frameworks */,
+				67A870F52FAF23C3005B23F5 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -115,6 +166,7 @@
 				67305E772F9E05210034CAA8 /* Weathra */,
 				67305E8A2F9E05220034CAA8 /* WeathraTests */,
 				67305E942F9E05220034CAA8 /* WeathraUITests */,
+				67A870F82FAF23C3005B23F5 /* Weathra Widget */,
 				67305E762F9E05210034CAA8 /* Products */,
 				16C05D6B4707AD0AA2A78895 /* Pods */,
 				6ED844C788CEA9D0CB5F6C13 /* Frameworks */,
@@ -127,6 +179,7 @@
 				67305E752F9E05210034CAA8 /* Weathra.app */,
 				67305E872F9E05220034CAA8 /* WeathraTests.xctest */,
 				67305E912F9E05220034CAA8 /* WeathraUITests.xctest */,
+				67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -136,6 +189,8 @@
 			children = (
 				5234476D47123F0CA2B87C6B /* Pods_Weathra.framework */,
 				71C2F66ABF8E71A8132DB78F /* Pods_WeathraTests.framework */,
+				67A870F42FAF23C3005B23F5 /* WidgetKit.framework */,
+				67A870F62FAF23C3005B23F5 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -152,10 +207,12 @@
 				67305E722F9E05210034CAA8 /* Frameworks */,
 				67305E732F9E05210034CAA8 /* Resources */,
 				4F7CD3B5690ABCCDF7A5CD69 /* [CP] Copy Pods Resources */,
+				67A871092FAF23C4005B23F5 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				67A871072FAF23C4005B23F5 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				67305E772F9E05210034CAA8 /* Weathra */,
@@ -208,6 +265,28 @@
 			productReference = 67305E912F9E05220034CAA8 /* WeathraUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		67A870F22FAF23C3005B23F5 /* Weathra WidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 67A8710C2FAF23C4005B23F5 /* Build configuration list for PBXNativeTarget "Weathra WidgetExtension" */;
+			buildPhases = (
+				67A870EF2FAF23C3005B23F5 /* Sources */,
+				67A870F02FAF23C3005B23F5 /* Frameworks */,
+				67A870F12FAF23C3005B23F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				67A870F82FAF23C3005B23F5 /* Weathra Widget */,
+			);
+			name = "Weathra WidgetExtension";
+			packageProductDependencies = (
+			);
+			productName = "Weathra WidgetExtension";
+			productReference = 67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -215,7 +294,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1600;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					67305E742F9E05210034CAA8 = {
@@ -228,6 +307,9 @@
 					67305E902F9E05220034CAA8 = {
 						CreatedOnToolsVersion = 16.0;
 						TestTargetID = 67305E742F9E05210034CAA8;
+					};
+					67A870F22FAF23C3005B23F5 = {
+						CreatedOnToolsVersion = 26.4.1;
 					};
 				};
 			};
@@ -249,6 +331,7 @@
 				67305E742F9E05210034CAA8 /* Weathra */,
 				67305E862F9E05220034CAA8 /* WeathraTests */,
 				67305E902F9E05220034CAA8 /* WeathraUITests */,
+				67A870F22FAF23C3005B23F5 /* Weathra WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -269,6 +352,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		67305E8F2F9E05220034CAA8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		67A870F12FAF23C3005B23F5 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -367,6 +457,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		67A870EF2FAF23C3005B23F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -379,6 +476,11 @@
 			isa = PBXTargetDependency;
 			target = 67305E742F9E05210034CAA8 /* Weathra */;
 			targetProxy = 67305E922F9E05220034CAA8 /* PBXContainerItemProxy */;
+		};
+		67A871072FAF23C4005B23F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 67A870F22FAF23C3005B23F5 /* Weathra WidgetExtension */;
+			targetProxy = 67A871062FAF23C4005B23F5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -511,14 +613,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Weathra/Weathra.entitlements;
-					CODE_SIGN_STYLE = Automatic;
-					CURRENT_PROJECT_VERSION = 1;
-					DEVELOPMENT_TEAM = Z8P38BHKU6;
-					ENABLE_PREVIEWS = YES;
-					GAD_APPLICATION_IDENTIFIER = "ca-app-pub-3940256099942544~1458002511";
-					GAD_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/2435281174";
-					GENERATE_INFOPLIST_FILE = NO;
-					INFOPLIST_FILE = Weathra/Info.plist;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z8P38BHKU6;
+				ENABLE_PREVIEWS = YES;
+				GAD_APPLICATION_IDENTIFIER = "ca-app-pub-3940256099942544~1458002511";
+				GAD_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/2435281174";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Weathra/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Weathra;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -538,16 +640,12 @@
 					"-framework",
 					WidgetKit,
 				);
-					PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.weatherassistant;
-					PRODUCT_NAME = Weathra;
-					OTHER_SWIFT_FLAGS = (
-						"$(inherited)",
-						"-Xcc",
-						"-Wno-incomplete-umbrella",
-					);
-					STRING_CATALOG_GENERATE_SYMBOLS = YES;
-					SWIFT_APPROACHABLE_CONCURRENCY = YES;
-					SWIFT_EMIT_LOC_STRINGS = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -Xcc -Wno-incomplete-umbrella";
+				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.weatherassistant;
+				PRODUCT_NAME = Weathra;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -561,14 +659,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Weathra/Weathra.entitlements;
-					CODE_SIGN_STYLE = Automatic;
-					CURRENT_PROJECT_VERSION = 1;
-					DEVELOPMENT_TEAM = Z8P38BHKU6;
-					ENABLE_PREVIEWS = YES;
-					GAD_APPLICATION_IDENTIFIER = "";
-					GAD_BANNER_AD_UNIT_ID = "";
-					GENERATE_INFOPLIST_FILE = NO;
-					INFOPLIST_FILE = Weathra/Info.plist;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z8P38BHKU6;
+				ENABLE_PREVIEWS = YES;
+				GAD_APPLICATION_IDENTIFIER = "";
+				GAD_BANNER_AD_UNIT_ID = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Weathra/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Weathra;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -588,16 +686,12 @@
 					"-framework",
 					WidgetKit,
 				);
-					PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.weatherassistant;
-					PRODUCT_NAME = Weathra;
-					OTHER_SWIFT_FLAGS = (
-						"$(inherited)",
-						"-Xcc",
-						"-Wno-incomplete-umbrella",
-					);
-					STRING_CATALOG_GENERATE_SYMBOLS = YES;
-					SWIFT_APPROACHABLE_CONCURRENCY = YES;
-					SWIFT_EMIT_LOC_STRINGS = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -Xcc -Wno-incomplete-umbrella";
+				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.weatherassistant;
+				PRODUCT_NAME = Weathra;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -690,6 +784,70 @@
 			};
 			name = Release;
 		};
+		67A8710A2FAF23C4005B23F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z8P38BHKU6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Weathra Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Weathra Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "bilgenworks.weatherassistant.Weathra-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		67A8710B2FAF23C4005B23F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = Z8P38BHKU6;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Weathra Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Weathra Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "bilgenworks.weatherassistant.Weathra-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -725,6 +883,15 @@
 			buildConfigurations = (
 				67305EA22F9E05220034CAA8 /* Debug */,
 				67305EA32F9E05220034CAA8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		67A8710C2FAF23C4005B23F5 /* Build configuration list for PBXNativeTarget "Weathra WidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				67A8710A2FAF23C4005B23F5 /* Debug */,
+				67A8710B2FAF23C4005B23F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

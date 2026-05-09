@@ -1,12 +1,6 @@
 {
   "colors" : [
     {
-      "color" : {
-        "alpha" : 1,
-        "blue" : 1,
-        "green" : 0.6,
-        "red" : 0.35
-      },
       "idiom" : "universal"
     }
   ],

@@ -7,4 +7,21 @@
    <FileRef
       location = "group:Pods/Pods.xcodeproj">
    </FileRef>
+   <Group
+      location = "group:WeathraWidget"
+      name = "WeathraWidget">
+      <Group
+         location = "group:LiveActivity"
+         name = "LiveActivity">
+      </Group>
+      <FileRef
+         location = "group:WeathraWidget.swift">
+      </FileRef>
+      <FileRef
+         location = "group:WeathraWidget.entitlements">
+      </FileRef>
+      <FileRef
+         location = "group:Info.plist">
+      </FileRef>
+   </Group>
 </Workspace>

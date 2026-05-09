@@ -177,8 +177,7 @@ struct PulsingDotsLoader: View {
     var color: Color = .white
     var dotSize: CGFloat = 7
     @State private var phase: Int = 0
-
-    private let timer = Timer.publish(every: 0.35, on: .main, in: .common).autoconnect()
+    @State private var timer: AnyCancellable?
 
     var body: some View {
         HStack(spacing: 7) {
@@ -190,8 +189,16 @@ struct PulsingDotsLoader: View {
                     .animation(.spring(response: 0.28, dampingFraction: 0.55), value: phase)
             }
         }
-        .onReceive(timer) { _ in
-            phase = (phase + 1) % 3
+        .onAppear {
+            timer = Timer.publish(every: 0.35, on: .main, in: .common)
+                .autoconnect()
+                .sink { _ in
+                    phase = (phase + 1) % 3
+                }
+        }
+        .onDisappear {
+            timer?.cancel()
+            phase = 0
         }
     }
 }
