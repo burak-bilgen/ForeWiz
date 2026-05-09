@@ -17,7 +17,13 @@ jobs:
           bundler-cache: true
       - name: Install pods
         run: pod install --project-directory=Weathra
+      - name: Select iPhone simulator
+        run: |
+          available=$(xcrun simctl list devices available | grep "iPhone" | head -5)
+          echo "Available simulators:"
+          echo "$available"
+          echo "iPhone 17e" > /tmp/selected_simulator.txt
       - name: Build
-        run: xcodebuild build -scheme Weathra -destination 'platform=iOS Simulator,name=iPhone 15'
+        run: xcodebuild build -workspace Weathra.xcworkspace -scheme Weathra -destination 'platform=iOS Simulator,name=iPhone 17e' CODE_SIGNING_ALLOWED=NO
       - name: Run Tests
-        run: xcodebuild test -scheme WeathraTests -destination 'platform=iOS Simulator,name=iPhone 15'
+        run: xcodebuild test -workspace Weathra.xcworkspace -scheme WeathraTests -destination 'platform=iOS Simulator,name=iPhone 17e'
