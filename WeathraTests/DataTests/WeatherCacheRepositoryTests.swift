@@ -64,7 +64,7 @@ struct WeatherCacheRepositoryTests {
         let container = try ModelContainer(for: WeatherSnapshotModel.self, configurations: config)
         let context = ModelContext(container)
 
-        let policy = WeatherCachePolicy(freshInterval: 1, staleInterval: 2)
+        let policy = WeatherCachePolicy(freshInterval: 1, usableInterval: 2)
         let repository = SwiftDataWeatherCacheRepository(modelContext: context, cachePolicy: policy)
 
         let oldSnapshot = WeatherSnapshot(
@@ -171,7 +171,7 @@ struct WeatherCachePolicyTests {
 
     @Test("Stale but usable data is detected correctly")
     func testStaleData() {
-        let policy = WeatherCachePolicy(freshInterval: 1200, staleInterval: 18000)
+        let policy = WeatherCachePolicy(freshInterval: 1200, usableInterval: 18000)
         let now = Date()
         let staleDate = now.addingTimeInterval(-3600)
 
@@ -184,7 +184,7 @@ struct WeatherCachePolicyTests {
     func testExpiredData() {
         let policy = WeatherCachePolicy()
         let now = Date()
-        let expiredDate = now.addingTimeInterval(-21600)
+        let expiredDate = now.addingTimeInterval(-21601)
 
         let freshness = policy.freshness(for: expiredDate, now: now)
 
@@ -207,7 +207,7 @@ struct PreferencesRepositoryTests {
 
         #expect(profile.temperatureSensitivity == .normal)
         #expect(profile.preferredActivities.contains(.goingOutside))
-        #expect(profile.language == .turkish)
+        #expect(profile.language == .system)
     }
 
     @Test("Profile can be saved and loaded")

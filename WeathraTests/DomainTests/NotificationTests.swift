@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import Weathra
 
@@ -5,22 +6,21 @@ struct NotificationTests {
     @Test func notificationPlanCreation() {
         let calendar = WeatherTestFixtures.calendar
         let now = Date()
-        let start = calendar.date(byAdding: .hour, value: 9, to: now)!
-        let end = calendar.date(byAdding: .hour, value: 12, to: now)!
-
-        let window = TimeWindow(start: start, end: end)
+        let fireDate = calendar.date(byAdding: .hour, value: 9, to: now)!
 
         let plan = NotificationPlan(
             id: "test-plan",
             category: .morningBriefing,
-            timeWindow: window,
-            recommendation: "Good day for outdoor activities",
-            priority: .high
+            fireDate: fireDate,
+            title: "Morning plan",
+            body: "Good day for outdoor activities.",
+            priority: 90,
+            reason: "Test"
         )
 
         #expect(plan.id == "test-plan")
         #expect(plan.category == .morningBriefing)
-        #expect(plan.priority == .high)
+        #expect(plan.priority == 90)
     }
 
     @Test func notificationPreferenceMapping() {
@@ -35,13 +35,13 @@ struct NotificationTests {
     }
 
     @Test func notificationAuthorizationStatusMapping() {
-        #expect(NotificationAuthorizationStatus.authorized.rawValue == "authorized")
-        #expect(NotificationAuthorizationStatus.denied.rawValue == "denied")
-        #expect(NotificationAuthorizationStatus.notDetermined.rawValue == "notDetermined")
+        #expect(NotificationAuthorizationStatus.authorized == .authorized)
+        #expect(NotificationAuthorizationStatus.denied == .denied)
+        #expect(NotificationAuthorizationStatus.notDetermined == .notDetermined)
     }
 
     @Test func notificationCategoryTitles() {
         #expect(NotificationCategory.morningBriefing.localizedTitle.isEmpty == false)
-        #expect(NotificationCategory.severeWeather.localizedTitle.isEmpty == false)
+        #expect(NotificationCategory.airQualityWarning.localizedTitle.isEmpty == false)
     }
 }

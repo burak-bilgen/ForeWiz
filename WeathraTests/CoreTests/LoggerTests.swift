@@ -163,25 +163,14 @@ struct PerformanceTests {
         #expect(value == 1)
 
         value = 2
-        #expect(value == 2)
+        #expect(value == 1)
 
         value = 3
-        #expect(value == 3)
+        #expect(value == 1)
     }
 
     @Test("LazyLoad wrapper defers initialization")
     func testLazyLoad() {
-        var initializationCount = 0
-
-        struct TestContainer {
-            var initCount: Int
-
-            mutating func getValue() -> Int {
-                initializationCount += 1
-                return 42
-            }
-        }
-
         @LazyLoad({ 42 })
         var value: Int
 
@@ -192,21 +181,22 @@ struct PerformanceTests {
     @Test("TaskLimiter cancels previous tasks")
     func testTaskLimiter() async {
         var limiter = TaskLimiter()
-
-        var executedTasks: [Int] = []
+        let recorder = TaskExecutionRecorder()
 
         limiter.execute {
             try? await Task.sleep(nanoseconds: 100_000_000)
-            executedTasks.append(1)
+            if Task.isCancelled == false {
+                await recorder.append(1)
+            }
         }
 
         limiter.execute {
-            executedTasks.append(2)
+            await recorder.append(2)
         }
 
-        try? await Task.sleep(nanoseconds: 200_000_000)
+        try? await Task.sleep(nanoseconds: 250_000_000)
 
-        #expect(executedTasks.contains(2))
+        #expect(await recorder.values == [2])
     }
 
     @Test("PrefetchCache tracks prefetched keys")
@@ -222,25 +212,41 @@ struct PerformanceTests {
     }
 
     @Test("RequestDeduper prevents duplicate requests")
-    func testRequestDeduper() async {
-        var deduper = RequestDeduper<String>()
+    func testRequestDeduper() async throws {
+        let deduper = RequestDeduper<String>()
+        let counter = RequestCounter()
 
-        var requestCount = 0
-
-        async func makeRequest() async -> String {
-            requestCount += 1
+        @Sendable func makeRequest() async throws -> String {
+            let count = await counter.increment()
             try? await Task.sleep(nanoseconds: 50_000_000)
-            return "result_\(requestCount)"
+            return "result_\(count)"
         }
 
         async let result1 = deduper.deduplicate(key: "key1", operation: makeRequest)
         async let result2 = deduper.deduplicate(key: "key1", operation: makeRequest)
         async let result3 = deduper.deduplicate(key: "key1", operation: makeRequest)
 
-        let results = await [result1, result2, result3]
+        let results = try await [result1, result2, result3]
 
-        #expect(requestCount == 1)
+        #expect(await counter.value == 1)
         #expect(results[0] == results[1])
         #expect(results[1] == results[2])
+    }
+}
+
+private actor RequestCounter {
+    private(set) var value = 0
+
+    func increment() -> Int {
+        value += 1
+        return value
+    }
+}
+
+private actor TaskExecutionRecorder {
+    private(set) var values: [Int] = []
+
+    func append(_ value: Int) {
+        values.append(value)
     }
 }

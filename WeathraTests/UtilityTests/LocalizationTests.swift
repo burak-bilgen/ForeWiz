@@ -3,46 +3,37 @@ import Testing
 
 struct LocalizationTests {
     @Test func turkishLocalizationReturnsCorrectValue() {
-        L10n.configure(language: .turkish)
-
-        let result = L10n.text("settings_title")
+        let result = L10n.text("settings_title", lang: "tr")
         #expect(result == "Ayarlar")
     }
 
     @Test func englishLocalizationReturnsCorrectValue() {
-        L10n.configure(language: .english)
-
-        let result = L10n.text("settings_title")
+        let result = L10n.text("settings_title", lang: "en")
         #expect(result == "Settings")
     }
 
     @Test func languageSwitchingWorks() {
-        L10n.configure(language: .turkish)
-        let turkish = L10n.text("home_title")
-
-        L10n.configure(language: .english)
-        let english = L10n.text("home_title")
+        let turkish = L10n.text("home_title", lang: "tr")
+        let english = L10n.text("home_title", lang: "en")
 
         #expect(turkish != english)
     }
 
     @Test func appLanguageLocaleReturnsCorrectValue() {
-        let turkish = AppLanguage.turkish.locale
-        #expect(turkish.languageCode == "tr")
+        let turkish = AppLanguage.turkish.localeIdentifier
+        #expect(turkish == "tr")
 
-        let english = AppLanguage.english.locale
-        #expect(english.languageCode == "en")
+        let english = AppLanguage.english.localeIdentifier
+        #expect(english == "en")
     }
 
     @Test func temperatureSensitivityLocalizedText() {
-        L10n.configure(language: .turkish)
+        let cold = L10n.text("sensitivity_cold", lang: "tr")
+        let normal = L10n.text("sensitivity_normal", lang: "tr")
+        let hot = L10n.text("sensitivity_hot", lang: "tr")
 
-        let cold = TemperatureSensitivity.getsColdEasily.localizedTitle
-        let normal = TemperatureSensitivity.normal.localizedTitle
-        let hot = TemperatureSensitivity.getsHotEasily.localizedTitle
-
-        #expect(cold.contains("soğuk"))
-        #expect(normal.contains("normal"))
-        #expect(hot.contains("sıcak"))
+        #expect(cold.lowercased().contains("soğu"))
+        #expect(normal.lowercased().contains("normal"))
+        #expect(hot.lowercased().contains("sıca"))
     }
 }

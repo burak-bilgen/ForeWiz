@@ -1,7 +1,7 @@
 import Foundation
 
 struct DailyForecastItem: Identifiable, Equatable, Sendable {
-    let id = UUID()
+    var id: Date { date }
     let dayName: String
     let date: Date
     let highTemp: Double

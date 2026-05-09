@@ -1,16 +1,20 @@
+import Foundation
 import Testing
 @testable import Weathra
 
 struct DataConsistencyTests {
     @Test func recommendationScoreIsValid() {
         let recommendation = DailyRecommendation(
+            generatedAt: Date(),
+            outdoorDecision: .good,
             outdoorScore: WeatherScore(rawValue: 85),
-            outdoorDecision: .goOut,
             bestOutdoorWindow: nil,
-            summaryText: "Test",
             bestActivityWindows: [],
-            outfit: OutfitRecommendation(title: "Test", items: [], accessories: nil, warning: nil),
-            risks: []
+            avoidWindows: [],
+            outfit: OutfitRecommendation(title: "Test", items: [], accessories: [], warning: nil),
+            risks: [],
+            summaryText: "Test",
+            explanation: "Test"
         )
 
         #expect(recommendation.outdoorScore.rawValue >= 0)
@@ -35,7 +39,7 @@ struct DataConsistencyTests {
 
     @Test func invalidCoordinateShouldBeRejected() {
         let invalidLat = LocationCoordinate(latitude: 100, longitude: 30)
-        #expect(invalidLat.latitude > 90 || invalidLat.latitude < -90 == false)
+        #expect(invalidLat.latitude > 90 || invalidLat.latitude < -90)
     }
 
     @Test func riskLevelComparison() {

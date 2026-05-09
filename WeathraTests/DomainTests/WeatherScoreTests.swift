@@ -2,87 +2,29 @@ import Testing
 @testable import Weathra
 
 struct WeatherScoreTests {
-    @Test func scoreCalculationForGoodConditions() {
-        let score = WeatherScore.calculate(
-            temperature: 22,
-            humidity: 0.45,
-            windSpeedKph: 10,
-            precipitationChance: 0.1,
-            uvIndex: 3,
-            isDaylight: true
-        )
-
-        #expect(score >= 80)
+    @Test func rawValueClampsToValidRange() {
+        #expect(WeatherScore(rawValue: -20).rawValue == 0)
+        #expect(WeatherScore(rawValue: 120).rawValue == 100)
     }
 
-    @Test func scoreCalculationForBadConditions() {
-        let score = WeatherScore.calculate(
-            temperature: 38,
-            humidity: 0.85,
-            windSpeedKph: 45,
-            precipitationChance: 0.8,
-            uvIndex: 11,
-            isDaylight: true
-        )
+    @Test func displayValueUsesTenPointScale() {
+        let score = WeatherScore(rawValue: 85)
 
-        #expect(score < 50)
+        #expect(score.displayValue == 8.5)
     }
 
-    @Test func scoreCalculationForExtremeHeat() {
-        let score = WeatherScore.calculate(
-            temperature: 42,
-            humidity: 0.3,
-            windSpeedKph: 5,
-            precipitationChance: 0.0,
-            uvIndex: 10,
-            isDaylight: true
-        )
+    @Test func defaultLabelFollowsScoreBands() {
+        L10n.configure(language: .english)
 
-        #expect(score < 40)
+        #expect(WeatherScore(rawValue: 90).label == L10n.text("decision_good"))
+        #expect(WeatherScore(rawValue: 70).label == L10n.text("decision_moderate"))
+        #expect(WeatherScore(rawValue: 50).label == L10n.text("decision_risky"))
+        #expect(WeatherScore(rawValue: 20).label == L10n.text("decision_avoid"))
     }
 
-    @Test func scoreCalculationForExtremeCold() {
-        let score = WeatherScore.calculate(
-            temperature: -5,
-            humidity: 0.7,
-            windSpeedKph: 30,
-            precipitationChance: 0.3,
-            uvIndex: 1,
-            isDaylight: true
-        )
+    @Test func customLabelIsPreserved() {
+        let score = WeatherScore(rawValue: 75, label: "Custom")
 
-        #expect(score < 30)
-    }
-
-    @Test func scoreCalculationForPerfectDay() {
-        let score = WeatherScore.calculate(
-            temperature: 24,
-            humidity: 0.5,
-            windSpeedKph: 8,
-            precipitationChance: 0.0,
-            uvIndex: 4,
-            isDaylight: true
-        )
-
-        #expect(score >= 90)
-    }
-
-    @Test func displayValueRoundsToInteger() {
-        let score = WeatherScore(rawValue: 85.7)
-        #expect(score.displayValue == 86)
-    }
-
-    @Test func scoreClampingWorksForNegativeValues() {
-        let score = WeatherScore.calculate(
-            temperature: 50,
-            humidity: 0.9,
-            windSpeedKph: 100,
-            precipitationChance: 1.0,
-            uvIndex: 15,
-            isDaylight: true
-        )
-
-        #expect(score.rawValue >= 0)
-        #expect(score.rawValue <= 100)
+        #expect(score.label == "Custom")
     }
 }
