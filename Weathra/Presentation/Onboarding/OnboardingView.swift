@@ -217,105 +217,50 @@ private struct OnboardingProgressBar: View {
 // MARK: - Step 0: Hero
 
 private struct HeroStep: View {
-    @State private var iconScale: CGFloat = 0.4
-    @State private var iconOpacity: Double = 0
-    @State private var ringScale1: CGFloat = 0.6
-    @State private var ringOpacity1: Double = 0
-    @State private var ringScale2: CGFloat = 0.6
-    @State private var ringOpacity2: Double = 0
-    @State private var titleOpacity: Double = 0
-    @State private var titleOffset: CGFloat = 20
-
     private let sky = Color(red: 0.55, green: 0.82, blue: 1.0)
 
     var body: some View {
         VStack(spacing: 0) {
-            Spacer(minLength: 20)
+            Spacer(minLength: 40)
 
             ZStack {
                 Circle()
-                    .stroke(sky.opacity(0.10), lineWidth: 1.5)
-                    .frame(width: 190, height: 190)
-                    .scaleEffect(ringScale2)
-                    .opacity(ringOpacity2)
-
-                Circle()
-                    .fill(sky.opacity(0.09))
-                    .frame(width: 154, height: 154)
-                    .scaleEffect(ringScale1)
-                    .opacity(ringOpacity1)
-                    .blur(radius: 12)
-
-                Circle()
                     .fill(
                         RadialGradient(
-                            colors: [sky.opacity(0.22), sky.opacity(0.04)],
-                            center: .center, startRadius: 20, endRadius: 80
+                            colors: [sky.opacity(0.15), sky.opacity(0.02)],
+                            center: .center, startRadius: 20, endRadius: 100
                         )
                     )
-                    .frame(width: 128, height: 128)
+                    .frame(width: 160, height: 160)
 
                 Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 68))
+                    .font(.system(size: 72))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(sky)
-                    .shadow(color: sky.opacity(0.5), radius: 24, x: 0, y: 8)
-                    .scaleEffect(iconScale)
-                    .opacity(iconOpacity)
-                    .floating(amplitude: 8, duration: 3.5)
+                    .shadow(color: sky.opacity(0.4), radius: 20, x: 0, y: 8)
             }
-            .padding(.bottom, 32)
 
-            VStack(spacing: 12) {
+            VStack(spacing: 16) {
                 Text(L10n.text("onboarding_welcome"))
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
+                    .font(.system(size: 38, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(2)
                     .minimumScaleFactor(0.70)
                     .multilineTextAlignment(.center)
-                    .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
 
                 Text(L10n.text("onboarding_subtitle"))
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(Color.white.opacity(0.70))
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.white.opacity(0.65))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
-
-                HStack(spacing: 8) {
-                    Image(systemName: "location.fill")
-                        .font(.system(size: 12))
-                    Text(L10n.text("home_current_location"))
-                        .font(.system(size: 13))
-                }
-                .foregroundStyle(Color.white.opacity(0.45))
-                .padding(.top, 8)
             }
             .padding(.horizontal, 24)
-            .opacity(titleOpacity)
-            .offset(y: titleOffset)
+            .padding(.top, 36)
 
             Spacer(minLength: 40)
         }
         .padding(.horizontal, 16)
-        .onAppear {
-            withAnimation(.spring(response: 0.65, dampingFraction: 0.68).delay(0.1)) {
-                iconScale = 1.0
-                iconOpacity = 1.0
-            }
-            withAnimation(.easeOut(duration: 0.7).delay(0.05)) {
-                ringScale1 = 1.0
-                ringOpacity1 = 1.0
-            }
-            withAnimation(.easeOut(duration: 0.9).delay(0.0)) {
-                ringScale2 = 1.0
-                ringOpacity2 = 1.0
-            }
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.82).delay(0.3)) {
-                titleOpacity = 1.0
-                titleOffset = 0
-            }
-        }
     }
 }
 
@@ -347,13 +292,12 @@ private struct FeaturesStep: View {
                 }
 
                 VStack(spacing: 14) {
-                    ForEach(Array(features.enumerated()), id: \.offset) { index, feature in
+                    ForEach(Array(features.enumerated()), id: \.offset) { _, feature in
                         FeatureRow(
                             icon: feature.icon,
                             accentColor: feature.color,
                             title: feature.title,
-                            subtitle: feature.subtitle,
-                            delay: Double(index) * 0.07
+                            subtitle: feature.subtitle
                         )
                     }
                 }
@@ -369,9 +313,6 @@ private struct FeatureRow: View {
     let accentColor: Color
     let title: String
     let subtitle: String
-    let delay: Double
-
-    @State private var appeared = false
 
     var body: some View {
         HStack(spacing: 16) {
@@ -384,7 +325,7 @@ private struct FeatureRow: View {
                     .foregroundStyle(accentColor)
             }
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
@@ -392,7 +333,7 @@ private struct FeatureRow: View {
                 Text(subtitle)
                     .font(.system(size: 13))
                     .foregroundStyle(Color.white.opacity(0.5))
-                    .lineLimit(3)
+                    .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .layoutPriority(1)
@@ -401,13 +342,6 @@ private struct FeatureRow: View {
         }
         .padding(16)
         .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .opacity(appeared ? 1 : 0)
-        .offset(y: appeared ? 0 : 20)
-        .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(delay)) {
-                appeared = true
-            }
-        }
     }
 }
 
@@ -669,67 +603,67 @@ private struct PermissionsStep: View {
     @ObservedObject var viewModel: OnboardingViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 12) {
-                Text(L10n.text("onboarding_permissions_title"))
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.80)
-                    .fixedSize(horizontal: false, vertical: true)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(L10n.text("onboarding_permissions_title"))
+                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.80)
+                        .fixedSize(horizontal: false, vertical: true)
 
-                Text(L10n.text("onboarding_permissions_subtitle"))
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.white.opacity(0.55))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.bottom, 28)
-
-            VStack(spacing: 14) {
-                PermissionCard(
-                    icon: "location.fill",
-                    accentColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                    title: L10n.text("onboarding_location_title"),
-                    subtitle: L10n.text("onboarding_location_message"),
-                    badge: locationBadge,
-                    isGranted: viewModel.locationStatus == .authorized,
-                    isRequired: true,
-                    action: {
-                        HapticManager.light()
-                        viewModel.requestLocationPermission()
-                    }
-                )
-
-                PermissionCard(
-                    icon: "bell.badge.fill",
-                    accentColor: Color(red: 1.0, green: 0.75, blue: 0.35),
-                    title: L10n.text("onboarding_notification_title"),
-                    subtitle: L10n.text("onboarding_notification_message"),
-                    badge: notificationBadge,
-                    isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
-                    isRequired: false,
-                    action: {
-                        HapticManager.light()
-                        viewModel.requestNotificationPermission()
-                    }
-                )
-            }
-
-            if let error = viewModel.errorMessage {
-                HStack(spacing: 8) {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .font(.caption)
-                    Text(error)
-                        .font(.caption)
+                    Text(L10n.text("onboarding_permissions_subtitle"))
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.white.opacity(0.55))
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.top, 16)
-            }
 
-            Spacer(minLength: 20)
+                VStack(spacing: 14) {
+                    PermissionCard(
+                        icon: "location.fill",
+                        accentColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                        title: L10n.text("onboarding_location_title"),
+                        subtitle: L10n.text("onboarding_location_message"),
+                        badge: locationBadge,
+                        isGranted: viewModel.locationStatus == .authorized,
+                        isRequired: true,
+                        action: {
+                            HapticManager.light()
+                            viewModel.requestLocationPermission()
+                        }
+                    )
+
+                    PermissionCard(
+                        icon: "bell.badge.fill",
+                        accentColor: Color(red: 1.0, green: 0.75, blue: 0.35),
+                        title: L10n.text("onboarding_notification_title"),
+                        subtitle: L10n.text("onboarding_notification_message"),
+                        badge: notificationBadge,
+                        isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
+                        isRequired: false,
+                        action: {
+                            HapticManager.light()
+                            viewModel.requestNotificationPermission()
+                        }
+                    )
+                }
+
+                if let error = viewModel.errorMessage {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.circle.fill")
+                            .font(.caption)
+                        Text(error)
+                            .font(.caption)
+                    }
+                    .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 8)
+                }
+            }
+            .padding(.horizontal, 16)
         }
-        .padding(.horizontal, 16)
+        .scrollIndicators(.hidden)
     }
 
     private var locationBadge: PermissionBadge {
@@ -763,54 +697,59 @@ private struct PermissionCard: View {
     let isRequired: Bool
     let action: () -> Void
 
+    private let requiredColor = Color(red: 1.0, green: 0.75, blue: 0.35)
+    private let successColor = Color(red: 0.35, green: 0.85, blue: 0.6)
+    private let errorColor = Color(red: 1.0, green: 0.45, blue: 0.45)
+
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(accentColor.opacity(0.18))
-                    .frame(width: 48, height: 48)
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(accentColor)
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
-                    Text(title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-
-                    if isRequired {
-                        Text("Required")
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.35))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color(red: 1.0, green: 0.75, blue: 0.35).opacity(0.15), in: Capsule())
-                    }
+        Button(action: action) {
+            HStack(alignment: .top, spacing: 16) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(accentColor.opacity(0.18))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: icon)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(accentColor)
                 }
 
-                Text(subtitle)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.white.opacity(0.45))
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 6) {
+                        Text(title)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .lineLimit(2)
 
-                badgeView
+                        if isRequired {
+                            Text(L10n.text("onboarding_location_required"))
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(requiredColor)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(requiredColor.opacity(0.15), in: Capsule())
+                        }
+                    }
+
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.white.opacity(0.45))
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
+
+                    badgeView
+                }
+                .layoutPriority(1)
             }
-            .layoutPriority(1)
+            .padding(16)
+            .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(isGranted ? accentColor.opacity(0.4) : Color.white.opacity(0.08), lineWidth: 1)
+            )
         }
-        .padding(16)
-        .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(isGranted ? accentColor.opacity(0.4) : Color.white.opacity(0.08), lineWidth: 1)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if !isGranted { action() }
-        }
+        .buttonStyle(.plain)
+        .disabled(isGranted)
     }
 
     @ViewBuilder
@@ -819,11 +758,11 @@ private struct PermissionCard: View {
         case .granted:
             Label(L10n.text("permission_open"), systemImage: "checkmark.circle.fill")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color(red: 0.35, green: 0.85, blue: 0.6))
+                .foregroundStyle(successColor)
         case .denied:
             Label(L10n.text("permission_closed"), systemImage: "xmark.circle.fill")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
+                .foregroundStyle(errorColor)
         case .pending:
             Text(L10n.text("onboarding_permission_allow"))
                 .font(.system(size: 12, weight: .semibold))
