@@ -2,8 +2,6 @@
 //  Weathra_WidgetControl.swift
 //  Weathra Widget
 //
-//  Created by Burak on 9.05.2026.
-//
 
 import AppIntents
 import SwiftUI
@@ -18,60 +16,55 @@ struct Weathra_WidgetControl: ControlWidget {
             provider: Provider()
         ) { value in
             ControlWidgetToggle(
-                "Start Timer",
-                isOn: value.isRunning,
-                action: StartTimerIntent(value.name)
-            ) { isRunning in
-                Label(isRunning ? "On" : "Off", systemImage: "timer")
+                "Hava Durumunu Yenile",
+                isOn: value.isEnabled,
+                action: RefreshWeatherIntent()
+            ) { isEnabled in
+                Label(isEnabled ? "Aktif" : "Pasif", systemImage: "arrow.clockwise")
             }
         }
-        .displayName("Timer")
-        .description("A an example control that runs a timer.")
+        .displayName("Weathra Kontrol")
+        .description("Hava durumunu manuel olarak yenile")
     }
 }
 
 extension Weathra_WidgetControl {
     struct Value {
-        var isRunning: Bool
-        var name: String
+        var isEnabled: Bool
     }
 
     struct Provider: AppIntentControlValueProvider {
-        func previewValue(configuration: TimerConfiguration) -> Value {
-            Weathra_WidgetControl.Value(isRunning: false, name: configuration.timerName)
+        func previewValue(configuration: RefreshConfiguration) -> Value {
+            Value(isEnabled: true)
         }
 
-        func currentValue(configuration: TimerConfiguration) async throws -> Value {
-            let isRunning = true // Check if the timer is running
-            return Weathra_WidgetControl.Value(isRunning: isRunning, name: configuration.timerName)
+        func currentValue(configuration: RefreshConfiguration) async throws -> Value {
+            Value(isEnabled: true)
         }
     }
 }
 
-struct TimerConfiguration: ControlConfigurationIntent {
-    static let title: LocalizedStringResource = "Timer Name Configuration"
+struct RefreshConfiguration: ControlConfigurationIntent {
+    static let title: LocalizedStringResource = "Yenileme"
 
-    @Parameter(title: "Timer Name", default: "Timer")
-    var timerName: String
+    @Parameter(title: "Aktif", default: true)
+    var isEnabled: Bool
 }
 
-struct StartTimerIntent: SetValueIntent {
-    static let title: LocalizedStringResource = "Start a timer"
+struct RefreshWeatherIntent: SetValueIntent {
+    static let title: LocalizedStringResource = "Hava Durumunu Yenile"
 
-    @Parameter(title: "Timer Name")
-    var name: String
-
-    @Parameter(title: "Timer is running")
+    @Parameter(title: "Yenile")
     var value: Bool
 
     init() {}
 
-    init(_ name: String) {
-        self.name = name
+    init(_ value: Bool) {
+        self.value = value
     }
 
     func perform() async throws -> some IntentResult {
-        // Start the timer…
+        WidgetCenter.shared.reloadAllTimelines()
         return .result()
     }
 }

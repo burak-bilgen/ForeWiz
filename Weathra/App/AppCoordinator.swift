@@ -22,6 +22,8 @@ final class AppCoordinator: ObservableObject {
     }
 
     func start() async {
+        AnalyticsManager.shared.track(.appLaunch)
+
         do {
             var loadedProfile = try await container.preferencesRepository.loadProfile()
             await container.subscriptionManager.refreshStatus()
@@ -39,6 +41,7 @@ final class AppCoordinator: ObservableObject {
         try await container.completeOnboardingUseCase.execute(profile: profile)
         L10n.configure(language: profile.language)
         self.profile = profile
+        AnalyticsManager.shared.track(.onboardingCompleted)
         rootFlow = .main
     }
 

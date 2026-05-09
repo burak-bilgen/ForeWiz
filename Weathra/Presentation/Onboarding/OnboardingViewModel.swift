@@ -44,8 +44,10 @@ final class OnboardingViewModel: ObservableObject {
             let status = await locationRepository.requestAuthorization()
             locationStatus = status
             if status == .denied || status == .restricted {
+                AnalyticsManager.shared.track(.locationPermissionDenied)
                 errorMessage = LocationPermissionMapper.userMessage(for: status)
-            } else {
+            } else if status == .authorized {
+                AnalyticsManager.shared.track(.locationPermissionGranted)
                 errorMessage = nil
             }
         }
@@ -53,7 +55,13 @@ final class OnboardingViewModel: ObservableObject {
 
     func requestNotificationPermission() {
         Task {
-            notificationStatus = await notificationRepository.requestAuthorization()
+            let status = await notificationRepository.requestAuthorization()
+            notificationStatus = status
+            if status == .authorized {
+                AnalyticsManager.shared.track(.notificationPermissionGranted)
+            } else if status == .denied {
+                AnalyticsManager.shared.track(.notificationPermissionDenied)
+            }
         }
     }
 

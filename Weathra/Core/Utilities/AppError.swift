@@ -9,6 +9,7 @@ enum AppError: Error, Equatable {
     case cacheUnavailable
     case notificationPermissionDenied
     case persistenceFailed
+    case invalidData
     case unknown
 
     var userMessage: String {
@@ -29,6 +30,8 @@ enum AppError: Error, Equatable {
             L10n.text("error_notification_denied")
         case .persistenceFailed:
             L10n.text("error_persistence")
+        case .invalidData:
+            L10n.text("error_unknown")
         case .unknown:
             L10n.text("error_unknown")
         }
