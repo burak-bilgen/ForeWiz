@@ -33,6 +33,47 @@ final class SharedWidgetRepository: WidgetRepository {
     }
 }
 
+struct WidgetWeatherPayload: Codable {
+    let temperature: Int
+    let conditionSymbol: String
+    let score: Int
+    let decision: String
+    let locationName: String
+
+    static func from(recommendation: DailyRecommendation, current: CurrentWeatherPoint, locationName: String) -> WidgetWeatherPayload {
+        let code = current.conditionCode ?? "cloudy"
+        return WidgetWeatherPayload(
+            temperature: Int(current.temperatureCelsius),
+            conditionSymbol: symbolFromCode(code),
+            score: recommendation.outdoorScore.rawValue,
+            decision: recommendation.outdoorDecision.rawValue,
+            locationName: locationName
+        )
+    }
+
+    private static func symbolFromCode(_ code: String) -> String {
+        let mapping: [String: String] = [
+            "clear": "sun.max.fill",
+            "mostlyClear": "sun.min.fill",
+            "partlyCloudy": "cloud.sun.fill",
+            "mostlyCloudy": "cloud.fill",
+            "cloudy": "cloud.fill",
+            "overcast": "smoke.fill",
+            "fog": "cloud.fog.fill",
+            "drizzle": "cloud.drizzle.fill",
+            "rain": "cloud.rain.fill",
+            "heavyRain": "cloud.heavyrain.fill",
+            "freezingRain": "cloud.sleet.fill",
+            "snow": "cloud.snow.fill",
+            "heavySnow": "cloud.snow.fill",
+            "sleet": "cloud.sleet.fill",
+            "thunderstorm": "cloud.bolt.fill",
+            "rainAndSnow": "cloud.sleet.fill"
+        ]
+        return mapping[code.lowercased()] ?? "cloud.fill"
+    }
+}
+
 private struct WidgetRecommendationPayload: Codable {
     let outdoorDecision: WidgetOutdoorDecisionPayload
     let outdoorScore: Int
