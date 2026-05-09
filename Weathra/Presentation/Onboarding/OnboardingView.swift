@@ -66,7 +66,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-Button {
+            Button {
                 withAnimation { currentStep = totalSteps - 1 }
             } label: {
                 Text(copy(tr: "Atla", en: "Skip"))
@@ -200,17 +200,17 @@ private struct OnboardingProgressBar: View {
     let total: Int
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             ForEach(0..<total, id: \.self) { index in
-                RoundedRectangle(cornerRadius: 2)
-                    .fill(index <= current
-                        ? Color.white
-                        : Color.white.opacity(0.25))
-                    .frame(height: 4)
-                    .opacity(index <= current ? 1 : 0.5)
-                    .animation(.easeInOut(duration: 0.3), value: current)
+                Capsule()
+                    .fill(index == current ? Color.white : Color.white.opacity(0.3))
+                    .frame(width: index == current ? 24 : 8, height: 4)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: current)
             }
         }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.08), in: Capsule())
     }
 }
 
