@@ -3,14 +3,17 @@ import Foundation
 struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
     private let activityWindowScoringEngine: ActivityWindowScoringEngine
     private let outfitDecisionEngine: OutfitDecisionEngine
+    private let allergyRiskClassifier: AllergyRiskClassifier
     private let riskClassifier: DefaultWeatherRiskClassifier
 
     init(
         activityWindowScoringEngine: ActivityWindowScoringEngine = DefaultActivityWindowScoringEngine(),
-        outfitDecisionEngine: OutfitDecisionEngine = DefaultOutfitDecisionEngine()
+        outfitDecisionEngine: OutfitDecisionEngine = DefaultOutfitDecisionEngine(),
+        allergyRiskClassifier: AllergyRiskClassifier = DefaultAllergyRiskClassifier()
     ) {
         self.activityWindowScoringEngine = activityWindowScoringEngine
         self.outfitDecisionEngine = outfitDecisionEngine
+        self.allergyRiskClassifier = allergyRiskClassifier
         self.riskClassifier = DefaultWeatherRiskClassifier(
             activityWindowScoringEngine: activityWindowScoringEngine
         )
@@ -23,8 +26,17 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         calendar: Calendar = .current
     ) -> DailyRecommendation {
         let todayHours = relevantHours(from: snapshot.hourly, now: now, calendar: calendar)
-        let risks = riskClassifier.uniqueRisks(from: todayHours, current: snapshot.current, calendar: calendar)
-        let avoidWindows = riskClassifier.makeAvoidWindows(from: todayHours, profile: profile, calendar: calendar)
+        let forecastRisks = riskClassifier.uniqueRisks(from: todayHours, current: snapshot.current, calendar: calendar)
+        let assistantRisks = weatherAlertRisks(from: snapshot.alerts) + minuteForecastRisks(
+            from: snapshot.minute,
+            now: now
+        ) + environmentalRisks(from: todayHours, profile: profile)
+        let risks = uniqueRisks(forecastRisks + assistantRisks)
+        let avoidWindows = (
+            riskClassifier.makeAvoidWindows(from: todayHours, profile: profile, calendar: calendar)
+            + minuteAvoidWindows(from: snapshot.minute, now: now, calendar: calendar)
+            + environmentalAvoidWindows(from: todayHours, profile: profile, now: now, calendar: calendar)
+        ).sorted { $0.window.start < $1.window.start }
         let outdoorScore = makeOutdoorScore(from: todayHours, profile: profile, risks: risks, calendar: calendar)
         let outdoorDecision = OutdoorDecision(score: outdoorScore)
         let bestOutdoorWindow = activityWindowScoringEngine.bestWindow(
@@ -74,6 +86,170 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         }
 
         return Array(hourly.filter { $0.date >= now }.sorted { $0.date < $1.date }.prefix(24))
+    }
+
+    private func uniqueRisks(_ risks: [WeatherRisk]) -> [WeatherRisk] {
+        var bestByType: [WeatherRiskType: WeatherRisk] = [:]
+
+        for risk in risks {
+            if let existing = bestByType[risk.type], risk.severity <= existing.severity {
+                continue
+            }
+            bestByType[risk.type] = risk
+        }
+
+        return bestByType.values.sorted {
+            if $0.severity == $1.severity {
+                return $0.type.rawValue < $1.type.rawValue
+            }
+            return $0.severity > $1.severity
+        }
+    }
+
+    private func weatherAlertRisks(from alerts: [WeatherAlertInfo]?) -> [WeatherRisk] {
+        (alerts ?? []).map { alert in
+            WeatherRisk(
+                type: riskType(for: alert.summary),
+                severity: alert.severity,
+                title: alert.summary,
+                message: alert.region.map { "\($0) - \(alert.source)" } ?? alert.source
+            )
+        }
+    }
+
+    private func minuteForecastRisks(from minute: [MinuteWeatherPoint]?, now: Date) -> [WeatherRisk] {
+        guard let peak = peakMinuteRain(from: minute, now: now) else {
+            return []
+        }
+
+        let severity: RiskLevel
+        if peak.precipitationChance >= 0.75 || peak.precipitationIntensityMmPerHour >= 2 {
+            severity = .high
+        } else if peak.precipitationChance >= 0.45 || peak.precipitationIntensityMmPerHour >= 0.3 {
+            severity = .medium
+        } else {
+            severity = .low
+        }
+
+        guard severity >= .medium else {
+            return []
+        }
+
+        let minutes = max(1, Int(peak.date.timeIntervalSince(now) / 60))
+        let chance = Int((peak.precipitationChance * 100).rounded())
+        return [
+            WeatherRisk(
+                type: .rain,
+                severity: severity,
+                title: localized(tr: "Yakın yağış", en: "Nearby rain"),
+                message: localized(
+                    tr: "\(minutes) dakika içinde yağış olasılığı %\(chance). Dış planında şemsiye veya kapalı rota düşün.",
+                    en: "\(chance)% rain chance in \(minutes) minutes. Consider an umbrella or a covered route."
+                )
+            )
+        ]
+    }
+
+    private func minuteAvoidWindows(
+        from minute: [MinuteWeatherPoint]?,
+        now: Date,
+        calendar: Calendar
+    ) -> [AvoidWindowRecommendation] {
+        guard let risk = minuteForecastRisks(from: minute, now: now).first,
+              risk.severity >= .medium else {
+            return []
+        }
+
+        let end = calendar.date(byAdding: .minute, value: 90, to: now) ?? now.addingTimeInterval(90 * 60)
+        let window = TimeWindow(start: now, end: end)
+        return [
+            AvoidWindowRecommendation(
+                window: window,
+                risk: risk,
+                reason: risk.message,
+                severity: risk.severity
+            )
+        ]
+    }
+
+    private func environmentalRisks(
+        from hourly: [HourlyWeatherPoint],
+        profile: UserComfortProfile
+    ) -> [WeatherRisk] {
+        guard profile.allergyProfile.isEnabled else {
+            return []
+        }
+
+        let risks = hourly.flatMap { hour in
+            [
+                profile.allergyProfile.allergies.contains(.pollen)
+                    ? allergyRiskClassifier.classifyPollenRisk(for: hour)
+                    : nil,
+                profile.allergyProfile.allergies.contains(.airQuality) || profile.allergyProfile.allergies.contains(.smoke)
+                    ? allergyRiskClassifier.classifyAirQualityRisk(for: hour, profile: profile.allergyProfile)
+                    : nil
+            ].compactMap { $0 }
+        }
+
+        return uniqueRisks(risks)
+    }
+
+    private func environmentalAvoidWindows(
+        from hourly: [HourlyWeatherPoint],
+        profile: UserComfortProfile,
+        now: Date,
+        calendar: Calendar
+    ) -> [AvoidWindowRecommendation] {
+        environmentalRisks(from: hourly, profile: profile)
+            .filter { $0.severity >= .medium }
+            .map { risk in
+                let end = calendar.date(byAdding: .hour, value: 4, to: now) ?? now.addingTimeInterval(4 * 60 * 60)
+                let window = TimeWindow(start: now, end: end)
+                return AvoidWindowRecommendation(
+                    window: window,
+                    risk: risk,
+                    reason: risk.message,
+                    severity: risk.severity
+                )
+            }
+    }
+
+    private func peakMinuteRain(from minute: [MinuteWeatherPoint]?, now: Date) -> MinuteWeatherPoint? {
+        let nextHour = now.addingTimeInterval(60 * 60)
+        return minute?
+            .filter { $0.date >= now && $0.date <= nextHour }
+            .filter { $0.precipitationType.lowercased() != "none" || $0.precipitationChance >= 0.2 }
+            .max {
+                let lhs = ($0.precipitationChance * 100) + ($0.precipitationIntensityMmPerHour * 12)
+                let rhs = ($1.precipitationChance * 100) + ($1.precipitationIntensityMmPerHour * 12)
+                return lhs < rhs
+            }
+    }
+
+    private func riskType(for alertSummary: String) -> WeatherRiskType {
+        let summary = alertSummary.lowercased()
+
+        if summary.contains("rain") || summary.contains("flood") || summary.contains("yağ") || summary.contains("sel") {
+            return .rain
+        }
+        if summary.contains("wind") || summary.contains("rüzgar") || summary.contains("rüzgâr") {
+            return .wind
+        }
+        if summary.contains("heat") || summary.contains("sıcak") {
+            return .heat
+        }
+        if summary.contains("snow") || summary.contains("ice") || summary.contains("kar") || summary.contains("buz") {
+            return .cold
+        }
+        if summary.contains("uv") || summary.contains("sun") || summary.contains("güneş") {
+            return .uv
+        }
+
+        return .storm
+    }
+
+    private func localized(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
     }
 
     private func makeOutdoorScore(

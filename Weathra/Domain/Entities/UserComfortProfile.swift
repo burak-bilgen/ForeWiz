@@ -60,7 +60,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.wakeUpTime = wakeUpTime
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
-        self.notificationPreferences = notificationPreferences
+        self.notificationPreferences = Self.normalizedNotificationPreferences(notificationPreferences)
         self.unitSystem = unitSystem
         self.maximumDailyNotifications = maximumDailyNotifications.clamped(to: 1...3)
         self.appearance = appearance
@@ -81,6 +81,15 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
                 NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
             }
         )
+    }
+
+    private static func normalizedNotificationPreferences(
+        _ preferences: [NotificationPreference]
+    ) -> [NotificationPreference] {
+        let byCategory = Dictionary(uniqueKeysWithValues: preferences.map { ($0.category, $0) })
+        return NotificationCategory.allCases.map { category in
+            byCategory[category] ?? NotificationPreference(category: category, isEnabled: true, preferredTime: nil)
+        }
     }
 }
 

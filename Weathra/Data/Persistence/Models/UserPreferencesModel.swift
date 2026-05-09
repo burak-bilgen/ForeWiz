@@ -15,6 +15,7 @@ final class UserPreferencesModel {
     var preferredLanguageRaw: String?
     var preferredAppearanceRaw: String?
     var preferredUnitSystemRaw: String?
+    var profileData: Data?
     var createdAt: Date
     var updatedAt: Date
 
@@ -51,11 +52,17 @@ final class UserPreferencesModel {
         self.preferredLanguageRaw = preferredLanguage?.rawValue
         self.preferredAppearanceRaw = preferredAppearance?.rawValue
         self.preferredUnitSystemRaw = preferredUnitSystem?.rawValue
+        self.profileData = nil
         self.createdAt = Date()
         self.updatedAt = Date()
     }
 
     func toProfile() -> UserComfortProfile {
+        if let profileData,
+           let profile = try? JSONDecoder().decode(UserComfortProfile.self, from: profileData) {
+            return profile
+        }
+
         let sensitivity = TemperatureSensitivity(rawValue: temperatureSensitivityRaw) ?? .normal
         let activities = preferredActivitiesRaw.compactMap { ActivityType(rawValue: $0) }
         
@@ -108,6 +115,7 @@ final class UserPreferencesModel {
         self.preferredLanguageRaw = profile.language.rawValue
         self.preferredAppearanceRaw = profile.appearance.rawValue
         self.preferredUnitSystemRaw = profile.unitSystem.rawValue
+        self.profileData = try? JSONEncoder().encode(profile)
         self.updatedAt = Date()
     }
 }

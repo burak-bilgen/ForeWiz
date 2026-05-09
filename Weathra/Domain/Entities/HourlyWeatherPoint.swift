@@ -12,11 +12,46 @@ struct HourlyWeatherPoint: Codable, Equatable, Identifiable, Sendable {
     let precipitationAmountMm: Double?
     let uvIndex: Int?
     let conditionCode: String?
+    let symbolName: String?
     let isDaylight: Bool?
     let severeWeatherRisk: RiskLevel?
     let pollenLevel: PollenLevel?
     let airQualityIndex: AirQualityIndex?
     let pm25Level: Pm25Level?
+
+    init(
+        date: Date,
+        temperatureCelsius: Double,
+        apparentTemperatureCelsius: Double,
+        humidity: Double?,
+        windSpeedKph: Double?,
+        precipitationChance: Double?,
+        precipitationAmountMm: Double?,
+        uvIndex: Int?,
+        conditionCode: String?,
+        symbolName: String? = nil,
+        isDaylight: Bool?,
+        severeWeatherRisk: RiskLevel?,
+        pollenLevel: PollenLevel?,
+        airQualityIndex: AirQualityIndex?,
+        pm25Level: Pm25Level?
+    ) {
+        self.date = date
+        self.temperatureCelsius = temperatureCelsius
+        self.apparentTemperatureCelsius = apparentTemperatureCelsius
+        self.humidity = humidity
+        self.windSpeedKph = windSpeedKph
+        self.precipitationChance = precipitationChance
+        self.precipitationAmountMm = precipitationAmountMm
+        self.uvIndex = uvIndex
+        self.conditionCode = conditionCode
+        self.symbolName = symbolName
+        self.isDaylight = isDaylight
+        self.severeWeatherRisk = severeWeatherRisk
+        self.pollenLevel = pollenLevel
+        self.airQualityIndex = airQualityIndex
+        self.pm25Level = pm25Level
+    }
 }
 
 enum PollenLevel: String, Codable, Sendable {

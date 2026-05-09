@@ -10,159 +10,69 @@ struct SettingsView: View {
         ZStack {
             SettingsBackground().ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.text("settings_profile_title"))
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                    Text(L10n.text("settings_profile_subtitle"))
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.white.opacity(0.45))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
+                .padding(.bottom, 8)
 
-                    if let saveMessage = viewModel.saveMessage {
-                        SettingsSaveBanner(message: saveMessage)
-                    }
+                if let saveMessage = viewModel.saveMessage {
+                    SettingsSaveBanner(message: saveMessage)
+                }
 
-                    // MARK: Premium
-                    SettingsSection(
-                        title: L10n.text("settings_section_premium"),
-                        icon: "crown.fill",
-                        color: Color(red: 1.0, green: 0.78, blue: 0.25)
-                    ) {
-                        if viewModel.isPremium {
-                            SettingsRow(
-                                icon: "checkmark.seal.fill",
-                                iconColor: Color(red: 0.35, green: 0.85, blue: 0.6),
-                                title: L10n.text("settings_premium_active"),
-                                subtitle: L10n.text("settings_premium_active_subtitle")
-                            )
-                        } else {
-                            ForEach(PremiumFeature.allCases) { feature in
-                                SettingsRow(
-                                    icon: feature.systemImage,
-                                    iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                                    title: feature.localizedTitle,
-                                    subtitle: feature.localizedDescription
-                                )
-                                if feature != PremiumFeature.allCases.last {
-                                    SettingsDivider()
-                                }
-                            }
-                            Button {
-                                HapticManager.medium()
-                                viewModel.openPaywall()
-                            } label: {
-                                HStack(spacing: 10) {
-                                    Image(systemName: "crown.fill")
-                                        .font(.system(size: 14))
-                                    Text(L10n.text("settings_premium_upgrade"))
-                                        .font(.system(size: 15, weight: .bold))
-                                }
-                                .foregroundStyle(Color(red: 0.06, green: 0.1, blue: 0.22))
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(
-                                    LinearGradient(
-                                        colors: [Color(red: 1.0, green: 0.85, blue: 0.32), Color(red: 1.0, green: 0.65, blue: 0.20)],
-                                        startPoint: .leading, endPoint: .trailing
-                                    ),
-                                    in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                )
-                                .shadow(color: Color(red: 1.0, green: 0.70, blue: 0.20).opacity(0.40), radius: 12, x: 0, y: 5)
-                                .shimmer()
-                            }
-                            .buttonStyle(PressScaleButtonStyle(scale: 0.97))
-                            .padding(.top, 8)
-                        }
-                    }
+                SettingsProfileSummaryCard(profile: viewModel.profile, isPremium: viewModel.isPremium)
 
-                    // MARK: Language
-                    SettingsSection(
-                        title: L10n.text("settings_language"),
-                        icon: "globe",
-                        color: Color(red: 0.4, green: 0.7, blue: 1.0)
-                    ) {
-                        SettingsPickerRow(
-                            icon: "globe",
-                            iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                            title: L10n.text("settings_language"),
-                            selection: languageSelection,
-                            options: AppLanguage.allCases,
-                            label: { $0.localizedTitle }
-                        )
-                    }
-
-                    // MARK: Permissions
-                    SettingsSection(
-                        title: L10n.text("settings_section_permissions"),
-                        icon: "lock.shield.fill",
-                        color: Color(red: 0.4, green: 0.85, blue: 0.6)
-                    ) {
-                        SettingsRow(
-                            icon: "location.fill",
-                            iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                            title: L10n.text("settings_permission_location"),
-                            subtitle: L10n.text("settings_permission_location_desc")
-                        )
-                        SettingsDivider()
-                        SettingsRow(
-                            icon: "bell.badge.fill",
-                            iconColor: Color(red: 1.0, green: 0.7, blue: 0.3),
-                            title: L10n.text("settings_permission_notifications"),
-                            subtitle: L10n.text("settings_permission_notifications_desc")
-                        )
-                        SettingsDivider()
-                        Button {
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                openURL(url)
-                            }
-                        } label: {
-                            HStack(spacing: 12) {
-                                SettingsIcon(systemName: "arrow.up.forward.app", color: Color(red: 0.4, green: 0.85, blue: 0.6))
-                                Text(L10n.text("settings_open_ios_settings"))
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(.white)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundStyle(Color.white.opacity(0.3))
-                            }
-                            .padding(.vertical, 4)
-                        }
-                    }
-
-                    // MARK: Units
-                    SettingsSection(
-                        title: L10n.text("settings_units"),
-                        icon: "ruler.fill",
-                        color: Color(red: 0.4, green: 0.7, blue: 1.0)
-                    ) {
+                SettingsSection(
+                    title: L10n.text("settings_units"),
+                    icon: "thermometer.medium",
+                    color: Color(red: 0.4, green: 0.7, blue: 1.0)
+                ) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(L10n.text("settings_units_subtitle"))
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.4))
                         SettingsChipPickerRow(
                             icon: "thermometer.medium",
                             iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                            title: L10n.text("settings_units"),
+                            title: "",
                             selection: $viewModel.profile.unitSystem,
                             options: UnitSystem.allCases,
                             label: { $0.localizedTitle }
                         )
                     }
+                }
 
-                    // MARK: Temperature sensitivity
-                    SettingsSection(
-                        title: L10n.text("settings_temp_sensitivity"),
-                        icon: "thermometer.sun.fill",
-                        color: Color(red: 1.0, green: 0.55, blue: 0.3)
-                    ) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(spacing: 12) {
-                                SettingsIcon(systemName: "thermometer.sun.fill", color: Color(red: 1.0, green: 0.55, blue: 0.3))
-                                Text(L10n.text("settings_temp_sensitivity"))
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(.white)
-                            }
-                            SettingsSensitivitySelector(selection: $viewModel.profile.temperatureSensitivity)
-                        }
+                SettingsSection(
+                    title: L10n.text("settings_temp_sensitivity"),
+                    icon: "thermometer.sun.fill",
+                    color: Color(red: 1.0, green: 0.55, blue: 0.3)
+                ) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(L10n.text("settings_temp_sensitivity_desc"))
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.4))
+                            .fixedSize(horizontal: false, vertical: true)
+                        SettingsSensitivitySelector(selection: $viewModel.profile.temperatureSensitivity)
                     }
+                }
 
-                    // MARK: Activities
-                    SettingsSection(
-                        title: L10n.text("settings_activities"),
-                        icon: "figure.run",
-                        color: Color(red: 0.4, green: 0.85, blue: 0.6)
-                    ) {
+                SettingsSection(
+                    title: L10n.text("settings_activities"),
+                    icon: "figure.run",
+                    color: Color(red: 0.4, green: 0.85, blue: 0.6)
+                ) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(L10n.text("settings_activities_desc"))
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.4))
+                            .fixedSize(horizontal: false, vertical: true)
                         ForEach(Array(ActivityType.allCases.enumerated()), id: \.offset) { index, activity in
                             if index > 0 { SettingsDivider() }
                             SettingsActivityRow(
@@ -171,13 +81,18 @@ struct SettingsView: View {
                             ) { toggle(activity) }
                         }
                     }
+                }
 
-                    // MARK: Wardrobe
-                    SettingsSection(
-                        title: L10n.text("settings_wardrobe_title"),
-                        icon: "tshirt.fill",
-                        color: Color(red: 0.8, green: 0.65, blue: 1.0)
-                    ) {
+                SettingsSection(
+                    title: L10n.text("settings_wardrobe_title"),
+                    icon: "tshirt.fill",
+                    color: Color(red: 0.8, green: 0.65, blue: 1.0)
+                ) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(L10n.text("settings_wardrobe_desc"))
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.4))
+                            .fixedSize(horizontal: false, vertical: true)
                         let items: [(icon: String, title: String, binding: Binding<Bool>)] = [
                             ("umbrella.fill",        L10n.text("wardrobe_umbrella"),     $viewModel.profile.wardrobe.hasUmbrella),
                             ("cloud.heavyrain.fill", L10n.text("wardrobe_raincoat"),     $viewModel.profile.wardrobe.hasRaincoat),
@@ -191,79 +106,227 @@ struct SettingsView: View {
                             SettingsToggleRow(icon: item.icon, iconColor: Color(red: 0.8, green: 0.65, blue: 1.0), title: item.title, isOn: item.binding)
                         }
                     }
+                }
 
-                    // MARK: Allergies
-                    SettingsSection(
-                        title: L10n.text("settings_allergy_title"),
-                        icon: "cross.vial.fill",
-                        color: Color(red: 1.0, green: 0.7, blue: 0.3)
-                    ) {
+                SettingsSection(
+                    title: L10n.text("settings_allergy_title"),
+                    icon: "cross.vial.fill",
+                    color: Color(red: 1.0, green: 0.7, blue: 0.3)
+                ) {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(copy(
+                            tr: "Polen, duman ve hava kalitesi hassasiyetlerini asistan kararlarına ve bildirimlere dahil eder.",
+                            en: "Includes pollen, smoke and air-quality sensitivity in assistant decisions and notifications."
+                        ))
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                        .fixedSize(horizontal: false, vertical: true)
+
                         SettingsToggleRow(
                             icon: "leaf.fill",
                             iconColor: Color(red: 1.0, green: 0.7, blue: 0.3),
                             title: L10n.text("settings_allergy_enable"),
                             isOn: $viewModel.profile.allergyProfile.isEnabled
                         )
+
                         if viewModel.profile.allergyProfile.isEnabled {
                             SettingsDivider()
+                            SettingsInfoRow(
+                                icon: "bell.badge.fill",
+                                color: Color(red: 1.0, green: 0.45, blue: 0.45),
+                                text: copy(
+                                    tr: "Polen ve hava kalitesi yüksek riskte ayrı Time Sensitive bildirim olarak planlanır. Apple Critical Alert özel entitlement istediği için release'te güvenli varsayılan değildir.",
+                                    en: "High pollen and air-quality risk can trigger separate Time Sensitive alerts. Apple Critical Alerts require a special entitlement, so they are not a safe release default."
+                                )
+                            )
+                            SettingsDivider()
+
+                            Text(copy(tr: "Hassasiyetler", en: "Sensitivities"))
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(Color.white.opacity(0.36))
+                                .textCase(.uppercase)
+                                .tracking(0.5)
+                                .padding(.leading, 4)
+
                             ForEach(Array(AllergyType.allCases.enumerated()), id: \.offset) { index, allergyType in
                                 if index > 0 { SettingsDivider() }
                                 SettingsAllergyRow(
                                     allergyType: allergyType,
                                     isSelected: viewModel.profile.allergyProfile.allergies.contains(allergyType)
                                 ) {
-                                    HapticManager.selection()
-                                    if viewModel.profile.allergyProfile.allergies.contains(allergyType) {
-                                        viewModel.profile.allergyProfile.allergies.remove(allergyType)
-                                    } else {
-                                        viewModel.profile.allergyProfile.allergies.insert(allergyType)
+                                    toggle(allergyType)
+                                }
+                            }
+
+                            if viewModel.profile.allergyProfile.allergies.contains(.pollen) {
+                                SettingsDivider()
+                                Text(copy(tr: "Polen türleri", en: "Pollen types"))
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundStyle(Color.white.opacity(0.36))
+                                    .textCase(.uppercase)
+                                    .tracking(0.5)
+                                    .padding(.leading, 4)
+                                    .padding(.top, 4)
+
+                                FlowLayout(spacing: 8) {
+                                    ForEach(PollenType.allCases, id: \.self) { pollenType in
+                                        SettingsPollenTypeChip(
+                                            pollenType: pollenType,
+                                            isSelected: viewModel.profile.allergyProfile.pollenTypes.contains(pollenType)
+                                        ) {
+                                            toggle(pollenType)
+                                        }
                                     }
                                 }
+                                .padding(.vertical, 8)
                             }
                         }
                     }
-
-                    // MARK: Notifications
-                    SettingsSection(
-                        title: L10n.text("settings_section_notifications"),
-                        icon: "bell.badge.fill",
-                        color: Color(red: 1.0, green: 0.45, blue: 0.45)
-                    ) {
-                        NotificationSettingsSection(profile: $viewModel.profile)
-                    }
-
-                    // MARK: About
-                    SettingsSection(
-                        title: L10n.text("settings_about_title"),
-                        icon: "info.circle.fill",
-                        color: Color(red: 0.4, green: 0.7, blue: 1.0)
-                    ) {
-                        SettingsAboutRow(label: L10n.text("settings_version"), value: appVersion)
-                        SettingsDivider()
-                        SettingsAboutRow(label: L10n.text("settings_data_source"), value: L10n.text("settings_data_apple_weather"))
-                    }
-
-                    // MARK: Reset
-                    Button {
-                        HapticManager.medium()
-                        showResetConfirmation = true
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: "arrow.counterclockwise")
-                                .font(.system(size: 14))
-                            Text(L10n.text("settings_reset_title"))
-                                .font(.system(size: 15, weight: .medium))
-                        }
-                        .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.2), lineWidth: 1))
-                    }
-                    .padding(.bottom, 32)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
+
+                SettingsSection(
+                    title: L10n.text("settings_section_notifications"),
+                    icon: "bell.badge.fill",
+                    color: Color(red: 1.0, green: 0.45, blue: 0.45)
+                ) {
+                    NotificationSettingsSection(profile: $viewModel.profile)
+                }
+
+                SettingsSection(
+                    title: L10n.text("settings_section_premium"),
+                    icon: "crown.fill",
+                    color: Color(red: 1.0, green: 0.78, blue: 0.25)
+                ) {
+                    if viewModel.isPremium {
+                        SettingsRow(
+                            icon: "checkmark.seal.fill",
+                            iconColor: Color(red: 0.35, green: 0.85, blue: 0.6),
+                            title: L10n.text("settings_premium_active"),
+                            subtitle: L10n.text("settings_premium_active_subtitle")
+                        )
+                    } else {
+                        ForEach(PremiumFeature.allCases) { feature in
+                            SettingsRow(
+                                icon: feature.systemImage,
+                                iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                                title: feature.localizedTitle,
+                                subtitle: feature.localizedDescription
+                            )
+                            if feature != PremiumFeature.allCases.last {
+                                SettingsDivider()
+                            }
+                        }
+                        Button {
+                            HapticManager.medium()
+                            viewModel.openPaywall()
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 14))
+                                Text(L10n.text("settings_premium_upgrade"))
+                                    .font(.system(size: 15, weight: .bold))
+                            }
+                            .foregroundStyle(Color(red: 0.06, green: 0.1, blue: 0.22))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(red: 1.0, green: 0.85, blue: 0.32), Color(red: 1.0, green: 0.65, blue: 0.20)],
+                                    startPoint: .leading, endPoint: .trailing
+                                ),
+                                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            )
+                            .shadow(color: Color(red: 1.0, green: 0.70, blue: 0.20).opacity(0.40), radius: 12, x: 0, y: 5)
+                            .shimmer()
+                        }
+                        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+                        .padding(.top, 8)
+                    }
+                }
+
+                SettingsSection(
+                    title: L10n.text("settings_section_permissions"),
+                    icon: "lock.shield.fill",
+                    color: Color(red: 0.4, green: 0.85, blue: 0.6)
+                ) {
+                    SettingsRow(
+                        icon: "location.fill",
+                        iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                        title: L10n.text("settings_permission_location"),
+                        subtitle: L10n.text("settings_permission_location_desc")
+                    )
+                    SettingsDivider()
+                    SettingsRow(
+                        icon: "bell.badge.fill",
+                        iconColor: Color(red: 1.0, green: 0.7, blue: 0.3),
+                        title: L10n.text("settings_permission_notifications"),
+                        subtitle: L10n.text("settings_permission_notifications_desc")
+                    )
+                    SettingsDivider()
+                    Button {
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            openURL(url)
+                        }
+                    } label: {
+                        HStack(spacing: 12) {
+                            SettingsIcon(systemName: "arrow.up.forward.app", color: Color(red: 0.4, green: 0.85, blue: 0.6))
+                            Text(L10n.text("settings_open_ios_settings"))
+                                .font(.system(size: 15))
+                                .foregroundStyle(.white)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(Color.white.opacity(0.3))
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+
+                SettingsSection(
+                    title: L10n.text("settings_language"),
+                    icon: "globe",
+                    color: Color(red: 0.4, green: 0.7, blue: 1.0)
+                ) {
+                    SettingsPickerRow(
+                        icon: "globe",
+                        iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                        title: L10n.text("settings_language"),
+                        selection: languageSelection,
+                        options: AppLanguage.allCases,
+                        label: { $0.localizedTitle }
+                    )
+                }
+
+                SettingsSection(
+                    title: L10n.text("settings_about_title"),
+                    icon: "info.circle.fill",
+                    color: Color(red: 0.4, green: 0.7, blue: 1.0)
+                ) {
+                    SettingsAboutRow(label: L10n.text("settings_version"), value: appVersion)
+                    SettingsDivider()
+                    SettingsAboutRow(label: L10n.text("settings_data_source"), value: L10n.text("settings_data_apple_weather"))
+                }
+
+                Button {
+                    HapticManager.medium()
+                    showResetConfirmation = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 14))
+                        Text(L10n.text("settings_reset_title"))
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.2), lineWidth: 1))
+                }
+                .padding(.bottom, 32)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
             }
             .scrollIndicators(.hidden)
             .safeAreaPadding(.bottom, 12)
@@ -314,6 +377,32 @@ struct SettingsView: View {
         }
     }
 
+    private func toggle(_ allergyType: AllergyType) {
+        HapticManager.selection()
+        if viewModel.profile.allergyProfile.allergies.contains(allergyType) {
+            viewModel.profile.allergyProfile.allergies.remove(allergyType)
+        } else {
+            viewModel.profile.allergyProfile.allergies.insert(allergyType)
+        }
+    }
+
+    private func toggle(_ pollenType: PollenType) {
+        HapticManager.selection()
+        if viewModel.profile.allergyProfile.pollenTypes.contains(pollenType) {
+            viewModel.profile.allergyProfile.pollenTypes.remove(pollenType)
+        } else {
+            viewModel.profile.allergyProfile.pollenTypes.insert(pollenType)
+        }
+
+        if viewModel.profile.allergyProfile.pollenTypes.isEmpty {
+            viewModel.profile.allergyProfile.pollenTypes.insert(pollenType)
+        }
+    }
+
+    private func copy(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
+    }
+
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
@@ -350,6 +439,130 @@ private struct SettingsSaveBanner: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.25), lineWidth: 1))
+    }
+}
+
+private struct SettingsProfileSummaryCard: View {
+    let profile: UserComfortProfile
+    let isPremium: Bool
+
+    private let blue = Color(red: 0.4, green: 0.72, blue: 1.0)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 12) {
+                SettingsIcon(systemName: "sparkles", color: blue)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(copy(tr: "Asistan profili", en: "Assistant profile"))
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(.white)
+                    Text(copy(
+                        tr: "Bu ayarlar ana ekran skorlarını, kıyafet önerisini ve bildirim önceliğini belirler.",
+                        en: "These settings shape Home scores, outfit guidance and notification priority."
+                    ))
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.white.opacity(0.42))
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+                .layoutPriority(1)
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 135), spacing: 10)], spacing: 10) {
+                SettingsSummaryTile(
+                    icon: "thermometer.medium",
+                    title: copy(tr: "Hissetme", en: "Comfort"),
+                    value: profile.temperatureSensitivity.localizedTitle,
+                    color: Color(red: 1.0, green: 0.62, blue: 0.28)
+                )
+                SettingsSummaryTile(
+                    icon: "figure.walk",
+                    title: copy(tr: "Aktivite", en: "Activities"),
+                    value: activitySummary,
+                    color: Color(red: 0.35, green: 0.85, blue: 0.62)
+                )
+                SettingsSummaryTile(
+                    icon: "heart.text.square.fill",
+                    title: copy(tr: "Sağlık", en: "Health"),
+                    value: healthSummary,
+                    color: Color(red: 0.4, green: 0.72, blue: 1.0)
+                )
+                SettingsSummaryTile(
+                    icon: isPremium ? "crown.fill" : "bell.badge.fill",
+                    title: isPremium ? "Premium" : copy(tr: "Bildirim", en: "Alerts"),
+                    value: isPremium ? copy(tr: "Aktif", en: "Active") : "\(profile.maximumDailyNotifications)/gün",
+                    color: Color(red: 1.0, green: 0.78, blue: 0.25)
+                )
+            }
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(blue.opacity(0.12), lineWidth: 1))
+    }
+
+    private var activitySummary: String {
+        let activities = profile.preferredActivities.sorted { $0.rawValue < $1.rawValue }
+        guard let first = activities.first else {
+            return ActivityType.goingOutside.localizedTitle
+        }
+
+        if activities.count == 1 {
+            return first.localizedTitle
+        }
+
+        return "\(first.localizedTitle) +\(activities.count - 1)"
+    }
+
+    private var healthSummary: String {
+        guard profile.allergyProfile.isEnabled,
+              let first = profile.allergyProfile.allergies.sorted(by: { $0.rawValue < $1.rawValue }).first else {
+            return copy(tr: "Standart", en: "Standard")
+        }
+
+        if profile.allergyProfile.allergies.count == 1 {
+            return first.localizedTitle
+        }
+
+        return "\(first.localizedTitle) +\(profile.allergyProfile.allergies.count - 1)"
+    }
+
+    private func copy(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
+    }
+}
+
+private struct SettingsSummaryTile: View {
+    let icon: String
+    let title: String
+    let value: String
+    let color: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(color)
+                .frame(width: 22, height: 22)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.36))
+                    .textCase(.uppercase)
+                    .tracking(0.4)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                Text(value)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .padding(12)
+        .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(color.opacity(0.12), lineWidth: 1))
     }
 }
 
@@ -445,6 +658,24 @@ private struct SettingsRow: View {
             Spacer(minLength: 8)
         }
         .padding(.vertical, 10)
+    }
+}
+
+private struct SettingsInfoRow: View {
+    let icon: String
+    let color: Color
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            SettingsIcon(systemName: icon, color: color)
+            Text(text)
+                .font(.system(size: 12))
+                .foregroundStyle(Color.white.opacity(0.42))
+                .fixedSize(horizontal: false, vertical: true)
+                .layoutPriority(1)
+        }
+        .padding(.vertical, 8)
     }
 }
 
@@ -703,5 +934,38 @@ private struct SettingsAllergyRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+private struct SettingsPollenTypeChip: View {
+    let pollenType: PollenType
+    let isSelected: Bool
+    let onTap: () -> Void
+
+    private let color = Color(red: 1.0, green: 0.7, blue: 0.3)
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 6) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 12, weight: .semibold))
+                Text(pollenType.localizedTitle)
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .foregroundStyle(isSelected ? color : Color.white.opacity(0.48))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                isSelected ? color.opacity(0.14) : Color.white.opacity(0.06),
+                in: Capsule()
+            )
+            .overlay(
+                Capsule().stroke(isSelected ? color.opacity(0.35) : Color.white.opacity(0.10), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .animation(.spring(response: 0.25, dampingFraction: 0.75), value: isSelected)
     }
 }

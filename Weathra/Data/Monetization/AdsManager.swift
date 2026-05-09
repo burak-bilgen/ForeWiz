@@ -60,8 +60,6 @@ enum AdsManager {
                 }
                 startMobileAdsWhenAllowed()
             }
-
-            startMobileAdsWhenAllowed()
         }
     }
 

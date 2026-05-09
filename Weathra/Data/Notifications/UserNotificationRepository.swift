@@ -50,11 +50,17 @@ final class UserNotificationRepository: NotificationRepository {
                 content.interruptionLevel = .passive
             }
 
-            let components = Calendar.current.dateComponents(
-                [.year, .month, .day, .hour, .minute],
-                from: plan.fireDate
-            )
-            let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            let secondsUntilFire = plan.fireDate.timeIntervalSince(Date())
+            let trigger: UNNotificationTrigger
+            if secondsUntilFire < 60 {
+                trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60, repeats: false)
+            } else {
+                let components = Calendar.current.dateComponents(
+                    [.year, .month, .day, .hour, .minute],
+                    from: plan.fireDate
+                )
+                trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            }
             let request = UNNotificationRequest(
                 identifier: NotificationIdentifierFactory.identifier(for: plan),
                 content: content,
@@ -69,7 +75,10 @@ final class UserNotificationRepository: NotificationRepository {
         let requests = await center.pendingNotificationRequests()
         let identifiers = requests
             .map(\.identifier)
-            .filter { $0.hasPrefix(NotificationIdentifierFactory.smartPrefix) }
+            .filter {
+                $0.hasPrefix(NotificationIdentifierFactory.smartPrefix)
+                    || $0.hasPrefix(NotificationIdentifierFactory.legacySmartPrefix)
+            }
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 

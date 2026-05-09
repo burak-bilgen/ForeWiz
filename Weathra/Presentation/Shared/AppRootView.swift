@@ -103,6 +103,7 @@ private struct MainTabView: View {
             preferencesRepository: coordinator.container.preferencesRepository,
             widgetRepository: coordinator.container.widgetRepository,
             dateProvider: coordinator.container.dateProvider,
+            activityWindowScoringEngine: coordinator.container.activityWindowScoringEngine,
             selectedLocationName: name
         ))
     }

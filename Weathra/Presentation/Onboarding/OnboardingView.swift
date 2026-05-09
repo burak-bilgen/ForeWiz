@@ -11,7 +11,7 @@ struct OnboardingView: View {
     @State private var currentStep = 0
     @State private var appeared = false
 
-    private let totalSteps = 3
+    private let totalSteps = 4
 
     var body: some View {
         ZStack {
@@ -58,6 +58,8 @@ struct OnboardingView: View {
         case 0: HeroStep()
         case 1: FeaturesStep()
         case 2:
+            PersonalizationStep(viewModel: viewModel)
+        case 3:
             PermissionsStep(
                 viewModel: viewModel,
                 appeared: appeared
@@ -105,6 +107,7 @@ struct OnboardingView: View {
         switch currentStep {
         case 0: L10n.text("onboarding_continue")
         case 1: L10n.text("onboarding_lets_start")
+        case 2: L10n.text("onboarding_continue")
         default: L10n.text("onboarding_ready")
         }
     }
@@ -369,6 +372,256 @@ private struct FeatureRow: View {
                 appeared = true
             }
         }
+    }
+}
+
+// MARK: - Step 2: Personalization
+
+private struct PersonalizationStep: View {
+    @ObservedObject var viewModel: OnboardingViewModel
+
+    private let blue = Color(red: 0.4, green: 0.72, blue: 1.0)
+    private let green = Color(red: 0.35, green: 0.85, blue: 0.62)
+    private let amber = Color(red: 1.0, green: 0.72, blue: 0.32)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(copy(tr: "Asistanı kendine göre ayarla", en: "Tune the assistant for you"))
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.78)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(copy(
+                    tr: "Bu seçimler skorları, kıyafet önerilerini ve bildirim önceliklerini doğrudan etkiler.",
+                    en: "These choices directly shape scores, outfit guidance and notification priority."
+                ))
+                .font(.system(size: 16))
+                .foregroundStyle(Color.white.opacity(0.55))
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.bottom, 22)
+            .padding(.horizontal, 16)
+
+            VStack(spacing: 14) {
+                OnboardingPersonalizationCard(
+                    icon: "thermometer.sun.fill",
+                    color: amber,
+                    title: copy(tr: "Sıcaklığı nasıl hissedersin?", en: "How do you feel temperature?"),
+                    subtitle: copy(tr: "Hissedilen sıcaklık skorunu kişiselleştirir.", en: "Personalizes the feels-like comfort score.")
+                ) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], spacing: 8) {
+                        ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
+                            OnboardingOptionTile(
+                                icon: icon(for: sensitivity),
+                                title: sensitivity.localizedTitle,
+                                color: amber,
+                                isSelected: viewModel.selectedSensitivity == sensitivity
+                            ) {
+                                HapticManager.selection()
+                                viewModel.selectSensitivity(sensitivity)
+                            }
+                        }
+                    }
+                }
+
+                OnboardingPersonalizationCard(
+                    icon: "figure.walk",
+                    color: green,
+                    title: copy(tr: "Dışarıda ne yaparsın?", en: "What do you do outside?"),
+                    subtitle: copy(tr: "Ana ekran en iyi saatleri bu aktivitelere göre çıkarır.", en: "Home finds the best windows for these activities.")
+                ) {
+                    FlowLayout(spacing: 8) {
+                        ForEach(ActivityType.allCases, id: \.self) { activity in
+                            OnboardingChip(
+                                icon: icon(for: activity),
+                                title: activity.localizedTitle,
+                                color: green,
+                                isSelected: viewModel.preferredActivities.contains(activity)
+                            ) {
+                                HapticManager.selection()
+                                viewModel.toggleActivity(activity)
+                            }
+                        }
+                    }
+                }
+
+                OnboardingPersonalizationCard(
+                    icon: "heart.text.square.fill",
+                    color: blue,
+                    title: copy(tr: "Sağlık hassasiyetleri", en: "Health sensitivities"),
+                    subtitle: copy(tr: "Polen ve hava kalitesi riskleri ana ekranda ve bildirimlerde öne çıkar.", en: "Pollen and air-quality risks are promoted on Home and in alerts.")
+                ) {
+                    FlowLayout(spacing: 8) {
+                        ForEach([AllergyType.pollen, .airQuality, .smoke, .dust], id: \.self) { allergy in
+                            OnboardingChip(
+                                icon: allergy.icon,
+                                title: allergy.localizedTitle,
+                                color: blue,
+                                isSelected: viewModel.selectedAllergies.contains(allergy)
+                            ) {
+                                HapticManager.selection()
+                                viewModel.toggleAllergy(allergy)
+                            }
+                        }
+                    }
+
+                    if viewModel.selectedAllergies.contains(.pollen) {
+                        Divider().background(Color.white.opacity(0.08)).padding(.vertical, 8)
+                        FlowLayout(spacing: 8) {
+                            ForEach(PollenType.allCases, id: \.self) { pollenType in
+                                OnboardingChip(
+                                    icon: "leaf.fill",
+                                    title: pollenType.localizedTitle,
+                                    color: amber,
+                                    isSelected: viewModel.selectedPollenTypes.contains(pollenType)
+                                ) {
+                                    HapticManager.selection()
+                                    viewModel.togglePollenType(pollenType)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private func icon(for sensitivity: TemperatureSensitivity) -> String {
+        switch sensitivity {
+        case .getsColdEasily:
+            return "snowflake"
+        case .normal:
+            return "thermometer.medium"
+        case .getsHotEasily:
+            return "sun.max.fill"
+        }
+    }
+
+    private func icon(for activity: ActivityType) -> String {
+        switch activity {
+        case .running:
+            return "figure.run"
+        case .walking:
+            return "figure.walk"
+        case .cycling:
+            return "bicycle"
+        case .goingOutside:
+            return "sun.max.fill"
+        }
+    }
+
+    private func copy(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
+    }
+}
+
+private struct OnboardingPersonalizationCard<Content: View>: View {
+    let icon: String
+    let color: Color
+    let title: String
+    let subtitle: String
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(color.opacity(0.16))
+                        .frame(width: 42, height: 42)
+                    Image(systemName: icon)
+                        .font(.system(size: 17, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(color)
+                }
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(subtitle)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.white.opacity(0.44))
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .layoutPriority(1)
+            }
+
+            content()
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(color.opacity(0.12), lineWidth: 1))
+    }
+}
+
+private struct OnboardingOptionTile: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 7) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .semibold))
+                Text(title)
+                    .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.75)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .foregroundStyle(isSelected ? color : Color.white.opacity(0.48))
+            .frame(maxWidth: .infinity, minHeight: 76)
+            .padding(.horizontal, 8)
+            .background(
+                isSelected ? color.opacity(0.15) : Color.white.opacity(0.055),
+                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isSelected ? color.opacity(0.36) : Color.white.opacity(0.08), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+private struct OnboardingChip: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+                Text(title)
+                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .foregroundStyle(isSelected ? color : Color.white.opacity(0.52))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(isSelected ? color.opacity(0.15) : Color.white.opacity(0.055), in: Capsule())
+            .overlay(Capsule().stroke(isSelected ? color.opacity(0.36) : Color.white.opacity(0.08), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

@@ -32,16 +32,21 @@ struct RecommendationShareContent {
     static func create(from recommendation: DailyRecommendation, temperature: Int, condition: String) -> String {
         let emoji = emojiFor(condition: condition)
         let decision = decisionText(for: recommendation.outdoorDecision)
+        let scoreLabel = copy(tr: "Skor", en: "Score")
+        let footer = copy(
+            tr: "Weathra ile hava durumunu plan asistanına çevir.",
+            en: "Turn weather into a planning assistant with Weathra."
+        )
 
         return """
         \(emoji) \(temperature)° - \(condition)
 
         \(decision)
-        Skor: \(recommendation.outdoorScore.rawValue)/100
+        \(scoreLabel): \(recommendation.outdoorScore.rawValue)/100
 
         \(recommendation.summaryText)
 
-        Weathra ile kendi hava durumu asistanın ol!
+        \(footer)
         🌤️ weathra.app
         """
     }
@@ -66,10 +71,18 @@ struct RecommendationShareContent {
 
     private static func decisionText(for decision: OutdoorDecision) -> String {
         switch decision {
-        case .good: return "Dışarı çık!"
-        case .moderate: return "Dikkatli ol"
-        case .risky: return "Riskli"
-        case .avoid: return "Dışarı çıkma"
+        case .good:
+            return copy(tr: "Dış plan için iyi görünüyor.", en: "Looks good for outdoor plans.")
+        case .moderate:
+            return copy(tr: "Küçük önlemle dışarı çıkılır.", en: "Outdoor plans work with small precautions.")
+        case .risky:
+            return copy(tr: "Risk var; planı esnek tut.", en: "There is some risk; keep the plan flexible.")
+        case .avoid:
+            return copy(tr: "Bugün içeri almak daha mantıklı.", en: "Moving the plan indoors is the better call today.")
         }
+    }
+
+    private static func copy(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
     }
 }

@@ -35,6 +35,7 @@ struct PaywallView: View {
                             .padding(.top, 16)
 
                         PaywallFeatureList()
+                        PaywallValueStrip()
 
                         if store.isLoading && store.products.isEmpty {
                             VStack(spacing: 12) {
@@ -267,6 +268,47 @@ private struct PaywallFeatureList: View {
     }
 }
 
+private struct PaywallValueStrip: View {
+    private let items: [(String, String, Color)] = [
+        ("calendar", "14 days", Color(red: 0.4, green: 0.7, blue: 1.0)),
+        ("xmark.square", "No ads", Color(red: 0.4, green: 0.85, blue: 0.6)),
+        ("chart.line.uptrend.xyaxis", "Insights", Color(red: 0.8, green: 0.65, blue: 1.0)),
+    ]
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(items, id: \.1) { item in
+                HStack(spacing: 6) {
+                    Image(systemName: item.0)
+                        .font(.system(size: 12, weight: .semibold))
+                    Text(localized(item.1))
+                        .font(.system(size: 12, weight: .semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+                }
+                .foregroundStyle(item.2)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .background(item.2.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(item.2.opacity(0.16), lineWidth: 1)
+                )
+            }
+        }
+    }
+
+    private func localized(_ value: String) -> String {
+        guard L10n.currentLanguageCode == "tr" else { return value }
+        switch value {
+        case "14 days": return "14 gün"
+        case "No ads": return "Reklamsız"
+        case "Insights": return "Analiz"
+        default: return value
+        }
+    }
+}
+
 // MARK: - Purchase button
 
 private struct PaywallPurchaseButton: View {
@@ -308,7 +350,17 @@ private struct PaywallPurchaseButton: View {
     }
 
     private var productCopy: some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 5) {
+            if let badgeText {
+                Text(badgeText)
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundStyle(dark)
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.white.opacity(0.28), in: Capsule())
+            }
             Text(product.displayName)
                 .font(.system(size: 16, weight: .bold))
                 .foregroundStyle(dark)
@@ -324,11 +376,35 @@ private struct PaywallPurchaseButton: View {
     }
 
     private var productPrice: some View {
-        Text(product.price)
-            .font(.system(size: 18, weight: .bold, design: .rounded))
-            .foregroundStyle(dark)
-            .monospacedDigit()
-            .lineLimit(1)
-            .minimumScaleFactor(0.70)
+        VStack(alignment: .trailing, spacing: 2) {
+            Text(product.price)
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(dark)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.70)
+            if product.period.isEmpty == false {
+                Text(periodText)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(dark.opacity(0.55))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+        }
+    }
+
+    private var isYearlyPlan: Bool {
+        let haystack = "\(product.id) \(product.period) \(product.displayName)".lowercased()
+        return haystack.contains("year") || haystack.contains("annual") || haystack.contains("yıl")
+    }
+
+    private var badgeText: String? {
+        guard isYearlyPlan else { return nil }
+        return L10n.currentLanguageCode == "tr" ? "En mantıklı seçenek" : "Best value"
+    }
+
+    private var periodText: String {
+        guard product.period.isEmpty == false else { return "" }
+        return L10n.currentLanguageCode == "tr" ? "\(product.period) plan" : "\(product.period) plan"
     }
 }

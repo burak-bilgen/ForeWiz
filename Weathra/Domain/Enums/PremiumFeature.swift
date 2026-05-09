@@ -4,7 +4,6 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
     case removeAds
     case fourteenDayForecast
     case advancedAnalytics
-    case appleWatchCompanion
 
     var id: String { rawValue }
 
@@ -13,7 +12,6 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
         case .removeAds: L10n.text("premium_remove_ads")
         case .fourteenDayForecast: L10n.text("premium_feature_forecast_14day")
         case .advancedAnalytics: L10n.text("premium_feature_analytics")
-        case .appleWatchCompanion: L10n.text("premium_feature_watch")
         }
     }
 
@@ -22,7 +20,6 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
         case .removeAds: L10n.text("premium_remove_ads_desc")
         case .fourteenDayForecast: L10n.text("premium_feature_forecast_14day_desc")
         case .advancedAnalytics: L10n.text("premium_feature_analytics_desc")
-        case .appleWatchCompanion: L10n.text("premium_feature_watch_desc")
         }
     }
 
@@ -31,7 +28,6 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
         case .removeAds: "xmark.square.fill"
         case .fourteenDayForecast: "calendar.badge.plus"
         case .advancedAnalytics: "chart.line.uptrend.xyaxis"
-        case .appleWatchCompanion: "applewatch.watchface"
         }
     }
 
@@ -44,7 +40,6 @@ enum PremiumFeature: String, CaseIterable, Identifiable, Codable, Sendable {
         case .removeAds: 0
         case .fourteenDayForecast: 1
         case .advancedAnalytics: 2
-        case .appleWatchCompanion: 3
         }
     }
 }

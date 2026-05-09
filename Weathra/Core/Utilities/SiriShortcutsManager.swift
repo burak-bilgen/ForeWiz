@@ -340,10 +340,29 @@ final class ContainerProvider {
                 return container
             }
 
-            let config = ModelConfiguration(isStoredInMemoryOnly: false)
-            let container = try! ModelContainer(for: UserPreferencesModel.self, WeatherSnapshotModel.self, configurations: config)
-            let context = ModelContext(container)
+            let container: ModelContainer
+            do {
+                let config = ModelConfiguration(isStoredInMemoryOnly: false)
+                container = try ModelContainer(
+                    for: UserPreferencesModel.self,
+                    WeatherSnapshotModel.self,
+                    configurations: config
+                )
+            } catch {
+                AppLogger.shortcuts.error("Persistent shortcut container failed: \(error.localizedDescription)")
+                do {
+                    let fallbackConfig = ModelConfiguration(isStoredInMemoryOnly: true)
+                    container = try ModelContainer(
+                        for: UserPreferencesModel.self,
+                        WeatherSnapshotModel.self,
+                        configurations: fallbackConfig
+                    )
+                } catch {
+                    fatalError("Failed to create shortcut ModelContainer: \(error)")
+                }
+            }
 
+            let context = ModelContext(container)
             let newContainer = DependencyContainer.live(modelContext: context)
             _container = newContainer
             return newContainer

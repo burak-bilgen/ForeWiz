@@ -12,6 +12,8 @@ struct NotificationPreferenceToggle: View {
         case .rainWarning:       return "cloud.rain.fill"
         case .windWarning:       return "wind"
         case .uvWarning:         return "sun.max.fill"
+        case .pollenWarning:     return "leaf.fill"
+        case .airQualityWarning: return "aqi.medium"
         }
     }
 

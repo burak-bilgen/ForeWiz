@@ -37,6 +37,7 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
                 preferredAppearance: profile.appearance,
                 preferredUnitSystem: profile.unitSystem
             )
+            model.update(from: profile)
             modelContext.insert(model)
         }
         

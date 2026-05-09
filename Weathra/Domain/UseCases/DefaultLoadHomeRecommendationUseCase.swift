@@ -100,7 +100,11 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         return HomeRecommendationResult(
             recommendation: recommendation,
             currentWeather: snapshot.current,
+            minutePoints: snapshot.minute ?? [],
+            hourlyPoints: snapshot.hourly,
             dailyPoints: snapshot.daily,
+            alerts: snapshot.alerts ?? [],
+            availability: snapshot.availability,
             isUsingCachedWeather: isCached,
             warningMessage: warningMessage,
             weatherFetchedAt: snapshot.fetchedAt,

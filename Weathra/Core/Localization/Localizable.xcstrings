@@ -287,13 +287,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ad"
+            "value" : "Remove ads"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reklam"
+            "value" : "Reklamları kaldır"
           }
         }
       }
@@ -1519,13 +1519,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "14-day forecast with Premium"
+            "value" : "Unlock the 14-day plan"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "14 günlük tahmin için Premium"
+            "value" : "14 günlük planı aç"
           }
         }
       }
@@ -1543,6 +1543,210 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saatlik"
+          }
+        }
+      }
+    },
+    "assistant_best_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best time"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En iyi saat"
+          }
+        }
+      }
+    },
+    "assistant_best_time_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go outside during this window"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu saat aralığında dışarı çık"
+          }
+        }
+      }
+    },
+    "assistant_headline_caution" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Go out with caution"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dikkatli çık"
+          }
+        }
+      }
+    },
+    "assistant_headline_good" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Great day to be outside"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dışarı çıkmak için güzel gün"
+          }
+        }
+      }
+    },
+    "assistant_headline_moderate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Okay to go outside"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dışarı çıkılabilir"
+          }
+        }
+      }
+    },
+    "assistant_headline_risky" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limit outdoor time"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dışarıda kalmayı kısıtla"
+          }
+        }
+      }
+    },
+    "assistant_today_summary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün"
+          }
+        }
+      }
+    },
+    "assistant_uv_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply sunscreen, seek shade"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Güneş kremi sür, gölgede kal"
+          }
+        }
+      }
+    },
+    "assistant_uv_warning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High UV"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yüksek UV"
+          }
+        }
+      }
+    },
+    "assistant_watch_out" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Watch out"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dikkat et"
+          }
+        }
+      }
+    },
+    "assistant_wear" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wear"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giy"
+          }
+        }
+      }
+    },
+    "home_hourly_best_window" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best window:"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En iyi saat:"
           }
         }
       }
@@ -2697,13 +2901,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Good morning!"
+            "value" : "Today's weather plan is ready"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Günaydın!"
+            "value" : "Bugünün hava planı hazır"
           }
         }
       }
@@ -2714,13 +2918,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Not a great day to be outside."
+            "value" : "Keep outdoor plans short today."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dışarısı bugün pek iyi değil."
+            "value" : "Bugün dış planı kısa tut."
           }
         }
       }
@@ -2731,13 +2935,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Perfect day to be outside!"
+            "value" : "Outdoor plans look comfortable today."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dışarısı harika görünüyor!"
+            "value" : "Bugün dış plan rahat görünüyor."
           }
         }
       }
@@ -2748,13 +2952,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Outside is fine today."
+            "value" : "Outdoor plans work with small precautions."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dışarısı bugün fena değil."
+            "value" : "Küçük önlemle dışarı çıkılır."
           }
         }
       }
@@ -2765,13 +2969,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Take care if you go out."
+            "value" : "Plan carefully if you go out."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dışarı çıkacaksan biraz dikkatli ol."
+            "value" : "Dışarı çıkacaksan planı dikkatli kur."
           }
         }
       }
@@ -3202,13 +3406,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decision Assistant"
+            "value" : "Should I go outside today?"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Karar Asistanı"
+            "value" : "Bugün dışarı çıkmalı mıyım?"
           }
         }
       }
@@ -3219,13 +3423,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Should I go outside today? What should I wear?"
+            "value" : "See whether going out makes sense and which hour feels best."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bugün dışarı çıkmalı mısın? Ne giymelisin?"
+            "value" : "Dışarı çıkılır mı, en iyi saat hangisi birlikte gör."
           }
         }
       }
@@ -3236,13 +3440,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Notifications"
+            "value" : "Smart reminders"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bildirimler"
+            "value" : "Akıllı hatırlatıcılar"
           }
         }
       }
@@ -3253,13 +3457,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Don't miss opportunities."
+            "value" : "Get a note when rain, pollen, air quality or timing matters."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fırsatları kaçırma."
+            "value" : "Yağmur, polen, hava kalitesi veya doğru saat önemliyse haber veririm."
           }
         }
       }
@@ -3270,13 +3474,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Personal Recommendations"
+            "value" : "What should I wear?"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kişisel Öneriler"
+            "value" : "Ne giymeliyim?"
           }
         }
       }
@@ -3287,13 +3491,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Smart decisions just for you."
+            "value" : "Outfit tips based on your wardrobe."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sana özel, akıllı kararlar."
+            "value" : "Gardırobuna göre kıyafet önerileri."
           }
         }
       }
@@ -3627,13 +3831,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "More than just the weather."
+            "value" : "A daily weather assistant for real-life plans."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sadece hava durumundan daha fazlası."
+            "value" : "Günlük planın için hava durumu asistanı."
           }
         }
       }
@@ -3678,13 +3882,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Decisions made for you."
+            "value" : "Clear, personal weather decisions instead of raw numbers."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sana özel hava kararları."
+            "value" : "Ham veri yerine sana uygun net hava kararları."
           }
         }
       }
@@ -4413,13 +4617,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unlock all features"
+            "value" : "Plan further, remove ads, and unlock deeper insights."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tüm özellikleri aç"
+            "value" : "Daha ileri planla, reklamları kaldır, içgörüleri aç."
           }
         }
       }
@@ -4719,13 +4923,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "View historical data"
+            "value" : "See trend cards that explain comfort, risk and timing."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geçmiş verileri incele"
+            "value" : "Rahatlık, risk ve doğru zamanı açıklayan analizleri gör."
           }
         }
       }
@@ -4753,13 +4957,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plan two weeks ahead"
+            "value" : "See the full two-week outlook for trips and busy weeks."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "İki haftaya kadar planla"
+            "value" : "Seyahat ve yoğun haftalar için iki haftayı birlikte planla."
           }
         }
       }
@@ -4872,13 +5076,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remove ads and use uninterrupted."
+            "value" : "Use the assistant without ad breaks or visual clutter."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reklamları kaldır ve kesintisiz kullan."
+            "value" : "Asistanı reklamsız ve daha sakin bir ekranda kullan."
           }
         }
       }
@@ -4974,13 +5178,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Get Premium"
+            "value" : "Go Premium"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Premium Al"
+            "value" : "Premium’a Geç"
           }
         }
       }
@@ -6652,13 +6856,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Upgrade to unlock"
+            "value" : "14-day plan, deeper insights and no ads"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Özellikleri açmak için yükselt"
+            "value" : "14 günlük plan, içgörüler ve reklamsız kullanım"
           }
         }
       }
@@ -7773,6 +7977,210 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dışarı skoru"
+          }
+        }
+      }
+    },
+    "settings_temp_sensitivity_desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How you feel temperature changes helps me give better recommendations."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sıcaklık değişimlerini nasıl hissettiğin, daha iyi öneriler vermemi sağlar."
+          }
+        }
+      }
+    },
+    "settings_units_subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temperature and wind speed units"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sıcaklık ve rüzgar hızı birimleri"
+          }
+        }
+      }
+    },
+    "settings_activities_desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which activities matter to you? I'll find the best times for these."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hangileri senin için önemli? En iyi saatleri bunlara göre ayarlayacağım."
+          }
+        }
+      }
+    },
+    "settings_wardrobe_desc" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What do you have? I'll recommend accordingly."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nelere sahipsin? Buna göre öneri yapacağım."
+          }
+        }
+      }
+    },
+    "settings_profile_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Profile"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profilin"
+          }
+        }
+      }
+    },
+    "settings_profile_subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These help me give personalized weather advice."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kişiselleştirilmiş hava önerileri vermem için bunlar gerekli."
+          }
+        }
+      }
+    },
+    "quick_tips_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quick Tips"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hızlı İpuçları"
+          }
+        }
+      }
+    },
+    "quick_tip_windy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's windy today. Secure loose items outdoors."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün rüzgarlı. Dışarıdaki gevşek eşyaları sabitle."
+          }
+        }
+      }
+    },
+    "quick_tip_humid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High humidity today. Stay hydrated."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bugün nem yüksek. Bol su iç."
+          }
+        }
+      }
+    },
+    "quick_tip_uv" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UV is %d. Apply sunscreen if going outside."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "UV %d. Dışarı çıkacaksan güneş kremi sür."
+          }
+        }
+      }
+    },
+    "quick_tip_avoid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avoid outdoor plans around %@."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saat %@ civarı dışarı planlarından kaçın."
+          }
+        }
+      }
+    },
+    "quick_tip_good_day" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Great conditions! A perfect day to be active outdoors."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mükemmel koşullar! Dışarıda aktif olmak için harika bir gün."
           }
         }
       }

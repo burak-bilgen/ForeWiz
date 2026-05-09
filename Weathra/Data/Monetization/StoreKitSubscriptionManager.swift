@@ -195,15 +195,20 @@ private extension SubscriptionProduct {
 
 private extension Product.SubscriptionPeriod {
     var localizedDescription: String {
+        let isTurkish = L10n.currentLanguageCode == "tr"
         switch unit {
         case .day:
-            return value == 1 ? "day" : "\(value) days"
+            if isTurkish { return value == 1 ? "günlük" : "\(value) günlük" }
+            return value == 1 ? "daily" : "\(value)-day"
         case .week:
-            return value == 1 ? "week" : "\(value) weeks"
+            if isTurkish { return value == 1 ? "haftalık" : "\(value) haftalık" }
+            return value == 1 ? "weekly" : "\(value)-week"
         case .month:
-            return value == 1 ? "month" : "\(value) months"
+            if isTurkish { return value == 1 ? "aylık" : "\(value) aylık" }
+            return value == 1 ? "monthly" : "\(value)-month"
         case .year:
-            return value == 1 ? "year" : "\(value) years"
+            if isTurkish { return value == 1 ? "yıllık" : "\(value) yıllık" }
+            return value == 1 ? "yearly" : "\(value)-year"
         @unknown default:
             return ""
         }

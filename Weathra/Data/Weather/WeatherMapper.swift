@@ -11,8 +11,11 @@ enum WeatherMapper {
         WeatherSnapshot(
             location: location,
             current: current(from: weather.currentWeather),
+            minute: weather.minuteForecast?.forecast.map(minute(from:)),
             hourly: weather.hourlyForecast.forecast.map(hourly(from:)),
             daily: weather.dailyForecast.forecast.map(daily(from:)),
+            alerts: weather.weatherAlerts?.map(alert(from:)),
+            availability: availability(from: weather.availability),
             fetchedAt: fetchedAt,
             attribution: attribution
         )
@@ -29,8 +32,18 @@ enum WeatherMapper {
             precipitationAmountMm: millimetersPerHour(from: weather.precipitationIntensity),
             uvIndex: weather.uvIndex.value,
             conditionCode: weather.condition.rawValue,
+            symbolName: weather.symbolName,
             isDaylight: weather.isDaylight,
             severeWeatherRisk: nil
+        )
+    }
+
+    private static func minute(from weather: MinuteWeather) -> MinuteWeatherPoint {
+        MinuteWeatherPoint(
+            date: weather.date,
+            precipitationChance: weather.precipitationChance,
+            precipitationIntensityMmPerHour: millimetersPerHour(from: weather.precipitationIntensity),
+            precipitationType: weather.precipitation.rawValue
         )
     }
 
@@ -45,6 +58,7 @@ enum WeatherMapper {
             precipitationAmountMm: weather.precipitationAmount.converted(to: .millimeters).value,
             uvIndex: weather.uvIndex.value,
             conditionCode: weather.condition.rawValue,
+            symbolName: weather.symbolName,
             isDaylight: weather.isDaylight,
             severeWeatherRisk: nil,
             pollenLevel: nil,
@@ -60,8 +74,45 @@ enum WeatherMapper {
             lowTemperatureCelsius: weather.lowTemperature.converted(to: .celsius).value,
             precipitationChance: weather.precipitationChance,
             uvIndex: weather.uvIndex.value,
-            conditionCode: weather.condition.rawValue
+            conditionCode: weather.condition.rawValue,
+            symbolName: weather.symbolName,
+            sunrise: weather.sun.sunrise,
+            sunset: weather.sun.sunset
         )
+    }
+
+    private static func alert(from weather: WeatherAlert) -> WeatherAlertInfo {
+        WeatherAlertInfo(
+            summary: weather.summary,
+            region: weather.region,
+            source: weather.source,
+            severity: riskLevel(from: weather.severity),
+            detailsURLString: weather.detailsURL.absoluteString
+        )
+    }
+
+    private static func availability(from weather: WeatherAvailability) -> WeatherAvailabilityInfo {
+        WeatherAvailabilityInfo(
+            minuteForecast: weather.minuteAvailability.rawValue,
+            alerts: weather.alertAvailability.rawValue
+        )
+    }
+
+    private static func riskLevel(from severity: WeatherSeverity) -> RiskLevel {
+        switch severity {
+        case .minor:
+            return .low
+        case .moderate:
+            return .medium
+        case .severe:
+            return .high
+        case .extreme:
+            return .extreme
+        case .unknown:
+            return .medium
+        @unknown default:
+            return .medium
+        }
     }
 
     private static func millimetersPerHour(from speed: Measurement<UnitSpeed>) -> Double {

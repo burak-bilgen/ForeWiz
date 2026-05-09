@@ -3,7 +3,11 @@ import Foundation
 struct HomeRecommendationResult: Equatable {
     let recommendation: DailyRecommendation
     let currentWeather: CurrentWeatherPoint
+    let minutePoints: [MinuteWeatherPoint]
+    let hourlyPoints: [HourlyWeatherPoint]
     let dailyPoints: [DailyWeatherPoint]
+    let alerts: [WeatherAlertInfo]
+    let availability: WeatherAvailabilityInfo?
     let isUsingCachedWeather: Bool
     let warningMessage: String?
     let weatherFetchedAt: Date

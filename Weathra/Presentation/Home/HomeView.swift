@@ -271,40 +271,59 @@ private struct HomeLoadedContent: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
+                HomeStatusBar(
+                    updatedText: state.lastUpdatedText,
+                    isUsingCached: state.isUsingCachedWeather,
+                    refresh: refresh
+                )
+                .cardEntrance(appeared: appeared, delay: 0.01)
+
+                HomeAssistantCard(assistant: state.assistant)
+                    .cardEntrance(appeared: appeared, delay: 0.02)
+
+                HomePlanCard(plan: state.plan)
+                    .cardEntrance(appeared: appeared, delay: 0.05)
+
                 HomeHeroCard(weather: state.currentWeather, recommendation: state.recommendation, isUsingCached: state.isUsingCachedWeather)
-                    .cardEntrance(appeared: appeared, delay: 0.04)
+                    .cardEntrance(appeared: appeared, delay: 0.08)
 
-                if let warning = state.warningMessage {
-                    HomeWarningBanner(message: warning).cardEntrance(appeared: appeared, delay: 0.08)
-                }
-
-                HomeHourlyCard(hourlyScores: state.hourlyScores)
-                    .cardEntrance(appeared: appeared, delay: 0.12)
-
-                HomeForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium, onUpgradeTap: onUpgradeTap)
-                    .cardEntrance(appeared: appeared, delay: 0.16)
-
-                if !isPremium {
-                    AdBannerView(isPremium: false, onRemoveAdsTapped: onUpgradeTap)
-                        .cardEntrance(appeared: appeared, delay: 0.19)
-                }
-
-                if !state.recommendation.bestActivityWindows.isEmpty {
-                    HomeActivityCard(recommendations: state.recommendation.bestActivityWindows)
-                        .cardEntrance(appeared: appeared, delay: 0.22)
-                }
-
-                HomeOutfitCard(outfit: state.recommendation.outfit)
-                    .cardEntrance(appeared: appeared, delay: 0.26)
+                HomeEnvironmentCard(environment: state.environment)
+                    .cardEntrance(appeared: appeared, delay: 0.10)
 
                 if !state.recommendation.risks.isEmpty {
                     HomeRiskCard(risks: state.recommendation.risks)
+                        .cardEntrance(appeared: appeared, delay: 0.14)
+                }
+
+                if let warning = state.warningMessage {
+                    HomeWarningBanner(message: warning).cardEntrance(appeared: appeared, delay: 0.16)
+                }
+
+                HomeHourlyCard(hourlyScores: state.hourlyScores, recommendation: state.recommendation)
+                    .cardEntrance(appeared: appeared, delay: 0.18)
+
+                HomeForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium, onUpgradeTap: onUpgradeTap)
+                    .cardEntrance(appeared: appeared, delay: 0.22)
+
+                if !isPremium {
+                    AdBannerView(isPremium: false, onRemoveAdsTapped: onUpgradeTap)
+                        .cardEntrance(appeared: appeared, delay: 0.24)
+                }
+
+                HomeQuickTipsCard(recommendation: state.recommendation, currentWeather: state.currentWeather)
+                    .cardEntrance(appeared: appeared, delay: 0.26)
+
+                if !state.recommendation.bestActivityWindows.isEmpty {
+                    HomeActivityCard(recommendations: state.recommendation.bestActivityWindows)
                         .cardEntrance(appeared: appeared, delay: 0.30)
                 }
 
+                HomeOutfitCard(outfit: state.recommendation.outfit)
+                    .cardEntrance(appeared: appeared, delay: 0.34)
+
                 if let attribution = state.attribution {
                     HomeAttributionView(info: attribution)
-                        .cardEntrance(appeared: appeared, delay: 0.33)
+                        .cardEntrance(appeared: appeared, delay: 0.38)
                 }
             }
             .padding(.horizontal, 16)
@@ -315,6 +334,379 @@ private struct HomeLoadedContent: View {
         .refreshable { await refresh() }
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) { appeared = true }
+        }
+    }
+}
+
+// MARK: - Assistant card
+
+private struct HomeStatusBar: View {
+    let updatedText: String
+    let isUsingCached: Bool
+    let refresh: () async -> Void
+
+    private let liveColor = Color(red: 0.3, green: 0.85, blue: 0.58)
+    private let cachedColor = Color(red: 1.0, green: 0.7, blue: 0.3)
+
+    var body: some View {
+        HStack(spacing: 10) {
+            statusPill
+            updatedPill
+            Spacer(minLength: 6)
+            Button {
+                HapticManager.light()
+                Task { await refresh() }
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Color.white.opacity(0.72))
+                    .frame(width: 32, height: 32)
+                    .background(Color.white.opacity(0.08), in: Circle())
+                    .overlay(Circle().stroke(Color.white.opacity(0.10), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L10n.text("home_error_retry"))
+        }
+        .padding(.horizontal, 2)
+    }
+
+    private var statusPill: some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(isUsingCached ? cachedColor : liveColor)
+                .frame(width: 7, height: 7)
+                .shadow(color: (isUsingCached ? cachedColor : liveColor).opacity(0.8), radius: 4)
+            Text(isUsingCached ? L10n.text("home_cached_label") : L10n.text("home_live"))
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.68))
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 11)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.055), in: Capsule())
+        .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 1))
+    }
+
+    private var updatedPill: some View {
+        HStack(spacing: 5) {
+            Image(systemName: "clock")
+                .font(.system(size: 11, weight: .semibold))
+            Text(updatedText)
+                .font(.system(size: 12, weight: .medium))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .foregroundStyle(Color.white.opacity(0.48))
+        .padding(.horizontal, 11)
+        .padding(.vertical, 8)
+        .background(Color.white.opacity(0.045), in: Capsule())
+        .overlay(Capsule().stroke(Color.white.opacity(0.07), lineWidth: 1))
+    }
+}
+
+private struct HomePlanCard: View {
+    let plan: HomePlanViewState
+
+    private let blue = Color(red: 0.4, green: 0.72, blue: 1.0)
+
+    var body: some View {
+        GlassCard(accentColor: blue) {
+            VStack(alignment: .leading, spacing: 14) {
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        CardSectionHeader(title: plan.title, icon: "checkmark.circle.fill", color: blue)
+                        Spacer(minLength: 10)
+                        Text(plan.subtitle)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.white.opacity(0.35))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.trailing)
+                    }
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        CardSectionHeader(title: plan.title, icon: "checkmark.circle.fill", color: blue)
+                        Text(plan.subtitle)
+                            .font(.system(size: 11))
+                            .foregroundStyle(Color.white.opacity(0.35))
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                VStack(spacing: 0) {
+                    ForEach(plan.items) { item in
+                        PlanItemRow(item: item)
+                        if item.id != plan.items.last?.id {
+                            Rectangle().fill(Color.white.opacity(0.055)).frame(height: 1).padding(.leading, 50)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct PlanItemRow: View {
+    let item: HomePlanItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(color.opacity(item.isPrimary ? 0.18 : 0.12))
+                    .frame(width: 38, height: 38)
+                Image(systemName: item.icon)
+                    .font(.system(size: 15, weight: .semibold))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(color)
+            }
+            .padding(.top, 2)
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(item.title)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    Text(item.timeText)
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(color)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
+                        .multilineTextAlignment(.trailing)
+                }
+
+                Text(item.detail)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.white.opacity(0.42))
+                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
+        }
+        .padding(.vertical, 10)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var color: Color {
+        switch item.tone {
+        case .good:
+            return Color(red: 0.3, green: 0.85, blue: 0.58)
+        case .caution:
+            return Color(red: 1.0, green: 0.7, blue: 0.3)
+        case .danger:
+            return Color(red: 1.0, green: 0.4, blue: 0.4)
+        case .info:
+            return Color(red: 0.4, green: 0.72, blue: 1.0)
+        }
+    }
+}
+
+private struct HomeAssistantCard: View {
+    let assistant: HomeAssistantViewState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .top, spacing: 12) {
+                ZStack {
+                    Circle().fill(accentColor.opacity(0.15)).frame(width: 44, height: 44)
+                    Image(systemName: assistant.symbolName)
+                        .font(.system(size: 19, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(accentColor)
+                }
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(L10n.text("assistant_today_summary"))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.white.opacity(0.5))
+                        .textCase(.uppercase)
+                        .tracking(0.8)
+                    Text(assistant.headline)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(assistant.detail)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.white.opacity(0.54))
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .layoutPriority(1)
+            }
+            .padding(.horizontal, 18)
+            .padding(.top, 16)
+            .padding(.bottom, 14)
+
+            if assistant.signals.isEmpty == false {
+                Divider().background(Color.white.opacity(0.07)).padding(.horizontal, 18)
+
+                VStack(spacing: 14) {
+                    ForEach(assistant.signals) { signal in
+                        AssistantTipRow(signal: signal)
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
+            }
+        }
+        .background(Color.white.opacity(0.04))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(accentColor.opacity(0.18), lineWidth: 1)
+        )
+    }
+
+    private var accentColor: Color {
+        switch assistant.tone {
+        case .good:
+            return Color(red: 0.3, green: 0.85, blue: 0.58)
+        case .caution:
+            return Color(red: 1.0, green: 0.7, blue: 0.3)
+        case .danger:
+            return Color(red: 1.0, green: 0.4, blue: 0.4)
+        case .info:
+            return Color(red: 0.4, green: 0.72, blue: 1.0)
+        }
+    }
+}
+
+private struct AssistantTipRow: View {
+    let signal: HomeAssistantSignal
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(iconColor.opacity(0.12))
+                    .frame(width: 32, height: 32)
+                Image(systemName: signal.icon)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(iconColor)
+            }
+            .padding(.top, 2)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(signal.title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.4))
+                    .textCase(.uppercase)
+                    .tracking(0.5)
+                Text(signal.subtitle)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(signal.hint)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.white.opacity(0.4))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
+        }
+    }
+
+    private var iconColor: Color {
+        switch signal.tone {
+        case .good:
+            return Color(red: 0.3, green: 0.85, blue: 0.58)
+        case .caution:
+            return Color(red: 1.0, green: 0.7, blue: 0.3)
+        case .danger:
+            return Color(red: 1.0, green: 0.4, blue: 0.4)
+        case .info:
+            return Color(red: 0.4, green: 0.72, blue: 1.0)
+        }
+    }
+}
+
+private struct HomeEnvironmentCard: View {
+    let environment: HomeEnvironmentViewState
+
+    var body: some View {
+        GlassCard(accentColor: Color(red: 0.35, green: 0.82, blue: 0.66)) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    CardSectionHeader(
+                        title: environment.title,
+                        icon: "heart.text.square.fill",
+                        color: Color(red: 0.35, green: 0.82, blue: 0.66)
+                    )
+                    Spacer(minLength: 8)
+                    Text(environment.subtitle)
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.white.opacity(0.35))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.trailing)
+                }
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 138), spacing: 10)], spacing: 10) {
+                    ForEach(environment.signals) { signal in
+                        EnvironmentSignalTile(signal: signal)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct EnvironmentSignalTile: View {
+    let signal: HomeEnvironmentSignal
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(color.opacity(signal.isAvailable ? 0.15 : 0.08))
+                        .frame(width: 30, height: 30)
+                    Image(systemName: signal.icon)
+                        .font(.system(size: 13, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(color.opacity(signal.isAvailable ? 1 : 0.55))
+                }
+                Text(signal.title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(signal.isAvailable ? 0.62 : 0.38))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Text(signal.value)
+                .font(.system(size: 19, weight: .bold, design: .rounded))
+                .foregroundStyle(signal.isAvailable ? Color.white : Color.white.opacity(0.42))
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(signal.detail)
+                .font(.system(size: 11))
+                .foregroundStyle(Color.white.opacity(signal.isAvailable ? 0.44 : 0.30))
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, minHeight: 138, alignment: .topLeading)
+        .padding(12)
+        .background(Color.white.opacity(signal.isAvailable ? 0.045 : 0.026), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(color.opacity(signal.isAvailable ? 0.16 : 0.08), lineWidth: 1)
+        )
+    }
+
+    private var color: Color {
+        switch signal.tone {
+        case .good:
+            return Color(red: 0.3, green: 0.85, blue: 0.58)
+        case .caution:
+            return Color(red: 1.0, green: 0.7, blue: 0.3)
+        case .danger:
+            return Color(red: 1.0, green: 0.4, blue: 0.4)
+        case .info:
+            return Color(red: 0.4, green: 0.72, blue: 1.0)
         }
     }
 }
@@ -406,20 +798,35 @@ private struct HomeHeroCard: View {
                 }
 
                 // Metrics row
-                HStack(spacing: 0) {
-                    MetricPill(icon: "humidity.fill", value: weather.humidityText, color: sky)
-                    Spacer()
-                    Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 28)
-                    Spacer()
-                    MetricPill(icon: "wind", value: weather.windText, color: sky)
-                    Spacer()
-                    Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 28)
-                    Spacer()
-                    MetricPill(icon: "sun.max.fill", value: "UV \(weather.uvIndexText)", color: Color(red: 1.0, green: 0.7, blue: 0.3))
+                VStack(spacing: 8) {
+                    HStack(spacing: 0) {
+                        MetricPill(icon: "humidity.fill", value: weather.humidityText, color: sky)
+                        Spacer()
+                        Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 28)
+                        Spacer()
+                        MetricPill(icon: "wind", value: weather.windText, color: sky)
+                        Spacer()
+                        Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 28)
+                        Spacer()
+                        MetricPill(icon: "sun.max.fill", value: "UV \(weather.uvIndexText)", color: Color(red: 1.0, green: 0.7, blue: 0.3))
+                    }
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 8)
+                    .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+
+                    if let sunriseText = weather.sunriseText, let sunsetText = weather.sunsetText {
+                        HStack(spacing: 0) {
+                            MetricPill(icon: "sunrise.fill", value: sunriseText, color: Color(red: 1.0, green: 0.7, blue: 0.3))
+                            Spacer()
+                            Rectangle().fill(Color.white.opacity(0.08)).frame(width: 1, height: 28)
+                            Spacer()
+                            MetricPill(icon: "sunset.fill", value: sunsetText, color: Color(red: 0.9, green: 0.5, blue: 0.3))
+                        }
+                        .padding(.vertical, 14)
+                        .padding(.horizontal, 8)
+                        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
                 }
-                .padding(.vertical, 14)
-                .padding(.horizontal, 8)
-                .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .padding(.top, 16)
 
                 // Divider
@@ -606,27 +1013,52 @@ private struct HomeWarningBanner: View {
 
 private struct HomeHourlyCard: View {
     let hourlyScores: [HourlyScoreItem]
+    let recommendation: DailyRecommendation
 
     var body: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 14) {
                 CardSectionHeader(title: L10n.text("home_hourly_label"), icon: "clock.fill")
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 4) {
-                        ForEach(hourlyScores.prefix(24), id: \.hour) { item in
-                            HourlyScoreCell(item: item)
+                if hourlyScores.isEmpty {
+                    Text(L10n.text("weather_limited_data"))
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.white.opacity(0.48))
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 4) {
+                            ForEach(hourlyScores.prefix(24)) { item in
+                                HourlyScoreCell(item: item, isBestWindow: isInBestWindow(date: item.date))
+                            }
                         }
+                        .padding(.vertical, 2)
                     }
-                    .padding(.vertical, 2)
+                }
+
+                if let bestWindow = recommendation.bestOutdoorWindow {
+                    HStack(spacing: 6) {
+                        Image(systemName: "star.fill").font(.system(size: 10)).foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.58))
+                        Text(L10n.text("home_hourly_best_window")).font(.system(size: 12))
+                            .foregroundStyle(Color.white.opacity(0.45))
+                        Text(bestWindow.shortDisplayText).font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.58))
+                    }
+                    .padding(.top, 2)
                 }
             }
         }
+    }
+
+    private func isInBestWindow(date: Date) -> Bool {
+        guard let window = recommendation.bestOutdoorWindow else { return false }
+        return date >= window.start && date < window.end
     }
 }
 
 private struct HourlyScoreCell: View {
     let item: HourlyScoreItem
+    var isBestWindow: Bool = false
 
     private var color: Color {
         switch item.score {
@@ -637,46 +1069,64 @@ private struct HourlyScoreCell: View {
         }
     }
 
-    private var sfSymbol: String {
-        switch item.score {
-        case 80...100: return "sun.max.fill"
-        case 60..<80:  return "cloud.sun.fill"
-        case 40..<60:  return "cloud.fill"
-        default:       return "cloud.rain.fill"
-        }
-    }
-
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 7) {
             Text(String(format: "%02d", item.hour))
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.white.opacity(0.45))
 
-            Image(systemName: sfSymbol)
+            Image(systemName: item.symbolName)
                 .font(.system(size: 18))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(color)
 
+            Text(item.temperatureText)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(Color.white.opacity(0.58))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+
             ZStack(alignment: .bottom) {
                 Capsule()
                     .fill(Color.white.opacity(0.07))
-                    .frame(width: 5, height: 40)
+                    .frame(width: 5, height: 34)
                 Capsule()
                     .fill(color.opacity(0.75))
-                    .frame(width: 5, height: max(4, CGFloat(item.score) * 0.40))
+                    .frame(width: 5, height: max(4, CGFloat(item.score) * 0.34))
             }
 
-            Text("\(item.score)")
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(color)
-                .monospacedDigit()
+            VStack(spacing: 2) {
+                Text("\(item.score)")
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(color)
+                    .monospacedDigit()
+
+                if item.precipitationChance >= 0.2 {
+                    HStack(spacing: 2) {
+                        Image(systemName: "drop.fill")
+                            .font(.system(size: 7))
+                        Text("\(Int((item.precipitationChance * 100).rounded()))%")
+                            .font(.system(size: 9, weight: .medium))
+                    }
+                    .foregroundStyle(Color(red: 0.45, green: 0.68, blue: 1.0).opacity(0.85))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                }
+            }
         }
-        .frame(width: 44)
+        .frame(width: 48)
         .padding(.vertical, 8)
         .padding(.horizontal, 4)
         .background {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(color.opacity(item.score >= 60 ? 0.07 : 0))
+                .fill(isBestWindow ? Color(red: 0.3, green: 0.85, blue: 0.6).opacity(0.12) : color.opacity(item.score >= 60 ? 0.07 : 0))
+        }
+        .overlay {
+            if isBestWindow {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color(red: 0.3, green: 0.85, blue: 0.6).opacity(0.4), lineWidth: 1)
+            }
         }
     }
 }
@@ -987,6 +1437,91 @@ private struct OutfitChip: View {
         .padding(.vertical, 6)
         .background(color.opacity(0.12), in: Capsule())
         .overlay(Capsule().stroke(color.opacity(0.2), lineWidth: 1))
+    }
+}
+
+// MARK: - Quick Tips card
+
+private struct HomeQuickTipsCard: View {
+    let recommendation: DailyRecommendation
+    let currentWeather: HomeCurrentWeatherViewState
+
+    var body: some View {
+        GlassCard(accentColor: Color(red: 0.4, green: 0.72, blue: 1.0)) {
+            VStack(alignment: .leading, spacing: 14) {
+                CardSectionHeader(title: L10n.text("quick_tips_title"), icon: "lightbulb.fill", color: Color(red: 1.0, green: 0.85, blue: 0.35))
+
+                VStack(spacing: 12) {
+                    if let windKph = extractWindSpeed(from: currentWeather.windText), windKph > 25 {
+                        QuickTipRow(
+                            icon: "wind",
+                            iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                            text: L10n.text("quick_tip_windy")
+                        )
+                    }
+
+                    if let humidity = Double(currentWeather.humidityText.replacingOccurrences(of: "%", with: "")), humidity > 80 {
+                        QuickTipRow(
+                            icon: "humidity.fill",
+                            iconColor: Color(red: 0.35, green: 0.65, blue: 0.9),
+                            text: L10n.text("quick_tip_humid")
+                        )
+                    }
+
+                    if let uv = Int(currentWeather.uvIndexText), uv >= 6 {
+                        QuickTipRow(
+                            icon: "sun.max.fill",
+                            iconColor: Color(red: 1.0, green: 0.65, blue: 0.2),
+                            text: String(format: L10n.text("quick_tip_uv"), uv)
+                        )
+                    }
+
+                    if !recommendation.avoidWindows.isEmpty, let avoidWindow = recommendation.avoidWindows.first {
+                        QuickTipRow(
+                            icon: "xmark.circle.fill",
+                            iconColor: Color(red: 1.0, green: 0.4, blue: 0.4),
+                            text: String(format: L10n.text("quick_tip_avoid"), avoidWindow.window.start.formatted(date: .omitted, time: .shortened))
+                        )
+                    }
+
+                    if recommendation.outdoorDecision == .good {
+                        QuickTipRow(
+                            icon: "checkmark.circle.fill",
+                            iconColor: Color(red: 0.35, green: 0.85, blue: 0.6),
+                            text: L10n.text("quick_tip_good_day")
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private func extractWindSpeed(from text: String) -> Double? {
+        let numbers = text.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        return Double(numbers)
+    }
+}
+
+private struct QuickTipRow: View {
+    let icon: String
+    let iconColor: Color
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(iconColor)
+                .frame(width: 20)
+            Text(text)
+                .font(.system(size: 13))
+                .foregroundStyle(Color.white.opacity(0.7))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 8)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 12)
+        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
 

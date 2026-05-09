@@ -2,8 +2,9 @@ import Foundation
 
 enum NotificationIdentifierFactory {
     static let smartPrefix = "smart."
+    static let legacySmartPrefix = "weathra."
 
     static func identifier(for plan: NotificationPlan) -> String {
-        plan.id
+        smartPrefix + plan.id
     }
 }
