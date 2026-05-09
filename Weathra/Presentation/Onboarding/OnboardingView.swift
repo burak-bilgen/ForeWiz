@@ -10,6 +10,7 @@ struct OnboardingView: View {
     @State private var isCompleting = false
     @State private var currentStep = 0
     @State private var appeared = false
+    @State private var languageKey = 0
 
     private let totalSteps = 4
 
@@ -28,7 +29,8 @@ struct OnboardingView: View {
                 ScrollView {
                     stepContent
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
+                        .padding(.top, 4)
+                        .padding(.bottom, 8)
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
                         .id(currentStep)
                         .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
@@ -58,7 +60,8 @@ struct OnboardingView: View {
         case 0: HeroStep()
         case 1: FeaturesStep()
         case 2:
-            PersonalizationStep(viewModel: viewModel)
+            PersonalizationStep(viewModel: viewModel, languageKey: languageKey)
+                .id(languageKey)
         case 3:
             PermissionsStep(
                 viewModel: viewModel,
@@ -379,6 +382,7 @@ private struct FeatureRow: View {
 
 private struct PersonalizationStep: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    let languageKey: Int
 
     private let blue = Color(red: 0.4, green: 0.72, blue: 1.0)
     private let green = Color(red: 0.35, green: 0.85, blue: 0.62)

@@ -4,6 +4,7 @@ import UIKit
 struct SettingsView: View {
     @StateObject var viewModel: SettingsViewModel
     @State private var showResetConfirmation = false
+    @State private var languageKey: String = L10n.currentLanguageCode
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -11,17 +12,17 @@ struct SettingsView: View {
             SettingsBackground().ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(L10n.text("settings_profile_title"))
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text(L10n.text("settings_profile_subtitle"))
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.white.opacity(0.45))
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 4)
-                .padding(.bottom, 8)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(L10n.text("settings_profile_title"))
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(.white)
+                        Text(L10n.text("settings_profile_subtitle"))
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.white.opacity(0.45))
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 4)
+                    .padding(.bottom, 8)
 
                 if let saveMessage = viewModel.saveMessage {
                     SettingsSaveBanner(message: saveMessage)
@@ -34,19 +35,14 @@ struct SettingsView: View {
                     icon: "thermometer.medium",
                     color: Color(red: 0.4, green: 0.7, blue: 1.0)
                 ) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(L10n.text("settings_units_subtitle"))
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color.white.opacity(0.4))
-                        SettingsChipPickerRow(
-                            icon: "thermometer.medium",
-                            iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                            title: "",
-                            selection: $viewModel.profile.unitSystem,
-                            options: UnitSystem.allCases,
-                            label: { $0.localizedTitle }
-                        )
-                    }
+                    SettingsChipPickerRow(
+                        icon: "thermometer.medium",
+                        iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
+                        title: "",
+                        selection: $viewModel.profile.unitSystem,
+                        options: UnitSystem.allCases,
+                        label: { $0.localizedTitle }
+                    )
                 }
 
                 SettingsSection(
@@ -337,6 +333,9 @@ struct SettingsView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .dynamicTypeSize(.large ... .xxxLarge)
         .onChange(of: viewModel.profile) { viewModel.save() }
+        .onChange(of: viewModel.profile.language) { _, newLang in
+            languageKey = newLang.localeIdentifier ?? "system"
+        }
         .sheet(isPresented: $viewModel.showPaywall) {
             PaywallView(store: viewModel.subscriptionManager)
         }

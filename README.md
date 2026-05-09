@@ -1,172 +1,248 @@
-# Weathra
+# Weathra — Personal Weather Decision Assistant
 
-Weathra is a personal weather decision assistant for iOS. The product goal is not to show a dense
-forecast dashboard, but to answer practical daily questions in Turkish: what to wear, whether going outside
-is sensible, which hours are best for running or walking, and which windows should be avoided.
+<p align="center">
+  <img src="Assets/AppIcon.png" width="120" height="120" alt="Weathra App Icon">
+</p>
 
-## MVP Direction
+<p align="center">
+  <strong>Weathra</strong> answers your daily weather questions before you even ask them.
+</p>
 
-- Onboarding for location, notifications, temperature sensitivity, preferred activities, and quiet hours.
-- A calm home screen with one daily decision, outdoor score, best window, avoid hours, outfit guidance, and risks.
-- A detail screen explaining hourly comfort, activity scoring, and the weather factors behind the recommendation.
-- Settings for appearance, language, permissions, units, notification categories, and onboarding preferences.
-- Local smart notifications with a default cap of 2 per day and a hard cap of 3.
+<p align="center">
+  <a href="https://apps.apple.com/app/weathra"><img src="https://img.shields.io/badge/App%20Store-Weathra-blue?style=flat-square&logo=apple" alt="App Store"></a>
+  <a href="https://twitter.com/weathraapp"><img src="https://img.shields.io/badge/Twitter-WeathraApp-1DA1F2?style=flat-square&logo=twitter" alt="Twitter"></a>
+  <img src="https://img.shields.io/badge/iOS-17%2B-green?style=flat-square&logo=apple" alt="iOS 17+">
+  <img src="https://img.shields.io/badge/Swift-6-orange?style=flat-square&logo=swift" alt="Swift 6">
+</p>
+
+---
+
+## What is Weathra?
+
+Weathra is an intelligent weather companion that goes beyond forecasts. It understands *your* comfort preferences, activities, and sensitivities to deliver personalized outdoor decisions.
+
+**No dashboards. No clutter. Just answers.**
+
+- "Should I go for a run today?"
+- "What should I wear?"
+- "When's the best time to be outside?"
+- "Are there any weather risks I should know about?"
+
+Weathra answers all of these — automatically, every morning.
+
+---
+
+## Key Features
+
+### Decision-First Weather
+Weathra doesn't just show you temperature and precipitation. It synthesizes every weather factor into a single **outdoor score (0-100)** and clear decision: **Great, go outside** / **Be careful** / **Stay in**.
+
+### Personalized Comfort Engine
+Every person feels temperature differently. During onboarding, Weathra learns:
+- Your temperature sensitivity (cold, normal, hot)
+- Your preferred outdoor activities (running, walking, cycling)
+- Health sensitivities (pollen, air quality, smoke, dust)
+
+Your profile shapes every recommendation, score, and notification.
+
+### Smart Timing
+Weathra identifies your **best activity windows** based on your schedule. No more guessing — it tells you exactly when conditions are ideal for your workout.
+
+### Outfit Intelligence
+Based on temperature, wind, precipitation chance, and UV, Weathra recommends specific clothing and accessories. "Wear layers — cold front arriving at noon."
+
+### Wind-Aware Decisions
+Strong winds affect cycling, running, and general comfort. Weathra factors in wind speed and direction for more accurate outdoor scores.
+
+### Risk Alerts
+Get notified about:
+- **Heat waves** and cold snaps
+- **High UV** and sunburn risk
+- **Rain** and storm windows
+- **Wind** hazards for outdoor activities
+- **Air quality** concerns
+- **Pollen** peaks based on your sensitivities
+
+### Bilingual Experience
+Full support for **English** and **Turkish**. Weathra adapts to your preferred language seamlessly.
+
+### Beautiful Dark UI
+Designed with a modern glassmorphic aesthetic. Deep gradients, adaptive backgrounds that change with weather conditions, smooth animations throughout.
+
+---
+
+## Screenshots
+
+| Home Screen | Risk Alerts | Insights |
+|-------------|-------------|----------|
+| ![Home](.github/screenshots/home.png) | ![Risks](.github/screenshots/risks.png) | ![Insights](.github/screenshots/insights.png) |
+
+---
 
 ## Architecture
 
-The app is structured around Clean Architecture with MVVM-C:
+Weathra is built with **Clean Architecture** and **MVVM-C** pattern:
 
-- `App`: entry point, app coordinator, environment, and dependency composition.
-- `Core`: design system, localization helpers, date/logging/error utilities.
-- `Domain`: entities, value objects, repository protocols, use-case protocols, and deterministic engines.
-- `Data`: WeatherKit, CoreLocation, UserNotifications, SwiftData, mappers, and cache policy boundaries.
-- `Presentation`: SwiftUI views, view models, coordinators, and reusable UI components.
-
-Domain code imports Foundation only. WeatherKit, CoreLocation, SwiftData, UserNotifications, and SwiftUI types
-must stay out of the domain layer.
-
-## Current Slice
-
-The current implementation slice includes:
-
-- Project structure for the requested layers.
-- Project, target, bundle, module, test, and source folder identity renamed to `Weathra`.
-- Domain entities for weather snapshots, hourly/daily points, recommendations, risks, scores, profile, and notifications.
-- Repository and use-case protocols.
-- Deterministic decision engines for outdoor scoring, activity windows, outfit suggestions, and notification planning.
-- A modern SwiftUI onboarding/home shell with adaptive glass-style components, score tiles, activity windows,
-  outfit guidance, avoid hours, and risk chips.
-- Swift Testing coverage for hot summer, mild spring, rain, wind, cold-sensitive users, and notification spam prevention.
-
-## Weather Decision Engine
-
-The MVP engine is deterministic and explainable. It starts from a comfort score of 100 and applies penalties for:
-
-- apparent and actual temperature
-- humidity
-- wind
-- precipitation chance and amount
-- UV index
-- severe weather risk
-- daylight and time of day
-- user temperature sensitivity
-
-Outdoor decisions map score ranges as:
-
-- `80...100`: good
-- `60...79`: moderate
-- `40...59`: risky
-- `0...39`: avoid
-
-Turkey summer rules are included for midday heat and UV windows.
-
-## WeatherKit Setup Notes
-
-WeatherKit must be enabled for the app identifier in the Apple Developer portal, and the target needs the
-WeatherKit capability before the production repository is wired. The data layer will map WeatherKit framework
-models into domain `WeatherSnapshot` values so framework types do not leak into presentation or domain code.
-
-## Location
-
-Location is used only to produce local weather recommendations for the user's current area. MVP does not require
-continuous background location tracking. The user-facing permission copy is:
-
-> Konumunu sadece bulunduğun yere uygun hava önerileri üretmek için kullanıyoruz.
-
-## Notifications
-
-The notification planner creates semantic `NotificationPlan` values. The repository layer schedules those plans
-with UserNotifications. The planner deduplicates categories, respects quiet hours, keeps only the top 2 plans by
-default, and never exceeds 3 daily plans.
-
-## Caching
-
-The cache policy is quota-aware:
-
-- fresh if fetched within 20 minutes
-- stale but usable up to 6 hours
-- expired after that
-
-The app should avoid WeatherKit calls on every view appearance. Refresh on launch only when stale, on explicit
-pull-to-refresh, and after meaningful location or preference changes.
-
-## SwiftData
-
-SwiftData is reserved for user preferences, onboarding completion, notification settings, and latest weather cache.
-Repositories are protocol-based so persistence can be replaced without touching the domain or presentation layers.
-
-## SwiftLint
-
-SwiftLint is configured in `.swiftlint.yml` with strict practical rules, including force unwrap prevention and
-sorted imports. Preferred setup is Homebrew SwiftLint plus an Xcode build phase:
-
-```sh
-swiftlint
+```
+Weathra/
+├── App/                 # App entry point, coordinator, dependency injection
+├── Core/                # Design system, localization, utilities
+├── Data/                 # WeatherKit, CoreLocation, SwiftData, StoreKit
+├── Domain/               # Business logic, entities, use cases, engines
+└── Presentation/         # SwiftUI views, view models, coordinators
 ```
 
-## Privacy
+**Key architectural principles:**
+- Domain layer imports Foundation only — no UI or framework dependencies
+- WeatherKit integration for accurate Apple Weather data
+- Deterministic decision engines with full test coverage
+- Protocol-based repositories for persistence flexibility
 
-MVP stores preferences, onboarding state, notification choices, and cached weather locally on device. It does not
-include third-party analytics, paid AI APIs, a remote backend, or background location tracking. Local notifications
-are generated on device from weather recommendations.
+---
+
+## Technology Stack
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | SwiftUI |
+| **Language** | Swift 6.2 |
+| **Min iOS** | iOS 17.0 |
+| **Weather Data** | Apple WeatherKit |
+| **Location** | CoreLocation |
+| **Persistence** | SwiftData |
+| **Monetization** | StoreKit 2 (Subscriptions) |
+| **Ads** | Google AdMob |
+| **Architecture** | Clean Architecture + MVVM-C |
+| **Testing** | Swift Testing |
+| **Linting** | SwiftLint |
+
+---
+
+## Monetization Model
+
+### Free Tier
+Everything you need to get started:
+
+- Daily outdoor decision with score
+- Best activity window
+- 3-day forecast
+- Risk alerts
+- Outfit recommendations
+- Basic notification scheduling
+- Banner ads
+
+### Premium Tier ($4.99/month or $29.99/year)
+For users who want the complete experience:
+
+| Feature | Free | Premium |
+|---------|------|---------|
+| Outdoor Score & Decision | Yes | Yes |
+| Best Activity Window | Yes | Yes |
+| 3-Day Forecast | Yes | **14-Day Forecast** |
+| Risk Alerts | Yes | Yes |
+| Outfit Suggestions | Yes | Yes |
+| Wind Analysis | Yes | Yes |
+| Basic Insights | Limited | **Full Analytics** |
+| **Remove Ads** | No | **Yes** |
+| Notification Priority | Normal | **Time Sensitive** |
+
+### Subscription Details
+- **Monthly**: $4.99/month
+- **Yearly**: $29.99/year (save 50%)
+- Subscriptions auto-renew unless cancelled 24 hours before period end
+- Manage subscriptions in iOS Settings > Account > Subscriptions
+
+---
+
+## Ad Strategy
+
+Weathra respects your experience. Free users see a single, non-intrusive banner ad at the bottom of the home screen. Premium subscribers enjoy a completely ad-free experience.
+
+**Ad formats:**
+- Single standard banner (320x50) on free tier
+- No interstitials, no video ads, no pop-ups
+
+---
+
+## Privacy & Data
+
+**Weathra keeps your data on your device.**
+
+- Location is used **only** for local weather — no background tracking
+- Preferences and weather cache stored locally via SwiftData
+- No third-party analytics
+- No AI cloud APIs
+- No data sold or shared
+
+> "Konumunu sadece bulunduğun yere uygun hava önerileri üretmek için kullanıyoruz."
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Xcode 16+
+- iOS 17+ Simulator or device
+- Apple Developer account with WeatherKit capability enabled
+
+### Setup
+```bash
+# Clone the repository
+git clone https://github.com/bilgenworks/weathra.git
+cd weathra
+
+# Install dependencies
+pod install
+
+# Open in Xcode
+open Weathra.xcworkspace
+```
+
+### WeatherKit Configuration
+1. Enable WeatherKit in [Apple Developer Portal](https://developer.apple.com)
+2. Add WeatherKit capability to your App ID
+3. Create a key with WeatherKit service
+
+---
 
 ## Roadmap
 
-- Full WeatherKit repository and mappers.
-- CoreLocation one-shot location repository.
-- SwiftData-backed preferences and weather cache.
-- Full onboarding flow and settings editing.
-- Recommendation detail timeline.
-- WidgetKit daily decision card.
-- ActivityKit run/walk weather window.
-- Apple Watch companion app.
-- StoreKit subscriptions.
-- Calendar, HealthKit, and wardrobe-aware suggestions.
+- [ ] **WidgetKit** daily decision widget
+- [ ] **ActivityKit** Live Activities for outdoor windows
+- [ ] **Apple Watch** companion app
+- [ ] **Siri Shortcuts** integration
+- [ ] **HealthKit** activity correlation
+- [ ] **Calendar** event-aware recommendations
+- [ ] **Wardrobe** integration for smarter outfit suggestions
 
-## Recent Improvements (2026)
+---
 
-### Code Modernization
-- Removed legacy UI components (GlassCard, AppBackground, AppTypography, AppTheme)
-- Modernized views with native SwiftUI components
-- Added Dynamic Type support
-- Implemented haptic feedback throughout the app
+## Contributing
 
-### New Features
-- Hourly Forecast: Added ModernHourlyForecastCard with horizontal scroll and LazyHStack
-- VoiceOver accessibility labels added to key components
+Contributions are welcome! Please read our contributing guidelines before submitting PRs.
 
-### Notification System
-- Enhanced notification content with emojis and context
-- Dynamic warning lead time based on risk severity
-- Improved permission handling with criticalAlert support
-- Category and priority-based interruption levels
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing`)
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-### Ad System
-- Ad caching for better performance
-- Parallel loading with TaskGroup
-- Structured logging
-- Configuration-based ad unit IDs
+---
 
-### Subscription System
-- Structured logging for subscription events
-- Configuration-based product IDs
-- Enhanced error handling
+## License
 
-### Architecture
-- MVVM architecture validation
-- DailyForecastItem moved to Domain layer
-- Centralized error handling with ErrorHandler utility
-- Configuration files for sensitive values (AdConfiguration, SubscriptionConfiguration)
+Copyright © 2026 Bilgen Works. All rights reserved.
 
-### Testing
-- Added ErrorHandlerTests
-- Added DailyForecastItemTests
+---
 
-### Performance
-- Image caching with AsyncImageCache
-- ConditionSymbol cache optimization
-- Lazy loading improvements
+## Contact
 
-### Security
-- Configuration-based sensitive values
-- Test/production mode flags
+- **Website**: [weathra.app](https://weathra.app)
+- **Twitter**: [@weathraapp](https://twitter.com/weathraapp)
+- **Email**: hello@weathra.app
+
+---
+
+<p align="center">
+  <sub>Made with ☁️ + 🧠 by <a href="https://bilgenworks.com">Bilgen Works</a></sub>
+</p>

@@ -26,6 +26,8 @@ struct HomeView: View {
                 content
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
+            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar { toolbarContent }
             .task { viewModel.onAppear() }
             .sheet(isPresented: $showLocationPicker) {
@@ -272,7 +274,6 @@ private struct HomeLoadedContent: View {
         ScrollView {
             VStack(spacing: 16) {
                 HomeStatusBar(
-                    updatedText: state.lastUpdatedText,
                     isUsingCached: state.isUsingCachedWeather,
                     refresh: refresh
                 )
@@ -341,7 +342,6 @@ private struct HomeLoadedContent: View {
 // MARK: - Assistant card
 
 private struct HomeStatusBar: View {
-    let updatedText: String
     let isUsingCached: Bool
     let refresh: () async -> Void
 
@@ -371,32 +371,24 @@ private struct HomeStatusBar: View {
     }
 
     private var statusPill: some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(isUsingCached ? cachedColor : liveColor)
-                .frame(width: 7, height: 7)
-                .shadow(color: (isUsingCached ? cachedColor : liveColor).opacity(0.8), radius: 4)
-            Text(isUsingCached ? L10n.text("home_cached_label") : L10n.text("home_live"))
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.68))
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 11)
-        .padding(.vertical, 8)
-        .background(Color.white.opacity(0.055), in: Capsule())
-        .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 1))
+        Circle()
+            .fill(isUsingCached ? cachedColor : liveColor)
+            .frame(width: 7, height: 7)
+            .shadow(color: (isUsingCached ? cachedColor : liveColor).opacity(0.8), radius: 4)
+            .padding(9)
+            .background(Color.white.opacity(0.055), in: Capsule())
+            .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 1))
     }
 
     private var updatedPill: some View {
         HStack(spacing: 5) {
-            Image(systemName: "clock")
+            Image(systemName: "cloud.sun.fill")
                 .font(.system(size: 11, weight: .semibold))
-            Text(updatedText)
-                .font(.system(size: 12, weight: .medium))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+            Text("Weathra")
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(0.5)
         }
-        .foregroundStyle(Color.white.opacity(0.48))
+        .foregroundStyle(Color.white.opacity(0.45))
         .padding(.horizontal, 11)
         .padding(.vertical, 8)
         .background(Color.white.opacity(0.045), in: Capsule())
