@@ -502,7 +502,9 @@ actor RequestDeduper<Key: Hashable> {
     func deduplicate<T>(key: Key, operation: @escaping () async throws -> T) async throws -> T {
         if let existingTask = inFlightRequests[key] {
             AppLogger.performance.debug("Deduplicating request for key: \(String(describing: key))")
-            return try await existingTask.value as! T
+            if let value = try await existingTask.value as? T {
+                return value
+            }
         }
 
         let task = Task<Any, Error> {
@@ -516,7 +518,10 @@ actor RequestDeduper<Key: Hashable> {
 
         inFlightRequests[key] = task
 
-        return try await task.value as! T
+        if let value = try await task.value as? T {
+            return value
+        }
+        throw AppError.invalidData
     }
 
     private func removeRequest(forKey key: Key) async {
