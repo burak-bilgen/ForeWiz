@@ -19,7 +19,6 @@ final class DependencyContainer {
     let completeOnboardingUseCase: CompleteOnboardingUseCase
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
-    let subscriptionManager: StoreKitSubscriptionManager
 
     init(
         environment: AppEnvironment,
@@ -37,8 +36,7 @@ final class DependencyContainer {
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
         completeOnboardingUseCase: CompleteOnboardingUseCase,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
-        scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
-        subscriptionManager: StoreKitSubscriptionManager
+        scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
     ) {
         self.environment = environment
         self.dateProvider = dateProvider
@@ -56,7 +54,6 @@ final class DependencyContainer {
         self.completeOnboardingUseCase = completeOnboardingUseCase
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
-        self.subscriptionManager = subscriptionManager
     }
 
     static func simulator(modelContext: ModelContext) -> DependencyContainer {
@@ -92,7 +89,6 @@ final class DependencyContainer {
             notificationPlanningEngine: notificationEngine,
             dateProvider: dateProvider
         )
-        let subscriptionManager = StoreKitSubscriptionManager()
 
         return DependencyContainer(
             environment: .simulator,
@@ -110,8 +106,7 @@ final class DependencyContainer {
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
-            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
-            subscriptionManager: subscriptionManager
+            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase
         )
     }
 
@@ -148,7 +143,6 @@ final class DependencyContainer {
             notificationPlanningEngine: notificationEngine,
             dateProvider: dateProvider
         )
-        let subscriptionManager = StoreKitSubscriptionManager()
 
         return DependencyContainer(
             environment: .production,
@@ -166,8 +160,7 @@ final class DependencyContainer {
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
-            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
-            subscriptionManager: subscriptionManager
+            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase
         )
     }
 }

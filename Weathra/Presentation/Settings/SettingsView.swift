@@ -189,58 +189,6 @@ struct SettingsView: View {
                 }
 
                 SettingsSection(
-                    title: L10n.text("settings_section_premium"),
-                    icon: "crown.fill",
-                    color: Color(red: 1.0, green: 0.78, blue: 0.25)
-                ) {
-                    if viewModel.isPremium {
-                        SettingsRow(
-                            icon: "checkmark.seal.fill",
-                            iconColor: Color(red: 0.35, green: 0.85, blue: 0.6),
-                            title: L10n.text("settings_premium_active"),
-                            subtitle: L10n.text("settings_premium_active_subtitle")
-                        )
-                    } else {
-                        ForEach(PremiumFeature.allCases) { feature in
-                            SettingsRow(
-                                icon: feature.systemImage,
-                                iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                                title: feature.localizedTitle,
-                                subtitle: feature.localizedDescription
-                            )
-                            if feature != PremiumFeature.allCases.last {
-                                SettingsDivider()
-                            }
-                        }
-                        Button {
-                            HapticManager.medium()
-                            viewModel.openPaywall()
-                        } label: {
-                            HStack(spacing: 10) {
-                                Image(systemName: "crown.fill")
-                                    .font(.system(size: 14))
-                                Text(L10n.text("settings_premium_upgrade"))
-                                    .font(.system(size: 15, weight: .bold))
-                            }
-                            .foregroundStyle(Color(red: 0.06, green: 0.1, blue: 0.22))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color(red: 1.0, green: 0.85, blue: 0.32), Color(red: 1.0, green: 0.65, blue: 0.20)],
-                                    startPoint: .leading, endPoint: .trailing
-                                ),
-                                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            )
-                            .shadow(color: Color(red: 1.0, green: 0.70, blue: 0.20).opacity(0.40), radius: 12, x: 0, y: 5)
-                            .shimmer()
-                        }
-                        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
-                        .padding(.top, 8)
-                    }
-                }
-
-                SettingsSection(
                     title: L10n.text("settings_section_permissions"),
                     icon: "lock.shield.fill",
                     color: Color(red: 0.4, green: 0.85, blue: 0.6)
@@ -335,9 +283,6 @@ struct SettingsView: View {
         .onChange(of: viewModel.profile) { viewModel.save() }
         .onChange(of: viewModel.profile.language) { _, newLang in
             languageKey = newLang.localeIdentifier ?? "system"
-        }
-        .sheet(isPresented: $viewModel.showPaywall) {
-            PaywallView(store: viewModel.subscriptionManager)
         }
         .confirmationDialog(
             L10n.text("settings_reset_title"),

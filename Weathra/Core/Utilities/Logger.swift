@@ -10,7 +10,6 @@ enum AppLogger {
     static let network = Logger(subsystem: "com.weathra.app", category: "network")
     static let performance = Logger(subsystem: "com.weathra.app", category: "performance")
     static let analytics = Logger(subsystem: "com.weathra.app", category: "analytics")
-    static let subscription = Logger(subsystem: "com.weathra.app", category: "subscription")
     static let ui = Logger(subsystem: "com.weathra.app", category: "ui")
     static let lifecycle = Logger(subsystem: "com.weathra.app", category: "lifecycle")
     static let cache = Logger(subsystem: "com.weathra.app", category: "cache")

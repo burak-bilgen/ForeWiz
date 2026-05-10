@@ -7,7 +7,6 @@ enum DeepLink: Equatable {
     case insights
     case settings
     case recommendationDetail(String)
-    case paywall
     case onboarding
 
     static func from(url: URL) -> DeepLink? {
@@ -23,8 +22,6 @@ enum DeepLink: Equatable {
         case "recommendation":
             let id = url.pathComponents.dropFirst().first ?? ""
             return .recommendationDetail(id)
-        case "paywall":
-            return .paywall
         case "onboarding":
             return .onboarding
         default:
@@ -46,8 +43,6 @@ enum DeepLink: Equatable {
         case .recommendationDetail(let id):
             components.host = "recommendation"
             components.path = "/\(id)"
-        case .paywall:
-            components.host = "paywall"
         case .onboarding:
             components.host = "onboarding"
         }

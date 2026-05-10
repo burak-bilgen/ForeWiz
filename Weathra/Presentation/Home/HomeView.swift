@@ -5,12 +5,9 @@ struct HomeView: View {
     @Binding var savedLocations: [SavedLocation]
     @Binding var selectedLocationID: String
 
-    let isPremium: Bool
-    let store: StoreKitSubscriptionManager
     let onRecommendationLoaded: (DailyRecommendation) -> Void
 
     @State private var showLocationPicker = false
-    @State private var showPaywall = false
 
     private var currentSymbol: String {
         if case .loaded(let state) = viewModel.state { return state.currentWeather.symbolName }
@@ -37,7 +34,6 @@ struct HomeView: View {
                     onSelect: { location in Task { await viewModel.changeLocation(to: location) } }
                 )
             }
-            .sheet(isPresented: $showPaywall) { PaywallView(store: store) }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
             }
@@ -76,14 +72,12 @@ struct HomeView: View {
         case .failed(let message):
             HomeErrorView(message: message, retry: { Task { await viewModel.refresh() } })
                 .transition(.opacity)
-        case .loaded(let state):
-            HomeLoadedContent(
-                state: state,
-                isPremium: isPremium,
-                onUpgradeTap: { showPaywall = true },
-                refresh: { await viewModel.refresh() }
-            )
-            .transition(.opacity.animation(.easeInOut(duration: 0.4)))
+            case .loaded(let state):
+                HomeLoadedContent(
+                    state: state,
+                    refresh: { await viewModel.refresh() }
+                )
+                .transition(.opacity.animation(.easeInOut(duration: 0.4)))
         }
     }
 }
@@ -264,7 +258,6 @@ private struct HomeErrorView: View {
 
 private struct HomeLoadedContent: View {
     let state: HomeViewState
-    let isPremium: Bool
     let onUpgradeTap: () -> Void
     let refresh: () async -> Void
 
@@ -303,13 +296,8 @@ private struct HomeLoadedContent: View {
                 HomeHourlyCard(hourlyScores: state.hourlyScores, recommendation: state.recommendation)
                     .cardEntrance(appeared: appeared, delay: 0.18)
 
-                HomeForecastCard(dailyForecasts: state.dailyForecasts, isPremium: isPremium, onUpgradeTap: onUpgradeTap)
+                HomeForecastCard(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: appeared, delay: 0.22)
-
-                if !isPremium {
-                    AdBannerView(isPremium: false, onRemoveAdsTapped: onUpgradeTap)
-                        .cardEntrance(appeared: appeared, delay: 0.24)
-                }
 
                 HomeQuickTipsCard(recommendation: state.recommendation, currentWeather: state.currentWeather)
                     .cardEntrance(appeared: appeared, delay: 0.26)
@@ -1127,27 +1115,6 @@ private struct HourlyScoreCell: View {
 
 private struct HomeForecastCard: View {
     let dailyForecasts: [DailyForecastItem]
-    let isPremium: Bool
-    let onUpgradeTap: () -> Void
-
-    private let limit: Int
-    private let shown: ArraySlice<DailyForecastItem>
-
-    init(dailyForecasts: [DailyForecastItem], isPremium: Bool, onUpgradeTap: @escaping () -> Void) {
-        self.dailyForecasts = dailyForecasts
-        self.isPremium = isPremium
-        self.onUpgradeTap = onUpgradeTap
-        self.limit = isPremium ? 14 : 3
-        self.shown = dailyForecasts.prefix(isPremium ? 14 : 3)
-    }
-
-    private var tempRange: ClosedRange<Double> {
-        let highs = shown.map(\.highTemp)
-        let lows  = shown.map(\.lowTemp)
-        let lo = (lows.min() ?? 0) - 1
-        let hi = (highs.max() ?? 40) + 1
-        return lo...hi
-    }
 
     var body: some View {
         GlassCard {
@@ -1155,34 +1122,30 @@ private struct HomeForecastCard: View {
                 CardSectionHeader(title: L10n.text("home_forecast_label"), icon: "calendar")
 
                 VStack(spacing: 2) {
-                    ForEach(shown) { forecast in
-                        ForecastRow(forecast: forecast, range: tempRange)
-                        if forecast.id != shown.last?.id {
+                    ForEach(Array(dailyForecasts.prefix(14).enumerated()), id: \.offset) { _, forecast in
+                        ForecastRow(forecast: forecast, range: Self.tempRange(for: dailyForecasts))
+                        if forecast.id != dailyForecasts.prefix(14).last?.id {
                             Rectangle().fill(Color.white.opacity(0.05)).frame(height: 1)
                         }
                     }
                 }
 
-                if !isPremium && dailyForecasts.count > 3 {
-                    Button {
-                        HapticManager.medium()
-                        onUpgradeTap()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "crown.fill").font(.system(size: 12))
-                            Text(L10n.text("home_forecast_premium_cta")).font(.system(size: 13, weight: .semibold))
-                        }
-                        .foregroundStyle(Color(red: 1.0, green: 0.8, blue: 0.28))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
-                        .background(Color(red: 1.0, green: 0.8, blue: 0.28).opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color(red: 1.0, green: 0.8, blue: 0.28).opacity(0.2), lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.top, 4)
+                if dailyForecasts.count > 14 {
+                    Text(L10n.text("home_forecast_all_loaded"))
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Color.white.opacity(0.4))
+                        .padding(.vertical, 8)
                 }
             }
         }
+    }
+
+    private static func tempRange(for forecasts: [DailyForecastItem]) -> ClosedRange<Double> {
+        let highs = forecasts.map(\.highTemp)
+        let lows  = forecasts.map(\.lowTemp)
+        let lo = (lows.min() ?? 0) - 1
+        let hi = (highs.max() ?? 40) + 1
+        return lo...hi
     }
 }
 

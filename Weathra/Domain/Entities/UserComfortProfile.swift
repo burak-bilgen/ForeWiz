@@ -15,7 +15,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var wardrobe: WardrobePreferences
     var savedLocations: [SavedLocation]
     var selectedLocationID: String
-    var subscriptionTier: SubscriptionTier
     var allergyProfile: AllergyProfile
 
     private enum CodingKeys: String, CodingKey {
@@ -33,7 +32,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         case wardrobe
         case savedLocations
         case selectedLocationID
-        case subscriptionTier
         case allergyProfile
     }
 
@@ -52,7 +50,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         wardrobe: WardrobePreferences = .default,
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
         selectedLocationID: String = "current-location",
-        subscriptionTier: SubscriptionTier = .free,
         allergyProfile: AllergyProfile = .default
     ) {
         self.temperatureSensitivity = temperatureSensitivity
@@ -60,7 +57,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.wakeUpTime = wakeUpTime
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
-        self.notificationPreferences = Self.normalizedNotificationPreferences(notificationPreferences)
+        self.notificationPreferences = preferences
         self.unitSystem = unitSystem
         self.maximumDailyNotifications = maximumDailyNotifications.clamped(to: 1...3)
         self.appearance = appearance
@@ -69,7 +66,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.wardrobe = wardrobe
         self.savedLocations = savedLocations
         self.selectedLocationID = selectedLocationID
-        self.subscriptionTier = subscriptionTier
         self.allergyProfile = allergyProfile
     }
 
@@ -80,59 +76,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
             notificationPreferences: NotificationCategory.allCases.map {
                 NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
             }
-        )
-    }
-
-    private static func normalizedNotificationPreferences(
-        _ preferences: [NotificationPreference]
-    ) -> [NotificationPreference] {
-        let byCategory = Dictionary(uniqueKeysWithValues: preferences.map { ($0.category, $0) })
-        return NotificationCategory.allCases.map { category in
-            byCategory[category] ?? NotificationPreference(category: category, isEnabled: true, preferredTime: nil)
-        }
-    }
-}
-
-extension UserComfortProfile {
-    init(from decoder: any Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.init(
-            temperatureSensitivity: try container.decodeIfPresent(
-                TemperatureSensitivity.self,
-                forKey: .temperatureSensitivity
-            ) ?? .normal,
-            preferredActivities: try container.decodeIfPresent(
-                Set<ActivityType>.self,
-                forKey: .preferredActivities
-            ) ?? [.running, .walking, .goingOutside],
-            wakeUpTime: try container.decodeIfPresent(DateComponents.self, forKey: .wakeUpTime),
-            usualWorkoutTime: try container.decodeIfPresent(DateComponents.self, forKey: .usualWorkoutTime),
-            quietHours: try container.decodeIfPresent(TimeWindow.self, forKey: .quietHours),
-            notificationPreferences: try container.decodeIfPresent(
-                [NotificationPreference].self,
-                forKey: .notificationPreferences
-            ) ?? NotificationCategory.allCases.map {
-                NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
-            },
-            unitSystem: try container.decodeIfPresent(UnitSystem.self, forKey: .unitSystem) ?? .metric,
-            maximumDailyNotifications: try container.decodeIfPresent(
-                Int.self,
-                forKey: .maximumDailyNotifications
-            ) ?? 2,
-            appearance: try container.decodeIfPresent(AppAppearance.self, forKey: .appearance) ?? .system,
-            accentPalette: try container.decodeIfPresent(AppAccentPalette.self, forKey: .accentPalette) ?? .sky,
-            language: try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .system,
-            wardrobe: try container.decodeIfPresent(WardrobePreferences.self, forKey: .wardrobe) ?? .default,
-            savedLocations: try container.decodeIfPresent(
-                [SavedLocation].self,
-                forKey: .savedLocations
-            ) ?? [SavedLocation.currentLocation],
-            selectedLocationID: try container.decodeIfPresent(
-                String.self,
-                forKey: .selectedLocationID
-            ) ?? "current-location",
-            subscriptionTier: try container.decodeIfPresent(SubscriptionTier.self, forKey: .subscriptionTier) ?? .free,
-            allergyProfile: try container.decodeIfPresent(AllergyProfile.self, forKey: .allergyProfile) ?? .default
         )
     }
 }

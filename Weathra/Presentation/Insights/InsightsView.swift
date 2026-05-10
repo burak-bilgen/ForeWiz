@@ -2,28 +2,22 @@ import SwiftUI
 
 struct InsightsView: View {
     let recommendation: DailyRecommendation
-    let isPremium: Bool
-    @Binding var showPaywall: Bool
 
     var body: some View {
         ZStack {
             InsightsBackground().ignoresSafeArea()
-            if isPremium {
-                ScrollView {
-                    VStack(spacing: 20) {
-                        InsightsHeader()
-                        InsightsScoreCard(recommendation: recommendation)
-                        InsightsActivityCard(recommendation: recommendation)
-                        InsightsDayQualityCard(recommendation: recommendation)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 16)
+            ScrollView {
+                VStack(spacing: 20) {
+                    InsightsHeader()
+                    InsightsScoreCard(recommendation: recommendation)
+                    InsightsActivityCard(recommendation: recommendation)
+                    InsightsDayQualityCard(recommendation: recommendation)
                 }
-                .scrollIndicators(.hidden)
-                .safeAreaPadding(.bottom, 12)
-            } else {
-                InsightsLockedView(onUpgrade: { showPaywall = true })
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
             }
+            .scrollIndicators(.hidden)
+            .safeAreaPadding(.bottom, 12)
         }
         .navigationTitle(L10n.text("premium_feature_analytics"))
         .navigationBarTitleDisplayMode(.inline)
@@ -474,6 +468,6 @@ private struct AnimatedBar: View {
 
 #Preview {
     NavigationStack {
-        InsightsView(recommendation: .placeholder, isPremium: true, showPaywall: .constant(false))
+        InsightsView(recommendation: .placeholder)
     }
 }

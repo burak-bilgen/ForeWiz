@@ -48,8 +48,6 @@ struct AppRootView: View {
             coordinator.showSettings = true
         case .insights:
             coordinator.selectedTab = 1
-        case .paywall:
-            coordinator.showPaywall = true
         case .onboarding:
             coordinator.rootFlow = .onboarding
         case .home:
@@ -87,13 +85,11 @@ private struct LaunchingView: View {
 
 private struct MainTabView: View {
     @ObservedObject var coordinator: AppCoordinator
-    @ObservedObject private var subscriptionManager: StoreKitSubscriptionManager
     @StateObject private var homeViewModel: HomeViewModel
     @State private var showInsightsPaywall = false
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
-        self.subscriptionManager = coordinator.container.subscriptionManager
         let name = coordinator.profile.savedLocations
             .first { $0.id == coordinator.profile.selectedLocationID }?
             .name ?? L10n.text("home_current_location")
@@ -119,8 +115,6 @@ private struct MainTabView: View {
                 viewModel: homeViewModel,
                 savedLocations: $coordinator.profile.savedLocations,
                 selectedLocationID: $coordinator.profile.selectedLocationID,
-                isPremium: subscriptionManager.isPremium,
-                store: subscriptionManager,
                 onRecommendationLoaded: { recommendation in
                     coordinator.updateRecommendation(recommendation)
                 }
@@ -131,14 +125,7 @@ private struct MainTabView: View {
 
             NavigationStack {
                 if let recommendation = coordinator.latestRecommendation {
-                    InsightsView(
-                        recommendation: recommendation,
-                        isPremium: subscriptionManager.isPremium,
-                        showPaywall: $showInsightsPaywall
-                    )
-                    .sheet(isPresented: $showInsightsPaywall) {
-                        PaywallView(store: subscriptionManager)
-                    }
+                    InsightsView(recommendation: recommendation)
                 } else {
                     InsightsPlaceholderView()
                 }
@@ -152,7 +139,6 @@ private struct MainTabView: View {
                     viewModel: SettingsViewModel(
                         profile: coordinator.profile,
                         updateUserPreferencesUseCase: coordinator.container.updateUserPreferencesUseCase,
-                        subscriptionManager: subscriptionManager,
                         onProfileSaved: coordinator.applyProfile,
                         onResetOnboarding: coordinator.resetToOnboarding
                     )

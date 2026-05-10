@@ -1,6 +1,6 @@
+import os
 import SwiftData
 import SwiftUI
-import os
 
 @main
 struct WeathraApp: App {
@@ -58,11 +58,7 @@ struct WeathraApp: App {
                     AppSplashView()
                         .task { initializeCoordinator() }
                 }
-            }
-            .task { AdsManager.configure() }
-            .onChange(of: scenePhase) { _, phase in
-                handleScenePhaseChange(phase)
-            }
+}
             .onOpenURL { url in
                 deepLinkHandler.handle(url)
             }

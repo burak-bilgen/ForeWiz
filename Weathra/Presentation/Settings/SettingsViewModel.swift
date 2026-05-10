@@ -5,10 +5,8 @@ import Foundation
 final class SettingsViewModel: ObservableObject {
     @Published var profile: UserComfortProfile
     @Published private(set) var saveMessage: String?
-    @Published var showPaywall = false
 
     private let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
-    let subscriptionManager: StoreKitSubscriptionManager
     private let onProfileSaved: (UserComfortProfile) -> Void
     private let onResetOnboarding: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []
@@ -18,21 +16,13 @@ final class SettingsViewModel: ObservableObject {
     init(
         profile: UserComfortProfile,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
-        subscriptionManager: StoreKitSubscriptionManager,
         onProfileSaved: @escaping (UserComfortProfile) -> Void,
         onResetOnboarding: (() -> Void)? = nil
     ) {
         self.profile = profile
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
-        self.subscriptionManager = subscriptionManager
         self.onProfileSaved = onProfileSaved
         self.onResetOnboarding = onResetOnboarding
-
-        subscriptionManager.objectWillChange
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
 
         saveSubject
             .debounce(for: .milliseconds(800), scheduler: DispatchQueue.main)
@@ -42,9 +32,7 @@ final class SettingsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    var isPremium: Bool {
-        subscriptionManager.isPremium
-    }
+    var isPremium: Bool { true }
 
     func save() {
         saveSubject.send(profile)
@@ -75,10 +63,5 @@ final class SettingsViewModel: ObservableObject {
 
     func resetOnboarding() {
         onResetOnboarding?()
-    }
-
-    func openPaywall() {
-        HapticManager.medium()
-        showPaywall = true
     }
 }

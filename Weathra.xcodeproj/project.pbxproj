@@ -281,8 +281,6 @@
 				67A870F82FAF23C3005B23F5 /* Weathra Widget */,
 			);
 			name = "Weathra WidgetExtension";
-			packageProductDependencies = (
-			);
 			productName = "Weathra WidgetExtension";
 			productReference = 67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";

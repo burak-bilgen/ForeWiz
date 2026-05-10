@@ -1,14 +1,11 @@
 import Foundation
 
 struct FeatureGate {
-    static func isUnlocked(_ feature: PremiumFeature, tier: SubscriptionTier) -> Bool {
-        if feature.isPremiumOnly == false {
-            return true
-        }
-        return tier == .premium
+    static func isUnlocked(_ feature: Any, tier: Any) -> Bool {
+        true
     }
-    
-    static func premiumPrompt(for feature: PremiumFeature) -> String {
-        L10n.text("premium_upgrade") + " — " + feature.localizedTitle
+
+    static func premiumPrompt(for feature: Any) -> String {
+        ""
     }
 }

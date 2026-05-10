@@ -15,7 +15,6 @@ final class AppCoordinator: ObservableObject {
     @Published var profile: UserComfortProfile = .default
     @Published var latestRecommendation: DailyRecommendation?
     @Published var showSettings = false
-    @Published var showPaywall = false
     @Published var selectedTab = 0
 
     init(container: DependencyContainer, rootFlow: RootFlow = .launching) {
@@ -29,8 +28,6 @@ final class AppCoordinator: ObservableObject {
 
         do {
             var loadedProfile = try await container.preferencesRepository.loadProfile()
-            await container.subscriptionManager.refreshStatus()
-            loadedProfile.subscriptionTier = container.subscriptionManager.tier
             L10n.configure(language: loadedProfile.language)
             profile = loadedProfile
             rootFlow = try await container.preferencesRepository.isOnboardingCompleted() ? .main : .onboarding

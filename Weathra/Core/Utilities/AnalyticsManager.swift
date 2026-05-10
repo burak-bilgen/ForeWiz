@@ -14,10 +14,6 @@ final class AnalyticsManager {
         case locationPermissionDenied
         case notificationPermissionGranted
         case notificationPermissionDenied
-        case subscriptionPurchased(SubscriptionTier)
-        case subscriptionRestored
-        case paywallViewed
-        case paywallDismissed
         case onboardingCompleted
         case homeRefresh
         case recommendationViewed(String)
@@ -31,10 +27,6 @@ final class AnalyticsManager {
             case .locationPermissionDenied: return "location_permission_denied"
             case .notificationPermissionGranted: return "notification_permission_granted"
             case .notificationPermissionDenied: return "notification_permission_denied"
-            case .subscriptionPurchased: return "subscription_purchased"
-            case .subscriptionRestored: return "subscription_restored"
-            case .paywallViewed: return "paywall_viewed"
-            case .paywallDismissed: return "paywall_dismissed"
             case .onboardingCompleted: return "onboarding_completed"
             case .homeRefresh: return "home_refresh"
             case .recommendationViewed: return "recommendation_viewed"
