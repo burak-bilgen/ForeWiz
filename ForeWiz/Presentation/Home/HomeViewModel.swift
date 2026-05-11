@@ -647,8 +647,8 @@ private func resolveLocationName(for location: LocationCoordinate) {
             let countryCode = placemark.isoCountryCode
 
             let name: String
-            if let city, let code = countryCode, !code.isEmpty {
-                name = "\(city), \(code)"
+            if let city {
+                name = city
             } else {
                 name = city ?? L10n.text("home_current_location")
             }
