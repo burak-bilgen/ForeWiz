@@ -14,7 +14,6 @@ final class DependencyContainer {
     let weatherCacheRepository: WeatherCacheRepository
     let preferencesRepository: PreferencesRepository
     let notificationRepository: NotificationRepository
-    let widgetRepository: WidgetRepository
     let loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase
     let completeOnboardingUseCase: CompleteOnboardingUseCase
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
@@ -32,7 +31,6 @@ final class DependencyContainer {
         weatherCacheRepository: WeatherCacheRepository,
         preferencesRepository: PreferencesRepository,
         notificationRepository: NotificationRepository,
-        widgetRepository: WidgetRepository,
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
         completeOnboardingUseCase: CompleteOnboardingUseCase,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
@@ -49,7 +47,6 @@ final class DependencyContainer {
         self.weatherCacheRepository = weatherCacheRepository
         self.preferencesRepository = preferencesRepository
         self.notificationRepository = notificationRepository
-        self.widgetRepository = widgetRepository
         self.loadHomeRecommendationUseCase = loadHomeRecommendationUseCase
         self.completeOnboardingUseCase = completeOnboardingUseCase
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
@@ -102,7 +99,6 @@ final class DependencyContainer {
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             notificationRepository: notificationRepository,
-            widgetRepository: SharedWidgetRepository(),
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
@@ -156,7 +152,6 @@ final class DependencyContainer {
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             notificationRepository: notificationRepository,
-            widgetRepository: SharedWidgetRepository(),
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,

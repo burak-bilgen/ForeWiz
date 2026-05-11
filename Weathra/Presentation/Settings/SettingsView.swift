@@ -6,6 +6,7 @@ struct SettingsView: View {
     @State private var showResetConfirmation = false
     @State private var languageKey: String = L10n.currentLanguageCode
     @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
@@ -279,6 +280,18 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    HapticManager.light()
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(Color.white.opacity(0.5))
+                }
+            }
+        }
         .dynamicTypeSize(.large ... .xxxLarge)
         .onChange(of: viewModel.profile) { viewModel.save() }
         .onChange(of: viewModel.profile.language) { _, newLang in

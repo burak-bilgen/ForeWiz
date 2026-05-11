@@ -57,7 +57,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.wakeUpTime = wakeUpTime
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
-        self.notificationPreferences = preferences
+        self.notificationPreferences = notificationPreferences
         self.unitSystem = unitSystem
         self.maximumDailyNotifications = maximumDailyNotifications.clamped(to: 1...3)
         self.appearance = appearance

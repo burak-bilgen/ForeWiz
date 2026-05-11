@@ -21,7 +21,7 @@ struct AppRootView: View {
                     onCompleted: coordinator.completeOnboarding
                 )
             case .main:
-                MainTabView(coordinator: coordinator)
+                HomeRootView(coordinator: coordinator)
             }
         }
         .preferredColorScheme(coordinator.profile.appearance.colorScheme)
@@ -46,13 +46,9 @@ struct AppRootView: View {
         switch link {
         case .settings:
             coordinator.showSettings = true
-        case .insights:
-            coordinator.selectedTab = 1
         case .onboarding:
             coordinator.rootFlow = .onboarding
-        case .home:
-            coordinator.selectedTab = 0
-        case .recommendationDetail:
+        case .insights, .home, .recommendationDetail:
             break
         }
 
@@ -83,10 +79,10 @@ private struct LaunchingView: View {
     }
 }
 
-private struct MainTabView: View {
+private struct HomeRootView: View {
     @ObservedObject var coordinator: AppCoordinator
     @StateObject private var homeViewModel: HomeViewModel
-    @State private var showInsightsPaywall = false
+    @State private var showSettings = false
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
@@ -97,7 +93,6 @@ private struct MainTabView: View {
             loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
             scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
             preferencesRepository: coordinator.container.preferencesRepository,
-            widgetRepository: coordinator.container.widgetRepository,
             dateProvider: coordinator.container.dateProvider,
             activityWindowScoringEngine: coordinator.container.activityWindowScoringEngine,
             selectedLocationName: name
@@ -105,35 +100,16 @@ private struct MainTabView: View {
     }
 
     var body: some View {
-        tabContent
-    }
-
-    @ViewBuilder
-    private var tabContent: some View {
-        TabView {
-            HomeView(
-                viewModel: homeViewModel,
-                savedLocations: $coordinator.profile.savedLocations,
-                selectedLocationID: $coordinator.profile.selectedLocationID,
-                onRecommendationLoaded: { recommendation in
-                    coordinator.updateRecommendation(recommendation)
-                }
-            )
-            .tabItem {
-                Label(L10n.text("tab_today"), systemImage: "sun.max.fill")
-            }
-
-            NavigationStack {
-                if let recommendation = coordinator.latestRecommendation {
-                    InsightsView(recommendation: recommendation)
-                } else {
-                    InsightsPlaceholderView()
-                }
-            }
-            .tabItem {
-                Label(L10n.text("premium_feature_analytics"), systemImage: "chart.bar")
-            }
-
+        HomeView(
+            viewModel: homeViewModel,
+            savedLocations: $coordinator.profile.savedLocations,
+            selectedLocationID: $coordinator.profile.selectedLocationID,
+            onRecommendationLoaded: { recommendation in
+                coordinator.updateRecommendation(recommendation)
+            },
+            onOpenSettings: { showSettings = true }
+        )
+        .sheet(isPresented: $showSettings) {
             NavigationStack {
                 SettingsView(
                     viewModel: SettingsViewModel(
@@ -144,36 +120,13 @@ private struct MainTabView: View {
                     )
                 )
             }
-            .tabItem {
-                Label(L10n.text("tab_settings"), systemImage: "gearshape.fill")
-            }
         }
-    }
-
-}
-
-private struct InsightsPlaceholderView: View {
-    var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color(red: 0.04, green: 0.08, blue: 0.18), Color(red: 0.06, green: 0.12, blue: 0.26)],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            VStack(spacing: 16) {
-                Image(systemName: "chart.bar.xaxis")
-                    .font(.system(size: 48))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.5))
-                Text(L10n.text("home_loading"))
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.white.opacity(0.35))
-            }
+        .onChange(of: coordinator.showSettings) { _, shouldShow in
+            if shouldShow { showSettings = true }
         }
-        .navigationTitle(L10n.text("premium_feature_analytics"))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.clear, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .onChange(of: showSettings) { _, isPresented in
+            if !isPresented { coordinator.dismissSettings() }
+        }
     }
 }
 

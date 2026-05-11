@@ -15,7 +15,6 @@ final class AppCoordinator: ObservableObject {
     @Published var profile: UserComfortProfile = .default
     @Published var latestRecommendation: DailyRecommendation?
     @Published var showSettings = false
-    @Published var selectedTab = 0
 
     init(container: DependencyContainer, rootFlow: RootFlow = .launching) {
         self.container = container
@@ -59,5 +58,9 @@ final class AppCoordinator: ObservableObject {
             try? await container.preferencesRepository.setOnboardingCompleted(false)
         }
         rootFlow = .onboarding
+    }
+
+    func dismissSettings() {
+        showSettings = false
     }
 }

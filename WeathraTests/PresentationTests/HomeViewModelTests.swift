@@ -60,8 +60,7 @@ struct HomeViewModelTests {
                 error: loadError
             ),
             scheduleSmartNotificationsUseCase: MockScheduleSmartNotificationsUseCase(),
-            preferencesRepository: MockPreferencesRepository(),
-            widgetRepository: MockWidgetRepository()
+            preferencesRepository: MockPreferencesRepository()
         )
     }
 }
@@ -114,10 +113,6 @@ private final class MockPreferencesRepository: PreferencesRepository {
     func setOnboardingCompleted(_ completed: Bool) async throws {
         onboardingCompleted = completed
     }
-}
-
-private final class MockWidgetRepository: WidgetRepository {
-    func save(recommendation: DailyRecommendation, current: CurrentWeatherPoint, locationName: String) throws {}
 }
 
 private extension HomeRecommendationResult {

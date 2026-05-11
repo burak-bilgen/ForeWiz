@@ -131,14 +131,7 @@ final class BackgroundRefreshManager {
 
             if snapshot == nil {
                 logger.info("No cached weather data, performing refresh")
-                let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
-
-                try container.widgetRepository.save(
-                    recommendation: result.recommendation,
-                    current: result.currentWeather,
-                    locationName: L10n.text("home_current_location")
-                )
-                WidgetCenter.shared.reloadAllTimelines()
+                _ = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
             }
 
             cleanupOldCacheData()
