@@ -96,7 +96,6 @@ state = .loaded(
                         recommendation: result.recommendation,
                         assistant: makeAssistantState(from: result),
                         plan: makePlanState(from: result),
-                        environment: makeEnvironmentState(from: result, profile: profile),
                         currentWeather: currentWeatherViewState(
                             from: result.currentWeather,
                             unitSystem: .current,
@@ -143,217 +142,53 @@ state = .loaded(
             }
             return lhs.severity > rhs.severity
         }.first
-        let nowcast = makeNowcastSignal(from: result.minutePoints)
-        let hasCriticalAlert = topAlert.map { $0.severity >= .high } ?? false
 
-        let greeting = timeBasedGreeting()
-        let temperatureSummary = makeTemperatureSummary(from: result)
-        let conditionSummary = makeConditionSummary(from: result)
-
-        var signals: [HomeAssistantSignal] = []
-
-        if let alert = topAlert {
-            signals.append(
-                HomeAssistantSignal(
-                    id: "official-alert",
-                    icon: "exclamationmark.triangle.fill",
-                    title: L10n.text("official_alert"),
-                    subtitle: alert.summary,
-                    hint: alert.region.map { "\($0) - \(alert.source)" } ?? alert.source,
-                    tone: alert.severity >= .high ? .danger : .caution
-                )
-            )
-        }
-
-        if let nowcast {
-            signals.append(nowcast)
-        }
-
-        if let bestWindow = recommendation.bestOutdoorWindow {
-            signals.append(
-                HomeAssistantSignal(
-                    id: "best-window",
-                    icon: "clock.fill",
-                    title: L10n.text("best_time"),
-                    subtitle: bestWindow.shortDisplayText,
-                    hint: L10n.text("use_this_window_for_outdoor"),
-                    tone: .good
-                )
-            )
-        }
-
-        if let topRisk = recommendation.risks.first,
-           topAlert == nil || topRisk.type != .storm {
-            signals.append(
-                HomeAssistantSignal(
-                    id: "top-risk",
-                    icon: iconName(for: topRisk.type),
-                    title: L10n.text("watch"),
-                    subtitle: topRisk.title,
-                    hint: topRisk.message,
-                    tone: topRisk.severity >= .high ? .danger : .caution
-                )
-            )
-        }
-
-        if let outfitItem = recommendation.outfit.items.first {
-            signals.append(
-                HomeAssistantSignal(
-                    id: "outfit",
-                    icon: "tshirt.fill",
-                    title: L10n.text("outfit"),
-                    subtitle: outfitItem,
-                    hint: recommendation.outfit.warning ?? recommendation.outfit.title,
-                    tone: .info
-                )
+        let criticalAlert: HomeAssistantSignal? = topAlert.flatMap { alert in
+            guard alert.severity >= .high else { return nil }
+            return HomeAssistantSignal(
+                id: "official-alert",
+                icon: "exclamationmark.triangle.fill",
+                title: L10n.text("official_alert"),
+                subtitle: alert.summary,
+                hint: alert.region.map { "\($0) - \(alert.source)" } ?? alert.source,
+                tone: .danger
             )
         }
 
         let headline: String
-        let detail: String
         let symbolName: String
         let tone: HomeAssistantTone
 
-        if let alert = topAlert, alert.severity >= .high {
+        if criticalAlert != nil {
             headline = L10n.text("official_weather_alert")
-            detail = "\(alert.summary). \(temperatureSummary)"
             symbolName = "exclamationmark.triangle.fill"
             tone = .danger
-        } else if let nowcast {
-            headline = L10n.text("plan_around_nearby_rain")
-            detail = "\(nowcast.hint). \(temperatureSummary)"
-            symbolName = "cloud.rain.fill"
-            tone = .caution
         } else if let topRisk = recommendation.risks.first(where: { $0.severity >= .high }) {
             headline = L10n.text("adjust_the_plan_for_safety")
-            detail = "\(topRisk.message). \(temperatureSummary)"
             symbolName = iconName(for: topRisk.type)
             tone = .danger
-        } else if let bestWindow = recommendation.bestOutdoorWindow {
-            headline = L10n.text("todays_plan_is_ready")
-            detail = String(format: L10n.text("best_window_detail_format"), bestWindow.shortDisplayText)
-            symbolName = "sparkles"
-            tone = recommendation.outdoorDecision == .good ? .good : .info
         } else {
-            headline = headlineText(for: recommendation.outdoorDecision)
-            detail = "\(recommendation.summaryText) \(temperatureSummary)"
+            headline = headlineText(for: recommendation.outdoorDecision, isTomorrow: recommendation.isTomorrowsRecommendation)
             symbolName = decisionSymbolName(for: recommendation.outdoorDecision)
             tone = assistantTone(for: recommendation.outdoorDecision)
         }
 
         return HomeAssistantViewState(
-            greeting: greeting,
             headline: headline,
-            detail: detail,
             symbolName: symbolName,
             tone: tone,
-            temperatureSummary: temperatureSummary,
-            conditionSummary: conditionSummary,
-            hasCriticalAlert: hasCriticalAlert,
-            signals: Array(signals.prefix(4))
-        )
-    }
-
-    private func timeBasedGreeting() -> String {
-        let hour = Calendar.current.component(.hour, from: dateProvider.now)
-        switch hour {
-        case 5..<12:
-            return L10n.text("good_morning")
-        case 12..<17:
-            return L10n.text("good_afternoon")
-        case 17..<22:
-            return L10n.text("good_evening")
-        default:
-            return L10n.text("good_night")
-        }
-    }
-
-    private func makeTemperatureSummary(from result: HomeRecommendationResult) -> String {
-        let current = result.currentWeather
-        let feelsLike = String(format: "%.0f°", current.apparentTemperatureCelsius)
-        var parts = ["\(L10n.text("weather_feels_like")) \(feelsLike)"]
-
-        if let today = result.dailyPoints.first {
-            let high = String(format: "%.0f°", today.highTemperatureCelsius)
-            let low = String(format: "%.0f°", today.lowTemperatureCelsius)
-            parts.append("\(L10n.text("high_label")) \(high)")
-            parts.append("\(L10n.text("low_label")) \(low)")
-        }
-
-        return parts.joined(separator: " · ")
-    }
-
-    private func makeConditionSummary(from result: HomeRecommendationResult) -> String {
-        let current = result.currentWeather
-        let condition = conditionText(for: current.conditionCode)
-
-        let wind: String
-        if let windSpeed = current.windSpeedKph {
-            if windSpeed < 10 {
-                wind = L10n.text("wind_calm")
-            } else if windSpeed < 25 {
-                wind = L10n.text("wind_moderate")
-            } else {
-                wind = L10n.text("wind_strong")
-            }
-        } else {
-            wind = ""
-        }
-
-        let humidity: String
-        if let h = current.humidity {
-            if h >= 0.8 { humidity = L10n.text("humid") }
-            else if h <= 0.3 { humidity = L10n.text("dry") }
-            else { humidity = "" }
-        } else {
-            humidity = ""
-        }
-
-        let parts = [condition, wind, humidity].filter { !$0.isEmpty }
-        return parts.joined(separator: ", ")
-    }
-
-    private func makeNowcastSignal(from minutePoints: [MinuteWeatherPoint]) -> HomeAssistantSignal? {
-        let nextHour = dateProvider.now.addingTimeInterval(60 * 60)
-        let upcoming = minutePoints
-            .filter { $0.date >= dateProvider.now && $0.date <= nextHour }
-            .filter { $0.precipitationType.lowercased() != "none" || $0.precipitationChance >= 0.2 }
-
-        guard let peak = upcoming.max(by: {
-            let lhs = ($0.precipitationChance * 100) + ($0.precipitationIntensityMmPerHour * 12)
-            let rhs = ($1.precipitationChance * 100) + ($1.precipitationIntensityMmPerHour * 12)
-            return lhs < rhs
-        }) else {
-            return nil
-        }
-
-        guard peak.precipitationChance >= 0.35 || peak.precipitationIntensityMmPerHour >= 0.15 else {
-            return nil
-        }
-
-        let minutes = max(1, Int(peak.date.timeIntervalSince(dateProvider.now) / 60))
-        let chance = Int((peak.precipitationChance * 100).rounded())
-        let intensityText = peak.precipitationIntensityMmPerHour >= 1.0
-            ? L10n.text("rain_may_get_heavier")
-            : L10n.text("light_rain_is_likely")
-
-        return HomeAssistantSignal(
-            id: "nowcast-rain",
-            icon: "cloud.rain.fill",
-            title: L10n.text("nowcast_rain"),
-            subtitle: String(format: L10n.text("nowcast_subtitle_format"), chance, minutes),
-            hint: String(format: L10n.text("nowcast_hint_format"), intensityText, minutes),
-            tone: peak.precipitationChance >= 0.65 || peak.precipitationIntensityMmPerHour >= 1.0 ? .danger : .caution
+            criticalAlert: criticalAlert
         )
     }
 
     private func makePlanState(from result: HomeRecommendationResult) -> HomePlanViewState {
         let recommendation = result.recommendation
+        let isTomorrow = recommendation.isTomorrowsRecommendation
         var items: [HomePlanItem] = [
             HomePlanItem(
                 id: "now",
                 icon: decisionSymbolName(for: recommendation.outdoorDecision),
-                title: L10n.text("now"),
+                title: isTomorrow ? L10n.text("tomorrow_label") : L10n.text("now"),
                 timeText: recommendation.outdoorDecision.localizedTitle,
                 detail: String(format: L10n.text("outdoor_score_detail_format"), recommendation.outdoorScore.rawValue),
                 tone: assistantTone(for: recommendation.outdoorDecision),
@@ -367,7 +202,7 @@ state = .loaded(
                     id: "official-alert",
                     icon: "exclamationmark.triangle.fill",
                     title: L10n.text("safety_first"),
-                    timeText: L10n.text("active_1"),
+                    timeText: L10n.text("active"),
                     detail: topAlert.summary,
                     tone: topAlert.severity >= .high ? .danger : .caution,
                     isPrimary: topAlert.severity >= .high
@@ -447,127 +282,57 @@ state = .loaded(
         }
 
         return HomePlanViewState(
-            title: L10n.text("todays_plan"),
+            title: isTomorrow ? L10n.text("tomorrows_plan") : L10n.text("todays_plan"),
             subtitle: L10n.text("a_short_action_plan_built"),
-            items: Array(items.prefix(5))
+            items: Array(items.prefix(3))
         )
     }
 
-    private func makeEnvironmentState(
-        from result: HomeRecommendationResult,
-        profile: UserComfortProfile
-    ) -> HomeEnvironmentViewState {
-        let current = result.currentWeather
+    private func makeNowcastSignal(from minutePoints: [MinuteWeatherPoint]) -> HomeAssistantSignal? {
+        let nextHour = dateProvider.now.addingTimeInterval(60 * 60)
+        let upcoming = minutePoints
+            .filter { $0.date >= dateProvider.now && $0.date <= nextHour }
+            .filter { $0.precipitationType.lowercased() != "none" || $0.precipitationChance >= 0.2 }
 
-        let signals = [
-            uvEnvironmentSignal(from: current),
-            humidityEnvironmentSignal(from: current)
-        ].filter { $0.isAvailable }
-
-        return HomeEnvironmentViewState(
-            title: L10n.text("health_conditions"),
-            subtitle: L10n.text("signals_that_affect_outdoor_comfort"),
-            signals: signals
-        )
-    }
-
-    private func unavailableEnvironmentSignal(
-        id: String,
-        icon: String,
-        title: String,
-        detail: String
-    ) -> HomeEnvironmentSignal {
-        HomeEnvironmentSignal(
-            id: id,
-            icon: icon,
-            title: title,
-            value: "",
-            detail: detail,
-            tone: .info,
-            isAvailable: false
-        )
-    }
-
-    private func uvEnvironmentSignal(from current: CurrentWeatherPoint) -> HomeEnvironmentSignal {
-        guard let uvIndex = current.uvIndex else {
-            return unavailableEnvironmentSignal(
-                id: "uv",
-                icon: "sun.max.fill",
-                title: "UV",
-                detail: L10n.text("apple_weather_did_not_provide")
-            )
+        guard let peak = upcoming.max(by: {
+            let lhs = ($0.precipitationChance * 100) + ($0.precipitationIntensityMmPerHour * 12)
+            let rhs = ($1.precipitationChance * 100) + ($1.precipitationIntensityMmPerHour * 12)
+            return lhs < rhs
+        }) else {
+            return nil
         }
 
-        let tone: HomeAssistantTone
-        let detail: String
-        switch uvIndex {
-        case 8...:
-            tone = .danger
-            detail = L10n.text("avoid_unprotected_exposure_use_shade")
-        case 6...7:
-            tone = .caution
-            detail = L10n.text("use_sun_protection_for_longer")
-        default:
-            tone = .good
-            detail = L10n.text("comfortable_uv_level")
+        guard peak.precipitationChance >= 0.35 || peak.precipitationIntensityMmPerHour >= 0.15 else {
+            return nil
         }
 
-        return HomeEnvironmentSignal(
-            id: "uv",
-            icon: "sun.max.fill",
-            title: "UV",
-            value: "\(uvIndex)",
-            detail: detail,
-            tone: tone,
-            isAvailable: true
+        let minutes = max(1, Int(peak.date.timeIntervalSince(dateProvider.now) / 60))
+        let chance = Int((peak.precipitationChance * 100).rounded())
+        let intensityText = peak.precipitationIntensityMmPerHour >= 1.0
+            ? L10n.text("rain_may_get_heavier")
+            : L10n.text("light_rain_is_likely")
+
+        return HomeAssistantSignal(
+            id: "nowcast-rain",
+            icon: "cloud.rain.fill",
+            title: L10n.text("nowcast_rain"),
+            subtitle: String(format: L10n.text("nowcast_subtitle_format"), chance, minutes),
+            hint: String(format: L10n.text("nowcast_hint_format"), intensityText, minutes),
+            tone: peak.precipitationChance >= 0.65 || peak.precipitationIntensityMmPerHour >= 1.0 ? .danger : .caution
         )
     }
 
-    private func humidityEnvironmentSignal(from current: CurrentWeatherPoint) -> HomeEnvironmentSignal {
-        guard let humidity = current.humidity else {
-            return unavailableEnvironmentSignal(
-                id: "humidity",
-                icon: "humidity.fill",
-                title: L10n.text("humidity"),
-                detail: L10n.text("humidity_data_is_unavailable")
-            )
-        }
-
-        let percent = Int((humidity * 100).rounded())
-        let tone: HomeAssistantTone
-        let detail: String
-        if humidity >= 0.8 && current.apparentTemperatureCelsius >= 25 {
-            tone = .caution
-            detail = L10n.text("it_may_feel_more_oppressive")
-        } else if humidity <= 0.3 {
-            tone = .info
-            detail = L10n.text("air_is_dry_hydrate_for")
-        } else {
-            tone = .good
-            detail = L10n.text("humidity_should_not_hurt_comfort")
-        }
-
-        return HomeEnvironmentSignal(
-            id: "humidity",
-            icon: "humidity.fill",
-            title: L10n.text("humidity"),
-            value: "%\(percent)",
-            detail: detail,
-            tone: tone,
-            isAvailable: true
-        )
-    }
-
-    private func headlineText(for decision: OutdoorDecision) -> String {
+    private func headlineText(for decision: OutdoorDecision, isTomorrow: Bool) -> String {
+        let prefix = isTomorrow ? L10n.text("tomorrow_prefix") + " " : ""
         switch decision {
         case .good:
-            return L10n.text("clear_outdoor_day")
+            return prefix + L10n.text("clear_outdoor_day")
         case .moderate:
-            return L10n.text("good_to_go_with_light")
+            return prefix + L10n.text("good_to_go_with_light")
         case .risky:
-            return L10n.text("plan_carefully")
+            return prefix + L10n.text("plan_carefully")
         case .avoid:
-            return L10n.text("better_to_postpone_outdoor_plans")
+            return prefix + L10n.text("better_to_postpone_outdoor_plans")
         }
     }
 

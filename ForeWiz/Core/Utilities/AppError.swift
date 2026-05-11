@@ -22,8 +22,8 @@ enum AppError: Error, Equatable {
             L10n.text("error_weather_unavailable")
         case .weatherKitPermissionMissing:
             L10n.text("error_weatherkit_auth")
-        case .weatherKitFailed(let reason):
-            L10n.text("error_weatherkit_failed") + " " + reason
+        case .weatherKitFailed:
+            L10n.text("error_weather_unavailable")
         case .cacheUnavailable:
             L10n.text("error_cache_unavailable")
         case .notificationPermissionDenied:
@@ -31,7 +31,7 @@ enum AppError: Error, Equatable {
         case .persistenceFailed:
             L10n.text("error_persistence")
         case .invalidData:
-            L10n.text("error_unknown")
+            L10n.text("error_invalid_data")
         case .unknown:
             L10n.text("error_unknown")
         }

@@ -11,7 +11,6 @@ struct OnboardingView: View {
     private let accentBlue = Color(red: 0.4, green: 0.72, blue: 1.0)
     private let accentGreen = Color(red: 0.3, green: 0.85, blue: 0.58)
     private let accentOrange = Color(red: 1.0, green: 0.55, blue: 0.3)
-    private let accentPurple = Color(red: 0.65, green: 0.5, blue: 1.0)
 
     var body: some View {
         ZStack {
@@ -30,10 +29,9 @@ struct OnboardingView: View {
                     VStack(spacing: 18) {
                         Group {
                             switch currentStep {
-                            case 0: introductionStep
-                            case 1: comfortStep
-                            case 2: permissionsStep
-                            default: introductionStep
+                            case 0: comfortStep
+                            case 1: permissionsStep
+                            default: comfortStep
                             }
                         }
                         .transition(.asymmetric(
@@ -45,7 +43,7 @@ struct OnboardingView: View {
                 }
                 .frame(maxHeight: .infinity)
 
-                if currentStep == 2 {
+                if currentStep == 1 {
                     startButton
                         .padding(.horizontal, 20)
                         .padding(.bottom, 16)
@@ -65,7 +63,7 @@ struct OnboardingView: View {
 
     private var stepIndicator: some View {
         HStack(spacing: 4) {
-            ForEach(0..<3, id: \.self) { index in
+            ForEach(0..<2, id: \.self) { index in
                 Capsule()
                     .fill(index <= currentStep ? accentBlue : Color.white.opacity(0.2))
                     .frame(width: index == currentStep ? 20 : 8, height: 4)
@@ -75,53 +73,7 @@ struct OnboardingView: View {
         .padding(.bottom, 24)
     }
 
-    // MARK: - Step 0: Introduction
-
-    private var introductionStep: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 14) {
-                ZStack {
-                    Circle()
-                        .fill(accentBlue.opacity(0.18))
-                        .frame(width: 90, height: 90)
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 40))
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(accentBlue)
-                }
-                .shadow(color: accentBlue.opacity(0.3), radius: 20)
-
-                Text(L10n.text("onboarding_welcome"))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-
-                Text(L10n.text("onboarding_tagline"))
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.white.opacity(0.55))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .padding(.horizontal, 8)
-            }
-
-            GlassCard(accentColor: accentBlue) {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text(L10n.text("onboarding_how_it_works"))
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-
-                    VStack(spacing: 10) {
-                        featureRow(icon: "clock.fill", color: accentGreen, text: L10n.text("onboarding_feature_plan"))
-                        featureRow(icon: "tshirt.fill", color: accentOrange, text: L10n.text("onboarding_feature_outfit"))
-                        featureRow(icon: "bell.badge.fill", color: Color(red: 1.0, green: 0.45, blue: 0.45), text: L10n.text("onboarding_feature_alerts"))
-                        featureRow(icon: "heart.text.square.fill", color: accentPurple, text: L10n.text("onboarding_feature_health"))
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Step 1: Comfort
+    // MARK: - Step 0: Comfort
 
     private var comfortStep: some View {
         VStack(spacing: 18) {
@@ -385,20 +337,6 @@ struct OnboardingView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
                 .padding(.horizontal, 8)
-        }
-    }
-
-    private func featureRow(icon: String, color: Color, text: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(color)
-                .frame(width: 28, height: 28)
-                .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-            Text(text)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.85))
-            Spacer()
         }
     }
 

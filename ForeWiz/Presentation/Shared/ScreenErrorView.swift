@@ -1,15 +1,21 @@
 import SwiftUI
 
-/// Empty/error state using the native `ContentUnavailableView`. Adapts to light/dark
-/// automatically and offers a clear retry action.
 struct ScreenErrorView: View {
+    let title: String
     let message: String
     let retryTitle: String
     let retry: () -> Void
 
+    init(title: String = L10n.text("home_loading_error_title"), message: String, retryTitle: String = L10n.text("home_error_retry"), retry: @escaping () -> Void) {
+        self.title = title
+        self.message = message
+        self.retryTitle = retryTitle
+        self.retry = retry
+    }
+
     var body: some View {
         ContentUnavailableView {
-            Label(L10n.text("home_loading_error_title"), systemImage: "cloud.slash")
+            Label(title, systemImage: "cloud.slash")
         } description: {
             Text(message)
         } actions: {

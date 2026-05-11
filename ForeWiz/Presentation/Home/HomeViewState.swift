@@ -4,7 +4,6 @@ struct HomeViewState: Equatable {
     let recommendation: DailyRecommendation
     let assistant: HomeAssistantViewState
     let plan: HomePlanViewState
-    let environment: HomeEnvironmentViewState
     let currentWeather: HomeCurrentWeatherViewState
     let dailyForecasts: [DailyForecastItem]
     let hourlyScores: [HourlyScoreItem]
@@ -31,15 +30,10 @@ struct HomePlanItem: Equatable, Identifiable {
 }
 
 struct HomeAssistantViewState: Equatable {
-    let greeting: String
     let headline: String
-    let detail: String
     let symbolName: String
     let tone: HomeAssistantTone
-    let temperatureSummary: String
-    let conditionSummary: String
-    let hasCriticalAlert: Bool
-    let signals: [HomeAssistantSignal]
+    let criticalAlert: HomeAssistantSignal?
 }
 
 struct HomeAssistantSignal: Equatable, Identifiable {
@@ -56,22 +50,6 @@ enum HomeAssistantTone: String, Equatable {
     case caution
     case danger
     case info
-}
-
-struct HomeEnvironmentViewState: Equatable {
-    let title: String
-    let subtitle: String
-    let signals: [HomeEnvironmentSignal]
-}
-
-struct HomeEnvironmentSignal: Equatable, Identifiable {
-    let id: String
-    let icon: String
-    let title: String
-    let value: String
-    let detail: String
-    let tone: HomeAssistantTone
-    let isAvailable: Bool
 }
 
 struct HourlyScoreItem: Equatable, Identifiable {

@@ -83,7 +83,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         if apparentTemperature < 8 {
             return L10n.text("outfit_title_cold")
         }
-        return String(format: L10n.text("outfit_title_balanced_format"), items.prefix(3).joined(separator: ", "))
+        return L10n.text("outfit_title_balanced")
     }
 
     private func eveningGetsCooler(hourly: [HourlyWeatherPoint], calendar: Calendar) -> Bool {

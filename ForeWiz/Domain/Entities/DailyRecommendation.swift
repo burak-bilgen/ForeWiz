@@ -11,6 +11,7 @@ struct DailyRecommendation: Codable, Equatable, Sendable {
     let risks: [WeatherRisk]
     let summaryText: String
     let explanation: String
+    let isTomorrowsRecommendation: Bool
 }
 
 extension DailyRecommendation {
@@ -35,7 +36,8 @@ extension DailyRecommendation {
             ),
             risks: [],
             summaryText: L10n.text("decision_good"),
-            explanation: "85/100"
+            explanation: "85/100",
+            isTomorrowsRecommendation: false
         )
     }
 }

@@ -77,6 +77,7 @@ enum WeatherSplashKind {
 struct WeatherSplashOverlay: View {
     let kind: WeatherSplashKind
     let onDismiss: () -> Void
+    var onFadeOut: (() -> Void)?
 
     @State private var opacity = 0.0
     @State private var iconScale: CGFloat = 0.3
@@ -138,6 +139,7 @@ struct WeatherSplashOverlay: View {
         }
 
         DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration - fadeOutDuration) {
+            onFadeOut?()
             withAnimation(.easeOut(duration: fadeOutDuration)) {
                 opacity = 0.0
                 particlesOpacity = 0.0

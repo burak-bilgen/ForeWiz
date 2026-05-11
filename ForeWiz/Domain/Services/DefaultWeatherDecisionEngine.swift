@@ -23,6 +23,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         calendar: Calendar = .current
     ) -> DailyRecommendation {
         let todayHours = relevantHours(from: snapshot.hourly, now: now, calendar: calendar)
+        let isTomorrow = todayHours.first.map { !calendar.isDate($0.date, inSameDayAs: now) } ?? false
         let forecastRisks = riskClassifier.uniqueRisks(from: todayHours, current: snapshot.current, calendar: calendar)
         let risks = uniqueRisks(forecastRisks + weatherAlertRisks(from: snapshot.alerts)
             + minuteForecastRisks(from: snapshot.minute, now: now))
@@ -77,7 +78,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             outfit: outfit,
             risks: risks,
             summaryText: summaryText(decision: outdoorDecision, bestWindow: bestOutdoorWindow, risks: risks),
-            explanation: explanation(score: outdoorScore, risks: risks, avoidWindows: avoidWindows)
+            explanation: explanation(score: outdoorScore, risks: risks, avoidWindows: avoidWindows),
+            isTomorrowsRecommendation: isTomorrow
         )
     }
 

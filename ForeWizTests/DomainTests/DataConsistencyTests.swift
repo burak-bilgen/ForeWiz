@@ -14,7 +14,8 @@ struct DataConsistencyTests {
             outfit: OutfitRecommendation(title: "Test", items: [], accessories: [], warning: nil),
             risks: [],
             summaryText: "Test",
-            explanation: "Test"
+            explanation: "Test",
+            isTomorrowsRecommendation: false
         )
 
         #expect(recommendation.outdoorScore.rawValue >= 0)
