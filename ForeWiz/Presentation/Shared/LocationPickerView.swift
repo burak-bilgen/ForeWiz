@@ -161,8 +161,7 @@ private struct AddLocationMapView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
-                .background(.ultraThinMaterial)
-                .cornerRadius(12)
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                 Button {
                     dismiss()
@@ -187,8 +186,7 @@ private struct AddLocationMapView: View {
                         }
                     }
                 }
-                .background(.ultraThinMaterial)
-                .cornerRadius(12)
+                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 .padding(.horizontal, 16)
             }
         }
@@ -402,8 +400,7 @@ private struct LocationPickerNavBar: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
-        .background(.ultraThinMaterial)
-        .overlay(Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1), alignment: .bottom)
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 
@@ -475,7 +472,7 @@ private struct LocationRow: View {
             .buttonStyle(.plain)
         }
         .padding(14)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(isSelected

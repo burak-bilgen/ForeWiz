@@ -56,7 +56,7 @@ struct NotificationSettingsSection: View {
                 }
                 .buttonStyle(.plain)
             }
-            .background(Color.white.opacity(0.07), in: Capsule())
+            .glassEffect(.regular, in: Capsule())
         }
         .padding(.vertical, 8)
 

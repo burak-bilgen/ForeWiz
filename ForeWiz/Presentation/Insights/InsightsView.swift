@@ -143,8 +143,7 @@ private struct InsightsScoreCard: View {
             }
         }
         .padding(18)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.14), lineWidth: 1))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .onAppear { withAnimation { appeared = true } }
     }
 
@@ -236,8 +235,7 @@ private struct InsightsActivityCard: View {
             }
         }
         .padding(18)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color(red: 0.4, green: 0.85, blue: 0.6).opacity(0.14), lineWidth: 1))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func activityIcon(_ type: ActivityType) -> String {
@@ -332,8 +330,7 @@ private struct InsightsDayQualityCard: View {
             }
         }
         .padding(18)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color(red: 0.75, green: 0.5, blue: 1.0).opacity(0.14), lineWidth: 1))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func barHeight(_ quality: HourBlock.Quality) -> CGFloat {

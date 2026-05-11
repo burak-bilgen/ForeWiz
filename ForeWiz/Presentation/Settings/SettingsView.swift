@@ -377,8 +377,7 @@ private struct SettingsSection<Content: View>: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 6)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(color.opacity(0.10), lineWidth: 1))
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
         }
     }
 }

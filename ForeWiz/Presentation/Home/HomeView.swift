@@ -240,7 +240,7 @@ private struct AssistantGreetingCard: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 8))
                 }
 
                 if assistant.signals.isEmpty == false {
@@ -535,7 +535,7 @@ private struct WeatherMetricChip: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 6)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
@@ -682,8 +682,7 @@ private struct ForecastPill: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.06), lineWidth: 0.5))
+        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func strokeColor(for score: WeatherScore) -> Color {
@@ -947,14 +946,10 @@ private struct SkeletonCard: View {
     var height: CGFloat
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .fill(.ultraThinMaterial)
+        Color.clear
             .frame(maxWidth: .infinity)
             .frame(height: height)
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.white.opacity(0.06), lineWidth: 1)
-            )
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 
@@ -972,9 +967,9 @@ private struct HomeErrorView: View {
                     .fill(Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.12))
                     .frame(width: 90, height: 90)
                     .blur(radius: 8)
-                Circle()
-                    .fill(.ultraThinMaterial)
+                Color.clear
                     .frame(width: 80, height: 80)
+                    .glassEffect(.regular, in: Circle())
                 Image(systemName: "cloud.slash.fill")
                     .font(.system(size: 34))
                     .foregroundStyle(Color(red: 1.0, green: 0.42, blue: 0.42))
@@ -1010,8 +1005,7 @@ private struct HomeErrorView: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 14)
-                .background(.ultraThinMaterial, in: Capsule())
-                .overlay(Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1))
+                .glassEffect(.regular, in: Capsule())
             }
             .buttonStyle(.plain)
         }

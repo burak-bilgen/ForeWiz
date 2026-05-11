@@ -68,7 +68,7 @@ struct QuietHoursPicker: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                     VStack(spacing: 6) {
                         Text(L10n.text("quiet_hours_end"))
@@ -96,7 +96,7 @@ struct QuietHoursPicker: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 .padding(.bottom, 8)
                 .transition(.opacity.combined(with: .move(edge: .top)))
