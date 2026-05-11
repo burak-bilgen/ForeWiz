@@ -29,10 +29,7 @@ final class MockWeatherRepository: WeatherRepository {
                 uvIndex: isDaylight ? (hour >= 10 && hour <= 16 ? 5 : 2) : 0,
                 conditionCode: precipChance > 0.4 ? "Rain" : (isDaylight ? "Clear" : "Clear"),
                 isDaylight: isDaylight,
-                severeWeatherRisk: nil,
-                pollenLevel: .moderate,
-                airQualityIndex: .good,
-                pm25Level: .good
+                severeWeatherRisk: nil
             )
         }
 

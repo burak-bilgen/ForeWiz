@@ -60,10 +60,7 @@ enum WeatherMapper {
             conditionCode: weather.condition.rawValue,
             symbolName: weather.symbolName,
             isDaylight: weather.isDaylight,
-            severeWeatherRisk: nil,
-            pollenLevel: nil,
-            airQualityIndex: nil,
-            pm25Level: nil
+            severeWeatherRisk: nil
         )
     }
 

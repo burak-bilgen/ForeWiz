@@ -8,8 +8,6 @@ struct AppRootView: View {
     var body: some View {
         Group {
             switch coordinator.rootFlow {
-            case .launching:
-                LaunchingView()
             case .onboarding:
                 OnboardingView(
                     viewModel: OnboardingViewModel(
@@ -53,29 +51,6 @@ struct AppRootView: View {
         }
 
         deepLinkHandler.clear()
-    }
-}
-
-private struct LaunchingView: View {
-    @State private var animate = false
-
-    var body: some View {
-        ZStack {
-            Color(UIColor.systemGroupedBackground)
-                .ignoresSafeArea()
-            VStack(spacing: 24) {
-                Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 56, weight: .regular))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(.blue)
-                    .symbolEffect(.pulse, isActive: animate)
-
-                Text(L10n.text("launch_preparing"))
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .onAppear { animate = true }
     }
 }
 

@@ -141,10 +141,7 @@ struct DecisionEngineIntegrationTests {
             conditionCode: conditionCode,
             symbolName: nil,
             isDaylight: true,
-            severeWeatherRisk: severeWeatherRisk,
-            pollenLevel: nil,
-            airQualityIndex: nil,
-            pm25Level: nil
+            severeWeatherRisk: severeWeatherRisk
         )
     }
 }

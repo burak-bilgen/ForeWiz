@@ -107,13 +107,3 @@ struct DateTimeHelpersTests {
         #expect(ActivityType.goingOutside.localizedTitle.isEmpty == false)
     }
 
-    @Test func allergyTypeLocalizedTitle() {
-        L10n.configure(language: .turkish)
-
-        #expect(AllergyType.pollen.localizedTitle.isEmpty == false)
-        #expect(AllergyType.dust.localizedTitle.isEmpty == false)
-        #expect(PollenType.grass.localizedTitle.isEmpty == false)
-        #expect(PollenType.tree.localizedTitle.isEmpty == false)
-        #expect(PollenType.weed.localizedTitle.isEmpty == false)
-    }
-}

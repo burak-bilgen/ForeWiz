@@ -42,6 +42,6 @@ struct NotificationTests {
 
     @Test func notificationCategoryTitles() {
         #expect(NotificationCategory.morningBriefing.localizedTitle.isEmpty == false)
-        #expect(NotificationCategory.airQualityWarning.localizedTitle.isEmpty == false)
+        #expect(NotificationCategory.windWarning.localizedTitle.isEmpty == false)
     }
 }

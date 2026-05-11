@@ -72,10 +72,7 @@ enum WeatherTestFixtures {
                 uvIndex: uvIndex(hour),
                 conditionCode: "test",
                 isDaylight: (6...20).contains(hour),
-                severeWeatherRisk: severeRisk(hour),
-                pollenLevel: nil,
-                airQualityIndex: nil,
-                pm25Level: nil
+                severeWeatherRisk: severeRisk(hour)
             )
         }
 

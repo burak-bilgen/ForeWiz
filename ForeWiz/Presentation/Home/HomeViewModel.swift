@@ -446,19 +446,33 @@ final class HomeViewModel: ObservableObject {
         profile: UserComfortProfile
     ) -> HomeEnvironmentViewState {
         let current = result.currentWeather
-        let firstHour = result.hourlyPoints.sorted { $0.date < $1.date }.first
 
         let signals = [
             uvEnvironmentSignal(from: current),
-            humidityEnvironmentSignal(from: current),
-            airQualityEnvironmentSignal(from: firstHour, profile: profile),
-            pollenEnvironmentSignal(from: firstHour, profile: profile)
+            humidityEnvironmentSignal(from: current)
         ].filter { $0.isAvailable }
 
         return HomeEnvironmentViewState(
             title: L10n.text("health_conditions"),
             subtitle: L10n.text("signals_that_affect_outdoor_comfort"),
             signals: signals
+        )
+    }
+
+    private func unavailableEnvironmentSignal(
+        id: String,
+        icon: String,
+        title: String,
+        detail: String
+    ) -> HomeEnvironmentSignal {
+        HomeEnvironmentSignal(
+            id: id,
+            icon: icon,
+            title: title,
+            value: "",
+            detail: detail,
+            tone: .info,
+            isAvailable: false
         )
     }
 
@@ -532,152 +546,6 @@ final class HomeViewModel: ObservableObject {
         )
     }
 
-    private func airQualityEnvironmentSignal(
-        from hour: HourlyWeatherPoint?,
-        profile: UserComfortProfile
-    ) -> HomeEnvironmentSignal {
-        guard let hour,
-              let level = hour.airQualityIndex ?? hour.pm25Level.map(airQualityIndexEquivalent(from:)) else {
-            return unavailableEnvironmentSignal(
-                id: "air-quality",
-                icon: "aqi.medium",
-                title: L10n.text("air_quality"),
-                detail: L10n.text("apple_weather_did_not_provide_1")
-            )
-        }
-
-        let severe = level.severity >= 5
-        let sensitive = profile.allergyProfile.isEnabled
-            && (profile.allergyProfile.allergies.contains(.airQuality) || profile.allergyProfile.allergies.contains(.smoke))
-
-        return HomeEnvironmentSignal(
-            id: "air-quality",
-            icon: "aqi.medium",
-            title: L10n.text("air_quality"),
-            value: localizedAirQuality(level),
-            detail: airQualityDetail(level, sensitive: sensitive),
-            tone: severe ? .danger : (level.severity >= 3 ? .caution : .good),
-            isAvailable: true
-        )
-    }
-
-    private func pollenEnvironmentSignal(
-        from hour: HourlyWeatherPoint?,
-        profile: UserComfortProfile
-    ) -> HomeEnvironmentSignal {
-        guard let pollen = hour?.pollenLevel else {
-            return unavailableEnvironmentSignal(
-                id: "pollen",
-                icon: "leaf.fill",
-                title: L10n.text("pollen"),
-                detail: L10n.text("apple_weather_did_not_provide_2")
-            )
-        }
-
-        let sensitive = profile.allergyProfile.isEnabled && profile.allergyProfile.allergies.contains(.pollen)
-        return HomeEnvironmentSignal(
-            id: "pollen",
-            icon: "leaf.fill",
-            title: L10n.text("pollen"),
-            value: localizedPollen(pollen),
-            detail: pollenDetail(pollen, sensitive: sensitive),
-            tone: pollen.severity >= 5 ? .danger : (pollen.severity >= 3 ? .caution : .good),
-            isAvailable: true
-        )
-    }
-
-    private func unavailableEnvironmentSignal(
-        id: String,
-        icon: String,
-        title: String,
-        detail: String
-    ) -> HomeEnvironmentSignal {
-        HomeEnvironmentSignal(
-            id: id,
-            icon: icon,
-            title: title,
-            value: L10n.text("no_data"),
-            detail: detail,
-            tone: .info,
-            isAvailable: false
-        )
-    }
-
-    private func airQualityIndexEquivalent(from pm25: Pm25Level) -> AirQualityIndex {
-        switch pm25 {
-        case .good:
-            return .good
-        case .moderate:
-            return .moderate
-        case .unhealthySensitive:
-            return .unhealthySensitive
-        case .unhealthy:
-            return .unhealthy
-        case .veryUnhealthy:
-            return .veryUnhealthy
-        case .hazardous:
-            return .hazardous
-        }
-    }
-
-    private func localizedAirQuality(_ level: AirQualityIndex) -> String {
-        switch level {
-        case .good:
-            return L10n.text("good")
-        case .moderate:
-            return L10n.text("moderate")
-        case .unhealthySensitive:
-            return L10n.text("risky_for_sensitive_groups")
-        case .unhealthy:
-            return L10n.text("unhealthy")
-        case .veryUnhealthy:
-            return L10n.text("very_unhealthy")
-        case .hazardous:
-            return L10n.text("hazardous")
-        }
-    }
-
-    private func airQualityDetail(_ level: AirQualityIndex, sensitive: Bool) -> String {
-        if level.severity >= 5 {
-            return L10n.text("reduce_long_outdoor_plans_consider")
-        }
-        if level.severity >= 3 {
-            return sensitive
-                ? L10n.text("keep_outdoor_time_shorter_for")
-                : L10n.text("sensitive_groups_may_need_caution")
-        }
-        return L10n.text("air_quality_is_suitable_for")
-    }
-
-    private func localizedPollen(_ level: PollenLevel) -> String {
-        switch level {
-        case .none:
-            return L10n.text("none")
-        case .veryLow:
-            return L10n.text("very_low")
-        case .low:
-            return L10n.text("low")
-        case .moderate:
-            return L10n.text("moderate")
-        case .high:
-            return L10n.text("high")
-        case .veryHigh:
-            return L10n.text("very_high")
-        }
-    }
-
-    private func pollenDetail(_ level: PollenLevel, sensitive: Bool) -> String {
-        if level.severity >= 5 {
-            return L10n.text("if_allergic_shorten_outdoor_plans")
-        }
-        if level.severity >= 3 {
-            return sensitive
-                ? L10n.text("your_allergy_profile_is_on")
-                : L10n.text("may_trigger_symptoms_for_allergic")
-        }
-        return L10n.text("pollen_level_is_calm")
-    }
-
     private func headlineText(for decision: OutdoorDecision) -> String {
         switch decision {
         case .good:
@@ -735,10 +603,6 @@ final class HomeViewModel: ObservableObject {
             return "cloud.bolt.rain.fill"
         case .poorComfort:
             return "exclamationmark.circle.fill"
-        case .pollen:
-            return "leaf.fill"
-        case .airQuality:
-            return "aqi.medium"
         }
     }
 

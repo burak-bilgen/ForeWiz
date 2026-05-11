@@ -5,10 +5,7 @@ import Foundation
 final class OnboardingViewModel: ObservableObject {
     @Published private(set) var selectedSensitivity: TemperatureSensitivity = .normal
     @Published private(set) var preferredActivities: Set<ActivityType> = [.walking, .goingOutside]
-    @Published private(set) var selectedAllergies: Set<AllergyType> = []
-    @Published private(set) var selectedPollenTypes: Set<PollenType> = Set(PollenType.allCases)
     @Published private(set) var wakeUpTime: DateComponents
-    @Published private(set) var wardrobe: WardrobePreferences
     @Published private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
     @Published private(set) var notificationStatus: NotificationAuthorizationStatus = .notDetermined
     @Published private(set) var errorMessage: String?
@@ -25,10 +22,7 @@ final class OnboardingViewModel: ObservableObject {
         self.notificationRepository = notificationRepository
         selectedSensitivity = profile.temperatureSensitivity
         preferredActivities = profile.preferredActivities
-        selectedAllergies = profile.allergyProfile.allergies
-        selectedPollenTypes = profile.allergyProfile.pollenTypes
         wakeUpTime = profile.wakeUpTime ?? Self.defaultWakeTime()
-        wardrobe = profile.wardrobe
     }
 
     var canContinue: Bool {
@@ -51,40 +45,8 @@ final class OnboardingViewModel: ObservableObject {
         }
     }
 
-    func toggleAllergy(_ allergy: AllergyType) {
-        if selectedAllergies.contains(allergy) {
-            selectedAllergies.remove(allergy)
-        } else {
-            selectedAllergies.insert(allergy)
-        }
-    }
-
-    func setAllergiesEnabled(_ enabled: Bool) {
-        if enabled && selectedAllergies.isEmpty {
-            selectedAllergies.insert(.pollen)
-        } else if !enabled {
-            selectedAllergies.removeAll()
-        }
-    }
-
-    func togglePollenType(_ pollenType: PollenType) {
-        if selectedPollenTypes.contains(pollenType) {
-            selectedPollenTypes.remove(pollenType)
-        } else {
-            selectedPollenTypes.insert(pollenType)
-        }
-
-        if selectedPollenTypes.isEmpty {
-            selectedPollenTypes.insert(pollenType)
-        }
-    }
-
     func setWakeUpHour(_ hour: Int) {
         wakeUpTime = DateComponents(hour: hour, minute: 0)
-    }
-
-    func toggleWardrobeItem(keyPath: WritableKeyPath<WardrobePreferences, Bool>) {
-        wardrobe[keyPath: keyPath].toggle()
     }
 
     func requestLocationPermission() {
@@ -122,12 +84,6 @@ final class OnboardingViewModel: ObservableObject {
         profile.temperatureSensitivity = selectedSensitivity
         profile.preferredActivities = preferredActivities.isEmpty ? [.goingOutside] : preferredActivities
         profile.wakeUpTime = wakeUpTime
-        profile.wardrobe = wardrobe
-        profile.allergyProfile = AllergyProfile(
-            allergies: selectedAllergies,
-            pollenTypes: selectedPollenTypes,
-            isEnabled: selectedAllergies.isEmpty == false
-        )
         return profile
     }
 

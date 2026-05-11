@@ -11,20 +11,13 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         let heatRisk = input.risks.contains { $0.type == .heat && $0.severity >= .medium }
         let uvRisk = input.risks.contains { $0.type == .uv && $0.severity >= .medium }
 
-        let wardrobe = input.profile.wardrobe
-        var items = baseItems(for: apparentTemperature, wardrobe: wardrobe)
+        var items = baseItems(for: apparentTemperature)
         var accessories: [String] = []
         var warnings: [String] = []
 
         if rainRisk {
-            if wardrobe.hasRaincoat {
-                items = [L10n.text("outfit_rainwear")] + items.filter { $0 != L10n.text("outfit_light_jacket") }
-            }
-            if wardrobe.hasUmbrella {
-                accessories.append(L10n.text("outfit_umbrella"))
-            } else if wardrobe.hasRaincoat == false {
-                warnings.append(L10n.text("outfit_warning_no_gear"))
-            }
+            items = [L10n.text("outfit_rainwear")] + items.filter { $0 != L10n.text("outfit_light_jacket") }
+            accessories.append(L10n.text("outfit_umbrella"))
             warnings.append(L10n.text("outfit_warning_rain"))
         }
 
@@ -34,9 +27,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         }
 
         if heatRisk || uvRisk {
-            if wardrobe.hasSunglasses {
-                accessories.append(L10n.text("outfit_sunglasses"))
-            }
+            accessories.append(L10n.text("outfit_sunglasses"))
             accessories.append(contentsOf: [L10n.text("outfit_hat"), L10n.text("outfit_water")])
             if let avoidWindow = input.avoidWindows.first(where: { $0.risk.type == .heat || $0.risk.type == .uv }) {
                 warnings.append(String(format: L10n.text("outfit_warning_avoid_format"), avoidWindow.window.shortDisplayText))
@@ -65,7 +56,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         }
     }
 
-    private func baseItems(for apparentTemperature: Double, wardrobe: WardrobePreferences) -> [String] {
+    private func baseItems(for apparentTemperature: Double) -> [String] {
         switch apparentTemperature {
         case 30...:
             return [L10n.text("outfit_light_tshirt"), L10n.text("outfit_shorts_pants")]
@@ -76,11 +67,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         case 8..<17:
             return [L10n.text("outfit_sweater"), L10n.text("outfit_light_coat"), L10n.text("outfit_closed_shoes")]
         default:
-            let coat = wardrobe.hasWinterCoat ? L10n.text("outfit_winter_coat") : L10n.text("outfit_thick_coat")
-            var base = [coat, L10n.text("outfit_sweater"), L10n.text("outfit_closed_shoes")]
-            if wardrobe.hasGloves { base.append(L10n.text("outfit_gloves")) }
-            if wardrobe.hasThermals { base.append(L10n.text("outfit_thermals")) }
-            return base
+            return [L10n.text("outfit_winter_coat"), L10n.text("outfit_sweater"), L10n.text("outfit_closed_shoes"), L10n.text("outfit_gloves"), L10n.text("outfit_thermals")]
         }
     }
 

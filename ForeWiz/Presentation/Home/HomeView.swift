@@ -116,40 +116,40 @@ private struct HomeLoadedContent: View {
                         .cardEntrance(appeared: appeared, delay: 0.01)
                 }
 
-                DailyPlanCard(plan: state.plan)
-                    .cardEntrance(appeared: appeared, delay: 0.02)
-
                 WeatherHeroCard(
                     weather: state.currentWeather,
                     recommendation: state.recommendation,
                     isUsingCached: state.isUsingCachedWeather
                 )
-                .cardEntrance(appeared: appeared, delay: 0.04)
+                .cardEntrance(appeared: appeared, delay: 0.02)
 
                 CompactHourlyCard(hourlyScores: state.hourlyScores)
-                    .cardEntrance(appeared: appeared, delay: 0.06)
+                    .cardEntrance(appeared: appeared, delay: 0.03)
 
                 if !state.environment.signals.isEmpty {
                     CompactEnvironmentCard(environment: state.environment)
-                        .cardEntrance(appeared: appeared, delay: 0.08)
+                        .cardEntrance(appeared: appeared, delay: 0.04)
                 }
 
                 CompactForecastCard(dailyForecasts: state.dailyForecasts)
-                    .cardEntrance(appeared: appeared, delay: 0.10)
+                    .cardEntrance(appeared: appeared, delay: 0.05)
 
                 if !state.recommendation.bestActivityWindows.isEmpty {
                     CompactActivityCard(recommendations: state.recommendation.bestActivityWindows)
-                        .cardEntrance(appeared: appeared, delay: 0.12)
+                        .cardEntrance(appeared: appeared, delay: 0.06)
                 }
+
+                DailyPlanCard(plan: state.plan)
+                    .cardEntrance(appeared: appeared, delay: 0.07)
 
                 if let warning = state.warningMessage {
                     CompactWarningBanner(message: warning)
-                        .cardEntrance(appeared: appeared, delay: 0.14)
+                        .cardEntrance(appeared: appeared, delay: 0.08)
                 }
 
                 if let attribution = state.attribution {
                     HomeAttributionView(info: attribution)
-                        .cardEntrance(appeared: appeared, delay: 0.16)
+                        .cardEntrance(appeared: appeared, delay: 0.09)
                 }
             }
             .padding(.horizontal, 16)
@@ -159,7 +159,7 @@ private struct HomeLoadedContent: View {
         .safeAreaPadding(.bottom, 12)
         .refreshable { await refresh() }
         .onAppear {
-            withAnimation(.spring(response: 0.5, dampingFraction: 0.85)) { appeared = true }
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) { appeared = true }
         }
     }
 }
@@ -168,6 +168,7 @@ private struct HomeLoadedContent: View {
 
 private struct AssistantGreetingCard: View {
     let assistant: HomeAssistantViewState
+    @State private var iconPulse = false
 
     private var accentColor: Color {
         switch assistant.tone {
@@ -185,10 +186,12 @@ private struct AssistantGreetingCard: View {
                     ZStack {
                         Circle()
                             .fill(accentColor.opacity(0.15))
-                            .frame(width: 44, height: 44)
+                            .frame(width: 48, height: 48)
+                            .scaleEffect(iconPulse ? 1.08 : 1.0)
                         Image(systemName: assistant.symbolName)
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 22, weight: .semibold))
                             .foregroundStyle(accentColor)
+                            .symbolEffect(.bounce.up.byLayer, options: .repeating.speed(0.3), value: iconPulse)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -197,7 +200,7 @@ private struct AssistantGreetingCard: View {
                             .foregroundStyle(accentColor.opacity(0.8))
 
                         Text(assistant.headline)
-                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .lineLimit(2)
                             .minimumScaleFactor(0.85)
@@ -212,14 +215,29 @@ private struct AssistantGreetingCard: View {
                     .lineLimit(5)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if !assistant.conditionSummary.isEmpty {
-                    HStack(spacing: 6) {
-                        Image(systemName: "waveform.path")
-                            .font(.system(size: 10))
-                        Text(assistant.conditionSummary.capitalized)
-                            .font(.system(size: 12, weight: .medium))
+                if !assistant.temperatureSummary.isEmpty {
+                    HStack(spacing: 8) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "thermometer.medium")
+                                .font(.system(size: 10))
+                            Text(assistant.temperatureSummary)
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        .foregroundStyle(Color.white.opacity(0.5))
+
+                        if !assistant.conditionSummary.isEmpty {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 3, height: 3)
+                            HStack(spacing: 4) {
+                                Image(systemName: "waveform.path")
+                                    .font(.system(size: 10))
+                                Text(assistant.conditionSummary.capitalized)
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundStyle(Color.white.opacity(0.5))
+                        }
                     }
-                    .foregroundStyle(Color.white.opacity(0.45))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                     .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
@@ -235,6 +253,8 @@ private struct AssistantGreetingCard: View {
             }
             .padding(14)
         }
+        .onAppear { iconPulse = true }
+        .animation(.spring(response: 0.6, dampingFraction: 0.7), value: iconPulse)
     }
 }
 
@@ -598,6 +618,7 @@ private struct CompactForecastCard: View {
                 Label(L10n.text("home_forecast_label"), systemImage: "calendar")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.5))
+                    .padding(.horizontal, 12)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -605,10 +626,10 @@ private struct CompactForecastCard: View {
                             ForecastPill(forecast: forecast)
                         }
                     }
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 12)
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, -16)
             .padding(.vertical, 10)
         }
     }
@@ -686,6 +707,7 @@ private struct CompactHourlyCard: View {
                 Label(L10n.text("home_hourly_label"), systemImage: "clock.fill")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.5))
+                    .padding(.horizontal, 12)
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
@@ -693,9 +715,10 @@ private struct CompactHourlyCard: View {
                             HourlyPill(item: item)
                         }
                     }
+                    .padding(.horizontal, 12)
                 }
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, -16)
             .padding(.vertical, 10)
         }
     }

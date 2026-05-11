@@ -93,48 +93,33 @@ private struct AddLocationMapView: View {
     @State private var searchText = ""
     @State private var searchResults: [MKMapItem] = []
     @State private var selectedMapItem: MKMapItem?
-    @State private var selectedCoordinate: CLLocationCoordinate2D?
-    @State private var isSearching = false
     @State private var searchTask: Task<Void, Never>?
+    @State private var showSearchResults = false
 
     var body: some View {
         ZStack {
             Map(position: $cameraPosition, interactionModes: [.pan, .zoom]) {
-                if let coord = selectedCoordinate {
-                    Annotation("", coordinate: coord) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.3))
-                                .frame(width: 44, height: 44)
-                            Circle()
-                                .fill(Color(red: 0.4, green: 0.7, blue: 1.0))
-                                .frame(width: 16, height: 16)
-                            Circle()
-                                .fill(.white)
-                                .frame(width: 6, height: 6)
-                        }
-                    }
+                if let item = selectedMapItem {
+                    Marker(item.name ?? "", coordinate: item.placemark.coordinate)
+                        .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
                 }
             }
             .mapStyle(.standard(elevation: .realistic))
             .ignoresSafeArea(edges: .top)
 
-            VStack {
+            VStack(spacing: 0) {
                 searchBar
                 Spacer()
-                bottomPanel
-            }
-        }
-        .onChange(of: cameraPosition) { newPosition in
-            if let region = newPosition.region {
-                selectedCoordinate = region.center
+                if selectedMapItem != nil {
+                    bottomPanel
+                }
             }
         }
     }
 
     private var searchBar: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 HStack(spacing: 8) {
                     Image(systemName: "magnifyingglass")
                         .font(.system(size: 15))
@@ -146,21 +131,11 @@ private struct AddLocationMapView: View {
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                         .submitLabel(.search)
-                        .overlay {
-                            if isSearching && !searchText.isEmpty {
-                                HStack {
-                                    Spacer()
-                                    ProgressView()
-                                        .tint(.white)
-                                        .scaleEffect(0.7)
-                                        .padding(.trailing, 8)
-                                }
-                            }
-                        }
                         .onChange(of: searchText) { _, newValue in
                             searchTask?.cancel()
-                            guard !newValue.isEmpty else {
+                            guard newValue.count >= 2 else {
                                 searchResults = []
+                                showSearchResults = false
                                 return
                             }
                             searchTask = Task { @MainActor in
@@ -170,22 +145,23 @@ private struct AddLocationMapView: View {
                             }
                         }
                         .onSubmit { searchTask?.cancel(); search() }
+                        .onTapGesture { showSearchResults = !searchResults.isEmpty }
 
                     if !searchText.isEmpty {
                         Button {
                             searchText = ""
                             searchResults = []
+                            showSearchResults = false
                         } label: {
-                            Image(systemName: isSearching ? "magnifyingglass" : "xmark.circle.fill")
+                            Image(systemName: "xmark.circle.fill")
                                 .font(.system(size: 15))
                                 .foregroundStyle(Color.white.opacity(0.4))
                         }
-                        .disabled(isSearching)
                     }
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
-                .background(Color.white.opacity(0.12))
+                .background(.ultraThinMaterial)
                 .cornerRadius(12)
 
                 Button {
@@ -200,7 +176,7 @@ private struct AddLocationMapView: View {
             .padding(.top, 60)
             .padding(.bottom, 12)
 
-            if !searchResults.isEmpty {
+            if showSearchResults, !searchResults.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(searchResults.prefix(5), id: \.self) { item in
                         SearchResultRow(item: item) {
@@ -211,7 +187,7 @@ private struct AddLocationMapView: View {
                         }
                     }
                 }
-                .background(Color(red: 0.06, green: 0.10, blue: 0.20))
+                .background(.ultraThinMaterial)
                 .cornerRadius(12)
                 .padding(.horizontal, 16)
             }
@@ -219,15 +195,15 @@ private struct AddLocationMapView: View {
     }
 
     private var bottomPanel: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             if let item = selectedMapItem {
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(item.name ?? "Unknown")
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
-                    if let addr = item.placemark.title {
+                    if let addr = item.placemark.title, !addr.isEmpty {
                         Text(addr)
                             .font(.system(size: 13))
                             .foregroundStyle(Color.white.opacity(0.6))
@@ -236,6 +212,7 @@ private struct AddLocationMapView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 20)
+                .padding(.top, 16)
             }
 
             Button {
@@ -255,8 +232,6 @@ private struct AddLocationMapView: View {
                         in: RoundedRectangle(cornerRadius: 16, style: .continuous)
                     )
             }
-            .disabled(selectedCoordinate == nil)
-            .opacity(selectedCoordinate == nil ? 0.5 : 1)
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 34)
@@ -271,7 +246,6 @@ private struct AddLocationMapView: View {
 
     private func search() {
         guard !searchText.isEmpty else { return }
-        isSearching = true
 
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
@@ -279,37 +253,38 @@ private struct AddLocationMapView: View {
 
         let search = MKLocalSearch(request: request)
         search.start { response, _ in
-            isSearching = false
             if let response = response {
                 searchResults = response.mapItems
+                showSearchResults = true
             }
         }
     }
 
     private func selectMapItem(_ item: MKMapItem) {
         selectedMapItem = item
-        selectedCoordinate = item.placemark.coordinate
         searchText = ""
         searchResults = []
+        showSearchResults = false
 
-        let region = MKCoordinateRegion(
-            center: item.placemark.coordinate,
-            latitudinalMeters: 1000,
-            longitudinalMeters: 1000
-        )
-        cameraPosition = .region(region)
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            cameraPosition = .region(MKCoordinateRegion(
+                center: item.placemark.coordinate,
+                latitudinalMeters: 1500,
+                longitudinalMeters: 1500
+            ))
+        }
     }
 
     private func addSelectedLocation() {
-        guard let coord = selectedCoordinate else { return }
+        guard let item = selectedMapItem else { return }
 
-        let name = selectedMapItem?.name ?? "Selected Location"
-        let address = selectedMapItem?.placemark.title ?? ""
+        let name = item.name ?? "Selected Location"
+        let address = item.placemark.title ?? ""
 
         let location = SavedLocation(
             name: name,
-            latitude: coord.latitude,
-            longitude: coord.longitude,
+            latitude: item.placemark.coordinate.latitude,
+            longitude: item.placemark.coordinate.longitude,
             address: address
         )
         savedLocations.append(location)
@@ -511,28 +486,3 @@ private struct LocationRow: View {
     }
 }
 
-// MARK: - Add location field
-
-private struct AddLocationField: View {
-    let label: String
-    let placeholder: String
-    @Binding var text: String
-    let keyboardType: UIKeyboardType
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.45))
-                .textCase(.uppercase)
-                .tracking(0.5)
-            TextField(placeholder, text: $text)
-                .font(.system(size: 15))
-                .foregroundStyle(.white)
-                .keyboardType(keyboardType)
-                .padding(14)
-                .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
-        }
-    }
-}

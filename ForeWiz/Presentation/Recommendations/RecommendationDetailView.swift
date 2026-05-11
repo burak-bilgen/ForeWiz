@@ -379,8 +379,6 @@ private struct DetailRiskCard: View {
         case .cold: "snowflake"
         case .storm: "cloud.bolt.rain.fill"
         case .poorComfort: "exclamationmark.circle.fill"
-        case .pollen: "leaf.fill"
-        case .airQuality: "aqi.medium"
         }
     }
 }

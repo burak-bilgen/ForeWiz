@@ -3437,23 +3437,7 @@
         }
       }
     },
-    "launch_preparing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preparing..."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hazırlanıyor..."
-          }
-        }
-      }
-    },
+
     "light_rain_is_likely": {
       "extractionState": "manual",
       "localizations": {

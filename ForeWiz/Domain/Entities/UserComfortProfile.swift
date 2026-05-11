@@ -12,10 +12,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var appearance: AppAppearance
     var accentPalette: AppAccentPalette
     var language: AppLanguage
-    var wardrobe: WardrobePreferences
     var savedLocations: [SavedLocation]
     var selectedLocationID: String
-    var allergyProfile: AllergyProfile
 
     private enum CodingKeys: String, CodingKey {
         case temperatureSensitivity
@@ -29,10 +27,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         case appearance
         case accentPalette
         case language
-        case wardrobe
         case savedLocations
         case selectedLocationID
-        case allergyProfile
     }
 
     init(
@@ -47,10 +43,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         appearance: AppAppearance = .system,
         accentPalette: AppAccentPalette = .sky,
         language: AppLanguage = .system,
-        wardrobe: WardrobePreferences = .default,
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
-        selectedLocationID: String = "current-location",
-        allergyProfile: AllergyProfile = .default
+        selectedLocationID: String = "current-location"
     ) {
         self.temperatureSensitivity = temperatureSensitivity
         self.preferredActivities = preferredActivities
@@ -63,10 +57,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.appearance = appearance
         self.accentPalette = accentPalette
         self.language = language
-        self.wardrobe = wardrobe
         self.savedLocations = savedLocations
         self.selectedLocationID = selectedLocationID
-        self.allergyProfile = allergyProfile
     }
 
     static var `default`: UserComfortProfile {

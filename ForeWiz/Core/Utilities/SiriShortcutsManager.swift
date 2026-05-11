@@ -319,10 +319,8 @@ extension WeatherRiskType {
         case .storm: return "storm"
         case .uv: return "UV"
         case .wind: return "wind"
-        case .airQuality: return "air quality"
         case .humidity: return "humidity"
         case .poorComfort: return "poor comfort"
-        case .pollen: return "pollen"
         }
     }
 }

@@ -23,10 +23,7 @@ enum PreviewWeatherFactory {
                 uvIndex: isMidday ? 7 : 3,
                 conditionCode: "partlyCloudy",
                 isDaylight: true,
-                severeWeatherRisk: nil,
-                pollenLevel: .low,
-                airQualityIndex: .good,
-                pm25Level: .good
+                severeWeatherRisk: nil
             )
         }
         let current = CurrentWeatherPoint(

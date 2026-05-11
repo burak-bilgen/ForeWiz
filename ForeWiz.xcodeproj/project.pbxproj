@@ -40,7 +40,6 @@
 		67305E752F9E05210034CAA8 /* ForeWiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ForeWiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E872F9E05220034CAA8 /* ForeWizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForeWizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E912F9E05220034CAA8 /* ForeWizUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForeWizUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		67A870F42FAF23C3005B23F5 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		67A870F62FAF23C3005B23F5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -124,7 +123,6 @@
 		6ED844C788CEA9D0CB5F6C13 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				67A870F42FAF23C3005B23F5 /* WidgetKit.framework */,
 				67A870F62FAF23C3005B23F5 /* SwiftUI.framework */,
 			);
 			name = Frameworks;

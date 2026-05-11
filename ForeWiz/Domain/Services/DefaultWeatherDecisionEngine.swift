@@ -3,17 +3,14 @@ import Foundation
 struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
     private let activityWindowScoringEngine: ActivityWindowScoringEngine
     private let outfitDecisionEngine: OutfitDecisionEngine
-    private let allergyRiskClassifier: AllergyRiskClassifier
     private let riskClassifier: DefaultWeatherRiskClassifier
 
     init(
         activityWindowScoringEngine: ActivityWindowScoringEngine = DefaultActivityWindowScoringEngine(),
-        outfitDecisionEngine: OutfitDecisionEngine = DefaultOutfitDecisionEngine(),
-        allergyRiskClassifier: AllergyRiskClassifier = DefaultAllergyRiskClassifier()
+        outfitDecisionEngine: OutfitDecisionEngine = DefaultOutfitDecisionEngine()
     ) {
         self.activityWindowScoringEngine = activityWindowScoringEngine
         self.outfitDecisionEngine = outfitDecisionEngine
-        self.allergyRiskClassifier = allergyRiskClassifier
         self.riskClassifier = DefaultWeatherRiskClassifier(
             activityWindowScoringEngine: activityWindowScoringEngine
         )
@@ -27,15 +24,12 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
     ) -> DailyRecommendation {
         let todayHours = relevantHours(from: snapshot.hourly, now: now, calendar: calendar)
         let forecastRisks = riskClassifier.uniqueRisks(from: todayHours, current: snapshot.current, calendar: calendar)
-        let assistantRisks = weatherAlertRisks(from: snapshot.alerts)
-            + minuteForecastRisks(from: snapshot.minute, now: now)
-            + environmentalRisks(from: todayHours, profile: profile)
-        let risks = uniqueRisks(forecastRisks + assistantRisks)
+        let risks = uniqueRisks(forecastRisks + weatherAlertRisks(from: snapshot.alerts)
+            + minuteForecastRisks(from: snapshot.minute, now: now))
 
         let avoidWindows = (
             riskClassifier.makeAvoidWindows(from: todayHours, profile: profile, calendar: calendar)
             + minuteAvoidWindows(from: snapshot.minute, now: now, calendar: calendar)
-            + environmentalAvoidWindows(from: todayHours, profile: profile, now: now, calendar: calendar)
         ).sorted { $0.window.start < $1.window.start }
 
         let outdoorScore = makeOutdoorScore(from: todayHours, profile: profile, risks: risks, calendar: calendar)
@@ -169,44 +163,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
                 severity: risk.severity
             )
         ]
-    }
-
-    private func environmentalRisks(
-        from hourly: [HourlyWeatherPoint],
-        profile: UserComfortProfile
-    ) -> [WeatherRisk] {
-        guard profile.allergyProfile.isEnabled else { return [] }
-        let risks = hourly.flatMap { hour in
-            [
-                profile.allergyProfile.allergies.contains(.pollen)
-                    ? allergyRiskClassifier.classifyPollenRisk(for: hour)
-                    : nil,
-                profile.allergyProfile.allergies.contains(.airQuality) || profile.allergyProfile.allergies.contains(.smoke)
-                    ? allergyRiskClassifier.classifyAirQualityRisk(for: hour, profile: profile.allergyProfile)
-                    : nil
-            ].compactMap { $0 }
-        }
-        return uniqueRisks(risks)
-    }
-
-    private func environmentalAvoidWindows(
-        from hourly: [HourlyWeatherPoint],
-        profile: UserComfortProfile,
-        now: Date,
-        calendar: Calendar
-    ) -> [AvoidWindowRecommendation] {
-        environmentalRisks(from: hourly, profile: profile)
-            .filter { $0.severity >= .medium }
-            .map { risk in
-                let end = calendar.date(byAdding: .hour, value: 4, to: now) ?? now.addingTimeInterval(4 * 60 * 60)
-                let window = TimeWindow(start: now, end: end)
-                return AvoidWindowRecommendation(
-                    window: window,
-                    risk: risk,
-                    reason: risk.message,
-                    severity: risk.severity
-                )
-            }
     }
 
     private func peakMinuteRain(from minute: [MinuteWeatherPoint]?, now: Date) -> MinuteWeatherPoint? {
@@ -345,6 +301,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             ? L10n.text("decision_no_avoid")
             : avoidWindows.map(\.window.shortDisplayText).joined(separator: ", ")
 
-        return String(format: L10n.text("explanation_format"), score.displayValue, riskText, avoidText)
+        return String(format: L10n.text("explanation_format"), String(score.displayValue), riskText, avoidText)
     }
 }

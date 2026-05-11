@@ -9,6 +9,4 @@ enum WeatherRiskType: String, CaseIterable, Codable, Hashable, Sendable {
     case cold
     case storm
     case poorComfort
-    case pollen
-    case airQuality
 }

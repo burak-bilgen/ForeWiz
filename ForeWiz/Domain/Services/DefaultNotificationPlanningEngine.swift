@@ -332,8 +332,6 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         case .humidity: return L10n.text("slow_the_pace_and_keep")
         case .cold: return L10n.text("dress_in_layers_and_avoid")
         case .poorComfort: return L10n.text("keeping_outdoor_time_short_is")
-        case .pollen: return L10n.text("if_you_have_allergies_keep")
-        case .airQuality: return L10n.text("if_you_are_sensitive_shorten")
         }
     }
 
@@ -386,8 +384,6 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         case .uv: return .uvWarning
         case .rain: return .rainWarning
         case .wind, .storm: return .windWarning
-        case .pollen: return .pollenWarning
-        case .airQuality: return .airQualityWarning
         case .humidity, .cold, .poorComfort: return nil
         }
     }

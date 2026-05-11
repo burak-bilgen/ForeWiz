@@ -29,21 +29,29 @@ struct SettingsView: View {
                     SettingsSaveBanner(message: saveMessage)
                 }
 
-                SettingsProfileSummaryCard(profile: viewModel.profile, isPremium: viewModel.isPremium)
-
                 SettingsSection(
                     title: L10n.text("settings_units"),
                     icon: "thermometer.medium",
                     color: Color(red: 0.4, green: 0.7, blue: 1.0)
                 ) {
-                    SettingsChipPickerRow(
-                        icon: "thermometer.medium",
-                        iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                        title: "",
-                        selection: $viewModel.profile.unitSystem,
-                        options: UnitSystem.allCases,
-                        label: { $0.localizedTitle }
-                    )
+                    HStack(spacing: 14) {
+                        SettingsIcon(
+                            systemName: "thermometer.medium",
+                            color: Color(red: 0.4, green: 0.7, blue: 1.0)
+                        )
+                        FlowLayout(spacing: 8) {
+                            ForEach(UnitSystem.allCases, id: \.self) { option in
+                                UnitOptionButton(
+                                    option: option,
+                                    isSelected: option == viewModel.profile.unitSystem
+                                ) {
+                                    HapticManager.selection()
+                                    viewModel.profile.unitSystem = option
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 10)
                 }
 
                 SettingsSection(
@@ -137,101 +145,6 @@ struct SettingsView: View {
                             .tint(Color.white.opacity(0.6))
                         }
                         .padding(.vertical, 4)
-                    }
-                }
-
-                SettingsSection(
-                    title: L10n.text("settings_wardrobe_title"),
-                    icon: "tshirt.fill",
-                    color: Color(red: 0.8, green: 0.65, blue: 1.0)
-                ) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(L10n.text("settings_wardrobe_desc"))
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color.white.opacity(0.4))
-                            .fixedSize(horizontal: false, vertical: true)
-                        let items: [(icon: String, title: String, binding: Binding<Bool>)] = [
-                            ("umbrella.fill",        L10n.text("wardrobe_umbrella"),     $viewModel.profile.wardrobe.hasUmbrella),
-                            ("cloud.heavyrain.fill", L10n.text("wardrobe_raincoat"),     $viewModel.profile.wardrobe.hasRaincoat),
-                            ("snowflake",            L10n.text("wardrobe_winter_coat"),  $viewModel.profile.wardrobe.hasWinterCoat),
-                            ("sunglasses",           L10n.text("wardrobe_sunglasses"),   $viewModel.profile.wardrobe.hasSunglasses),
-                            ("hand.raised.fill",     L10n.text("wardrobe_gloves"),       $viewModel.profile.wardrobe.hasGloves),
-                            ("flame.fill",           L10n.text("wardrobe_thermals"),     $viewModel.profile.wardrobe.hasThermals),
-                        ]
-                        ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                            if index > 0 { SettingsDivider() }
-                            SettingsToggleRow(icon: item.icon, iconColor: Color(red: 0.8, green: 0.65, blue: 1.0), title: item.title, isOn: item.binding)
-                        }
-                    }
-                }
-
-                SettingsSection(
-                    title: L10n.text("settings_allergy_title"),
-                    icon: "cross.vial.fill",
-                    color: Color(red: 1.0, green: 0.7, blue: 0.3)
-                ) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(L10n.text("settings_allergy_assistant_desc"))
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.white.opacity(0.4))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                        SettingsToggleRow(
-                            icon: "leaf.fill",
-                            iconColor: Color(red: 1.0, green: 0.7, blue: 0.3),
-                            title: L10n.text("settings_allergy_enable"),
-                            isOn: $viewModel.profile.allergyProfile.isEnabled
-                        )
-
-                        if viewModel.profile.allergyProfile.isEnabled {
-                            SettingsDivider()
-                            SettingsInfoRow(
-                                icon: "bell.badge.fill",
-                                color: Color(red: 1.0, green: 0.45, blue: 0.45),
-                                text: L10n.text("settings_allergy_alert_info")
-                            )
-                            SettingsDivider()
-
-                            Text(L10n.text("sensitivities"))
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundStyle(Color.white.opacity(0.36))
-                                .textCase(.uppercase)
-                                .tracking(0.5)
-                                .padding(.leading, 4)
-
-                            ForEach(Array(AllergyType.allCases.enumerated()), id: \.offset) { index, allergyType in
-                                if index > 0 { SettingsDivider() }
-                                SettingsAllergyRow(
-                                    allergyType: allergyType,
-                                    isSelected: viewModel.profile.allergyProfile.allergies.contains(allergyType)
-                                ) {
-                                    toggle(allergyType)
-                                }
-                            }
-
-                            if viewModel.profile.allergyProfile.allergies.contains(.pollen) {
-                                SettingsDivider()
-                                Text(L10n.text("pollen_types"))
-                                    .font(.system(size: 11, weight: .semibold))
-                                    .foregroundStyle(Color.white.opacity(0.36))
-                                    .textCase(.uppercase)
-                                    .tracking(0.5)
-                                    .padding(.leading, 4)
-                                    .padding(.top, 4)
-
-                                FlowLayout(spacing: 8) {
-                                    ForEach(PollenType.allCases, id: \.self) { pollenType in
-                                        SettingsPollenTypeChip(
-                                            pollenType: pollenType,
-                                            isSelected: viewModel.profile.allergyProfile.pollenTypes.contains(pollenType)
-                                        ) {
-                                            toggle(pollenType)
-                                        }
-                                    }
-                                }
-                                .padding(.vertical, 8)
-                            }
-                        }
                     }
                 }
 
@@ -388,28 +301,6 @@ struct SettingsView: View {
         }
     }
 
-    private func toggle(_ allergyType: AllergyType) {
-        HapticManager.selection()
-        if viewModel.profile.allergyProfile.allergies.contains(allergyType) {
-            viewModel.profile.allergyProfile.allergies.remove(allergyType)
-        } else {
-            viewModel.profile.allergyProfile.allergies.insert(allergyType)
-        }
-    }
-
-    private func toggle(_ pollenType: PollenType) {
-        HapticManager.selection()
-        if viewModel.profile.allergyProfile.pollenTypes.contains(pollenType) {
-            viewModel.profile.allergyProfile.pollenTypes.remove(pollenType)
-        } else {
-            viewModel.profile.allergyProfile.pollenTypes.insert(pollenType)
-        }
-
-        if viewModel.profile.allergyProfile.pollenTypes.isEmpty {
-            viewModel.profile.allergyProfile.pollenTypes.insert(pollenType)
-        }
-    }
-
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
@@ -446,123 +337,6 @@ private struct SettingsSaveBanner: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(Color(red: 0.35, green: 0.85, blue: 0.6).opacity(0.25), lineWidth: 1))
-    }
-}
-
-private struct SettingsProfileSummaryCard: View {
-    let profile: UserComfortProfile
-    let isPremium: Bool
-
-    private let blue = Color(red: 0.4, green: 0.72, blue: 1.0)
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 12) {
-                SettingsIcon(systemName: "sparkles", color: blue)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(L10n.text("assistant_profile"))
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text(L10n.text("settings_profile_assistant_context"))
-                        .font(.system(size: 12))
-                    .foregroundStyle(Color.white.opacity(0.42))
-                    .fixedSize(horizontal: false, vertical: true)
-                }
-                .layoutPriority(1)
-            }
-
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 135), spacing: 10)], spacing: 10) {
-                SettingsSummaryTile(
-                    icon: "thermometer.medium",
-                    title: L10n.text("comfort"),
-                    value: profile.temperatureSensitivity.localizedTitle,
-                    color: Color(red: 1.0, green: 0.62, blue: 0.28)
-                )
-                SettingsSummaryTile(
-                    icon: "figure.walk",
-                    title: L10n.text("activities"),
-                    value: activitySummary,
-                    color: Color(red: 0.35, green: 0.85, blue: 0.62)
-                )
-                SettingsSummaryTile(
-                    icon: "heart.text.square.fill",
-                    title: L10n.text("health"),
-                    value: healthSummary,
-                    color: Color(red: 0.4, green: 0.72, blue: 1.0)
-                )
-                SettingsSummaryTile(
-                    icon: isPremium ? "crown.fill" : "bell.badge.fill",
-                    title: isPremium ? "Premium" : L10n.text("alerts"),
-                    value: isPremium ? L10n.text("active") : "\(profile.maximumDailyNotifications)/\(L10n.text("per_day"))",
-                    color: Color(red: 1.0, green: 0.78, blue: 0.25)
-                )
-            }
-        }
-        .padding(16)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(blue.opacity(0.12), lineWidth: 1))
-    }
-
-    private var activitySummary: String {
-        let activities = profile.preferredActivities.sorted { $0.rawValue < $1.rawValue }
-        guard let first = activities.first else {
-            return ActivityType.goingOutside.localizedTitle
-        }
-
-        if activities.count == 1 {
-            return first.localizedTitle
-        }
-
-        return "\(first.localizedTitle) +\(activities.count - 1)"
-    }
-
-    private var healthSummary: String {
-        guard profile.allergyProfile.isEnabled,
-              let first = profile.allergyProfile.allergies.sorted(by: { $0.rawValue < $1.rawValue }).first else {
-            return L10n.text("standard")
-        }
-
-        if profile.allergyProfile.allergies.count == 1 {
-            return first.localizedTitle
-        }
-
-        return "\(first.localizedTitle) +\(profile.allergyProfile.allergies.count - 1)"
-    }
-}
-
-private struct SettingsSummaryTile: View {
-    let icon: String
-    let title: String
-    let value: String
-    let color: Color
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(color)
-                .frame(width: 22, height: 22)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.36))
-                    .textCase(.uppercase)
-                    .tracking(0.4)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-                Text(value)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .layoutPriority(1)
-        }
-        .frame(maxWidth: .infinity, alignment: .topLeading)
-        .padding(12)
-        .background(Color.white.opacity(0.045), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(color.opacity(0.12), lineWidth: 1))
     }
 }
 
@@ -768,60 +542,6 @@ private struct SettingsPickerRow<T: Hashable>: View {
     }
 }
 
-private struct SettingsChipPickerRow<T: Hashable>: View {
-    let icon: String
-    let iconColor: Color
-    let title: String
-    @Binding var selection: T
-    let options: [T]
-    let label: (T) -> String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 14) {
-                SettingsIcon(systemName: icon, color: iconColor)
-                Text(title)
-                    .font(.system(size: 15))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            FlowLayout(spacing: 8) {
-                ForEach(options, id: \.self) { option in
-                    let selected = option == selection
-                    Button {
-                        HapticManager.selection()
-                        selection = option
-                    } label: {
-                        Text(label(option))
-                            .font(.system(size: 13, weight: selected ? .semibold : .regular))
-                            .foregroundStyle(selected ? iconColor : Color.white.opacity(0.5))
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(
-                                selected
-                                    ? iconColor.opacity(0.15)
-                                    : Color.white.opacity(0.07),
-                                in: Capsule()
-                            )
-                            .overlay(
-                                Capsule().stroke(
-                                    selected ? iconColor.opacity(0.4) : Color.white.opacity(0.1),
-                                    lineWidth: 1
-                                )
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
-                }
-            }
-        }
-        .padding(.vertical, 10)
-    }
-}
-
 private struct SettingsSensitivitySelector: View {
     @Binding var selection: TemperatureSensitivity
 
@@ -909,61 +629,32 @@ private struct SettingsActivityRow: View {
     }
 }
 
-private struct SettingsAllergyRow: View {
-    let allergyType: AllergyType
+private struct UnitOptionButton: View {
+    let option: UnitSystem
     let isSelected: Bool
-    let onTap: () -> Void
+    let action: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 14) {
-                SettingsIcon(systemName: allergyType.icon, color: Color(red: 1.0, green: 0.7, blue: 0.3))
-                Text(allergyType.localizedTitle)
-                    .font(.system(size: 15))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .layoutPriority(1)
-                Spacer(minLength: 8)
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 20))
-                    .foregroundStyle(isSelected ? Color(red: 1.0, green: 0.7, blue: 0.3) : Color.white.opacity(0.2))
-                    .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isSelected)
-            }
-            .padding(.vertical, 9)
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-}
-
-private struct SettingsPollenTypeChip: View {
-    let pollenType: PollenType
-    let isSelected: Bool
-    let onTap: () -> Void
-
-    private let color = Color(red: 1.0, green: 0.7, blue: 0.3)
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 6) {
-                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 12, weight: .semibold))
-                Text(pollenType.localizedTitle)
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .foregroundStyle(isSelected ? color : Color.white.opacity(0.48))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(
-                isSelected ? color.opacity(0.14) : Color.white.opacity(0.06),
-                in: Capsule()
-            )
-            .overlay(
-                Capsule().stroke(isSelected ? color.opacity(0.35) : Color.white.opacity(0.10), lineWidth: 1)
-            )
+        Button(action: action) {
+            Text(option.localizedTitle)
+                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
+                .foregroundStyle(isSelected ? Color(red: 0.4, green: 0.7, blue: 1.0) : Color.white.opacity(0.5))
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(
+                    isSelected
+                        ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.15)
+                        : Color.white.opacity(0.07),
+                    in: Capsule()
+                )
+                .overlay(
+                    Capsule().stroke(
+                        isSelected ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.4) : Color.white.opacity(0.1),
+                        lineWidth: 1
+                    )
+                )
         }
         .buttonStyle(.plain)
         .animation(.spring(response: 0.25, dampingFraction: 0.75), value: isSelected)

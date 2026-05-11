@@ -32,9 +32,7 @@ struct OnboardingView: View {
                             switch currentStep {
                             case 0: introductionStep
                             case 1: comfortStep
-                            case 2: healthStep
-                            case 3: wardrobeStep
-                            case 4: permissionsStep
+                            case 2: permissionsStep
                             default: introductionStep
                             }
                         }
@@ -43,7 +41,7 @@ struct OnboardingView: View {
                             removal: .move(edge: .leading).combined(with: .opacity)
                         ))
 
-                        if currentStep == 4 {
+                        if currentStep == 2 {
                             startButton
                                 .padding(.top, 12)
                         } else {
@@ -64,7 +62,7 @@ struct OnboardingView: View {
 
     private var stepIndicator: some View {
         HStack(spacing: 4) {
-            ForEach(0..<5, id: \.self) { index in
+            ForEach(0..<3, id: \.self) { index in
                 Capsule()
                     .fill(index <= currentStep ? accentBlue : Color.white.opacity(0.2))
                     .frame(width: index == currentStep ? 20 : 8, height: 4)
@@ -241,172 +239,7 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Step 2: Health
-
-    private var healthStep: some View {
-        VStack(spacing: 18) {
-            stepTitle(
-                icon: "cross.vial.fill",
-                color: accentOrange,
-                title: L10n.text("onboarding_health_title"),
-                subtitle: L10n.text("onboarding_health_subtitle")
-            )
-
-            GlassCard(accentColor: accentOrange) {
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 12) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                .fill(accentOrange.opacity(0.16))
-                                .frame(width: 34, height: 34)
-                            Image(systemName: "leaf.fill")
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(accentOrange)
-                        }
-                        Text(L10n.text("onboarding_allergy_enable"))
-                            .font(.system(size: 15))
-                            .foregroundStyle(.white)
-                        Spacer()
-                        Toggle("", isOn: Binding(
-                            get: { !viewModel.selectedAllergies.isEmpty },
-                            set: { viewModel.setAllergiesEnabled($0) }
-                        ))
-                        .tint(accentOrange)
-                        .labelsHidden()
-                    }
-
-                    if !viewModel.selectedAllergies.isEmpty {
-                        Divider().background(Color.white.opacity(0.06))
-
-                        Text(L10n.text("sensitivities"))
-                            .font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.white.opacity(0.35))
-                            .textCase(.uppercase)
-
-                        ForEach(Array(AllergyType.allCases.enumerated()), id: \.offset) { _, allergyType in
-                            let selected = viewModel.selectedAllergies.contains(allergyType)
-                            Button {
-                                viewModel.toggleAllergy(allergyType)
-                            } label: {
-                                HStack(spacing: 12) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(accentOrange.opacity(0.12))
-                                            .frame(width: 28, height: 28)
-                                        Image(systemName: allergyType.icon)
-                                            .font(.system(size: 11, weight: .medium))
-                                            .foregroundStyle(accentOrange)
-                                    }
-                                    Text(allergyType.localizedTitle)
-                                        .font(.system(size: 14))
-                                        .foregroundStyle(.white)
-                                    Spacer()
-                                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                                        .font(.system(size: 18))
-                                        .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.2))
-                                }
-                                .padding(.vertical, 6)
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        if viewModel.selectedAllergies.contains(.pollen) {
-                            Divider().background(Color.white.opacity(0.06))
-
-                            Text(L10n.text("pollen_types"))
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(Color.white.opacity(0.35))
-                                .textCase(.uppercase)
-
-                            FlowLayout(spacing: 8) {
-                                ForEach(PollenType.allCases, id: \.self) { pollenType in
-                                    let selected = viewModel.selectedPollenTypes.contains(pollenType)
-                                    Button {
-                                        viewModel.togglePollenType(pollenType)
-                                    } label: {
-                                        HStack(spacing: 6) {
-                                            Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                                                .font(.system(size: 11))
-                                            Text(pollenType.localizedTitle)
-                                                .font(.system(size: 12))
-                                        }
-                                        .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.5))
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            selected ? accentOrange.opacity(0.12) : Color.white.opacity(0.05),
-                                            in: Capsule()
-                                        )
-                                        .overlay(
-                                            Capsule().stroke(
-                                                selected ? accentOrange.opacity(0.3) : Color.white.opacity(0.08),
-                                                lineWidth: 1
-                                            )
-                                        )
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Step 3: Wardrobe
-
-    private var wardrobeStep: some View {
-        VStack(spacing: 18) {
-            stepTitle(
-                icon: "tshirt.fill",
-                color: accentPurple,
-                title: L10n.text("onboarding_wardrobe_title"),
-                subtitle: L10n.text("onboarding_wardrobe_subtitle")
-            )
-
-            GlassCard(accentColor: accentPurple) {
-                VStack(spacing: 0) {
-                    let items: [(String, String, WritableKeyPath<WardrobePreferences, Bool>)] = [
-                        ("umbrella.fill", L10n.text("wardrobe_umbrella"), \.hasUmbrella),
-                        ("cloud.heavyrain.fill", L10n.text("wardrobe_raincoat"), \.hasRaincoat),
-                        ("snowflake", L10n.text("wardrobe_winter_coat"), \.hasWinterCoat),
-                        ("sunglasses", L10n.text("wardrobe_sunglasses"), \.hasSunglasses),
-                        ("hand.raised.fill", L10n.text("wardrobe_gloves"), \.hasGloves),
-                        ("flame.fill", L10n.text("wardrobe_thermals"), \.hasThermals),
-                    ]
-                    ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                        if index > 0 {
-                            Divider().background(Color.white.opacity(0.06)).padding(.leading, 48)
-                        }
-                        HStack(spacing: 12) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                    .fill(accentPurple.opacity(0.14))
-                                    .frame(width: 34, height: 34)
-                                Image(systemName: item.0)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundStyle(accentPurple)
-                            }
-                            Text(item.1)
-                                .font(.system(size: 15))
-                                .foregroundStyle(.white)
-                            Spacer()
-                            Toggle("", isOn: Binding(
-                                get: { viewModel.wardrobe[keyPath: item.2] },
-                                set: { _ in viewModel.toggleWardrobeItem(keyPath: item.2) }
-                            ))
-                            .tint(accentPurple)
-                            .labelsHidden()
-                        }
-                        .padding(.vertical, 8)
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Step 4: Permissions
+    // MARK: - Step 2: Permissions
 
     private var permissionsStep: some View {
         VStack(spacing: 18) {

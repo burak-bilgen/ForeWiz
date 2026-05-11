@@ -133,10 +133,7 @@ private extension HomeRecommendationResult {
                 conditionCode: "clear",
                 symbolName: "sun.max.fill",
                 isDaylight: true,
-                severeWeatherRisk: nil,
-                pollenLevel: .low,
-                airQualityIndex: .good,
-                pm25Level: .good
+                severeWeatherRisk: nil
             )
         }
         let daily = (0..<5).compactMap { offset -> DailyWeatherPoint? in

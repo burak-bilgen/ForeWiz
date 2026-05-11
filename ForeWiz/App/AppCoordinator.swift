@@ -4,7 +4,6 @@ import Foundation
 @MainActor
 final class AppCoordinator: ObservableObject {
     enum RootFlow: Equatable {
-        case launching
         case onboarding
         case main
     }
@@ -16,7 +15,7 @@ final class AppCoordinator: ObservableObject {
     @Published var latestRecommendation: DailyRecommendation?
     @Published var showSettings = false
 
-    init(container: DependencyContainer, rootFlow: RootFlow = .launching) {
+    init(container: DependencyContainer, rootFlow: RootFlow = .onboarding) {
         self.container = container
         self.rootFlow = rootFlow
         L10n.configure(language: profile.language)
