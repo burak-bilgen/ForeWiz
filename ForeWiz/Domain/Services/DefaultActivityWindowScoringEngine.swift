@@ -30,8 +30,20 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             score -= activity == .walking ? 14 : 22
         }
 
-        if hour.isDaylight == false, activity != .goingOutside {
-            score -= 8
+        if hour.isDaylight == false {
+            if activity == .goingOutside {
+                score -= 15
+            } else {
+                score -= 8
+            }
+        }
+
+        if activity == .goingOutside {
+            if hourOfDay >= 22 || hourOfDay < 5 {
+                score -= 20
+            } else if hourOfDay >= 20 || hourOfDay < 6 {
+                score -= 10
+            }
         }
 
         if let severeWeatherRisk = hour.severeWeatherRisk {

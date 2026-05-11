@@ -106,4 +106,4 @@ struct DateTimeHelpersTests {
         #expect(ActivityType.cycling.localizedTitle == "Bisiklet")
         #expect(ActivityType.goingOutside.localizedTitle.isEmpty == false)
     }
-
+}
