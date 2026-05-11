@@ -96,6 +96,15 @@ enum AppTheme {
         }
     }
 
+    static func toneColor(for tone: HomeAssistantTone) -> Color {
+        switch tone {
+        case .good: Color(red: 0.3, green: 0.85, blue: 0.58)
+        case .caution: Color(red: 1.0, green: 0.7, blue: 0.3)
+        case .danger: Color(red: 1.0, green: 0.4, blue: 0.4)
+        case .info: Color(red: 0.4, green: 0.72, blue: 1.0)
+        }
+    }
+
     // MARK: - Gradients
 
     /// Subtle ambient page gradient. Keep low contrast so text stays readable

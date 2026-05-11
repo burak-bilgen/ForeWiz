@@ -7,7 +7,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var usualWorkoutTime: DateComponents?
     var quietHours: TimeWindow?
     var notificationPreferences: [NotificationPreference]
-    var unitSystem: UnitSystem
     var maximumDailyNotifications: Int
     var appearance: AppAppearance
     var accentPalette: AppAccentPalette
@@ -22,7 +21,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         case usualWorkoutTime
         case quietHours
         case notificationPreferences
-        case unitSystem
         case maximumDailyNotifications
         case appearance
         case accentPalette
@@ -38,7 +36,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         usualWorkoutTime: DateComponents? = nil,
         quietHours: TimeWindow? = nil,
         notificationPreferences: [NotificationPreference],
-        unitSystem: UnitSystem = .metric,
         maximumDailyNotifications: Int = 2,
         appearance: AppAppearance = .system,
         accentPalette: AppAccentPalette = .sky,
@@ -52,7 +49,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
         self.notificationPreferences = notificationPreferences
-        self.unitSystem = unitSystem
         self.maximumDailyNotifications = maximumDailyNotifications.clamped(to: 1...3)
         self.appearance = appearance
         self.accentPalette = accentPalette

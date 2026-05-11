@@ -9,6 +9,7 @@ struct HomeRecommendationResult: Equatable {
     let alerts: [WeatherAlertInfo]
     let availability: WeatherAvailabilityInfo?
     let isUsingCachedWeather: Bool
+    let usedLocation: LocationCoordinate?
     let warningMessage: String?
     let weatherFetchedAt: Date
     let attribution: WeatherAttributionInfo?

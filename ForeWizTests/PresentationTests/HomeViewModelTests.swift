@@ -173,6 +173,7 @@ private extension HomeRecommendationResult {
             alerts: [],
             availability: nil,
             isUsingCachedWeather: false,
+            usedLocation: LocationCoordinate(latitude: 41.0, longitude: 29.0),
             warningMessage: nil,
             weatherFetchedAt: now,
             attribution: nil

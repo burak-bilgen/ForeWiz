@@ -37,7 +37,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         if forceRefresh == false,
            let cached = try await weatherCacheRepository.loadLatest(),
            cachePolicy.freshness(for: cached.fetchedAt, now: now) == .fresh {
-            return makeResult(snapshot: cached, profile: profile, now: now, isCached: true)
+            return makeResult(snapshot: cached, profile: profile, now: now, isCached: true, usedLocation: cached.location)
         }
 
         do {
@@ -54,7 +54,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
 
             let snapshot = try await weatherRepository.fetchWeather(for: location)
             try await weatherCacheRepository.save(snapshot)
-            return makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false)
+            return makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false, usedLocation: location)
         } catch {
             guard let cached = try await usableCachedSnapshot(now: now) else {
                 throw normalized(error)
@@ -65,6 +65,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
                 profile: profile,
                 now: now,
                 isCached: true,
+                usedLocation: cached.location,
                 warningMessage: L10n.text("error_live_forecast")
             )
         }
@@ -88,6 +89,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         profile: UserComfortProfile,
         now: Date,
         isCached: Bool,
+        usedLocation: LocationCoordinate?,
         warningMessage: String? = nil
     ) -> HomeRecommendationResult {
         let recommendation = weatherDecisionEngine.makeDailyRecommendation(
@@ -106,6 +108,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             alerts: snapshot.alerts ?? [],
             availability: snapshot.availability,
             isUsingCachedWeather: isCached,
+            usedLocation: usedLocation,
             warningMessage: warningMessage,
             weatherFetchedAt: snapshot.fetchedAt,
             attribution: snapshot.attribution

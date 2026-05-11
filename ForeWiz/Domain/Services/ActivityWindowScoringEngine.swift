@@ -15,4 +15,13 @@ protocol ActivityWindowScoringEngine {
         now: Date,
         calendar: Calendar
     ) -> ActivityRecommendation?
+
+    func bestWindow(
+        for activity: ActivityType,
+        hourly: [HourlyWeatherPoint],
+        profile: UserComfortProfile,
+        now: Date,
+        calendar: Calendar,
+        avoidWindows: [AvoidWindowRecommendation]
+    ) -> ActivityRecommendation?
 }

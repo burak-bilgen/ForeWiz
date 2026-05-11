@@ -25,35 +25,6 @@ struct SettingsView: View {
                     .padding(.horizontal, 4)
                     .padding(.bottom, 8)
 
-                    SettingsSaveBanner(message: viewModel.saveMessage ?? "")
-                        .opacity(viewModel.saveMessage != nil ? 1 : 0)
-                        .animation(.easeInOut(duration: 0.3), value: viewModel.saveMessage != nil)
-
-                SettingsSection(
-                    title: L10n.text("settings_units"),
-                    icon: "thermometer.medium",
-                    color: Color(red: 0.4, green: 0.7, blue: 1.0)
-                ) {
-                    HStack(spacing: 14) {
-                        SettingsIcon(
-                            systemName: "thermometer.medium",
-                            color: Color(red: 0.4, green: 0.7, blue: 1.0)
-                        )
-                        FlowLayout(spacing: 8) {
-                            ForEach(UnitSystem.allCases, id: \.self) { option in
-                                UnitOptionButton(
-                                    option: option,
-                                    isSelected: option == viewModel.profile.unitSystem
-                                ) {
-                                    HapticManager.selection()
-                                    viewModel.profile.unitSystem = option
-                                }
-                            }
-                        }
-                    }
-                    .padding(.vertical, 10)
-                }
-
                 SettingsSection(
                     title: L10n.text("settings_temp_sensitivity"),
                     icon: "thermometer.sun.fill",
@@ -64,7 +35,9 @@ struct SettingsView: View {
                             .font(.system(size: 12))
                             .foregroundStyle(Color.white.opacity(0.4))
                             .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 6)
                         SettingsSensitivitySelector(selection: $viewModel.profile.temperatureSensitivity)
+                            .padding(.bottom, 6)
                     }
                 }
 
@@ -73,11 +46,12 @@ struct SettingsView: View {
                     icon: "figure.run",
                     color: Color(red: 0.4, green: 0.85, blue: 0.6)
                 ) {
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 5) {
                         Text(L10n.text("settings_activities_desc"))
                             .font(.system(size: 12))
                             .foregroundStyle(Color.white.opacity(0.4))
                             .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 6)
                         ForEach(Array(ActivityType.allCases.enumerated()), id: \.offset) { index, activity in
                             if index > 0 { SettingsDivider() }
                             SettingsActivityRow(
@@ -85,6 +59,7 @@ struct SettingsView: View {
                                 isSelected: viewModel.profile.preferredActivities.contains(activity)
                             ) { toggle(activity) }
                         }
+                        .padding(.bottom, 6)
                     }
                 }
 
@@ -93,7 +68,7 @@ struct SettingsView: View {
                     icon: "sunrise.fill",
                     color: Color(red: 1.0, green: 0.7, blue: 0.35)
                 ) {
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 23) {
                         HStack(spacing: 14) {
                             SettingsIcon(systemName: "sunrise.fill", color: Color(red: 1.0, green: 0.7, blue: 0.35))
                             VStack(alignment: .leading, spacing: 3) {
@@ -118,9 +93,7 @@ struct SettingsView: View {
                             .pickerStyle(.menu)
                             .tint(Color.white.opacity(0.6))
                         }
-                        .padding(.vertical, 4)
-
-                        SettingsDivider()
+                        .padding(.vertical, 5)
 
                         HStack(spacing: 14) {
                             SettingsIcon(systemName: "figure.run", color: Color(red: 1.0, green: 0.7, blue: 0.35))
@@ -146,7 +119,7 @@ struct SettingsView: View {
                             .pickerStyle(.menu)
                             .tint(Color.white.opacity(0.6))
                         }
-                        .padding(.vertical, 4)
+                        .padding(.bottom, 20)
                     }
                 }
 
@@ -614,7 +587,7 @@ private struct SettingsActivityRow: View {
                     .foregroundStyle(isSelected ? Color(red: 0.4, green: 0.85, blue: 0.6) : Color.white.opacity(0.2))
                     .animation(.spring(response: 0.25, dampingFraction: 0.7), value: isSelected)
             }
-            .padding(.vertical, 9)
+            .padding(.vertical, 5)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -627,37 +600,5 @@ private struct SettingsActivityRow: View {
         case .cycling: "bicycle"
         case .goingOutside: "sun.max.fill"
         }
-    }
-}
-
-private struct UnitOptionButton: View {
-    let option: UnitSystem
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(option.localizedTitle)
-                .font(.system(size: 13, weight: isSelected ? .semibold : .regular))
-                .foregroundStyle(isSelected ? Color(red: 0.4, green: 0.7, blue: 1.0) : Color.white.opacity(0.5))
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 8)
-                .background(
-                    isSelected
-                        ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.15)
-                        : Color.white.opacity(0.07),
-                    in: Capsule()
-                )
-                .overlay(
-                    Capsule().stroke(
-                        isSelected ? Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.4) : Color.white.opacity(0.1),
-                        lineWidth: 1
-                    )
-                )
-        }
-        .buttonStyle(.plain)
-        .animation(.spring(response: 0.25, dampingFraction: 0.75), value: isSelected)
     }
 }

@@ -1,4 +1,5 @@
 import Combine
+import CoreLocation
 import Foundation
 import os.log
 
@@ -16,6 +17,7 @@ final class HomeViewModel: ObservableObject {
 
     private var selectedLocation: SavedLocation?
     private var selectedLocationID: String = "current-location"
+    private let geocoder = CLGeocoder()
 
     init(
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
@@ -89,29 +91,34 @@ final class HomeViewModel: ObservableObject {
                 .execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
             let profile = try await preferencesRepository.loadProfile()
 
-            state = .loaded(
-                HomeViewState(
-                    recommendation: result.recommendation,
-                    assistant: makeAssistantState(from: result),
-                    plan: makePlanState(from: result),
-                    environment: makeEnvironmentState(from: result, profile: profile),
-                    currentWeather: currentWeatherViewState(
-                        from: result.currentWeather,
-                        unitSystem: profile.unitSystem,
-                        dailyPoints: result.dailyPoints
-                    ),
-                    dailyForecasts: makeDailyForecastItems(from: result.dailyPoints, unitSystem: profile.unitSystem),
-                    hourlyScores: makeHourlyScores(
-                        from: result.hourlyPoints,
-                        profile: profile,
-                        unitSystem: profile.unitSystem
-                    ),
-                    lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
-                    isUsingCachedWeather: result.isUsingCachedWeather,
-                    warningMessage: result.warningMessage,
-                    attribution: result.attribution
+state = .loaded(
+                    HomeViewState(
+                        recommendation: result.recommendation,
+                        assistant: makeAssistantState(from: result),
+                        plan: makePlanState(from: result),
+                        environment: makeEnvironmentState(from: result, profile: profile),
+                        currentWeather: currentWeatherViewState(
+                            from: result.currentWeather,
+                            unitSystem: .current,
+                            dailyPoints: result.dailyPoints
+                        ),
+                        dailyForecasts: makeDailyForecastItems(from: result.dailyPoints, unitSystem: .current),
+                        hourlyScores: makeHourlyScores(
+                            from: result.hourlyPoints,
+                            profile: profile,
+                            unitSystem: .current
+                        ),
+                        lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
+                        isUsingCachedWeather: result.isUsingCachedWeather,
+                        warningMessage: result.warningMessage,
+                        attribution: result.attribution
+                    )
                 )
-            )
+
+            if selectedLocation == nil || selectedLocation?.id == "current-location",
+               let location = result.usedLocation {
+                resolveLocationName(for: location)
+            }
 
             do {
                 _ = try await scheduleSmartNotificationsUseCase.execute(
@@ -861,6 +868,30 @@ final class HomeViewModel: ObservableObject {
         }
 
         return AppError.unknown.userMessage
+    }
+
+private func resolveLocationName(for location: LocationCoordinate) {
+        let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        geocoder.reverseGeocodeLocation(clLocation) { [weak self] placemarks, _ in
+            guard let self, let placemark = placemarks?.first else { return }
+
+            let city = placemark.locality
+                ?? placemark.administrativeArea
+                ?? placemark.country
+
+            let countryCode = placemark.isoCountryCode
+
+            let name: String
+            if let city, let code = countryCode, !code.isEmpty {
+                name = "\(city), \(code)"
+            } else {
+                name = city ?? L10n.text("home_current_location")
+            }
+
+            Task { @MainActor in
+                self.selectedLocationName = name
+            }
+        }
     }
 
 }

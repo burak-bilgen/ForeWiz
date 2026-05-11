@@ -26,8 +26,7 @@ final class UserPreferencesModel {
         quietHours: TimeWindow? = nil,
         onboardingCompleted: Bool = false,
         preferredLanguage: AppLanguage? = nil,
-        preferredAppearance: AppAppearance? = nil,
-        preferredUnitSystem: UnitSystem? = nil
+        preferredAppearance: AppAppearance? = nil
     ) {
         self.id = id
         self.temperatureSensitivityRaw = temperatureSensitivity.rawValue
@@ -51,7 +50,6 @@ final class UserPreferencesModel {
         self.onboardingCompleted = onboardingCompleted
         self.preferredLanguageRaw = preferredLanguage?.rawValue
         self.preferredAppearanceRaw = preferredAppearance?.rawValue
-        self.preferredUnitSystemRaw = preferredUnitSystem?.rawValue
         self.profileData = nil
         self.createdAt = Date()
         self.updatedAt = Date()
@@ -114,7 +112,6 @@ final class UserPreferencesModel {
 
         self.preferredLanguageRaw = profile.language.rawValue
         self.preferredAppearanceRaw = profile.appearance.rawValue
-        self.preferredUnitSystemRaw = profile.unitSystem.rawValue
         self.profileData = try? JSONEncoder().encode(profile)
         self.updatedAt = Date()
     }

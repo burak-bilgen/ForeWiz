@@ -9,10 +9,15 @@ struct HomeView: View {
     let onOpenSettings: () -> Void
 
     @State private var showLocationPicker = false
+    @State private var showSplash = true
 
     private var currentSymbol: String {
         if case .loaded(let state) = viewModel.state { return state.currentWeather.symbolName }
         return "cloud.fill"
+    }
+
+    private var splashKind: WeatherSplashKind {
+        WeatherSplashKind.from(symbolName: currentSymbol)
     }
 
     var body: some View {
@@ -22,6 +27,12 @@ struct HomeView: View {
                     .ignoresSafeArea()
                     .animation(.easeInOut(duration: 1.2), value: currentSymbol)
                 content
+
+                if showSplash {
+                    WeatherSplashOverlay(kind: splashKind, onDismiss: { showSplash = false })
+                        .ignoresSafeArea()
+                        .transition(.opacity.animation(.easeOut(duration: 0.6)))
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.ultraThinMaterial, for: .navigationBar)
@@ -116,11 +127,10 @@ private struct HomeLoadedContent: View {
                         .cardEntrance(appeared: appeared, delay: 0.01)
                 }
 
-                WeatherHeroCard(
-                    weather: state.currentWeather,
-                    recommendation: state.recommendation,
-                    isUsingCached: state.isUsingCachedWeather
-                )
+WeatherHeroCard(
+                     weather: state.currentWeather,
+                     recommendation: state.recommendation
+                 )
                 .cardEntrance(appeared: appeared, delay: 0.02)
 
                 CompactHourlyCard(hourlyScores: state.hourlyScores)
@@ -151,6 +161,18 @@ private struct HomeLoadedContent: View {
                     HomeAttributionView(info: attribution)
                         .cardEntrance(appeared: appeared, delay: 0.09)
                 }
+
+                if !state.lastUpdatedText.isEmpty {
+                    HStack(spacing: 4) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 9))
+                        Text(state.lastUpdatedText)
+                            .font(.system(size: 10))
+                    }
+                    .foregroundStyle(Color.white.opacity(0.22))
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 2)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -170,14 +192,7 @@ private struct AssistantGreetingCard: View {
     let assistant: HomeAssistantViewState
     @State private var iconPulse = false
 
-    private var accentColor: Color {
-        switch assistant.tone {
-        case .good: return Color(red: 0.3, green: 0.85, blue: 0.58)
-        case .caution: return Color(red: 1.0, green: 0.7, blue: 0.3)
-        case .danger: return Color(red: 1.0, green: 0.4, blue: 0.4)
-        case .info: return Color(red: 0.4, green: 0.72, blue: 1.0)
-        }
-    }
+    private var accentColor: Color { AppTheme.toneColor(for: assistant.tone) }
 
     var body: some View {
         GlassCard(accentColor: accentColor) {
@@ -344,14 +359,7 @@ private struct DailyPlanCard: View {
 private struct PlanItemRow: View {
     let item: HomePlanItem
 
-    private var toneColor: Color {
-        switch item.tone {
-        case .good: return Color(red: 0.3, green: 0.85, blue: 0.58)
-        case .caution: return Color(red: 1.0, green: 0.7, blue: 0.3)
-        case .danger: return Color(red: 1.0, green: 0.4, blue: 0.4)
-        case .info: return Color(red: 0.4, green: 0.72, blue: 1.0)
-        }
-    }
+    private var toneColor: Color { AppTheme.toneColor(for: item.tone) }
 
     var body: some View {
         HStack(spacing: 10) {
@@ -392,14 +400,7 @@ private struct PlanItemRow: View {
 private struct AssistantSignalChip: View {
     let signal: HomeAssistantSignal
 
-    private var toneColor: Color {
-        switch signal.tone {
-        case .good: return Color(red: 0.3, green: 0.85, blue: 0.58)
-        case .caution: return Color(red: 1.0, green: 0.7, blue: 0.3)
-        case .danger: return Color(red: 1.0, green: 0.4, blue: 0.4)
-        case .info: return Color(red: 0.4, green: 0.72, blue: 1.0)
-        }
-    }
+    private var toneColor: Color { AppTheme.toneColor(for: signal.tone) }
 
     var body: some View {
         HStack(spacing: 5) {
@@ -426,9 +427,19 @@ private struct AssistantSignalChip: View {
 private struct WeatherHeroCard: View {
     let weather: HomeCurrentWeatherViewState
     let recommendation: DailyRecommendation
-    let isUsingCached: Bool
 
     private var decisionColor: Color { AppTheme.color(for: recommendation.outdoorDecision) }
+
+    private func uvColor(_ text: String) -> Color {
+        guard let value = Int(text) else { return Color.white.opacity(0.55) }
+        switch value {
+        case 0...2: return Color(red: 0.3, green: 0.85, blue: 0.58)
+        case 3...5: return Color(red: 1.0, green: 0.7, blue: 0.3)
+        case 6...7: return Color(red: 1.0, green: 0.5, blue: 0.3)
+        case 8...10: return Color(red: 1.0, green: 0.3, blue: 0.3)
+        default: return Color(red: 0.7, green: 0.2, blue: 0.8)
+        }
+    }
 
     var body: some View {
         GlassCard {
@@ -441,19 +452,11 @@ private struct WeatherHeroCard: View {
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
 
-                        HStack(spacing: 6) {
-                            Text(weather.conditionText)
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(Color.white.opacity(0.8))
-
-                            if isUsingCached {
-                                Text("·")
-                                    .foregroundStyle(Color.white.opacity(0.3))
-                                Text(L10n.text("home_cached_label"))
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(Color.white.opacity(0.3))
-                            }
-                        }
+HStack(spacing: 6) {
+                             Text(weather.conditionText)
+                                 .font(.system(size: 15, weight: .medium))
+                                 .foregroundStyle(Color.white.opacity(0.8))
+                         }
                     }
 
                     Spacer()
@@ -505,6 +508,41 @@ private struct WeatherHeroCard: View {
                         icon: "wind",
                         color: Color.white.opacity(0.55)
                     )
+
+                    if weather.uvIndexText != "–" {
+                        WeatherMetricChip(
+                            label: "UV",
+                            value: weather.uvIndexText,
+                            icon: "sun.max.fill",
+                            color: uvColor(weather.uvIndexText)
+                        )
+                    }
+                }
+
+                if weather.sunriseText != nil || weather.sunsetText != nil {
+                    HStack(spacing: 16) {
+                        if let sunrise = weather.sunriseText {
+                            HStack(spacing: 4) {
+                                Image(systemName: "sunrise.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Color(red: 1.0, green: 0.75, blue: 0.3))
+                                Text(sunrise)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(Color.white.opacity(0.6))
+                            }
+                        }
+                        if let sunset = weather.sunsetText {
+                            HStack(spacing: 4) {
+                                Image(systemName: "sunset.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.3))
+                                Text(sunset)
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(Color.white.opacity(0.6))
+                            }
+                        }
+                    }
+                    .padding(.top, 2)
                 }
             }
             .padding(14)
@@ -566,14 +604,7 @@ private struct CompactEnvironmentCard: View {
 private struct SignalBadge: View {
     let signal: HomeEnvironmentSignal
 
-    private var toneColor: Color {
-        switch signal.tone {
-        case .good: Color(red: 0.3, green: 0.85, blue: 0.58)
-        case .caution: Color(red: 1.0, green: 0.7, blue: 0.3)
-        case .danger: Color(red: 1.0, green: 0.4, blue: 0.4)
-        case .info: Color(red: 0.4, green: 0.72, blue: 1.0)
-        }
-    }
+    private var toneColor: Color { AppTheme.toneColor(for: signal.tone) }
 
     var body: some View {
         VStack(spacing: 5) {
@@ -758,6 +789,16 @@ private struct HourlyPill: View {
             Text(item.temperatureText)
                 .font(.system(size: 9))
                 .foregroundStyle(.white.opacity(0.6))
+
+            if item.precipitationChance > 0.05 {
+                HStack(spacing: 2) {
+                    Image(systemName: "drop.fill")
+                        .font(.system(size: 7))
+                    Text(String(format: "%0.0f%%", item.precipitationChance * 100))
+                        .font(.system(size: 8, weight: .medium))
+                }
+                .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.8))
+            }
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -924,18 +965,20 @@ private struct HomeLoadingView: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 12) {
+            VStack(spacing: 14) {
                 SkeletonCard(height: 120)
                     .staggerEntrance(index: 0, appeared: appeared)
-                SkeletonCard(height: 60)
+                SkeletonCard(height: 140)
                     .staggerEntrance(index: 1, appeared: appeared)
-                SkeletonCard(height: 90)
+                SkeletonCard(height: 80)
                     .staggerEntrance(index: 2, appeared: appeared)
-                SkeletonCard(height: 60)
+                SkeletonCard(height: 100)
                     .staggerEntrance(index: 3, appeared: appeared)
+                SkeletonCard(height: 60)
+                    .staggerEntrance(index: 4, appeared: appeared)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+            .padding(.vertical, 14)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear { withAnimation { appeared = true } }

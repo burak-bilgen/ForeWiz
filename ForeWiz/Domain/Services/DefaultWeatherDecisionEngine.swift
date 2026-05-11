@@ -35,24 +35,27 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         let outdoorScore = makeOutdoorScore(from: todayHours, profile: profile, risks: risks, calendar: calendar)
         let outdoorDecision = OutdoorDecision(score: outdoorScore)
 
-        // Consistency: if decision says avoid, do not suggest a best time
+        // Consistency: if decision says avoid, or no good window found, do not suggest a best time
         let bestOutdoorWindow: TimeWindow? = {
             guard outdoorDecision != .avoid else { return nil }
             guard risks.contains(where: { $0.severity == .extreme }) == false else { return nil }
-            return activityWindowScoringEngine.bestWindow(
+            guard let recommendation = activityWindowScoringEngine.bestWindow(
                 for: .goingOutside,
                 hourly: todayHours,
                 profile: profile,
                 now: now,
-                calendar: calendar
-            )?.bestWindow
+                calendar: calendar,
+                avoidWindows: avoidWindows
+            ) else { return nil }
+            return recommendation.bestWindow
         }()
 
         let activityWindows = makeActivityWindows(
             hourly: todayHours,
             profile: profile,
             now: now,
-            calendar: calendar
+            calendar: calendar,
+            avoidWindows: avoidWindows
         )
 
         let outfit = outfitDecisionEngine.recommendOutfit(input: OutfitRecommendationInput(
@@ -248,7 +251,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         hourly: [HourlyWeatherPoint],
         profile: UserComfortProfile,
         now: Date,
-        calendar: Calendar
+        calendar: Calendar,
+        avoidWindows: [AvoidWindowRecommendation]
     ) -> [ActivityRecommendation] {
         let preferredActivities = profile.preferredActivities.isEmpty
             ? Set([ActivityType.walking])
@@ -263,7 +267,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
                     hourly: hourly,
                     profile: profile,
                     now: now,
-                    calendar: calendar
+                    calendar: calendar,
+                    avoidWindows: avoidWindows
                 )
             }
     }

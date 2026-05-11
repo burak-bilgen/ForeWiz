@@ -34,8 +34,7 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
                 quietHours: profile.quietHours,
                 onboardingCompleted: true,
                 preferredLanguage: profile.language,
-                preferredAppearance: profile.appearance,
-                preferredUnitSystem: profile.unitSystem
+                preferredAppearance: profile.appearance
             )
             model.update(from: profile)
             modelContext.insert(model)

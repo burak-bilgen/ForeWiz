@@ -60,6 +60,24 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         now: Date,
         calendar: Calendar = .current
     ) -> ActivityRecommendation? {
+        bestWindow(
+            for: activity,
+            hourly: hourly,
+            profile: profile,
+            now: now,
+            calendar: calendar,
+            avoidWindows: []
+        )
+    }
+
+    func bestWindow(
+        for activity: ActivityType,
+        hourly: [HourlyWeatherPoint],
+        profile: UserComfortProfile,
+        now: Date,
+        calendar: Calendar = .current,
+        avoidWindows: [AvoidWindowRecommendation]
+    ) -> ActivityRecommendation? {
         let nextHours = hourly
             .filter { $0.date >= now }
             .sorted { $0.date < $1.date }
@@ -76,19 +94,25 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             return nil
         }
 
-        let windowSize = min(3, scoredHours.count)
         var bestSlice: ArraySlice<(hour: HourlyWeatherPoint, score: WeatherScore)>?
         var bestAverage = -1
 
         for startIndex in scoredHours.indices {
+            let windowSize = 3
             let endIndex = min(startIndex + windowSize, scoredHours.endIndex)
             let slice = scoredHours[startIndex..<endIndex]
-            guard slice.isEmpty == false else {
+            guard slice.isEmpty == false else { continue }
+
+            let firstTime = slice.first!.hour.date
+            let lastTime = slice.last!.hour.date
+
+            if overlapsAvoidWindows(start: firstTime, end: calendar.date(byAdding: .hour, value: 1, to: lastTime) ?? lastTime, avoidWindows: avoidWindows) {
                 continue
             }
 
             let average = slice.map { $0.score.rawValue }.reduce(0, +) / slice.count
-            if average > bestAverage {
+
+            if slice.allSatisfy({ $0.score.rawValue >= 60 }) && average > bestAverage {
                 bestAverage = average
                 bestSlice = slice
             }
@@ -123,9 +147,23 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         if endHour > startHour {
             return hourOfDay >= startHour && hourOfDay < endHour
         } else {
-            // overnight quiet hours (e.g. 22:00 - 07:00)
             return hourOfDay >= startHour || hourOfDay < endHour
         }
+    }
+
+    // MARK: - Avoid window overlap
+
+    private func overlapsAvoidWindows(
+        start: Date,
+        end: Date,
+        avoidWindows: [AvoidWindowRecommendation]
+    ) -> Bool {
+        for avoid in avoidWindows {
+            if start < avoid.window.end && end > avoid.window.start {
+                return true
+            }
+        }
+        return false
     }
 
     // MARK: - Helpers
