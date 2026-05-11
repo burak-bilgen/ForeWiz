@@ -1,494 +1,278 @@
 import SwiftUI
 
-// MARK: - OnboardingView
-
 struct OnboardingView: View {
     @StateObject var viewModel: OnboardingViewModel
     let existingProfile: UserComfortProfile
     let onCompleted: (UserComfortProfile) async throws -> Void
 
     @State private var isCompleting = false
-    @State private var currentStep = 0
-    @State private var languageKey = 0
-
-    private let totalSteps = 4
 
     var body: some View {
         ZStack {
-            OnboardingBackground(step: currentStep)
-                .ignoresSafeArea()
-                .animation(.easeInOut(duration: 0.6), value: currentStep)
+            AnimatedOrbBackground(
+                primary: Color(red: 0.25, green: 0.48, blue: 0.92),
+                secondary: Color(red: 0.15, green: 0.32, blue: 0.75),
+                tertiary: Color(red: 0.40, green: 0.65, blue: 1.0)
+            )
+            .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                headerBar
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 20) {
+                    heroSection
+                        .padding(.top, 40)
 
-                TabView(selection: $currentStep) {
-                    ForEach(0 ..< totalSteps, id: \.self) { step in
-                        stepView(for: step)
-                            .tag(step)
-                    }
+                    welcomeCard
+                    personalizationCard
+                    permissionsCard
+
+                    startButton
+                        .padding(.vertical, 12)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .animation(.spring(response: 0.45, dampingFraction: 0.85), value: currentStep)
-
-                navigationBar
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 32)
             }
         }
         .navigationBarHidden(true)
         .dynamicTypeSize(.large ... .xxxLarge)
     }
 
-    // MARK: - Header
+    // MARK: - Hero
 
-    private var headerBar: some View {
-        HStack {
-            if currentStep > 0 {
-                Button {
-                    withAnimation { currentStep -= 1 }
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 32, height: 32)
-                        .background(Color.white.opacity(0.1), in: Circle())
-                }
-            } else {
-                Color.clear.frame(width: 32, height: 32)
-            }
+    private var heroSection: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "cloud.sun.fill")
+                .font(.system(size: 64))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(Color(red: 0.55, green: 0.82, blue: 1.0))
+                .shadow(color: Color(red: 0.55, green: 0.82, blue: 1.0).opacity(0.35), radius: 20)
 
-            Spacer()
+            Text(L10n.text("onboarding_welcome"))
+                .font(.system(size: 34, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
 
-            OnboardingProgressBar(current: currentStep, total: totalSteps)
-
-            Spacer()
-
-            if currentStep < totalSteps - 1 {
-                Button {
-                    withAnimation { currentStep = totalSteps - 1 }
-                } label: {
-                    Text(copy(tr: "Atla", en: "Skip"))
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-            } else {
-                Color.clear.frame(width: 40, height: 20)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-    }
-
-    // MARK: - Step view
-
-    @ViewBuilder
-    private func stepView(for step: Int) -> some View {
-        switch step {
-        case 0: HeroStep()
-        case 1: FeaturesStep()
-        case 2:
-            PersonalizationStep(viewModel: viewModel, languageKey: languageKey)
-                .id(languageKey)
-        case 3:
-            PermissionsStep(viewModel: viewModel)
-        default: EmptyView()
+            Text(copy(
+                tr: "Weathra artık sadece bir hava durumu uygulaması değil; kişisel hava asistanın. Abonelik, reklam ve widget gibi karmaşıklıkları kaldırdık. Sadece sana özel öneriler ve temiz bir deneyim.",
+                en: "Weathra is no longer just a weather app; it's your personal weather assistant. We removed subscriptions, ads, widgets, and clutter. Just personalized guidance and a clean experience."
+            ))
+            .font(.system(size: 15))
+            .foregroundStyle(Color.white.opacity(0.6))
+            .multilineTextAlignment(.center)
+            .lineSpacing(4)
         }
     }
 
-    // MARK: - Navigation
+    // MARK: - Welcome Card
 
-    private var navigationBar: some View {
+    private var welcomeCard: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 14) {
+                Text(copy(tr: "Neler değişti?", en: "What's new?"))
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(.white)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    featureRow(icon: "sparkles", color: Color(red: 0.4, green: 0.72, blue: 1.0), text: copy(tr: "Abonelik ve reklam yok", en: "No subscriptions or ads"))
+                    featureRow(icon: "checkmark.seal.fill", color: Color(red: 0.3, green: 0.85, blue: 0.58), text: copy(tr: "Sadece ana ekran ve ayarlar", en: "Just Home and Settings"))
+                    featureRow(icon: "bell.badge.fill", color: Color(red: 1.0, green: 0.75, blue: 0.35), text: copy(tr: "Akıllı ve anlaşılır bildirimler", en: "Smart, clear notifications"))
+                    featureRow(icon: "heart.text.square.fill", color: Color(red: 0.8, green: 0.65, blue: 1.0), text: copy(tr: "Profiline göre öneriler", en: "Recommendations tailored to you"))
+                }
+            }
+        }
+    }
+
+    private func featureRow(icon: String, color: Color, text: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 28, height: 28)
+                .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            Text(text)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(Color.white.opacity(0.85))
+            Spacer()
+        }
+    }
+
+    // MARK: - Personalization Card
+
+    private var personalizationCard: some View {
+        GlassCard(accentColor: Color(red: 1.0, green: 0.55, blue: 0.3)) {
+            VStack(alignment: .leading, spacing: 16) {
+                Label(copy(tr: "Sana göre ayarla", en: "Tune for you"), systemImage: "slider.horizontal.3")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.5))
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(copy(tr: "Sıcaklığı nasıl hissedersin?", en: "How do you feel temperature?"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    HStack(spacing: 8) {
+                        ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
+                            let selected = viewModel.selectedSensitivity == sensitivity
+                            Button {
+                                HapticManager.selection()
+                                viewModel.selectSensitivity(sensitivity)
+                            } label: {
+                                VStack(spacing: 4) {
+                                    Image(systemName: icon(for: sensitivity))
+                                        .font(.system(size: 16))
+                                    Text(sensitivity.localizedTitle)
+                                        .font(.system(size: 11, weight: selected ? .semibold : .regular))
+                                }
+                                .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    selected
+                                        ? Color(red: 1.0, green: 0.55, blue: 0.3).opacity(0.12)
+                                        : Color.white.opacity(0.05),
+                                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .stroke(selected ? Color(red: 1.0, green: 0.55, blue: 0.3).opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(copy(tr: "Hangi aktiviteleri seversin?", en: "Which activities do you enjoy?"))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    FlowLayout(spacing: 8) {
+                        ForEach(ActivityType.allCases, id: \.self) { activity in
+                            let selected = viewModel.preferredActivities.contains(activity)
+                            Button {
+                                HapticManager.selection()
+                                viewModel.toggleActivity(activity)
+                            } label: {
+                                HStack(spacing: 5) {
+                                    Image(systemName: icon(for: activity))
+                                        .font(.system(size: 11, weight: .semibold))
+                                    Text(activity.localizedTitle)
+                                        .font(.system(size: 12, weight: selected ? .semibold : .regular))
+                                }
+                                .foregroundStyle(selected ? Color(red: 0.3, green: 0.85, blue: 0.58) : Color.white.opacity(0.5))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    selected
+                                        ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.12)
+                                        : Color.white.opacity(0.05),
+                                    in: Capsule()
+                                )
+                                .overlay(
+                                    Capsule().stroke(
+                                        selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.35) : Color.white.opacity(0.06),
+                                        lineWidth: 1
+                                    )
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Permissions Card
+
+    private var permissionsCard: some View {
+        GlassCard(accentColor: Color(red: 0.4, green: 0.7, blue: 1.0)) {
+            VStack(alignment: .leading, spacing: 16) {
+                Label(copy(tr: "İzinler", en: "Permissions"), systemImage: "lock.shield.fill")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.5))
+
+                PermissionRow(
+                    icon: "location.fill",
+                    color: Color(red: 0.4, green: 0.7, blue: 1.0),
+                    title: copy(tr: "Konum", en: "Location"),
+                    subtitle: copy(tr: "Yerel hava tahmini için gerekli", en: "Required for local weather"),
+                    isGranted: viewModel.locationStatus == .authorized,
+                    isRequired: true
+                ) {
+                    viewModel.requestLocationPermission()
+                }
+
+                PermissionRow(
+                    icon: "bell.badge.fill",
+                    color: Color(red: 1.0, green: 0.75, blue: 0.35),
+                    title: copy(tr: "Bildirimler", en: "Notifications"),
+                    subtitle: copy(tr: "Zamanında hatırlatmalar için", en: "For timely reminders"),
+                    isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
+                    isRequired: false
+                ) {
+                    viewModel.requestNotificationPermission()
+                }
+            }
+        }
+    }
+
+    // MARK: - Start Button
+
+    private var startButton: some View {
         Button {
             HapticManager.medium()
-            if currentStep < totalSteps - 1 {
-                withAnimation { currentStep += 1 }
-            } else {
-                complete()
+            guard !isCompleting else { return }
+            isCompleting = true
+            Task {
+                do {
+                    try await onCompleted(viewModel.makeProfile(inheriting: existingProfile))
+                } catch {
+                    viewModel.setErrorMessage(AppError.persistenceFailed.userMessage)
+                    isCompleting = false
+                }
             }
         } label: {
             ZStack {
                 if isCompleting {
                     PulsingDotsLoader(color: .white)
                 } else {
-                    HStack(spacing: 8) {
-                        Text(buttonLabel)
-                            .font(.system(size: 17, weight: .semibold))
-                        if currentStep < totalSteps - 1 {
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 15, weight: .semibold))
-                        }
-                    }
-                    .foregroundStyle(.white)
+                    Text(copy(tr: "Başla", en: "Get Started"))
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
                 }
             }
             .frame(maxWidth: .infinity)
             .frame(height: 56)
-            .background {
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(buttonBackground)
-            }
-            .shimmer(isActive: !isCompleting && !(isLastStep && !viewModel.canContinue))
+            .background(
+                LinearGradient(
+                    colors: [Color(red: 0.2, green: 0.5, blue: 1.0), Color(red: 0.1, green: 0.35, blue: 0.85)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
-        .disabled(isLastStep && !viewModel.canContinue || isCompleting)
-        .animation(.easeInOut(duration: 0.2), value: viewModel.canContinue)
+        .disabled(isCompleting)
     }
 
-    private var buttonLabel: String {
-        switch currentStep {
-        case 0: L10n.text("onboarding_continue")
-        case 1: L10n.text("onboarding_lets_start")
-        case 2: L10n.text("onboarding_continue")
-        default: L10n.text("onboarding_ready")
-        }
-    }
-
-    private var buttonBackground: AnyShapeStyle {
-        if isLastStep && !viewModel.canContinue {
-            AnyShapeStyle(Color.gray.opacity(0.4))
-        } else {
-            AnyShapeStyle(LinearGradient(
-                colors: [Color(red: 0.2, green: 0.5, blue: 1.0), Color(red: 0.1, green: 0.35, blue: 0.85)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ))
-        }
-    }
-
-    private var isLastStep: Bool {
-        currentStep == totalSteps - 1
-    }
-
-    private func copy(tr: String, en: String) -> String {
-        L10n.currentLanguageCode == "tr" ? tr : en
-    }
-
-    private func complete() {
-        guard viewModel.canContinue, !isCompleting else { return }
-        isCompleting = true
-        Task {
-            do {
-                try await onCompleted(viewModel.makeProfile(inheriting: existingProfile))
-            } catch {
-                viewModel.setErrorMessage(AppError.persistenceFailed.userMessage)
-            }
-            isCompleting = false
-        }
-    }
-}
-
-// MARK: - Background
-
-private struct OnboardingBackground: View {
-    let step: Int
-
-    private var colors: (Color, Color, Color) {
-        switch step {
-        case 0: return (Color(red: 0.25, green: 0.50, blue: 1.00), Color(red: 0.10, green: 0.30, blue: 0.85), Color(red: 0.50, green: 0.75, blue: 1.00))
-        case 1: return (Color(red: 0.30, green: 0.65, blue: 1.00), Color(red: 0.15, green: 0.55, blue: 0.85), Color(red: 0.20, green: 0.80, blue: 0.65))
-        default: return (Color(red: 0.20, green: 0.45, blue: 0.90), Color(red: 0.40, green: 0.70, blue: 1.00), Color(red: 0.10, green: 0.60, blue: 0.85))
-        }
-    }
-
-    var body: some View {
-        AnimatedOrbBackground(primary: colors.0, secondary: colors.1, tertiary: colors.2)
-            .animation(.easeInOut(duration: 0.8), value: step)
-    }
-}
-
-// MARK: - Progress Bar
-
-private struct OnboardingProgressBar: View {
-    let current: Int
-    let total: Int
-
-    var body: some View {
-        HStack(spacing: 6) {
-            ForEach(0 ..< total, id: \.self) { index in
-                Capsule()
-                    .fill(index == current ? Color.white : Color.white.opacity(0.3))
-                    .frame(width: index == current ? 24 : 8, height: 4)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: current)
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 8)
-        .background(Color.white.opacity(0.08), in: Capsule())
-    }
-}
-
-// MARK: - Step 0: Hero
-
-private struct HeroStep: View {
-    private let sky = Color(red: 0.55, green: 0.82, blue: 1.0)
-
-    var body: some View {
-        VStack(spacing: 0) {
-            Spacer(minLength: 40)
-
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [sky.opacity(0.15), sky.opacity(0.02)],
-                            center: .center, startRadius: 20, endRadius: 100
-                        )
-                    )
-                    .frame(width: 160, height: 160)
-
-                Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 72))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(sky)
-                    .shadow(color: sky.opacity(0.4), radius: 20, x: 0, y: 8)
-            }
-
-            VStack(spacing: 16) {
-                Text(L10n.text("onboarding_welcome"))
-                    .font(.system(size: 38, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.70)
-                    .multilineTextAlignment(.center)
-
-                Text(L10n.text("onboarding_subtitle"))
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.white.opacity(0.65))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.horizontal, 24)
-            .padding(.top, 36)
-
-            Spacer(minLength: 40)
-        }
-        .padding(.horizontal, 16)
-    }
-}
-
-// MARK: - Step 1: Features
-
-private struct FeaturesStep: View {
-    private var features: [(icon: String, color: Color, title: String, subtitle: String)] {
-        [
-            ("brain.head.profile", Color(red: 0.4, green: 0.7, blue: 1.0), L10n.text("onboarding_feature_decision"), L10n.text("onboarding_feature_decision_desc")),
-            ("figure.outdoor.cycle", Color(red: 0.4, green: 0.85, blue: 0.65), L10n.text("onboarding_feature_personal"), L10n.text("onboarding_feature_personal_desc")),
-            ("tshirt.fill", Color(red: 0.8, green: 0.65, blue: 1.0), L10n.text("onboarding_comparison_what_wear"), L10n.text("onboarding_comparison_what_wear_weathra")),
-            ("bell.badge.fill", Color(red: 1.0, green: 0.75, blue: 0.35), L10n.text("onboarding_feature_notifications"), L10n.text("onboarding_feature_notifications_desc")),
-        ]
-    }
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(L10n.text("onboarding_why_weathra"))
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.80)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(L10n.text("onboarding_why_subtitle"))
-                        .font(.system(size: 16))
-                        .foregroundStyle(Color.white.opacity(0.55))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                VStack(spacing: 14) {
-                    ForEach(Array(features.enumerated()), id: \.offset) { _, feature in
-                        FeatureRow(
-                            icon: feature.icon,
-                            accentColor: feature.color,
-                            title: feature.title,
-                            subtitle: feature.subtitle
-                        )
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-        }
-        .scrollIndicators(.hidden)
-    }
-}
-
-private struct FeatureRow: View {
-    let icon: String
-    let accentColor: Color
-    let title: String
-    let subtitle: String
-
-    var body: some View {
-        HStack(spacing: 16) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(accentColor.opacity(0.18))
-                    .frame(width: 48, height: 48)
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(accentColor)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                Text(subtitle)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.white.opacity(0.5))
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .layoutPriority(1)
-
-            Spacer(minLength: 0)
-        }
-        .padding(16)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-}
-
-// MARK: - Step 2: Personalization
-
-private struct PersonalizationStep: View {
-    @ObservedObject var viewModel: OnboardingViewModel
-    let languageKey: Int
-
-    private let blue = Color(red: 0.4, green: 0.72, blue: 1.0)
-    private let green = Color(red: 0.35, green: 0.85, blue: 0.62)
-    private let amber = Color(red: 1.0, green: 0.72, blue: 0.32)
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(copy(tr: "Asistanı kendine göre ayarla", en: "Tune the assistant for you"))
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.78)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(copy(
-                        tr: "Bu seçimler skorları, kıyafet önerilerini ve bildirim önceliklerini doğrudan etkiler.",
-                        en: "These choices directly shape scores, outfit guidance and notification priority."
-                    ))
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.white.opacity(0.55))
-                    .fixedSize(horizontal: false, vertical: true)
-                }
-
-                VStack(spacing: 14) {
-                    OnboardingPersonalizationCard(
-                        icon: "thermometer.sun.fill",
-                        color: amber,
-                        title: copy(tr: "Sıcaklığı nasıl hissedersin?", en: "How do you feel temperature?"),
-                        subtitle: copy(tr: "Hissedilen sıcaklık skorunu kişiselleştirir.", en: "Personalizes the feels-like comfort score.")
-                    ) {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], spacing: 8) {
-                            ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
-                                OnboardingOptionTile(
-                                    icon: icon(for: sensitivity),
-                                    title: sensitivity.localizedTitle,
-                                    color: amber,
-                                    isSelected: viewModel.selectedSensitivity == sensitivity
-                                ) {
-                                    HapticManager.selection()
-                                    viewModel.selectSensitivity(sensitivity)
-                                }
-                            }
-                        }
-                    }
-
-                    OnboardingPersonalizationCard(
-                        icon: "figure.walk",
-                        color: green,
-                        title: copy(tr: "Dışarıda ne yaparsın?", en: "What do you do outside?"),
-                        subtitle: copy(tr: "Ana ekran en iyi saatleri bu aktivitelere göre çıkarır.", en: "Home finds the best windows for these activities.")
-                    ) {
-                        FlowLayout(spacing: 8) {
-                            ForEach(ActivityType.allCases, id: \.self) { activity in
-                                OnboardingChip(
-                                    icon: icon(for: activity),
-                                    title: activity.localizedTitle,
-                                    color: green,
-                                    isSelected: viewModel.preferredActivities.contains(activity)
-                                ) {
-                                    HapticManager.selection()
-                                    viewModel.toggleActivity(activity)
-                                }
-                            }
-                        }
-                    }
-
-                    OnboardingPersonalizationCard(
-                        icon: "heart.text.square.fill",
-                        color: blue,
-                        title: copy(tr: "Sağlık hassasiyetleri", en: "Health sensitivities"),
-                        subtitle: copy(tr: "Polen ve hava kalitesi riskleri ana ekranda ve bildirimlerde öne çıkar.", en: "Pollen and air-quality risks are promoted on Home and in alerts.")
-                    ) {
-                        FlowLayout(spacing: 8) {
-                            ForEach([AllergyType.pollen, .airQuality, .smoke, .dust], id: \.self) { allergy in
-                                OnboardingChip(
-                                    icon: allergy.icon,
-                                    title: allergy.localizedTitle,
-                                    color: blue,
-                                    isSelected: viewModel.selectedAllergies.contains(allergy)
-                                ) {
-                                    HapticManager.selection()
-                                    viewModel.toggleAllergy(allergy)
-                                }
-                            }
-                        }
-
-                        if viewModel.selectedAllergies.contains(.pollen) {
-                            Divider().background(Color.white.opacity(0.08)).padding(.vertical, 8)
-                            FlowLayout(spacing: 8) {
-                                ForEach(PollenType.allCases, id: \.self) { pollenType in
-                                    OnboardingChip(
-                                        icon: "leaf.fill",
-                                        title: pollenType.localizedTitle,
-                                        color: amber,
-                                        isSelected: viewModel.selectedPollenTypes.contains(pollenType)
-                                    ) {
-                                        HapticManager.selection()
-                                        viewModel.togglePollenType(pollenType)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-        }
-        .scrollIndicators(.hidden)
-    }
+    // MARK: - Helpers
 
     private func icon(for sensitivity: TemperatureSensitivity) -> String {
         switch sensitivity {
-        case .getsColdEasily:
-            return "snowflake"
-        case .normal:
-            return "thermometer.medium"
-        case .getsHotEasily:
-            return "sun.max.fill"
+        case .getsColdEasily: return "snowflake"
+        case .normal: return "thermometer.medium"
+        case .getsHotEasily: return "sun.max.fill"
         }
     }
 
     private func icon(for activity: ActivityType) -> String {
         switch activity {
-        case .running:
-            return "figure.run"
-        case .walking:
-            return "figure.walk"
-        case .cycling:
-            return "bicycle"
-        case .goingOutside:
-            return "sun.max.fill"
+        case .running: return "figure.run"
+        case .walking: return "figure.walk"
+        case .cycling: return "bicycle"
+        case .goingOutside: return "sun.max.fill"
         }
     }
 
@@ -497,287 +281,76 @@ private struct PersonalizationStep: View {
     }
 }
 
-private struct OnboardingPersonalizationCard<Content: View>: View {
+// MARK: - Permission Row
+
+private struct PermissionRow: View {
     let icon: String
     let color: Color
     let title: String
     let subtitle: String
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(color.opacity(0.16))
-                        .frame(width: 42, height: 42)
-                    Image(systemName: icon)
-                        .font(.system(size: 17, weight: .semibold))
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(color)
-                }
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text(subtitle)
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.white.opacity(0.44))
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .layoutPriority(1)
-            }
-
-            content()
-        }
-        .padding(16)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(color.opacity(0.12), lineWidth: 1))
-    }
-}
-
-private struct OnboardingOptionTile: View {
-    let icon: String
-    let title: String
-    let color: Color
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 7) {
-                Image(systemName: icon)
-                    .font(.system(size: 16, weight: .semibold))
-                Text(title)
-                    .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .foregroundStyle(isSelected ? color : Color.white.opacity(0.48))
-            .frame(maxWidth: .infinity, minHeight: 76)
-            .padding(.horizontal, 8)
-            .background(
-                isSelected ? color.opacity(0.15) : Color.white.opacity(0.055),
-                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(isSelected ? color.opacity(0.36) : Color.white.opacity(0.08), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-}
-
-private struct OnboardingChip: View {
-    let icon: String
-    let title: String
-    let color: Color
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 12, weight: .semibold))
-                Text(title)
-                    .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .foregroundStyle(isSelected ? color : Color.white.opacity(0.52))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(isSelected ? color.opacity(0.15) : Color.white.opacity(0.055), in: Capsule())
-            .overlay(Capsule().stroke(isSelected ? color.opacity(0.36) : Color.white.opacity(0.08), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-}
-
-// MARK: - Step 3: Permissions
-
-private struct PermissionsStep: View {
-    @ObservedObject var viewModel: OnboardingViewModel
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(L10n.text("onboarding_permissions_title"))
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.80)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(L10n.text("onboarding_permissions_subtitle"))
-                        .font(.system(size: 16))
-                        .foregroundStyle(Color.white.opacity(0.55))
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                VStack(spacing: 14) {
-                    PermissionCard(
-                        icon: "location.fill",
-                        accentColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                        title: L10n.text("onboarding_location_title"),
-                        subtitle: L10n.text("onboarding_location_message"),
-                        badge: locationBadge,
-                        isGranted: viewModel.locationStatus == .authorized,
-                        isRequired: true,
-                        action: {
-                            HapticManager.light()
-                            viewModel.requestLocationPermission()
-                        }
-                    )
-
-                    PermissionCard(
-                        icon: "bell.badge.fill",
-                        accentColor: Color(red: 1.0, green: 0.75, blue: 0.35),
-                        title: L10n.text("onboarding_notification_title"),
-                        subtitle: L10n.text("onboarding_notification_message"),
-                        badge: notificationBadge,
-                        isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
-                        isRequired: false,
-                        action: {
-                            HapticManager.light()
-                            viewModel.requestNotificationPermission()
-                        }
-                    )
-                }
-
-                if let error = viewModel.errorMessage {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.circle.fill")
-                            .font(.caption)
-                        Text(error)
-                            .font(.caption)
-                    }
-                    .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.5))
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, 8)
-                }
-            }
-            .padding(.horizontal, 16)
-        }
-        .scrollIndicators(.hidden)
-    }
-
-    private var locationBadge: PermissionBadge {
-        switch viewModel.locationStatus {
-        case .authorized: .granted
-        case .denied, .restricted: .denied
-        case .notDetermined: .pending
-        }
-    }
-
-    private var notificationBadge: PermissionBadge {
-        switch viewModel.notificationStatus {
-        case .authorized, .provisional: .granted
-        case .denied: .denied
-        case .notDetermined: .pending
-        }
-    }
-}
-
-private enum PermissionBadge {
-    case pending, granted, denied
-}
-
-private struct PermissionCard: View {
-    let icon: String
-    let accentColor: Color
-    let title: String
-    let subtitle: String
-    let badge: PermissionBadge
     let isGranted: Bool
     let isRequired: Bool
     let action: () -> Void
 
-    private let requiredColor = Color(red: 1.0, green: 0.75, blue: 0.35)
-    private let successColor = Color(red: 0.35, green: 0.85, blue: 0.6)
-    private let errorColor = Color(red: 1.0, green: 0.45, blue: 0.45)
-
     var body: some View {
         Button(action: action) {
-            HStack(alignment: .top, spacing: 16) {
+            HStack(spacing: 12) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(accentColor.opacity(0.18))
-                        .frame(width: 48, height: 48)
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(color.opacity(0.12))
+                        .frame(width: 36, height: 36)
                     Image(systemName: icon)
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(accentColor)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(color)
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(title)
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.white)
-                            .lineLimit(2)
-
                         if isRequired {
-                            Text(L10n.text("onboarding_location_required"))
-                                .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(requiredColor)
-                                .padding(.horizontal, 6)
+                            Text(copy(tr: "Gerekli", en: "Required"))
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.15))
+                                .padding(.horizontal, 5)
                                 .padding(.vertical, 2)
-                                .background(requiredColor.opacity(0.15), in: Capsule())
+                                .background(Color(red: 1.0, green: 0.55, blue: 0.15).opacity(0.12), in: Capsule())
                         }
                     }
-
                     Text(subtitle)
                         .font(.system(size: 12))
                         .foregroundStyle(Color.white.opacity(0.45))
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .multilineTextAlignment(.leading)
-
-                    badgeView
                 }
-                .layoutPriority(1)
+
+                Spacer()
+
+                if isGranted {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.58))
+                } else {
+                    Text(copy(tr: "İzin Ver", en: "Allow"))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(color)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(color.opacity(0.1), in: Capsule())
+                        .overlay(Capsule().stroke(color.opacity(0.25), lineWidth: 1))
+                }
             }
-            .padding(16)
-            .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .padding(12)
+            .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(isGranted ? accentColor.opacity(0.4) : Color.white.opacity(0.08), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isGranted ? color.opacity(0.3) : Color.white.opacity(0.05), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
         .disabled(isGranted)
     }
 
-    @ViewBuilder
-    private var badgeView: some View {
-        switch badge {
-        case .granted:
-            Label(L10n.text("permission_open"), systemImage: "checkmark.circle.fill")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(successColor)
-        case .denied:
-            Label(L10n.text("permission_closed"), systemImage: "xmark.circle.fill")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(errorColor)
-        case .pending:
-            Text(L10n.text("onboarding_permission_allow"))
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.white.opacity(0.15), in: Capsule())
-        }
+    private func copy(tr: String, en: String) -> String {
+        L10n.currentLanguageCode == "tr" ? tr : en
     }
 }
