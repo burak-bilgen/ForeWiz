@@ -51,10 +51,7 @@ struct OnboardingView: View {
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
 
-            Text(copy(
-                tr: "Weathra artık sadece bir hava durumu uygulaması değil; kişisel hava asistanın. Abonelik, reklam ve widget gibi karmaşıklıkları kaldırdık. Sadece sana özel öneriler ve temiz bir deneyim.",
-                en: "Weathra is no longer just a weather app; it's your personal weather assistant. We removed subscriptions, ads, widgets, and clutter. Just personalized guidance and a clean experience."
-            ))
+            Text(L10n.text("onboarding_tagline"))
             .font(.system(size: 15))
             .foregroundStyle(Color.white.opacity(0.6))
             .multilineTextAlignment(.center)
@@ -67,15 +64,15 @@ struct OnboardingView: View {
     private var welcomeCard: some View {
         GlassCard {
             VStack(alignment: .leading, spacing: 14) {
-                Text(copy(tr: "Neler değişti?", en: "What's new?"))
+                Text(L10n.text("whats_new"))
                     .font(.system(size: 17, weight: .bold))
                     .foregroundStyle(.white)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    featureRow(icon: "sparkles", color: Color(red: 0.4, green: 0.72, blue: 1.0), text: copy(tr: "Abonelik ve reklam yok", en: "No subscriptions or ads"))
-                    featureRow(icon: "checkmark.seal.fill", color: Color(red: 0.3, green: 0.85, blue: 0.58), text: copy(tr: "Sadece ana ekran ve ayarlar", en: "Just Home and Settings"))
-                    featureRow(icon: "bell.badge.fill", color: Color(red: 1.0, green: 0.75, blue: 0.35), text: copy(tr: "Akıllı ve anlaşılır bildirimler", en: "Smart, clear notifications"))
-                    featureRow(icon: "heart.text.square.fill", color: Color(red: 0.8, green: 0.65, blue: 1.0), text: copy(tr: "Profiline göre öneriler", en: "Recommendations tailored to you"))
+                    featureRow(icon: "sparkles", color: Color(red: 0.4, green: 0.72, blue: 1.0), text: L10n.text("no_subscriptions_or_ads"))
+                    featureRow(icon: "checkmark.seal.fill", color: Color(red: 0.3, green: 0.85, blue: 0.58), text: L10n.text("just_home_and_settings"))
+                    featureRow(icon: "bell.badge.fill", color: Color(red: 1.0, green: 0.75, blue: 0.35), text: L10n.text("smart_clear_notifications"))
+                    featureRow(icon: "heart.text.square.fill", color: Color(red: 0.8, green: 0.65, blue: 1.0), text: L10n.text("recommendations_tailored_to_you"))
                 }
             }
         }
@@ -100,12 +97,12 @@ struct OnboardingView: View {
     private var personalizationCard: some View {
         GlassCard(accentColor: Color(red: 1.0, green: 0.55, blue: 0.3)) {
             VStack(alignment: .leading, spacing: 16) {
-                Label(copy(tr: "Sana göre ayarla", en: "Tune for you"), systemImage: "slider.horizontal.3")
+                Label(L10n.text("tune_for_you"), systemImage: "slider.horizontal.3")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.5))
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(copy(tr: "Sıcaklığı nasıl hissedersin?", en: "How do you feel temperature?"))
+                    Text(L10n.text("how_do_you_feel"))
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
 
@@ -142,7 +139,7 @@ struct OnboardingView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(copy(tr: "Hangi aktiviteleri seversin?", en: "Which activities do you enjoy?"))
+                    Text(L10n.text("which_activities_do_you"))
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(.white)
 
@@ -188,15 +185,15 @@ struct OnboardingView: View {
     private var permissionsCard: some View {
         GlassCard(accentColor: Color(red: 0.4, green: 0.7, blue: 1.0)) {
             VStack(alignment: .leading, spacing: 16) {
-                Label(copy(tr: "İzinler", en: "Permissions"), systemImage: "lock.shield.fill")
+                Label(L10n.text("permissions"), systemImage: "lock.shield.fill")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.5))
 
                 PermissionRow(
                     icon: "location.fill",
                     color: Color(red: 0.4, green: 0.7, blue: 1.0),
-                    title: copy(tr: "Konum", en: "Location"),
-                    subtitle: copy(tr: "Yerel hava tahmini için gerekli", en: "Required for local weather"),
+                    title: L10n.text("location"),
+                    subtitle: L10n.text("required_for_local_weather"),
                     isGranted: viewModel.locationStatus == .authorized,
                     isRequired: true
                 ) {
@@ -206,8 +203,8 @@ struct OnboardingView: View {
                 PermissionRow(
                     icon: "bell.badge.fill",
                     color: Color(red: 1.0, green: 0.75, blue: 0.35),
-                    title: copy(tr: "Bildirimler", en: "Notifications"),
-                    subtitle: copy(tr: "Zamanında hatırlatmalar için", en: "For timely reminders"),
+                    title: L10n.text("notifications"),
+                    subtitle: L10n.text("for_timely_reminders"),
                     isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
                     isRequired: false
                 ) {
@@ -237,7 +234,7 @@ struct OnboardingView: View {
                 if isCompleting {
                     PulsingDotsLoader(color: .white)
                 } else {
-                    Text(copy(tr: "Başla", en: "Get Started"))
+                    Text(L10n.text("get_started"))
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                 }
@@ -310,7 +307,7 @@ private struct PermissionRow: View {
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.white)
                         if isRequired {
-                            Text(copy(tr: "Gerekli", en: "Required"))
+                            Text(L10n.text("required"))
                                 .font(.system(size: 9, weight: .bold))
                                 .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.15))
                                 .padding(.horizontal, 5)
@@ -330,7 +327,7 @@ private struct PermissionRow: View {
                         .font(.system(size: 18))
                         .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.58))
                 } else {
-                    Text(copy(tr: "İzin Ver", en: "Allow"))
+                    Text(L10n.text("allow"))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(color)
                         .padding(.horizontal, 10)

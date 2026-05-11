@@ -139,7 +139,7 @@ final class HomeViewModel: ObservableObject {
                 HomeAssistantSignal(
                     id: "official-alert",
                     icon: "exclamationmark.triangle.fill",
-                    title: copy(tr: "Resmi uyarı", en: "Official alert"),
+                    title: L10n.text("official_alert"),
                     subtitle: alert.summary,
                     hint: alert.region.map { "\($0) - \(alert.source)" } ?? alert.source,
                     tone: alert.severity >= .high ? .danger : .caution
@@ -156,9 +156,9 @@ final class HomeViewModel: ObservableObject {
                 HomeAssistantSignal(
                     id: "best-window",
                     icon: "clock.fill",
-                    title: copy(tr: "En iyi zaman", en: "Best time"),
+                    title: L10n.text("best_time"),
                     subtitle: bestWindow.shortDisplayText,
-                    hint: copy(tr: "Dış planını bu aralığa al", en: "Use this window for outdoor plans"),
+                    hint: L10n.text("use_this_window_for_outdoor"),
                     tone: .good
                 )
             )
@@ -170,7 +170,7 @@ final class HomeViewModel: ObservableObject {
                 HomeAssistantSignal(
                     id: "top-risk",
                     icon: iconName(for: topRisk.type),
-                    title: copy(tr: "Dikkat", en: "Watch"),
+                    title: L10n.text("watch"),
                     subtitle: topRisk.title,
                     hint: topRisk.message,
                     tone: topRisk.severity >= .high ? .danger : .caution
@@ -183,7 +183,7 @@ final class HomeViewModel: ObservableObject {
                 HomeAssistantSignal(
                     id: "outfit",
                     icon: "tshirt.fill",
-                    title: copy(tr: "Giyim", en: "Outfit"),
+                    title: L10n.text("outfit"),
                     subtitle: outfitItem,
                     hint: recommendation.outfit.warning ?? recommendation.outfit.title,
                     tone: .info
@@ -197,22 +197,22 @@ final class HomeViewModel: ObservableObject {
         let tone: HomeAssistantTone
 
         if let alert = topAlert, alert.severity >= .high {
-            headline = copy(tr: "Resmi hava uyarısı var", en: "Official weather alert")
+            headline = L10n.text("official_weather_alert")
             detail = alert.summary
             symbolName = "exclamationmark.triangle.fill"
             tone = .danger
         } else if let nowcast {
-            headline = copy(tr: "Yakın yağışı hesaba kat", en: "Plan around nearby rain")
+            headline = L10n.text("plan_around_nearby_rain")
             detail = nowcast.hint
             symbolName = "cloud.rain.fill"
             tone = .caution
         } else if let topRisk = recommendation.risks.first(where: { $0.severity >= .high }) {
-            headline = copy(tr: "Planı revize etmek daha güvenli", en: "Adjust the plan for safety")
+            headline = L10n.text("adjust_the_plan_for_safety")
             detail = topRisk.message
             symbolName = iconName(for: topRisk.type)
             tone = .danger
         } else if let bestWindow = recommendation.bestOutdoorWindow {
-            headline = copy(tr: "Bugünün planı hazır", en: "Today's plan is ready")
+            headline = L10n.text("todays_plan_is_ready")
             detail = copy(
                 tr: "En rahat dışarı çıkış aralığı \(bestWindow.shortDisplayText).",
                 en: "Best outdoor window is \(bestWindow.shortDisplayText)."
@@ -256,13 +256,13 @@ final class HomeViewModel: ObservableObject {
         let minutes = max(1, Int(peak.date.timeIntervalSince(dateProvider.now) / 60))
         let chance = Int((peak.precipitationChance * 100).rounded())
         let intensityText = peak.precipitationIntensityMmPerHour >= 1.0
-            ? copy(tr: "yağış kuvvetlenebilir", en: "rain may get heavier")
-            : copy(tr: "hafif yağış bekleniyor", en: "light rain is likely")
+            ? L10n.text("rain_may_get_heavier")
+            : L10n.text("light_rain_is_likely")
 
         return HomeAssistantSignal(
             id: "nowcast-rain",
             icon: "cloud.rain.fill",
-            title: copy(tr: "Yakın yağış", en: "Nowcast rain"),
+            title: L10n.text("nowcast_rain"),
             subtitle: copy(tr: "\(minutes) dk içinde %\(chance)", en: "\(chance)% in \(minutes)m"),
             hint: copy(
                 tr: "\(minutes) dakika içinde \(intensityText). Şemsiye veya kapalı rota iyi olur.",
@@ -278,7 +278,7 @@ final class HomeViewModel: ObservableObject {
             HomePlanItem(
                 id: "now",
                 icon: decisionSymbolName(for: recommendation.outdoorDecision),
-                title: copy(tr: "Şimdi", en: "Now"),
+                title: L10n.text("now"),
                 timeText: recommendation.outdoorDecision.localizedTitle,
                 detail: copy(
                     tr: "Dış plan skoru \(recommendation.outdoorScore.rawValue)/100.",
@@ -294,8 +294,8 @@ final class HomeViewModel: ObservableObject {
                 HomePlanItem(
                     id: "official-alert",
                     icon: "exclamationmark.triangle.fill",
-                    title: copy(tr: "Önce güvenlik", en: "Safety first"),
-                    timeText: copy(tr: "Aktif", en: "Active"),
+                    title: L10n.text("safety_first"),
+                    timeText: L10n.text("active_1"),
                     detail: topAlert.summary,
                     tone: topAlert.severity >= .high ? .danger : .caution,
                     isPrimary: topAlert.severity >= .high
@@ -322,7 +322,7 @@ final class HomeViewModel: ObservableObject {
                 HomePlanItem(
                     id: "best-window",
                     icon: "clock.fill",
-                    title: copy(tr: "Dış plan", en: "Outdoor plan"),
+                    title: L10n.text("outdoor_plan"),
                     timeText: bestWindow.shortDisplayText,
                     detail: copy(
                         tr: "Yürüyüş, iş ve açık hava işlerini bu aralığa taşı.",
@@ -339,7 +339,7 @@ final class HomeViewModel: ObservableObject {
                 HomePlanItem(
                     id: "avoid-window",
                     icon: iconName(for: avoidWindow.risk.type),
-                    title: copy(tr: "Kaçın", en: "Avoid"),
+                    title: L10n.text("avoid"),
                     timeText: avoidWindow.window.shortDisplayText,
                     detail: avoidWindow.reason,
                     tone: avoidWindow.severity >= .high ? .danger : .caution,
@@ -353,7 +353,7 @@ final class HomeViewModel: ObservableObject {
                 HomePlanItem(
                     id: "outfit",
                     icon: "tshirt.fill",
-                    title: copy(tr: "Hazırlık", en: "Prep"),
+                    title: L10n.text("prep"),
                     timeText: outfitItem,
                     detail: recommendation.outfit.warning ?? recommendation.outfit.title,
                     tone: .info,
@@ -368,7 +368,7 @@ final class HomeViewModel: ObservableObject {
                 HomePlanItem(
                     id: "sunset",
                     icon: "sunset.fill",
-                    title: copy(tr: "Gün batımı", en: "Sunset"),
+                    title: L10n.text("sunset"),
                     timeText: clockText(for: sunset),
                     detail: copy(
                         tr: "Dış planın bitişini buna göre ayarla.",
@@ -381,7 +381,7 @@ final class HomeViewModel: ObservableObject {
         }
 
         return HomePlanViewState(
-            title: copy(tr: "Bugünün planı", en: "Today’s plan"),
+            title: L10n.text("todays_plan"),
             subtitle: copy(
                 tr: "Asistanın hava durumunu aksiyona çevirdiği kısa plan",
                 en: "A short action plan built from today’s weather"
@@ -398,7 +398,7 @@ final class HomeViewModel: ObservableObject {
         let firstHour = result.hourlyPoints.sorted { $0.date < $1.date }.first
 
         return HomeEnvironmentViewState(
-            title: copy(tr: "Sağlık koşulları", en: "Health conditions"),
+            title: L10n.text("health_conditions"),
             subtitle: copy(
                 tr: "Dışarı çıkarken vücudu etkileyen veriler",
                 en: "Signals that affect outdoor comfort"
@@ -418,7 +418,7 @@ final class HomeViewModel: ObservableObject {
                 id: "uv",
                 icon: "sun.max.fill",
                 title: "UV",
-                detail: copy(tr: "Apple Weather UV verisi sağlamadı", en: "Apple Weather did not provide UV data")
+                detail: L10n.text("apple_weather_did_not_provide")
             )
         }
 
@@ -427,13 +427,13 @@ final class HomeViewModel: ObservableObject {
         switch uvIndex {
         case 8...:
             tone = .danger
-            detail = copy(tr: "Korumasız kalma; gölge ve güneş kremi önemli.", en: "Avoid unprotected exposure; use shade and sunscreen.")
+            detail = L10n.text("avoid_unprotected_exposure_use_shade")
         case 6...7:
             tone = .caution
-            detail = copy(tr: "Uzun dış planlarda güneş koruması kullan.", en: "Use sun protection for longer outdoor plans.")
+            detail = L10n.text("use_sun_protection_for_longer")
         default:
             tone = .good
-            detail = copy(tr: "UV açısından rahat seviye.", en: "Comfortable UV level.")
+            detail = L10n.text("comfortable_uv_level")
         }
 
         return HomeEnvironmentSignal(
@@ -452,8 +452,8 @@ final class HomeViewModel: ObservableObject {
             return unavailableEnvironmentSignal(
                 id: "humidity",
                 icon: "humidity.fill",
-                title: copy(tr: "Nem", en: "Humidity"),
-                detail: copy(tr: "Nem verisi bu tahminde yok", en: "Humidity data is unavailable")
+                title: L10n.text("humidity"),
+                detail: L10n.text("humidity_data_is_unavailable")
             )
         }
 
@@ -462,19 +462,19 @@ final class HomeViewModel: ObservableObject {
         let detail: String
         if humidity >= 0.8 && current.apparentTemperatureCelsius >= 25 {
             tone = .caution
-            detail = copy(tr: "Sıcaklık daha bunaltıcı hissedebilir.", en: "It may feel more oppressive outside.")
+            detail = L10n.text("it_may_feel_more_oppressive")
         } else if humidity <= 0.3 {
             tone = .info
-            detail = copy(tr: "Hava kuru; uzun planda su iyi olur.", en: "Air is dry; hydrate for longer plans.")
+            detail = L10n.text("air_is_dry_hydrate_for")
         } else {
             tone = .good
-            detail = copy(tr: "Nem konforu bozacak seviyede değil.", en: "Humidity should not hurt comfort.")
+            detail = L10n.text("humidity_should_not_hurt_comfort")
         }
 
         return HomeEnvironmentSignal(
             id: "humidity",
             icon: "humidity.fill",
-            title: copy(tr: "Nem", en: "Humidity"),
+            title: L10n.text("humidity"),
             value: "%\(percent)",
             detail: detail,
             tone: tone,
@@ -491,7 +491,7 @@ final class HomeViewModel: ObservableObject {
             return unavailableEnvironmentSignal(
                 id: "air-quality",
                 icon: "aqi.medium",
-                title: copy(tr: "Hava kalitesi", en: "Air quality"),
+                title: L10n.text("air_quality"),
                 detail: copy(
                     tr: "Apple Weather bu tahminde hava kalitesi sağlamıyor.",
                     en: "Apple Weather did not provide air quality for this forecast."
@@ -506,7 +506,7 @@ final class HomeViewModel: ObservableObject {
         return HomeEnvironmentSignal(
             id: "air-quality",
             icon: "aqi.medium",
-            title: copy(tr: "Hava kalitesi", en: "Air quality"),
+            title: L10n.text("air_quality"),
             value: localizedAirQuality(level),
             detail: airQualityDetail(level, sensitive: sensitive),
             tone: severe ? .danger : (level.severity >= 3 ? .caution : .good),
@@ -522,7 +522,7 @@ final class HomeViewModel: ObservableObject {
             return unavailableEnvironmentSignal(
                 id: "pollen",
                 icon: "leaf.fill",
-                title: copy(tr: "Polen", en: "Pollen"),
+                title: L10n.text("pollen"),
                 detail: copy(
                     tr: "Apple Weather bu tahminde polen verisi sağlamıyor.",
                     en: "Apple Weather did not provide pollen data for this forecast."
@@ -534,7 +534,7 @@ final class HomeViewModel: ObservableObject {
         return HomeEnvironmentSignal(
             id: "pollen",
             icon: "leaf.fill",
-            title: copy(tr: "Polen", en: "Pollen"),
+            title: L10n.text("pollen"),
             value: localizedPollen(pollen),
             detail: pollenDetail(pollen, sensitive: sensitive),
             tone: pollen.severity >= 5 ? .danger : (pollen.severity >= 3 ? .caution : .good),
@@ -552,7 +552,7 @@ final class HomeViewModel: ObservableObject {
             id: id,
             icon: icon,
             title: title,
-            value: copy(tr: "Veri yok", en: "No data"),
+            value: L10n.text("no_data"),
             detail: detail,
             tone: .info,
             isAvailable: false
@@ -579,71 +579,71 @@ final class HomeViewModel: ObservableObject {
     private func localizedAirQuality(_ level: AirQualityIndex) -> String {
         switch level {
         case .good:
-            return copy(tr: "İyi", en: "Good")
+            return L10n.text("good")
         case .moderate:
-            return copy(tr: "Orta", en: "Moderate")
+            return L10n.text("moderate")
         case .unhealthySensitive:
-            return copy(tr: "Hassaslara riskli", en: "Risky for sensitive groups")
+            return L10n.text("risky_for_sensitive_groups")
         case .unhealthy:
-            return copy(tr: "Sağlıksız", en: "Unhealthy")
+            return L10n.text("unhealthy")
         case .veryUnhealthy:
-            return copy(tr: "Çok sağlıksız", en: "Very unhealthy")
+            return L10n.text("very_unhealthy")
         case .hazardous:
-            return copy(tr: "Tehlikeli", en: "Hazardous")
+            return L10n.text("hazardous")
         }
     }
 
     private func airQualityDetail(_ level: AirQualityIndex, sensitive: Bool) -> String {
         if level.severity >= 5 {
-            return copy(tr: "Uzun dış planları azalt; hassassan maske düşün.", en: "Reduce long outdoor plans; consider a mask if sensitive.")
+            return L10n.text("reduce_long_outdoor_plans_consider")
         }
         if level.severity >= 3 {
             return sensitive
-                ? copy(tr: "Hassas profil için dışarıda süreyi kısa tut.", en: "Keep outdoor time shorter for your sensitive profile.")
-                : copy(tr: "Hassas kişiler için dikkat gerektirebilir.", en: "Sensitive groups may need caution.")
+                ? L10n.text("keep_outdoor_time_shorter_for")
+                : L10n.text("sensitive_groups_may_need_caution")
         }
-        return copy(tr: "Hava kalitesi dış plan için uygun.", en: "Air quality is suitable for outdoor plans.")
+        return L10n.text("air_quality_is_suitable_for")
     }
 
     private func localizedPollen(_ level: PollenLevel) -> String {
         switch level {
         case .none:
-            return copy(tr: "Yok", en: "None")
+            return L10n.text("none")
         case .veryLow:
-            return copy(tr: "Çok düşük", en: "Very low")
+            return L10n.text("very_low")
         case .low:
-            return copy(tr: "Düşük", en: "Low")
+            return L10n.text("low")
         case .moderate:
-            return copy(tr: "Orta", en: "Moderate")
+            return L10n.text("moderate")
         case .high:
-            return copy(tr: "Yüksek", en: "High")
+            return L10n.text("high")
         case .veryHigh:
-            return copy(tr: "Çok yüksek", en: "Very high")
+            return L10n.text("very_high")
         }
     }
 
     private func pollenDetail(_ level: PollenLevel, sensitive: Bool) -> String {
         if level.severity >= 5 {
-            return copy(tr: "Alerjin varsa dış planı kısalt ve gözlük/maske düşün.", en: "If allergic, shorten outdoor plans and consider glasses or a mask.")
+            return L10n.text("if_allergic_shorten_outdoor_plans")
         }
         if level.severity >= 3 {
             return sensitive
-                ? copy(tr: "Alerji profilin açık; dışarı dönüşte duş iyi olur.", en: "Your allergy profile is on; showering after outdoor time can help.")
-                : copy(tr: "Alerjisi olanlar için semptom yapabilir.", en: "May trigger symptoms for allergic users.")
+                ? L10n.text("your_allergy_profile_is_on")
+                : L10n.text("may_trigger_symptoms_for_allergic")
         }
-        return copy(tr: "Polen seviyesi sakin.", en: "Pollen level is calm.")
+        return L10n.text("pollen_level_is_calm")
     }
 
     private func headlineText(for decision: OutdoorDecision) -> String {
         switch decision {
         case .good:
-            return copy(tr: "Dışarı için temiz gün", en: "Clear outdoor day")
+            return L10n.text("clear_outdoor_day")
         case .moderate:
-            return copy(tr: "Dışarı çıkılır, küçük önlem al", en: "Good to go with light prep")
+            return L10n.text("good_to_go_with_light")
         case .risky:
-            return copy(tr: "Planı dikkatli yap", en: "Plan carefully")
+            return L10n.text("plan_carefully")
         case .avoid:
-            return copy(tr: "Dış planı ertelemek daha iyi", en: "Better to postpone outdoor plans")
+            return L10n.text("better_to_postpone_outdoor_plans")
         }
     }
 

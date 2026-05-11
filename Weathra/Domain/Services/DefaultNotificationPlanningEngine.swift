@@ -102,7 +102,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
             category: .morningBriefing,
             fireDate: fireDate,
-            title: copy(tr: "Bugünün hava planı hazır", en: "Today's weather plan is ready"),
+            title: L10n.text("todays_weather_plan_is_ready"),
             body: body,
             priority: 70,
             reason: L10n.text("notification_morning_reason")
@@ -180,7 +180,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .outfitSuggestion, fireDate: fireDate, calendar: calendar),
             category: .outfitSuggestion,
             fireDate: fireDate,
-            title: copy(tr: "Bugün ne giyilir?", en: "What to wear today"),
+            title: L10n.text("what_to_wear_today"),
             body: body,
             priority: 60,
             reason: L10n.text("notification_outfit_reason")

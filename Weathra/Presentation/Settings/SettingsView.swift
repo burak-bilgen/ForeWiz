@@ -138,7 +138,7 @@ struct SettingsView: View {
                             )
                             SettingsDivider()
 
-                            Text(copy(tr: "Hassasiyetler", en: "Sensitivities"))
+                            Text(L10n.text("sensitivities"))
                                 .font(.system(size: 11, weight: .semibold))
                                 .foregroundStyle(Color.white.opacity(0.36))
                                 .textCase(.uppercase)
@@ -157,7 +157,7 @@ struct SettingsView: View {
 
                             if viewModel.profile.allergyProfile.allergies.contains(.pollen) {
                                 SettingsDivider()
-                                Text(copy(tr: "Polen türleri", en: "Pollen types"))
+                                Text(L10n.text("pollen_types"))
                                     .font(.system(size: 11, weight: .semibold))
                                     .foregroundStyle(Color.white.opacity(0.36))
                                     .textCase(.uppercase)
@@ -410,7 +410,7 @@ private struct SettingsProfileSummaryCard: View {
             HStack(alignment: .top, spacing: 12) {
                 SettingsIcon(systemName: "sparkles", color: blue)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(copy(tr: "Asistan profili", en: "Assistant profile"))
+                    Text(L10n.text("assistant_profile"))
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.white)
                     Text(copy(
@@ -427,26 +427,26 @@ private struct SettingsProfileSummaryCard: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 135), spacing: 10)], spacing: 10) {
                 SettingsSummaryTile(
                     icon: "thermometer.medium",
-                    title: copy(tr: "Hissetme", en: "Comfort"),
+                    title: L10n.text("comfort"),
                     value: profile.temperatureSensitivity.localizedTitle,
                     color: Color(red: 1.0, green: 0.62, blue: 0.28)
                 )
                 SettingsSummaryTile(
                     icon: "figure.walk",
-                    title: copy(tr: "Aktivite", en: "Activities"),
+                    title: L10n.text("activities"),
                     value: activitySummary,
                     color: Color(red: 0.35, green: 0.85, blue: 0.62)
                 )
                 SettingsSummaryTile(
                     icon: "heart.text.square.fill",
-                    title: copy(tr: "Sağlık", en: "Health"),
+                    title: L10n.text("health"),
                     value: healthSummary,
                     color: Color(red: 0.4, green: 0.72, blue: 1.0)
                 )
                 SettingsSummaryTile(
                     icon: isPremium ? "crown.fill" : "bell.badge.fill",
-                    title: isPremium ? "Premium" : copy(tr: "Bildirim", en: "Alerts"),
-                    value: isPremium ? copy(tr: "Aktif", en: "Active") : "\(profile.maximumDailyNotifications)/gün",
+                    title: isPremium ? "Premium" : L10n.text("alerts"),
+                    value: isPremium ? L10n.text("active") : "\(profile.maximumDailyNotifications)/gün",
                     color: Color(red: 1.0, green: 0.78, blue: 0.25)
                 )
             }
@@ -472,7 +472,7 @@ private struct SettingsProfileSummaryCard: View {
     private var healthSummary: String {
         guard profile.allergyProfile.isEnabled,
               let first = profile.allergyProfile.allergies.sorted(by: { $0.rawValue < $1.rawValue }).first else {
-            return copy(tr: "Standart", en: "Standard")
+            return L10n.text("standard")
         }
 
         if profile.allergyProfile.allergies.count == 1 {
