@@ -27,31 +27,40 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
     ) -> DailyRecommendation {
         let todayHours = relevantHours(from: snapshot.hourly, now: now, calendar: calendar)
         let forecastRisks = riskClassifier.uniqueRisks(from: todayHours, current: snapshot.current, calendar: calendar)
-        let assistantRisks = weatherAlertRisks(from: snapshot.alerts) + minuteForecastRisks(
-            from: snapshot.minute,
-            now: now
-        ) + environmentalRisks(from: todayHours, profile: profile)
+        let assistantRisks = weatherAlertRisks(from: snapshot.alerts)
+            + minuteForecastRisks(from: snapshot.minute, now: now)
+            + environmentalRisks(from: todayHours, profile: profile)
         let risks = uniqueRisks(forecastRisks + assistantRisks)
+
         let avoidWindows = (
             riskClassifier.makeAvoidWindows(from: todayHours, profile: profile, calendar: calendar)
             + minuteAvoidWindows(from: snapshot.minute, now: now, calendar: calendar)
             + environmentalAvoidWindows(from: todayHours, profile: profile, now: now, calendar: calendar)
         ).sorted { $0.window.start < $1.window.start }
+
         let outdoorScore = makeOutdoorScore(from: todayHours, profile: profile, risks: risks, calendar: calendar)
         let outdoorDecision = OutdoorDecision(score: outdoorScore)
-        let bestOutdoorWindow = activityWindowScoringEngine.bestWindow(
-            for: .goingOutside,
-            hourly: todayHours,
-            profile: profile,
-            now: now,
-            calendar: calendar
-        )?.bestWindow
+
+        // Consistency: if decision says avoid, do not suggest a best time
+        let bestOutdoorWindow: TimeWindow? = {
+            guard outdoorDecision != .avoid else { return nil }
+            guard risks.contains(where: { $0.severity == .extreme }) == false else { return nil }
+            return activityWindowScoringEngine.bestWindow(
+                for: .goingOutside,
+                hourly: todayHours,
+                profile: profile,
+                now: now,
+                calendar: calendar
+            )?.bestWindow
+        }()
+
         let activityWindows = makeActivityWindows(
             hourly: todayHours,
             profile: profile,
             now: now,
             calendar: calendar
         )
+
         let outfit = outfitDecisionEngine.recommendOutfit(input: OutfitRecommendationInput(
             current: snapshot.current,
             hourly: todayHours,
@@ -75,6 +84,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         )
     }
 
+    // MARK: - Helpers
+
     private func relevantHours(
         from hourly: [HourlyWeatherPoint],
         now: Date,
@@ -84,20 +95,17 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         if today.isEmpty == false {
             return Array(today.sorted { $0.date < $1.date }.prefix(24))
         }
-
         return Array(hourly.filter { $0.date >= now }.sorted { $0.date < $1.date }.prefix(24))
     }
 
     private func uniqueRisks(_ risks: [WeatherRisk]) -> [WeatherRisk] {
         var bestByType: [WeatherRiskType: WeatherRisk] = [:]
-
         for risk in risks {
             if let existing = bestByType[risk.type], risk.severity <= existing.severity {
                 continue
             }
             bestByType[risk.type] = risk
         }
-
         return bestByType.values.sorted {
             if $0.severity == $1.severity {
                 return $0.type.rawValue < $1.type.rawValue
@@ -118,9 +126,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
     }
 
     private func minuteForecastRisks(from minute: [MinuteWeatherPoint]?, now: Date) -> [WeatherRisk] {
-        guard let peak = peakMinuteRain(from: minute, now: now) else {
-            return []
-        }
+        guard let peak = peakMinuteRain(from: minute, now: now) else { return [] }
 
         let severity: RiskLevel
         if peak.precipitationChance >= 0.75 || peak.precipitationIntensityMmPerHour >= 2 {
@@ -131,9 +137,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             severity = .low
         }
 
-        guard severity >= .medium else {
-            return []
-        }
+        guard severity >= .medium else { return [] }
 
         let minutes = max(1, Int(peak.date.timeIntervalSince(now) / 60))
         let chance = Int((peak.precipitationChance * 100).rounded())
@@ -141,11 +145,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             WeatherRisk(
                 type: .rain,
                 severity: severity,
-                title: localized(tr: "Yakın yağış", en: "Nearby rain"),
-                message: localized(
-                    tr: "\(minutes) dakika içinde yağış olasılığı %\(chance). Dış planında şemsiye veya kapalı rota düşün.",
-                    en: "\(chance)% rain chance in \(minutes) minutes. Consider an umbrella or a covered route."
-                )
+                title: L10n.text("risk_nearby_rain"),
+                message: String(format: L10n.text("risk_nearby_rain_message"), chance, minutes)
             )
         ]
     }
@@ -156,9 +157,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         calendar: Calendar
     ) -> [AvoidWindowRecommendation] {
         guard let risk = minuteForecastRisks(from: minute, now: now).first,
-              risk.severity >= .medium else {
-            return []
-        }
+              risk.severity >= .medium else { return [] }
 
         let end = calendar.date(byAdding: .minute, value: 90, to: now) ?? now.addingTimeInterval(90 * 60)
         let window = TimeWindow(start: now, end: end)
@@ -176,10 +175,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         from hourly: [HourlyWeatherPoint],
         profile: UserComfortProfile
     ) -> [WeatherRisk] {
-        guard profile.allergyProfile.isEnabled else {
-            return []
-        }
-
+        guard profile.allergyProfile.isEnabled else { return [] }
         let risks = hourly.flatMap { hour in
             [
                 profile.allergyProfile.allergies.contains(.pollen)
@@ -190,7 +186,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
                     : nil
             ].compactMap { $0 }
         }
-
         return uniqueRisks(risks)
     }
 
@@ -228,7 +223,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
 
     private func riskType(for alertSummary: String) -> WeatherRiskType {
         let summary = alertSummary.lowercased()
-
         if summary.contains("rain") || summary.contains("flood") || summary.contains("yağ") || summary.contains("sel") {
             return .rain
         }
@@ -244,12 +238,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         if summary.contains("uv") || summary.contains("sun") || summary.contains("güneş") {
             return .uv
         }
-
         return .storm
-    }
-
-    private func localized(tr: String, en: String) -> String {
-        L10n.currentLanguageCode == "tr" ? tr : en
     }
 
     private func makeOutdoorScore(
@@ -258,10 +247,10 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         risks: [WeatherRisk],
         calendar: Calendar
     ) -> WeatherScore {
-        let daylightScores = hourly
+        let activeScores = hourly
             .filter { hour in
-                let hourOfDay = calendar.component(.hour, from: hour.date)
-                return (6...22).contains(hourOfDay)
+                let h = calendar.component(.hour, from: hour.date)
+                return isActiveHour(h, profile: profile)
             }
             .map {
                 activityWindowScoringEngine.score(
@@ -272,11 +261,11 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
                 ).rawValue
             }
 
-        guard daylightScores.isEmpty == false else {
+        guard activeScores.isEmpty == false else {
             return WeatherScore(rawValue: 40, label: L10n.text("weather_limited_data"))
         }
 
-        let average = Double(daylightScores.reduce(0, +)) / Double(daylightScores.count)
+        let average = Double(activeScores.reduce(0, +)) / Double(activeScores.count)
         var score = Int(average.rounded())
 
         if risks.contains(where: { $0.severity == .extreme }) {
@@ -286,6 +275,17 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         }
 
         return WeatherScore(rawValue: score)
+    }
+
+    private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
+        let startHour = profile.wakeUpTime?.hour ?? 7
+        let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 22
+
+        if endHour > startHour {
+            return hourOfDay >= startHour && hourOfDay < endHour
+        } else {
+            return hourOfDay >= startHour || hourOfDay < endHour
+        }
     }
 
     private func makeActivityWindows(
@@ -318,24 +318,18 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         risks: [WeatherRisk]
     ) -> String {
         if let risk = risks.first(where: { $0.severity >= .high }) {
-            return "\(risk.title). \(L10n.text("decision_risk_high_message"))"
+            return String(format: L10n.text("summary_risk_format"), risk.title, L10n.text("decision_risk_high_message"))
         }
 
         if let bestWindow {
-            let prefix = L10n.text("decision_best_window")
-            let suffix = L10n.text("decision_best_window_message")
-            return "\(prefix) \(bestWindow.shortDisplayText). \(suffix)"
+            return String(format: L10n.text("summary_best_time_format"), bestWindow.shortDisplayText, L10n.text("decision_best_window_message"))
         }
 
         switch decision {
-        case .good:
-            return L10n.text("decision_good_message")
-        case .moderate:
-            return L10n.text("decision_moderate_message")
-        case .risky:
-            return L10n.text("decision_risky_message")
-        case .avoid:
-            return L10n.text("decision_avoid_message")
+        case .good: return L10n.text("decision_good_message")
+        case .moderate: return L10n.text("decision_moderate_message")
+        case .risky: return L10n.text("decision_risky_message")
+        case .avoid: return L10n.text("decision_avoid_message")
         }
     }
 
@@ -351,11 +345,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             ? L10n.text("decision_no_avoid")
             : avoidWindows.map(\.window.shortDisplayText).joined(separator: ", ")
 
-        let scorePrefix = L10n.text("decision_score_explanation")
-        let factors = L10n.text("decision_explanation_factors")
-        let mainRisk = L10n.text("decision_main_risk")
-        let avoidTime = L10n.text("decision_avoid_time")
-
-        return "\(scorePrefix) \(score.displayValue)/10. \(factors) \(mainRisk) \(riskText). \(avoidTime) \(avoidText)."
+        return String(format: L10n.text("explanation_format"), score.displayValue, riskText, avoidText)
     }
 }

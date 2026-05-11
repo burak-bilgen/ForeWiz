@@ -79,6 +79,8 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         return Array(sorted.prefix(profile.maximumDailyNotifications.clamped(to: 1...3)))
     }
 
+    // MARK: - Morning Briefing
+
     private func makeSmartMorningBriefing(
         recommendation: DailyRecommendation,
         profile: UserComfortProfile,
@@ -92,9 +94,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             after: now,
             matching: preferredTime,
             matchingPolicy: .nextTime
-        ) else {
-            return nil
-        }
+        ) else { return nil }
 
         let body = buildSmartMorningBody(recommendation: recommendation)
 
@@ -113,48 +113,28 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let opening: String
         switch recommendation.outdoorDecision {
         case .good:
-            opening = copy(
-                tr: "Bugün dış plan için rahat görünüyor.",
-                en: "Today looks comfortable for outdoor plans."
-            )
+            opening = L10n.text("today_looks_comfortable_for_outdoor")
         case .moderate:
-            opening = copy(
-                tr: "Dışarı çıkılır, ama küçük önlem iyi olur.",
-                en: "Outdoor plans are fine today, with a little preparation."
-            )
+            opening = L10n.text("outdoor_plans_are_fine_today")
         case .risky:
-            opening = copy(
-                tr: "Bugün dış planı dikkatli kurmak daha iyi.",
-                en: "Build today's outdoor plan carefully."
-            )
+            opening = L10n.text("build_todays_outdoor_plan_carefully")
         case .avoid:
-            opening = copy(
-                tr: "Bugün dış planı kısa tutmak daha güvenli.",
-                en: "It is safer to keep outdoor plans short today."
-            )
+            opening = L10n.text("it_is_safer_to_keep")
         }
 
         var sentences = [opening]
         if let bestWindow = recommendation.bestOutdoorWindow {
-            sentences.append(
-                copy(
-                    tr: "En rahat aralık \(bestWindow.shortDisplayText).",
-                    en: "The best window is \(bestWindow.shortDisplayText)."
-                )
-            )
+            sentences.append(String(format: L10n.text("morning_best_time_format"), bestWindow.shortDisplayText))
         }
 
         if let risk = dominantRisk(in: recommendation), risk.severity >= .high {
-            sentences.append(
-                copy(
-                    tr: "\(risk.title) öne çıkıyor; \(actionText(for: risk))",
-                    en: "\(risk.title) stands out; \(actionText(for: risk))"
-                )
-            )
+            sentences.append(String(format: L10n.text("morning_risk_format"), risk.title, actionText(for: risk)))
         }
 
         return sentences.joined(separator: " ")
     }
+
+    // MARK: - Outfit Plan
 
     private func makeOutfitPlan(
         recommendation: DailyRecommendation,
@@ -169,12 +149,9 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             after: now,
             matching: preferredTime,
             matchingPolicy: .nextTime
-        ) else {
-            return nil
-        }
+        ) else { return nil }
 
-        let outfit = recommendation.outfit
-        let body = buildOutfitBody(outfit)
+        let body = buildOutfitBody(recommendation.outfit)
 
         return NotificationPlan(
             id: stableID(category: .outfitSuggestion, fireDate: fireDate, calendar: calendar),
@@ -195,21 +172,11 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         if items.isEmpty {
             sentences.append(outfit.title)
         } else {
-            sentences.append(
-                copy(
-                    tr: "\(items) iyi olur.",
-                    en: "\(items) should work well."
-                )
-            )
+            sentences.append(String(format: L10n.text("outfit_items_format"), items))
         }
 
         if accessories.isEmpty == false {
-            sentences.append(
-                copy(
-                    tr: "\(accessories) yanına al.",
-                    en: "Bring \(accessories)."
-                )
-            )
+            sentences.append(String(format: L10n.text("outfit_accessories_format"), accessories))
         }
 
         if let warning = outfit.warning {
@@ -219,15 +186,15 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         return sentences.joined(separator: " ")
     }
 
+    // MARK: - Activity Plan
+
     private func makeActivityPlan(
         activityRecommendation: ActivityRecommendation,
         now: Date,
         calendar: Calendar
     ) -> NotificationPlan? {
         let fireDate = activityRecommendation.bestWindow.start
-        guard fireDate >= now.addingTimeInterval(30 * 60) else {
-            return nil
-        }
+        guard fireDate >= now.addingTimeInterval(30 * 60) else { return nil }
 
         let time = activityRecommendation.bestWindow.shortDisplayText
         let activityTitle = activityRecommendation.activityType.localizedTitle
@@ -241,10 +208,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             id: stableID(category: .bestRunWindow, fireDate: fireDate, calendar: calendar),
             category: .bestRunWindow,
             fireDate: fireDate,
-            title: copy(
-                tr: "\(activityTitle) için iyi aralık",
-                en: "Best \(activityTitle) window"
-            ),
+            title: String(format: L10n.text("activity_best_title_format"), activityTitle),
             body: body,
             priority: 80,
             reason: activityRecommendation.reason
@@ -253,24 +217,15 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
     private func buildActivityBody(activityTitle: String, time: String, score: Int) -> String {
         if score >= 80 {
-            return copy(
-                tr: "\(time) arası gerçekten iyi görünüyor. Skor \(score)/100; planını bu aralığa al.",
-                en: "\(time) looks genuinely good. Score \(score)/100; use this window if you can."
-            )
+            return String(format: L10n.text("activity_best_body_format"), time, score)
         }
-
         if score >= 60 {
-            return copy(
-                tr: "\(time) arası daha uygun. Skor \(score)/100; \(activityTitle) planını bu saate çek.",
-                en: "\(time) is the better option. Score \(score)/100; move your \(activityTitle) plan there."
-            )
+            return String(format: L10n.text("activity_good_body_format"), time, score, activityTitle)
         }
-
-        return copy(
-            tr: "Bugünün en makul aralığı \(time). Skor \(score)/100; kısa ve esnek planla.",
-            en: "The least risky window today is \(time). Score \(score)/100; keep it short and flexible."
-        )
+        return String(format: L10n.text("activity_moderate_body_format"), time, score)
     }
+
+    // MARK: - Risk Plans
 
     private func makeSmartRiskPlans(
         recommendation: DailyRecommendation,
@@ -315,16 +270,14 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             .filter { $0.severity >= .high }
             .compactMap { risk -> NotificationPlan? in
                 guard let category = notificationCategory(for: risk.type),
-                      enabledCategories.contains(category) else {
-                    return nil
-                }
+                      enabledCategories.contains(category) else { return nil }
 
                 return NotificationPlan(
                     id: stableID(category: category, fireDate: fireDate, calendar: calendar) + ".urgent.\(risk.type.rawValue)",
                     category: category,
                     fireDate: fireDate,
-                    title: immediateRiskTitle(for: risk),
-                    body: buildImmediateRiskBody(risk),
+                    title: String(format: L10n.text("immediate_risk_title_format"), risk.title),
+                    body: String(format: L10n.text("immediate_risk_body_format"), risk.message, actionText(for: risk)),
                     priority: priorityForSeverity(risk.severity),
                     reason: risk.message
                 )
@@ -361,24 +314,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         let risks = windows.prefix(2).map { $0.risk.title }.joined(separator: ", ")
         let primary = windows[0].risk
 
-        return copy(
-            tr: "\(time) arası \(risks) öne çıkıyor. \(actionText(for: primary))",
-            en: "\(risks) stands out around \(time). \(actionText(for: primary))"
-        )
-    }
-
-    private func immediateRiskTitle(for risk: WeatherRisk) -> String {
-        copy(
-            tr: "Şimdi dikkat: \(risk.title)",
-            en: "Heads up: \(risk.title)"
-        )
-    }
-
-    private func buildImmediateRiskBody(_ risk: WeatherRisk) -> String {
-        copy(
-            tr: "\(risk.message) \(actionText(for: risk))",
-            en: "\(risk.message) \(actionText(for: risk))"
-        )
+        return String(format: L10n.text("smart_risk_body_format"), time, risks, actionText(for: primary))
     }
 
     private func dominantRisk(in recommendation: DailyRecommendation) -> WeatherRisk? {
@@ -389,72 +325,26 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
     private func actionText(for risk: WeatherRisk) -> String {
         switch risk.type {
-        case .heat:
-            copy(
-                tr: "gölge, su ve kısa molalarla ilerle.",
-                en: "stick to shade, water and short breaks."
-            )
-        case .uv:
-            copy(
-                tr: "güneş kremi, şapka ve gölge planı iyi olur.",
-                en: "use sunscreen, a hat and a shade plan."
-            )
-        case .rain:
-            copy(
-                tr: "şemsiyeyi al veya planı kapalı alana çek.",
-                en: "bring an umbrella or move the plan indoors."
-            )
-        case .wind, .storm:
-            copy(
-                tr: "açık alanda uzun kalma ve esnek plan yap.",
-                en: "avoid long exposed outdoor time and keep plans flexible."
-            )
-        case .humidity:
-            copy(
-                tr: "tempoyu düşür ve suyu yanında tut.",
-                en: "slow the pace and keep water nearby."
-            )
-        case .cold:
-            copy(
-                tr: "katmanlı giyin ve rüzgara açık yerde uzun kalma.",
-                en: "dress in layers and avoid staying exposed too long."
-            )
-        case .poorComfort:
-            copy(
-                tr: "dışarıdaki süreyi kısa tutmak daha mantıklı.",
-                en: "keeping outdoor time short is the better call."
-            )
-        case .pollen:
-            copy(
-                tr: "alerjin varsa ilacını ve gözlüğünü hazır tut.",
-                en: "if you have allergies, keep medication and sunglasses ready."
-            )
-        case .airQuality:
-            copy(
-                tr: "hassassan dış planı kısalt ve yoğun aktiviteden kaçın.",
-                en: "if you are sensitive, shorten outdoor plans and avoid intense activity."
-            )
+        case .heat: return L10n.text("stick_to_shade_water_and")
+        case .uv: return L10n.text("use_sunscreen_a_hat_and")
+        case .rain: return L10n.text("bring_an_umbrella_or_move")
+        case .wind, .storm: return L10n.text("avoid_long_exposed_outdoor_time")
+        case .humidity: return L10n.text("slow_the_pace_and_keep")
+        case .cold: return L10n.text("dress_in_layers_and_avoid")
+        case .poorComfort: return L10n.text("keeping_outdoor_time_short_is")
+        case .pollen: return L10n.text("if_you_have_allergies_keep")
+        case .airQuality: return L10n.text("if_you_are_sensitive_shorten")
         }
-    }
-
-    private func copy(tr: String, en: String) -> String {
-        L10n.currentLanguageCode == "tr" ? tr : en
     }
 
     private func isWorthNotifying(plan: NotificationPlan, calendar: Calendar) -> Bool {
         let hour = calendar.component(.hour, from: plan.fireDate)
-        
-        // Late night: only high-priority notifications
         if hour >= 22 || hour < 6 {
             return plan.priority >= 90
         }
-
-        // Midday (12-14): suppress low-priority notifications
         if hour >= 12 && hour < 14 {
             return plan.priority >= 60
         }
-
-        // Morning (7-9) and evening (17-19): allow all
         return true
     }
 
@@ -463,17 +353,12 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         now: Date,
         calendar: Calendar
     ) -> Date {
-        // Lead time varies by risk severity
         let warningLeadMinutes: Int
         switch window.severity {
-        case .extreme:
-            warningLeadMinutes = 60 // warn 1 hour in advance
-        case .high:
-            warningLeadMinutes = 45
-        case .medium:
-            warningLeadMinutes = 30
-        case .low:
-            warningLeadMinutes = 15
+        case .extreme: warningLeadMinutes = 60
+        case .high: warningLeadMinutes = 45
+        case .medium: warningLeadMinutes = 30
+        case .low: warningLeadMinutes = 15
         }
 
         let leadDate = calendar.date(

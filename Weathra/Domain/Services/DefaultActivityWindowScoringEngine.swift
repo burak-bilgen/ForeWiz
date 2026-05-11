@@ -7,12 +7,17 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         profile: UserComfortProfile,
         calendar: Calendar = .current
     ) -> WeatherScore {
+        let hourOfDay = calendar.component(.hour, from: hour.date)
+
+        guard isActiveHour(hourOfDay, profile: profile) else {
+            return WeatherScore(rawValue: 0)
+        }
+
         var score = 100
         let apparentTemperature = adjustedTemperature(
             hour.apparentTemperatureCelsius,
             sensitivity: profile.temperatureSensitivity
         )
-        let hourOfDay = calendar.component(.hour, from: hour.date)
         let month = calendar.component(.month, from: hour.date)
 
         score -= temperaturePenalty(for: apparentTemperature, activity: activity)
@@ -27,10 +32,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
         if hour.isDaylight == false, activity != .goingOutside {
             score -= 8
-        }
-
-        if isLateNight(hour: hourOfDay) {
-            score -= 40
         }
 
         if let severeWeatherRisk = hour.severeWeatherRisk {
@@ -101,6 +102,22 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         )
     }
 
+    // MARK: - Active hours guard
+
+    private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
+        let startHour = profile.wakeUpTime?.hour ?? 7
+        let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 22
+
+        if endHour > startHour {
+            return hourOfDay >= startHour && hourOfDay < endHour
+        } else {
+            // overnight quiet hours (e.g. 22:00 - 07:00)
+            return hourOfDay >= startHour || hourOfDay < endHour
+        }
+    }
+
+    // MARK: - Helpers
+
     private func adjustedTemperature(_ temperature: Double, sensitivity: TemperatureSensitivity) -> Double {
         switch sensitivity {
         case .getsColdEasily:
@@ -125,48 +142,32 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
     private func runningTemperaturePenalty(_ temperature: Double) -> Int {
         switch temperature {
-        case 8...22:
-            0
-        case 4..<8, 22.01...26:
-            10
-        case 26.01...30:
-            28
-        case 30.01...34:
-            46
-        case 34.01...:
-            68
-        default:
-            24
+        case 8...22: 0
+        case 4..<8, 22.01...26: 10
+        case 26.01...30: 28
+        case 30.01...34: 46
+        case 34.01...: 68
+        default: 24
         }
     }
 
     private func walkingTemperaturePenalty(_ temperature: Double) -> Int {
         switch temperature {
-        case 12...28:
-            0
-        case 6..<12, 28.01...31:
-            10
-        case 31.01...35:
-            28
-        case 35.01...:
-            48
-        default:
-            22
+        case 12...28: 0
+        case 6..<12, 28.01...31: 10
+        case 31.01...35: 28
+        case 35.01...: 48
+        default: 22
         }
     }
 
     private func cyclingTemperaturePenalty(_ temperature: Double) -> Int {
         switch temperature {
-        case 10...24:
-            0
-        case 5..<10, 24.01...28:
-            12
-        case 28.01...32:
-            30
-        case 32.01...:
-            54
-        default:
-            24
+        case 10...24: 0
+        case 5..<10, 24.01...28: 12
+        case 28.01...32: 30
+        case 32.01...: 54
+        default: 24
         }
     }
 
@@ -192,14 +193,10 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         let cyclingMultiplier = activity == .cycling ? 1.55 : 1
 
         switch windSpeed {
-        case 0..<20:
-            return 0
-        case 20..<30:
-            return Int((8 * cyclingMultiplier).rounded())
-        case 30..<45:
-            return Int((22 * cyclingMultiplier).rounded())
-        default:
-            return Int((42 * cyclingMultiplier).rounded())
+        case 0..<20: return 0
+        case 20..<30: return Int((8 * cyclingMultiplier).rounded())
+        case 30..<45: return Int((22 * cyclingMultiplier).rounded())
+        default: return Int((42 * cyclingMultiplier).rounded())
         }
     }
 
@@ -208,38 +205,26 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         apparentTemperature: Double,
         activity: ActivityType
     ) -> Int {
-        guard apparentTemperature >= 25 else {
-            return 0
-        }
-
+        guard apparentTemperature >= 25 else { return 0 }
         let humidityValue = humidity ?? 0
         let multiplier = activity == .running ? 1.3 : 1
 
         switch humidityValue {
-        case 0.80...:
-            return Int((16 * multiplier).rounded())
-        case 0.65..<0.80:
-            return Int((8 * multiplier).rounded())
-        default:
-            return 0
+        case 0.80...: return Int((16 * multiplier).rounded())
+        case 0.65..<0.80: return Int((8 * multiplier).rounded())
+        default: return 0
         }
     }
 
     private func uvPenalty(_ uvIndex: Int?, hourOfDay: Int, activity: ActivityType) -> Int {
-        guard (11...16).contains(hourOfDay) else {
-            return 0
-        }
-
+        guard (11...16).contains(hourOfDay) else { return 0 }
         let uv = uvIndex ?? 0
         let multiplier = activity == .running ? 1.15 : 1
 
         switch uv {
-        case 8...:
-            return Int((24 * multiplier).rounded())
-        case 6...7:
-            return Int((14 * multiplier).rounded())
-        default:
-            return 0
+        case 8...: return Int((24 * multiplier).rounded())
+        case 6...7: return Int((14 * multiplier).rounded())
+        default: return 0
         }
     }
 
@@ -248,26 +233,14 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
     }
 
     private func reason(for activity: ActivityType, score: WeatherScore, window: TimeWindow) -> String {
-        let activityTitle = activity.localizedTitle
-        let bestRange = L10n.text("scoring_best_range")
-        let balanced = L10n.text("scoring_balanced")
-        let ok = L10n.text("scoring_ok")
-        let check = L10n.text("scoring_check")
-        let noBest = L10n.text("scoring_no_best")
-        let leastBad = L10n.text("scoring_least_bad")
-
-        if score.rawValue >= 80 {
-            return "\(activityTitle) \(bestRange) \(window.shortDisplayText); \(balanced)"
+        let time = window.shortDisplayText
+        switch score.rawValue {
+        case 80...:
+            return String(format: L10n.text("reason_best_time"), activity.localizedTitle, time)
+        case 60..<80:
+            return String(format: L10n.text("reason_good_time"), activity.localizedTitle, time)
+        default:
+            return String(format: L10n.text("reason_moderate_time"), activity.localizedTitle, time)
         }
-
-        if score.rawValue >= 60 {
-            return "\(activityTitle) \(window.shortDisplayText) \(ok) \(check)"
-        }
-
-        return "\(activityTitle) \(noBest) \(leastBad) \(window.shortDisplayText)."
-    }
-
-    private func isLateNight(hour: Int) -> Bool {
-        hour >= 23 || hour <= 5
     }
 }
