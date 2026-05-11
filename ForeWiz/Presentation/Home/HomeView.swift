@@ -240,7 +240,7 @@ private struct AssistantGreetingCard: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8))
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
                 }
 
                 if assistant.signals.isEmpty == false {
@@ -535,7 +535,7 @@ private struct WeatherMetricChip: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 6)
-        .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 8))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
@@ -682,7 +682,7 @@ private struct ForecastPill: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.06), lineWidth: 0.5))
     }
 
@@ -948,7 +948,7 @@ private struct SkeletonCard: View {
 
     var body: some View {
         RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .fill(Color.white.opacity(0.05))
+            .fill(.ultraThinMaterial)
             .frame(maxWidth: .infinity)
             .frame(height: height)
             .overlay(
@@ -973,7 +973,7 @@ private struct HomeErrorView: View {
                     .frame(width: 90, height: 90)
                     .blur(radius: 8)
                 Circle()
-                    .fill(Color.white.opacity(0.05))
+                    .fill(.ultraThinMaterial)
                     .frame(width: 80, height: 80)
                 Image(systemName: "cloud.slash.fill")
                     .font(.system(size: 34))
@@ -1010,7 +1010,7 @@ private struct HomeErrorView: View {
                 .foregroundStyle(.white)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 14)
-                .background(Color.white.opacity(0.12), in: Capsule())
+                .background(.ultraThinMaterial, in: Capsule())
                 .overlay(Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1))
             }
             .buttonStyle(.plain)

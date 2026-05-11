@@ -375,7 +375,7 @@ private struct SettingsSection<Content: View>: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 6)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(color.opacity(0.10), lineWidth: 1))
         }
     }

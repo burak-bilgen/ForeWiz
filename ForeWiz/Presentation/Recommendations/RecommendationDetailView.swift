@@ -67,7 +67,7 @@ private struct DetailCard<Content: View>: View {
     var body: some View {
         content
             .padding(18)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(accentColor.opacity(0.14), lineWidth: 1))
     }
 }

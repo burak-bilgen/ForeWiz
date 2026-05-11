@@ -7,20 +7,13 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content
             .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color.white.opacity(0.06))
-                    .background(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                    )
-            )
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .strokeBorder(
                         accentColor != nil
                             ? accentColor!.opacity(0.15)
-                            : Color.white.opacity(0.08),
+                            : .white.opacity(0.08),
                         lineWidth: 1
                     )
             )
