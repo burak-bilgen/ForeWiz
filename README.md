@@ -1,25 +1,25 @@
-# Weathra — Personal Weather Decision Assistant
+# ForeWiz — Personal Weather Decision Assistant
 
 <p align="center">
-  <img src="Assets/AppIcon.png" width="120" height="120" alt="Weathra App Icon">
+  <img src="Assets/AppIcon.png" width="120" height="120" alt="ForeWiz App Icon">
 </p>
 
 <p align="center">
-  <strong>Weathra</strong> answers your daily weather questions before you even ask them.
+  <strong>ForeWiz</strong> answers your daily weather questions before you even ask them.
 </p>
 
 <p align="center">
-  <a href="https://apps.apple.com/app/weathra"><img src="https://img.shields.io/badge/App%20Store-Weathra-blue?style=flat-square&logo=apple" alt="App Store"></a>
-  <a href="https://twitter.com/weathraapp"><img src="https://img.shields.io/badge/Twitter-WeathraApp-1DA1F2?style=flat-square&logo=twitter" alt="Twitter"></a>
+  <a href="https://apps.apple.com/app/forewiz"><img src="https://img.shields.io/badge/App%20Store-ForeWiz-blue?style=flat-square&logo=apple" alt="App Store"></a>
+  <a href="https://twitter.com/forewizapp"><img src="https://img.shields.io/badge/Twitter-ForeWizApp-1DA1F2?style=flat-square&logo=twitter" alt="Twitter"></a>
   <img src="https://img.shields.io/badge/iOS-17%2B-green?style=flat-square&logo=apple" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-6-orange?style=flat-square&logo=swift" alt="Swift 6">
 </p>
 
 ---
 
-## What is Weathra?
+## What is ForeWiz?
 
-Weathra is an intelligent weather companion that goes beyond forecasts. It understands *your* comfort preferences, activities, and sensitivities to deliver personalized outdoor decisions.
+ForeWiz is an intelligent weather companion that goes beyond forecasts. It understands *your* comfort preferences, activities, and sensitivities to deliver personalized outdoor decisions.
 
 **No dashboards. No clutter. Just answers.**
 
@@ -28,17 +28,17 @@ Weathra is an intelligent weather companion that goes beyond forecasts. It under
 - "When's the best time to be outside?"
 - "Are there any weather risks I should know about?"
 
-Weathra answers all of these — automatically, every morning.
+ForeWiz answers all of these — automatically, every morning.
 
 ---
 
 ## Key Features
 
 ### Decision-First Weather
-Weathra doesn't just show you temperature and precipitation. It synthesizes every weather factor into a single **outdoor score (0-100)** and clear decision: **Great, go outside** / **Be careful** / **Stay in**.
+ForeWiz doesn't just show you temperature and precipitation. It synthesizes every weather factor into a single **outdoor score (0-100)** and clear decision: **Great, go outside** / **Be careful** / **Stay in**.
 
 ### Personalized Comfort Engine
-Every person feels temperature differently. During onboarding, Weathra learns:
+Every person feels temperature differently. During onboarding, ForeWiz learns:
 - Your temperature sensitivity (cold, normal, hot)
 - Your preferred outdoor activities (running, walking, cycling)
 - Health sensitivities (pollen, air quality, smoke, dust)
@@ -46,13 +46,13 @@ Every person feels temperature differently. During onboarding, Weathra learns:
 Your profile shapes every recommendation, score, and notification.
 
 ### Smart Timing
-Weathra identifies your **best activity windows** based on your schedule. No more guessing — it tells you exactly when conditions are ideal for your workout.
+ForeWiz identifies your **best activity windows** based on your schedule. No more guessing — it tells you exactly when conditions are ideal for your workout.
 
 ### Outfit Intelligence
-Based on temperature, wind, precipitation chance, and UV, Weathra recommends specific clothing and accessories. "Wear layers — cold front arriving at noon."
+Based on temperature, wind, precipitation chance, and UV, ForeWiz recommends specific clothing and accessories. "Wear layers — cold front arriving at noon."
 
 ### Wind-Aware Decisions
-Strong winds affect cycling, running, and general comfort. Weathra factors in wind speed and direction for more accurate outdoor scores.
+Strong winds affect cycling, running, and general comfort. ForeWiz factors in wind speed and direction for more accurate outdoor scores.
 
 ### Risk Alerts
 Get notified about:
@@ -64,7 +64,7 @@ Get notified about:
 - **Pollen** peaks based on your sensitivities
 
 ### Bilingual Experience
-Full support for **English** and **Turkish**. Weathra adapts to your preferred language seamlessly.
+Full support for **English** and **Turkish**. ForeWiz adapts to your preferred language seamlessly.
 
 ### Beautiful Dark UI
 Designed with a modern glassmorphic aesthetic. Deep gradients, adaptive backgrounds that change with weather conditions, smooth animations throughout.
@@ -81,10 +81,10 @@ Designed with a modern glassmorphic aesthetic. Deep gradients, adaptive backgrou
 
 ## Architecture
 
-Weathra is built with **Clean Architecture** and **MVVM-C** pattern:
+ForeWiz is built with **Clean Architecture** and **MVVM-C** pattern:
 
 ```
-Weathra/
+ForeWiz/
 ├── App/                 # App entry point, coordinator, dependency injection
 ├── Core/                # Design system, localization, utilities
 ├── Data/                 # WeatherKit, CoreLocation, SwiftData, StoreKit
@@ -156,7 +156,7 @@ For users who want the complete experience:
 
 ## Ad Strategy
 
-Weathra respects your experience. Free users see a single, non-intrusive banner ad at the bottom of the home screen. Premium subscribers enjoy a completely ad-free experience.
+ForeWiz respects your experience. Free users see a single, non-intrusive banner ad at the bottom of the home screen. Premium subscribers enjoy a completely ad-free experience.
 
 **Ad formats:**
 - Single standard banner (320x50) on free tier
@@ -166,7 +166,7 @@ Weathra respects your experience. Free users see a single, non-intrusive banner 
 
 ## Privacy & Data
 
-**Weathra keeps your data on your device.**
+**ForeWiz keeps your data on your device.**
 
 - Location is used **only** for local weather — no background tracking
 - Preferences and weather cache stored locally via SwiftData
@@ -188,14 +188,14 @@ Weathra respects your experience. Free users see a single, non-intrusive banner 
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/bilgenworks/weathra.git
-cd weathra
+git clone https://github.com/bilgenworks/forewiz.git
+cd forewiz
 
 # Install dependencies
 pod install
 
 # Open in Xcode
-open Weathra.xcworkspace
+open ForeWiz.xcworkspace
 ```
 
 ### WeatherKit Configuration
@@ -237,9 +237,9 @@ Copyright © 2026 Bilgen Works. All rights reserved.
 
 ## Contact
 
-- **Website**: [weathra.app](https://weathra.app)
-- **Twitter**: [@weathraapp](https://twitter.com/weathraapp)
-- **Email**: hello@weathra.app
+- **Website**: [forewiz.app](https://forewiz.app)
+- **Twitter**: [@forewizapp](https://twitter.com/forewizapp)
+- **Email**: hello@forewiz.app
 
 ---
 
