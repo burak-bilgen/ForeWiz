@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		67A871082FAF23C4005B23F5 /* Weathra WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		67305E882F9E05220034CAA8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -34,7 +30,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				67A871082FAF23C4005B23F5 /* Weathra WidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -45,7 +40,6 @@
 		67305E752F9E05210034CAA8 /* Weathra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Weathra.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E872F9E05220034CAA8 /* WeathraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeathraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E912F9E05220034CAA8 /* WeathraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WeathraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Weathra WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		67A870F42FAF23C3005B23F5 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		67A870F62FAF23C3005B23F5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -71,11 +65,15 @@
 		};
 		67305E8A2F9E05220034CAA8 /* WeathraTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = WeathraTests;
 			sourceTree = "<group>";
 		};
 		67305E942F9E05220034CAA8 /* WeathraUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = WeathraUITests;
 			sourceTree = "<group>";
 		};
@@ -123,7 +121,6 @@
 				67305E752F9E05210034CAA8 /* Weathra.app */,
 				67305E872F9E05220034CAA8 /* WeathraTests.xctest */,
 				67305E912F9E05220034CAA8 /* WeathraUITests.xctest */,
-				67A870F32FAF23C3005B23F5 /* Weathra WidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
