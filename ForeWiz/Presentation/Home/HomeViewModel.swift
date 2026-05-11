@@ -44,6 +44,11 @@ final class HomeViewModel: ObservableObject {
         }
     }
 
+    func reloadForLanguageChange() async {
+        didLoad = false
+        await load(forceRefresh: false)
+    }
+
     func refresh() async {
         await load(forceRefresh: true)
     }

@@ -24,7 +24,7 @@ struct OnboardingView: View {
 
             VStack(spacing: 0) {
                 stepIndicator
-                    .padding(.top, 48)
+                    .padding(.top, 32)
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 18) {
@@ -51,6 +51,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 40)
                 }
+                .frame(maxHeight: .infinity)
             }
         }
         .navigationBarHidden(true)
@@ -250,7 +251,7 @@ struct OnboardingView: View {
                 subtitle: L10n.text("onboarding_permissions_subtitle")
             )
 
-            GlassCard(accentColor: accentBlue) {
+            GlassCard(accentColor: accentBlue, innerPadding: 10) {
                 VStack(spacing: 0) {
                     PermissionRow(
                         icon: "location.fill",

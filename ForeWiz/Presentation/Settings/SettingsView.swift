@@ -25,9 +25,9 @@ struct SettingsView: View {
                     .padding(.horizontal, 4)
                     .padding(.bottom, 8)
 
-                if let saveMessage = viewModel.saveMessage {
-                    SettingsSaveBanner(message: saveMessage)
-                }
+                    SettingsSaveBanner(message: viewModel.saveMessage ?? "")
+                        .opacity(viewModel.saveMessage != nil ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.3), value: viewModel.saveMessage != nil)
 
                 SettingsSection(
                     title: L10n.text("settings_units"),
@@ -115,6 +115,7 @@ struct SettingsView: View {
                                     Text(String(format: "%02d:00", hour)).tag(hour)
                                 }
                             }
+                            .pickerStyle(.menu)
                             .tint(Color.white.opacity(0.6))
                         }
                         .padding(.vertical, 4)
@@ -142,6 +143,7 @@ struct SettingsView: View {
                                     Text(String(format: "%02d:00", hour)).tag(hour)
                                 }
                             }
+                            .pickerStyle(.menu)
                             .tint(Color.white.opacity(0.6))
                         }
                         .padding(.vertical, 4)

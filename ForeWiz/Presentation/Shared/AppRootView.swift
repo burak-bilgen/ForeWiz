@@ -102,6 +102,9 @@ private struct HomeRootView: View {
         .onChange(of: showSettings) { _, isPresented in
             if !isPresented { coordinator.dismissSettings() }
         }
+        .onChange(of: coordinator.profile.language) { _, _ in
+            Task { await homeViewModel.reloadForLanguageChange() }
+        }
     }
 }
 
