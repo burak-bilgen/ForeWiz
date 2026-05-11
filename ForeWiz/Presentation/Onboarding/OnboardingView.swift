@@ -40,18 +40,20 @@ struct OnboardingView: View {
                             insertion: .move(edge: .trailing).combined(with: .opacity),
                             removal: .move(edge: .leading).combined(with: .opacity)
                         ))
-
-                        if currentStep == 2 {
-                            startButton
-                                .padding(.top, 12)
-                        } else {
-                            nextButton
-                        }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 40)
                 }
                 .frame(maxHeight: .infinity)
+
+                if currentStep == 2 {
+                    startButton
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 16)
+                } else {
+                    nextButton
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 16)
+                }
             }
         }
         .navigationBarHidden(true)
@@ -251,8 +253,8 @@ struct OnboardingView: View {
                 subtitle: L10n.text("onboarding_permissions_subtitle")
             )
 
-            GlassCard(accentColor: accentBlue, innerPadding: 10) {
-                VStack(spacing: 0) {
+            GlassCard(accentColor: accentBlue, innerPadding: 20) {
+                VStack(spacing: 10) {
                     PermissionRow(
                         icon: "location.fill",
                         color: accentBlue,
@@ -263,8 +265,6 @@ struct OnboardingView: View {
                     ) {
                         viewModel.requestLocationPermission()
                     }
-
-                    Divider().background(Color.white.opacity(0.06)).padding(.leading, 50)
 
                     PermissionRow(
                         icon: "bell.badge.fill",
