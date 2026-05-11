@@ -213,10 +213,7 @@ final class HomeViewModel: ObservableObject {
             tone = .danger
         } else if let bestWindow = recommendation.bestOutdoorWindow {
             headline = L10n.text("todays_plan_is_ready")
-            detail = copy(
-                tr: "En rahat dışarı çıkış aralığı \(bestWindow.shortDisplayText).",
-                en: "Best outdoor window is \(bestWindow.shortDisplayText)."
-            )
+            detail = String(format: L10n.text("best_window_detail_format"), bestWindow.shortDisplayText)
             symbolName = "sparkles"
             tone = recommendation.outdoorDecision == .good ? .good : .info
         } else {
@@ -263,11 +260,8 @@ final class HomeViewModel: ObservableObject {
             id: "nowcast-rain",
             icon: "cloud.rain.fill",
             title: L10n.text("nowcast_rain"),
-            subtitle: copy(tr: "\(minutes) dk içinde %\(chance)", en: "\(chance)% in \(minutes)m"),
-            hint: copy(
-                tr: "\(minutes) dakika içinde \(intensityText). Şemsiye veya kapalı rota iyi olur.",
-                en: "\(intensityText.capitalized) within \(minutes) minutes. Carry an umbrella or choose a covered route."
-            ),
+            subtitle: String(format: L10n.text("nowcast_subtitle_format"), chance, minutes),
+            hint: String(format: L10n.text("nowcast_hint_format"), intensityText, minutes),
             tone: peak.precipitationChance >= 0.65 || peak.precipitationIntensityMmPerHour >= 1.0 ? .danger : .caution
         )
     }
@@ -280,10 +274,7 @@ final class HomeViewModel: ObservableObject {
                 icon: decisionSymbolName(for: recommendation.outdoorDecision),
                 title: L10n.text("now"),
                 timeText: recommendation.outdoorDecision.localizedTitle,
-                detail: copy(
-                    tr: "Dış plan skoru \(recommendation.outdoorScore.rawValue)/100.",
-                    en: "Outdoor score is \(recommendation.outdoorScore.rawValue)/100."
-                ),
+                detail: String(format: L10n.text("outdoor_score_detail_format"), recommendation.outdoorScore.rawValue),
                 tone: assistantTone(for: recommendation.outdoorDecision),
                 isPrimary: true
             )
@@ -324,10 +315,7 @@ final class HomeViewModel: ObservableObject {
                     icon: "clock.fill",
                     title: L10n.text("outdoor_plan"),
                     timeText: bestWindow.shortDisplayText,
-                    detail: copy(
-                        tr: "Yürüyüş, iş ve açık hava işlerini bu aralığa taşı.",
-                        en: "Move walks, errands and outdoor tasks into this window."
-                    ),
+                    detail: L10n.text("move_walks_errands_and_outdoor"),
                     tone: .good,
                     isPrimary: false
                 )
@@ -370,10 +358,7 @@ final class HomeViewModel: ObservableObject {
                     icon: "sunset.fill",
                     title: L10n.text("sunset"),
                     timeText: clockText(for: sunset),
-                    detail: copy(
-                        tr: "Dış planın bitişini buna göre ayarla.",
-                        en: "Use this as a natural end time for outdoor plans."
-                    ),
+                    detail: L10n.text("use_this_as_a_natural"),
                     tone: .info,
                     isPrimary: false
                 )
@@ -382,10 +367,7 @@ final class HomeViewModel: ObservableObject {
 
         return HomePlanViewState(
             title: L10n.text("todays_plan"),
-            subtitle: copy(
-                tr: "Asistanın hava durumunu aksiyona çevirdiği kısa plan",
-                en: "A short action plan built from today’s weather"
-            ),
+            subtitle: L10n.text("a_short_action_plan_built"),
             items: Array(items.prefix(5))
         )
     }
@@ -397,18 +379,17 @@ final class HomeViewModel: ObservableObject {
         let current = result.currentWeather
         let firstHour = result.hourlyPoints.sorted { $0.date < $1.date }.first
 
+        let signals = [
+            uvEnvironmentSignal(from: current),
+            humidityEnvironmentSignal(from: current),
+            airQualityEnvironmentSignal(from: firstHour, profile: profile),
+            pollenEnvironmentSignal(from: firstHour, profile: profile)
+        ].filter { $0.isAvailable }
+
         return HomeEnvironmentViewState(
             title: L10n.text("health_conditions"),
-            subtitle: copy(
-                tr: "Dışarı çıkarken vücudu etkileyen veriler",
-                en: "Signals that affect outdoor comfort"
-            ),
-            signals: [
-                uvEnvironmentSignal(from: current),
-                humidityEnvironmentSignal(from: current),
-                airQualityEnvironmentSignal(from: firstHour, profile: profile),
-                pollenEnvironmentSignal(from: firstHour, profile: profile)
-            ]
+            subtitle: L10n.text("signals_that_affect_outdoor_comfort"),
+            signals: signals
         )
     }
 
@@ -492,10 +473,7 @@ final class HomeViewModel: ObservableObject {
                 id: "air-quality",
                 icon: "aqi.medium",
                 title: L10n.text("air_quality"),
-                detail: copy(
-                    tr: "Apple Weather bu tahminde hava kalitesi sağlamıyor.",
-                    en: "Apple Weather did not provide air quality for this forecast."
-                )
+                detail: L10n.text("apple_weather_did_not_provide_1")
             )
         }
 
@@ -523,10 +501,7 @@ final class HomeViewModel: ObservableObject {
                 id: "pollen",
                 icon: "leaf.fill",
                 title: L10n.text("pollen"),
-                detail: copy(
-                    tr: "Apple Weather bu tahminde polen verisi sağlamıyor.",
-                    en: "Apple Weather did not provide pollen data for this forecast."
-                )
+                detail: L10n.text("apple_weather_did_not_provide_2")
             )
         }
 
@@ -950,7 +925,4 @@ final class HomeViewModel: ObservableObject {
         return AppError.unknown.userMessage
     }
 
-    private func copy(tr: String, en: String) -> String {
-        L10n.currentLanguageCode == "tr" ? tr : en
-    }
 }

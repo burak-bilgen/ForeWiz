@@ -79,11 +79,6 @@
 			path = WeathraUITests;
 			sourceTree = "<group>";
 		};
-		67A870F82FAF23C3005B23F5 /* Weathra Widget */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Weathra Widget";
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,7 +112,6 @@
 				67305E772F9E05210034CAA8 /* Weathra */,
 				67305E8A2F9E05220034CAA8 /* WeathraTests */,
 				67305E942F9E05220034CAA8 /* WeathraUITests */,
-				67A870F82FAF23C3005B23F5 /* Weathra Widget */,
 				67305E762F9E05210034CAA8 /* Products */,
 				6ED844C788CEA9D0CB5F6C13 /* Frameworks */,
 			);
