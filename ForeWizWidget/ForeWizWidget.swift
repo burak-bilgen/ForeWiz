@@ -124,7 +124,7 @@ struct ForeWizWidgetEntryView: View {
                     HStack(spacing: 3) {
                         Image(systemName: "arrow.up")
                             .font(.system(size: 8, weight: .bold))
-                        Text("H \(entry.high)")
+                        Text("\(L10n.text("widget.high_label")) \(entry.high)")
                             .font(.system(size: 11, weight: .semibold))
                     }
                     .foregroundStyle(.white.opacity(0.7))
@@ -132,7 +132,7 @@ struct ForeWizWidgetEntryView: View {
                     HStack(spacing: 3) {
                         Image(systemName: "arrow.down")
                             .font(.system(size: 8, weight: .bold))
-                        Text("L \(entry.low)")
+                        Text("\(L10n.text("widget.low_label")) \(entry.low)")
                             .font(.system(size: 11, weight: .semibold))
                     }
                     .foregroundStyle(.white.opacity(0.5))

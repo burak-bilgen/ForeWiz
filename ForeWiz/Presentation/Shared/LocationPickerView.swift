@@ -658,7 +658,7 @@ private struct ModernAddLocationView: View {
 
     private func addLocation(_ item: MKMapItem) {
         let location = SavedLocation(
-            name: item.name ?? "Selected Location",
+            name: item.name ?? L10n.text("location.picker.fallback_name"),
             latitude: item.location.coordinate.latitude,
             longitude: item.location.coordinate.longitude,
             address: item.address?.fullAddress ?? ""

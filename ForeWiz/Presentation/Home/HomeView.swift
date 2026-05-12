@@ -227,11 +227,11 @@ private struct UnifiedHeroCard: View {
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
-                            .accessibilityLabel("Temperature \(weather.temperatureText)")
+                            .accessibilityLabel(L10n.formatted("home.accessibility.temperature", weather.temperatureText))
                         Text(weather.conditionText)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundStyle(Color.white.opacity(0.8))
-                            .accessibilityLabel("Condition: \(weather.conditionText)")
+                            .accessibilityLabel(L10n.formatted("home.accessibility.condition", weather.conditionText))
                     }
                     Spacer()
                     ZStack {
@@ -336,7 +336,7 @@ private struct UnifiedHeroCard: View {
         }
         .animation(.spring(response: 0.6, dampingFraction: 0.7), value: iconPulse)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(weather.temperatureText), \(weather.conditionText). \(assistant.headline)")
+            .accessibilityLabel(L10n.formatted("home.accessibility.summary", weather.temperatureText, weather.conditionText, assistant.headline))
     }
 
     @ViewBuilder
