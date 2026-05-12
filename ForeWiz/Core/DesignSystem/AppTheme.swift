@@ -88,6 +88,15 @@ enum AppTheme {
         }
     }
 
+    static func color(for score: WeatherScore) -> Color {
+        switch score.rawValue {
+        case 80...100: return success
+        case 60..<80: return accent
+        case 40..<60: return warning
+        default: return danger
+        }
+    }
+
     static func color(for severity: RiskLevel) -> Color {
         switch severity {
         case .low: accent
@@ -98,10 +107,10 @@ enum AppTheme {
 
     static func toneColor(for tone: HomeAssistantTone) -> Color {
         switch tone {
-        case .good: Color(red: 0.3, green: 0.85, blue: 0.58)
-        case .caution: Color(red: 1.0, green: 0.7, blue: 0.3)
-        case .danger: Color(red: 1.0, green: 0.4, blue: 0.4)
-        case .info: Color(red: 0.4, green: 0.72, blue: 1.0)
+        case .good: AppTheme.success
+        case .caution: AppTheme.warning
+        case .danger: AppTheme.danger
+        case .info: AppTheme.accent
         }
     }
 
