@@ -208,6 +208,11 @@ private struct UnifiedHeroCard: View {
     let recommendation: DailyRecommendation
 
     @State private var iconPulse = false
+    @State private var aiOutfitTip: String?
+    @State private var isLoadingAITip = false
+    @State private var showAITip = false
+
+    private let ai = WeatherIntelligenceService.shared
 
     private var accentColor: Color { AppTheme.toneColor(for: assistant.tone) }
     private var decisionColor: Color { AppTheme.color(for: recommendation.outdoorDecision) }
@@ -316,13 +321,80 @@ private struct UnifiedHeroCard: View {
                     .padding(.horizontal, 4)
                     .padding(.vertical, 2)
                 }
+
+                aiTipSection
             }
             .padding(14)
         }
-        .onAppear { iconPulse = true }
+        .onAppear {
+            iconPulse = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                withAnimation { showAITip = true }
+            }
+        }
         .animation(.spring(response: 0.6, dampingFraction: 0.7), value: iconPulse)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(weather.temperatureText), \(weather.conditionText). \(assistant.headline)")
+    }
+
+    @ViewBuilder
+    private var aiTipSection: some View {
+        if let tip = aiOutfitTip {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
+                Text(tip)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.8))
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(10)
+            .background(Color(red: 1.0, green: 0.7, blue: 0.3).opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .transition(.opacity.combined(with: .move(edge: .bottom)))
+        } else if !isLoadingAITip && showAITip {
+            Button {
+                loadAITip()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 11))
+                    Text(L10n.text("home_ai_outfit_tip"))
+                        .font(.system(size: 11, weight: .medium))
+                }
+                .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(Color(red: 1.0, green: 0.7, blue: 0.3).opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+            }
+            .buttonStyle(.plain)
+        } else if isLoadingAITip {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .tint(Color(red: 1.0, green: 0.7, blue: 0.3))
+                    .scaleEffect(0.7)
+                Text(L10n.text("home_ai_thinking"))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.5))
+            }
+        }
+    }
+
+    private func loadAITip() {
+        isLoadingAITip = true
+        Task {
+            let temp = weather.temperatureText
+            let condition = weather.conditionText
+            let wind = weather.windText
+            let tip = await ai.generateOutfitSuggestion(temperature: temp, condition: condition, wind: wind)
+            await MainActor.run {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    aiOutfitTip = tip
+                    isLoadingAITip = false
+                }
+            }
+        }
     }
 
     private func metricInline(icon: String, label: String, value: String) -> some View {
