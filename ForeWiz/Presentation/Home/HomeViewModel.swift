@@ -2,7 +2,7 @@ import Combine
 import CoreLocation
 import Foundation
 import MapKit
-import os.log
+import OSLog
 
 @MainActor
 final class HomeViewModel: ObservableObject {

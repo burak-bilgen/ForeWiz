@@ -103,8 +103,8 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             let slice = scoredHours[startIndex..<endIndex]
             guard slice.isEmpty == false else { continue }
 
-            let firstTime = slice.first!.hour.date
-            let lastTime = slice.last!.hour.date
+            guard let firstTime = slice.first?.hour.date,
+                  let lastTime = slice.last?.hour.date else { continue }
 
             if overlapsAvoidWindows(start: firstTime, end: calendar.date(byAdding: .hour, value: 1, to: lastTime) ?? lastTime, avoidWindows: avoidWindows) {
                 continue
