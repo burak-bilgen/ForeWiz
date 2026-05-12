@@ -227,9 +227,11 @@ private struct UnifiedHeroCard: View {
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.6)
+                            .accessibilityLabel("Temperature \(weather.temperatureText)")
                         Text(weather.conditionText)
                             .font(.system(size: 15, weight: .medium))
                             .foregroundStyle(Color.white.opacity(0.8))
+                            .accessibilityLabel("Condition: \(weather.conditionText)")
                     }
                     Spacer()
                     ZStack {
@@ -725,11 +727,25 @@ private struct CompactWarningBanner: View {
 
 private extension View {
     func cardEntrance(appeared: Bool, delay: Double) -> some View {
-        self
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 12)
-            .scaleEffect(appeared ? 1 : 0.98)
-            .animation(.spring(response: 0.4, dampingFraction: 0.82).delay(delay), value: appeared)
+        modifier(CardEntranceModifier(appeared: appeared, delay: delay))
+    }
+}
+
+private struct CardEntranceModifier: ViewModifier {
+    let appeared: Bool
+    let delay: Double
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
+
+    func body(content: Content) -> some View {
+        if reduceMotion {
+            content.opacity(appeared ? 1 : 0)
+        } else {
+            content
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 12)
+                .scaleEffect(appeared ? 1 : 0.98)
+                .animation(.spring(response: 0.4, dampingFraction: 0.82).delay(delay), value: appeared)
+        }
     }
 }
 
