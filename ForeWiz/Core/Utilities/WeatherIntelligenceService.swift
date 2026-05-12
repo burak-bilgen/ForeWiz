@@ -21,20 +21,20 @@ final class WeatherIntelligenceService {
     }
 
     private func smartOutfit(isCold: Bool, isRainy: Bool, isWindy: Bool, tempNum: Double?, condition: String) -> String {
-        if isRainy { return "Grab a waterproof jacket and umbrella — rain's in the forecast." }
-        if isCold && isWindy { return "Bundle up with a windproof coat and warm layers." }
-        if isCold { return "Wear a warm coat and dress in layers to stay comfortable." }
-        if isWindy { return "A wind-resistant jacket will keep you comfortable today." }
+        if isRainy { return "Yağmur var — yanına şemsiye ve su geçirmez bir şey al." }
+        if isCold && isWindy { return "Rüzgar geçirmez bir mont ve kat kat giyinmek iyi olur." }
+        if isCold { return "Hava soğuk, kalın bir mont ve katmanlı giyinmekte fayda var." }
+        if isWindy { return "Rüzgarlı bir gün — rüzgar geçirmez bir ceket rahat ettirir." }
         if let temp = tempNum {
-            if temp > 30 { return "It's hot out — light fabrics, sunscreen, and plenty of water." }
-            if temp > 25 { return "Warm day ahead — light clothing and stay hydrated." }
-            if temp > 20 { return "Pleasant weather — light layers work perfectly." }
-            if temp > 15 { return "A light jacket or sweater should be just right." }
+            if temp > 30 { return "Hava çok sıcak — ince kumaşlar, güneş kremi ve bol su." }
+            if temp > 25 { return "Sıcak bir gün — hafif giysiler ve bol sıvı iyi gelir." }
+            if temp > 20 { return "Keyifli bir hava — ince bir şeyler giymek yeterli." }
+            if temp > 15 { return "Hafif bir ceket veya hırka ideal olur." }
         }
         if condition.lowercased().contains("sun") || condition.lowercased().contains("clear") {
-            return "Sunny and clear — dress comfortably and enjoy the day."
+            return "Güneşli ve açık bir gün — rahat giyin ve keyfini çıkar."
         }
-        return "Light and comfortable clothing works well today."
+        return "Hafif ve rahat kıyafetler bugün için uygun."
     }
 
     private func extractNumber(from text: String) -> Double? {

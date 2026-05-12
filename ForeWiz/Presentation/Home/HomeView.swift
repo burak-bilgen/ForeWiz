@@ -523,7 +523,7 @@ private struct PlanItemRow: View {
                 Text(item.detail)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.white.opacity(0.5))
-                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer(minLength: 6)
@@ -600,14 +600,16 @@ private struct ForecastPill: View {
                 .font(.system(size: 12))
                 .foregroundStyle(Color.white.opacity(0.4))
 
-            // Skor göstergesi
             ZStack {
                 Circle()
-                    .stroke(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)), lineWidth: 2)
-                    .frame(width: 18, height: 18)
+                    .fill(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)).opacity(0.15))
+                    .frame(width: 30, height: 30)
+                Circle()
+                    .stroke(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)).opacity(0.5), lineWidth: 2)
+                    .frame(width: 30, height: 30)
                 Text(String(forecast.outdoorScore))
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)))
             }
         }
         .padding(.horizontal, 10)

@@ -642,7 +642,7 @@ state = .loaded(
             do {
                 let mapItems = try await request.mapItems
                 guard let item = mapItems.first else { return }
-                let locationName = item.name ?? item.address?.fullAddress ?? L10n.text("home_current_location")
+                let locationName = item.addressRepresentations?.cityName ?? item.address?.shortAddress ?? item.name ?? L10n.text("home_current_location")
                 Task { @MainActor in
                     self.selectedLocationName = locationName
                 }

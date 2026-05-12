@@ -91,9 +91,10 @@ struct OnboardingView: View {
                                         .scaleEffect(selected ? 1.15 : 1.0)
                                     Text(sensitivity.localizedTitle)
                                         .font(.system(size: 14, weight: selected ? .semibold : .regular))
+                                        .multilineTextAlignment(.center)
                                 }
                                 .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.4))
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .padding(.vertical, 12)
                                 .background(selected ? accentOrange.opacity(0.12) : Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(selected ? accentOrange.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
@@ -102,6 +103,7 @@ struct OnboardingView: View {
                             .buttonStyle(.plain)
                         }
                     }
+                    .frame(minHeight: 72)
                 }
             }
             .staggerEntrance(index: 3, appeared: pageAppeared)

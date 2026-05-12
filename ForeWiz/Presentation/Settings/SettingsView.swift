@@ -94,7 +94,8 @@ struct SettingsView: View {
                         .pickerStyle(.menu)
                         .tint(Color.white.opacity(0.6))
                     }
-                    .padding(.vertical, 5)
+                    .padding(.top, 14)
+                    .padding(.bottom, 20)
                 }
 
                 SettingsSection(
