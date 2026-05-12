@@ -67,6 +67,7 @@ struct ForeWizApp: App {
             .onChange(of: scenePhase) { _, phase in
                 handleScenePhaseChange(phase)
             }
+            .preferredColorScheme(.dark)
         }
     }
 

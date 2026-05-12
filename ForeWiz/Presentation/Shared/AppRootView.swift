@@ -23,7 +23,7 @@ struct AppRootView: View {
                 HomeRootView(coordinator: coordinator)
             }
         }
-        .preferredColorScheme(coordinator.profile.appearance.colorScheme)
+        .preferredColorScheme(.dark)
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
         .task {
@@ -147,19 +147,6 @@ private extension AppLanguage {
             Locale(identifier: localeIdentifier)
         } else {
             .autoupdatingCurrent
-        }
-    }
-}
-
-private extension AppAppearance {
-    var colorScheme: ColorScheme? {
-        switch self {
-        case .system:
-            nil
-        case .light:
-            .light
-        case .dark:
-            .dark
         }
     }
 }

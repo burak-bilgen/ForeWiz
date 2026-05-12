@@ -16,12 +16,12 @@ final class ThemeManager {
     }
     
     func toggleDarkMode() {
-        colorScheme = isDarkMode ? .light : .dark
+        colorScheme = .dark
         saveTheme()
     }
     
-    func setColorScheme(_ scheme: ColorScheme) {
-        colorScheme = scheme
+    func setColorScheme(_: ColorScheme) {
+        colorScheme = .dark
         saveTheme()
     }
     
@@ -31,9 +31,7 @@ final class ThemeManager {
     }
     
     private func loadSavedTheme() {
-        if let saved = UserDefaults.standard.string(forKey: "app_theme") {
-            colorScheme = saved == "dark" ? .dark : .light
-        }
+        colorScheme = .dark
         
         if let accentData = UserDefaults.standard.data(forKey: "app_accent_color"),
            let uiColor = try? NSKeyedUnarchiver.unarchivedObject(ofClass: UIColor.self, from: accentData) {
