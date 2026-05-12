@@ -42,7 +42,9 @@ final class MockWeatherRepository: WeatherRepository {
                 lowTemperatureCelsius: 14 + Double.random(in: -2...2),
                 precipitationChance: isRainy ? 0.75 : 0.1,
                 uvIndex: 5,
-                conditionCode: isRainy ? "Rain" : "Clear"
+                conditionCode: isRainy ? "Rain" : "Clear",
+                sunrise: calendar.date(bySettingHour: 6, minute: 30, second: 0, of: date),
+                sunset: calendar.date(bySettingHour: 19, minute: 30, second: 0, of: date)
             )
         }
 

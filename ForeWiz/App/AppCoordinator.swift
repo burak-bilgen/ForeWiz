@@ -16,7 +16,7 @@ final class AppCoordinator: ObservableObject {
     @Published var showSettings = false
 
     init(container: DependencyContainer, rootFlow: RootFlow = .onboarding) {
-        self.container = container
+        self.container = container  
         self.rootFlow = rootFlow
         L10n.configure(language: profile.language)
     }
@@ -25,7 +25,7 @@ final class AppCoordinator: ObservableObject {
         AnalyticsManager.shared.track(.appLaunch)
 
         do {
-            var loadedProfile = try await container.preferencesRepository.loadProfile()
+            let loadedProfile = try await container.preferencesRepository.loadProfile()
             L10n.configure(language: loadedProfile.language)
             profile = loadedProfile
             rootFlow = try await container.preferencesRepository.isOnboardingCompleted() ? .main : .onboarding

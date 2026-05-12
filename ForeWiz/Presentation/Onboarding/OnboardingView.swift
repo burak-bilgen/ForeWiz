@@ -51,6 +51,7 @@ struct OnboardingView: View {
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(Color(red: 0.4, green: 0.72, blue: 1.0))
             }
+            .floating(amplitude: 6, duration: 3.5)
             .staggerEntrance(index: 0, appeared: pageAppeared)
 
             Text(L10n.text("onboarding_welcome_title"))
@@ -80,11 +81,14 @@ struct OnboardingView: View {
                             let selected = viewModel.selectedSensitivity == sensitivity
                             Button {
                                 HapticManager.selection()
-                                viewModel.selectSensitivity(sensitivity)
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    viewModel.selectSensitivity(sensitivity)
+                                }
                             } label: {
                                 VStack(spacing: 5) {
                                     Image(systemName: OnboardingView.icon(for: sensitivity))
                                         .font(.system(size: 18))
+                                        .scaleEffect(selected ? 1.15 : 1.0)
                                     Text(sensitivity.localizedTitle)
                                         .font(.system(size: 11, weight: selected ? .semibold : .regular))
                                 }
@@ -100,6 +104,7 @@ struct OnboardingView: View {
                     }
                 }
             }
+            .staggerEntrance(index: 3, appeared: pageAppeared)
 
             sectionCard {
                 VStack(alignment: .leading, spacing: 10) {
@@ -109,6 +114,7 @@ struct OnboardingView: View {
                         Image(systemName: "sunrise.fill")
                             .font(.system(size: 16))
                             .foregroundStyle(accentOrange)
+                            .floating(amplitude: 3, duration: 4)
                         Spacer()
                         Picker("", selection: Binding(
                             get: { viewModel.wakeUpTime.hour ?? 7 },
@@ -126,6 +132,7 @@ struct OnboardingView: View {
                     .padding(.vertical, 2)
                 }
             }
+            .staggerEntrance(index: 4, appeared: pageAppeared)
 
             sectionCard {
                 VStack(alignment: .leading, spacing: 10) {
@@ -136,7 +143,9 @@ struct OnboardingView: View {
                             let selected = viewModel.preferredActivities.contains(activity)
                             Button {
                                 HapticManager.selection()
-                                viewModel.toggleActivity(activity)
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    viewModel.toggleActivity(activity)
+                                }
                             } label: {
                                 HStack(spacing: 5) {
                                     Image(systemName: OnboardingView.icon(for: activity))
@@ -149,6 +158,7 @@ struct OnboardingView: View {
                                 .padding(.vertical, 8)
                                 .background(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.12) : Color.white.opacity(0.05), in: Capsule())
                                 .overlay(Capsule().stroke(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
+                                .scaleEffect(selected ? 1.05 : 1.0)
                             }
                             .accessibilityLabel(activity.localizedTitle)
                             .buttonStyle(.plain)
@@ -156,6 +166,7 @@ struct OnboardingView: View {
                     }
                 }
             }
+            .staggerEntrance(index: 5, appeared: pageAppeared)
         }
     }
 
@@ -188,6 +199,7 @@ struct OnboardingView: View {
                 }
             }
         }
+        .staggerEntrance(index: 6, appeared: pageAppeared)
 
         if let error = viewModel.errorMessage {
             Text(error)
@@ -235,9 +247,11 @@ struct OnboardingView: View {
                 ),
                 in: RoundedRectangle(cornerRadius: 18, style: .continuous)
             )
+            .pulseGlow(color: Color(red: 0.2, green: 0.5, blue: 1.0), radius: 12)
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
         .disabled(isCompleting)
+        .staggerEntrance(index: 7, appeared: pageAppeared)
     }
 
     private func sectionCard(@ViewBuilder content: () -> some View) -> some View {

@@ -6,7 +6,6 @@ struct NotificationSettingsSection: View {
     private let notifColor = Color(red: 1.0, green: 0.45, blue: 0.45)
 
     var body: some View {
-        // Daily limit
         HStack(spacing: 14) {
             ZStack {
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
@@ -59,17 +58,5 @@ struct NotificationSettingsSection: View {
             .glassEffect(.regular, in: Capsule())
         }
         .padding(.vertical, 8)
-
-        Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1).padding(.leading, 50)
-
-        // Quiet hours
-        QuietHoursPicker(quietHours: $profile.quietHours)
-
-        Rectangle().fill(Color.white.opacity(0.06)).frame(height: 1).padding(.leading, 50)
-
-        // Per-category toggles
-        ForEach($profile.notificationPreferences) { $preference in
-            NotificationPreferenceToggle(preference: $preference)
-        }
     }
 }

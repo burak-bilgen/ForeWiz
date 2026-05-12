@@ -3,6 +3,7 @@ import BackgroundTasks
 import UIKit
 import OSLog
 import Network
+import UserNotifications
 import WidgetKit
 
 final class BackgroundRefreshManager {
@@ -205,7 +206,7 @@ final class AppLifecycleManager {
 
         logStateTransition(from: .inactive, to: .active)
 
-        UIApplication.shared.applicationIconBadgeNumber = 0
+        UNUserNotificationCenter.current().setBadgeCount(0)
 
         NotificationCenter.default.post(name: .appDidBecomeActive, object: nil)
     }

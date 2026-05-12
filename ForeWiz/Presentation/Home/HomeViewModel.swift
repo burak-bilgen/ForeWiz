@@ -1,6 +1,7 @@
 import Combine
 import CoreLocation
 import Foundation
+import MapKit
 import os.log
 
 @MainActor
@@ -17,7 +18,6 @@ final class HomeViewModel: ObservableObject {
 
     private var selectedLocation: SavedLocation?
     private var selectedLocationID: String = "current-location"
-    private let geocoder = CLGeocoder()
 
     init(
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
@@ -635,26 +635,19 @@ state = .loaded(
         return AppError.unknown.userMessage
     }
 
-private func resolveLocationName(for location: LocationCoordinate) {
+    private func resolveLocationName(for location: LocationCoordinate) {
         let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
-        geocoder.reverseGeocodeLocation(clLocation) { [weak self] placemarks, _ in
-            guard let self, let placemark = placemarks?.first else { return }
-
-            let city = placemark.locality
-                ?? placemark.administrativeArea
-                ?? placemark.country
-
-            let countryCode = placemark.isoCountryCode
-
-            let name: String
-            if let city {
-                name = city
-            } else {
-                name = L10n.text("home_current_location")
-            }
-
-            Task { @MainActor in
-                self.selectedLocationName = name
+        guard let request = MKReverseGeocodingRequest(location: clLocation) else { return }
+        Task {
+            do {
+                let mapItems = try await request.mapItems
+                guard let item = mapItems.first else { return }
+                let locationName = item.name ?? item.address?.fullAddress ?? L10n.text("home_current_location")
+                Task { @MainActor in
+                    self.selectedLocationName = locationName
+                }
+            } catch {
+                AppLogger.app.error("Reverse geocoding failed: \(error.localizedDescription)")
             }
         }
     }

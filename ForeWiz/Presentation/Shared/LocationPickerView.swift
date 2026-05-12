@@ -100,7 +100,7 @@ private struct AddLocationMapView: View {
         ZStack {
             Map(position: $cameraPosition, interactionModes: [.pan, .zoom]) {
                 if let item = selectedMapItem {
-                    Marker(item.name ?? "", coordinate: item.placemark.coordinate)
+                    Marker(item.name ?? "", coordinate: item.location.coordinate)
                         .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
                 }
             }
@@ -201,7 +201,7 @@ private struct AddLocationMapView: View {
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
-                    if let addr = item.placemark.title, !addr.isEmpty {
+                    if let addr = item.address?.fullAddress, !addr.isEmpty {
                         Text(addr)
                             .font(.system(size: 13))
                             .foregroundStyle(Color.white.opacity(0.6))
@@ -266,7 +266,7 @@ private struct AddLocationMapView: View {
 
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             cameraPosition = .region(MKCoordinateRegion(
-                center: item.placemark.coordinate,
+                center: item.location.coordinate,
                 latitudinalMeters: 1500,
                 longitudinalMeters: 1500
             ))
@@ -277,12 +277,12 @@ private struct AddLocationMapView: View {
         guard let item = selectedMapItem else { return }
 
         let name = item.name ?? "Selected Location"
-        let address = item.placemark.title ?? ""
+        let address = item.address?.fullAddress ?? item.name ?? "Selected Location"
 
         let location = SavedLocation(
             name: name,
-            latitude: item.placemark.coordinate.latitude,
-            longitude: item.placemark.coordinate.longitude,
+            latitude: item.location.coordinate.latitude,
+            longitude: item.location.coordinate.longitude,
             address: address
         )
         savedLocations.append(location)
@@ -307,7 +307,7 @@ private struct SearchResultRow: View {
                         .foregroundStyle(.white)
                         .lineLimit(1)
 
-                    if let addr = item.placemark.title {
+                    if let addr = item.address?.fullAddress {
                         Text(addr)
                             .font(.system(size: 12))
                             .foregroundStyle(Color.white.opacity(0.5))

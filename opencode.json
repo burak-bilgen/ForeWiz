@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "xcode-mcp": {
+      "command": "/Users/burak/.local/bin/npx",
+      "args": [
+        "-y",
+        "xcode-mcp-server@latest"
+      ]
+    }
+  }
+}

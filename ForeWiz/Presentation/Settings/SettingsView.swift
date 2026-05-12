@@ -3,7 +3,6 @@ import UIKit
 
 struct SettingsView: View {
     @StateObject var viewModel: SettingsViewModel
-    @State private var showResetConfirmation = false
     @State private var showDeleteAllDataConfirmation = false
     @State private var showShareSheet = false
     @State private var exportJSON = ""
@@ -71,59 +70,31 @@ struct SettingsView: View {
                     icon: "sunrise.fill",
                     color: Color(red: 1.0, green: 0.7, blue: 0.35)
                 ) {
-                    VStack(alignment: .leading, spacing: 23) {
-                        HStack(spacing: 14) {
-                            SettingsIcon(systemName: "sunrise.fill", color: Color(red: 1.0, green: 0.7, blue: 0.35))
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(L10n.text("settings_wake_time"))
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(.white)
-                                Text(L10n.text("settings_wake_desc"))
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color.white.opacity(0.38))
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            .layoutPriority(1)
-                            Spacer(minLength: 8)
-                            Picker("", selection: Binding(
-                                get: { viewModel.profile.wakeUpTime?.hour ?? 7 },
-                                set: { viewModel.profile.wakeUpTime = DateComponents(hour: $0, minute: 0) }
-                            )) {
-                                ForEach(5...11, id: \.self) { hour in
-                                    Text(String(format: "%02d:00", hour)).tag(hour)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .tint(Color.white.opacity(0.6))
+                    HStack(spacing: 14) {
+                        SettingsIcon(systemName: "sunrise.fill", color: Color(red: 1.0, green: 0.7, blue: 0.35))
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(L10n.text("settings_wake_time"))
+                                .font(.system(size: 15))
+                                .foregroundStyle(.white)
+                            Text(L10n.text("settings_wake_desc"))
+                                .font(.system(size: 12))
+                                .foregroundStyle(Color.white.opacity(0.38))
+                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(.vertical, 5)
-
-                        HStack(spacing: 14) {
-                            SettingsIcon(systemName: "figure.run", color: Color(red: 1.0, green: 0.7, blue: 0.35))
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(L10n.text("settings_workout_time"))
-                                    .font(.system(size: 15))
-                                    .foregroundStyle(.white)
-                                Text(L10n.text("settings_workout_desc"))
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Color.white.opacity(0.38))
-                                    .fixedSize(horizontal: false, vertical: true)
+                        .layoutPriority(1)
+                        Spacer(minLength: 8)
+                        Picker("", selection: Binding(
+                            get: { viewModel.profile.wakeUpTime?.hour ?? 7 },
+                            set: { viewModel.profile.wakeUpTime = DateComponents(hour: $0, minute: 0) }
+                        )) {
+                            ForEach(5...11, id: \.self) { hour in
+                                Text(String(format: "%02d:00", hour)).tag(hour)
                             }
-                            .layoutPriority(1)
-                            Spacer(minLength: 8)
-                            Picker("", selection: Binding(
-                                get: { viewModel.profile.usualWorkoutTime?.hour ?? 8 },
-                                set: { viewModel.profile.usualWorkoutTime = DateComponents(hour: $0, minute: 0) }
-                            )) {
-                                ForEach(6...22, id: \.self) { hour in
-                                    Text(String(format: "%02d:00", hour)).tag(hour)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .tint(Color.white.opacity(0.6))
                         }
-                        .padding(.bottom, 20)
+                        .pickerStyle(.menu)
+                        .tint(Color.white.opacity(0.6))
                     }
+                    .padding(.vertical, 5)
                 }
 
                 SettingsSection(
@@ -134,43 +105,7 @@ struct SettingsView: View {
                     NotificationSettingsSection(profile: $viewModel.profile)
                 }
 
-                SettingsSection(
-                    title: L10n.text("settings_section_permissions"),
-                    icon: "lock.shield.fill",
-                    color: Color(red: 0.4, green: 0.85, blue: 0.6)
-                ) {
-                    SettingsRow(
-                        icon: "location.fill",
-                        iconColor: Color(red: 0.4, green: 0.7, blue: 1.0),
-                        title: L10n.text("settings_permission_location"),
-                        subtitle: L10n.text("settings_permission_location_desc")
-                    )
-                    SettingsDivider()
-                    SettingsRow(
-                        icon: "bell.badge.fill",
-                        iconColor: Color(red: 1.0, green: 0.7, blue: 0.3),
-                        title: L10n.text("settings_permission_notifications"),
-                        subtitle: L10n.text("settings_permission_notifications_desc")
-                    )
-                    SettingsDivider()
-                    Button {
-                        if let url = URL(string: UIApplication.openSettingsURLString) {
-                            openURL(url)
-                        }
-                    } label: {
-                        HStack(spacing: 12) {
-                            SettingsIcon(systemName: "arrow.up.forward.app", color: Color(red: 0.4, green: 0.85, blue: 0.6))
-                            Text(L10n.text("settings_open_ios_settings"))
-                                .font(.system(size: 15))
-                                .foregroundStyle(.white)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(Color.white.opacity(0.3))
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
+
 
                 SettingsSection(
                     title: L10n.text("settings_language"),
@@ -199,23 +134,6 @@ struct SettingsView: View {
 
                 Button {
                     HapticManager.medium()
-                    showResetConfirmation = true
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "arrow.counterclockwise")
-                            .font(.system(size: 14))
-                        Text(L10n.text("settings_reset_title"))
-                            .font(.system(size: 15, weight: .medium))
-                    }
-                    .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.2), lineWidth: 1))
-                }
-
-                Button {
-                    HapticManager.medium()
                     showDeleteAllDataConfirmation = true
                 } label: {
                     HStack(spacing: 10) {
@@ -229,26 +147,6 @@ struct SettingsView: View {
                     .padding(.vertical, 14)
                     .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.red.opacity(0.2), lineWidth: 1))
-                }
-
-                Button {
-                    HapticManager.medium()
-                    if let json = viewModel.exportData() {
-                        exportJSON = json
-                        showShareSheet = true
-                    }
-                } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 14))
-                        Text(L10n.text("settings_export_data_title"))
-                            .font(.system(size: 15, weight: .medium))
-                    }
-                    .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.2), lineWidth: 1))
                 }
 
                 .padding(.bottom, 32)
@@ -280,19 +178,6 @@ struct SettingsView: View {
         .onChange(of: viewModel.profile.language) { _, newLang in
             languageKey = newLang.localeIdentifier ?? "system"
         }
-        .confirmationDialog(
-            L10n.text("settings_reset_title"),
-            isPresented: $showResetConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button(L10n.text("settings_reset_confirm"), role: .destructive) {
-                viewModel.resetOnboarding()
-            }
-            Button(L10n.text("settings_cancel"), role: .cancel) {}
-        } message: {
-            Text(L10n.text("settings_reset_message"))
-        }
-
         .confirmationDialog(
             L10n.text("settings_delete_all_data_title"),
             isPresented: $showDeleteAllDataConfirmation,
