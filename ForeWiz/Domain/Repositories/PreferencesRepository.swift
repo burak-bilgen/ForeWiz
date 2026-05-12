@@ -5,4 +5,5 @@ protocol PreferencesRepository {
     func saveProfile(_ profile: UserComfortProfile) async throws
     func isOnboardingCompleted() async throws -> Bool
     func setOnboardingCompleted(_ completed: Bool) async throws
+    func deleteAll() async throws
 }

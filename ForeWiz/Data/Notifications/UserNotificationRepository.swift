@@ -39,7 +39,7 @@ final class UserNotificationRepository: NotificationRepository {
             content.title = titleAndBody.title
             content.body = titleAndBody.body
             content.sound = .default
-            content.badge = 1
+            content.badge = 0
 
             content.categoryIdentifier = plan.category.rawValue
 

@@ -67,4 +67,11 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
         
         try modelContext.save()
     }
+
+    func deleteAll() async throws {
+        let descriptor = FetchDescriptor<UserPreferencesModel>()
+        let models = try modelContext.fetch(descriptor)
+        models.forEach { modelContext.delete($0) }
+        try modelContext.save()
+    }
 }

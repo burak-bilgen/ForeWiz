@@ -39,4 +39,11 @@ final class SwiftDataWeatherCacheRepository: WeatherCacheRepository {
         modelContext.insert(model)
         try modelContext.save()
     }
+
+    func deleteAll() async throws {
+        let descriptor = FetchDescriptor<WeatherSnapshotModel>()
+        let models = try modelContext.fetch(descriptor)
+        models.forEach { modelContext.delete($0) }
+        try modelContext.save()
+    }
 }
