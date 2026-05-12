@@ -48,6 +48,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				LaunchScreen.storyboard,
 			);
 			target = 67305E742F9E05210034CAA8 /* ForeWiz */;
 		};
