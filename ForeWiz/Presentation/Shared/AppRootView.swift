@@ -81,8 +81,8 @@ private struct HomeRootView: View {
     var body: some View {
         HomeView(
             viewModel: homeViewModel,
-            savedLocations: $coordinator.profile.savedLocations,
-            selectedLocationID: $coordinator.profile.selectedLocationID,
+            savedLocations: savedLocationsBinding,
+            selectedLocationID: selectedLocationIDBinding,
             onRecommendationLoaded: { recommendation in
                 coordinator.updateRecommendation(recommendation)
             },
@@ -123,6 +123,20 @@ private struct HomeRootView: View {
         .onChange(of: coordinator.profile.language) { _, _ in
             Task { await homeViewModel.reloadForLanguageChange() }
         }
+    }
+
+    private var savedLocationsBinding: Binding<[SavedLocation]> {
+        Binding(
+            get: { coordinator.profile.savedLocations },
+            set: { coordinator.profile.savedLocations = $0 }
+        )
+    }
+
+    private var selectedLocationIDBinding: Binding<String> {
+        Binding(
+            get: { coordinator.profile.selectedLocationID },
+            set: { coordinator.profile.selectedLocationID = $0 }
+        )
     }
 }
 
