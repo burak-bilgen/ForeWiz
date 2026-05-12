@@ -18,6 +18,8 @@ enum L10n {
             userDefaults.removeObject(forKey: Constant.languageOverrideKey)
             sharedUserDefaults?.removeObject(forKey: Constant.languageOverrideKey)
         }
+
+        clearBundleCache()
     }
 
     static func text(_ key: String) -> String {
@@ -66,13 +68,22 @@ enum L10n {
         return bundle(for: Constant.fallbackLanguageCode).localizedString(forKey: key, value: key, table: nil)
     }
 
+    private static var bundleCache: [String: Bundle] = [:]
+
     private static func bundle(for languageCode: String) -> Bundle {
+        if let cached = bundleCache[languageCode] {
+            return cached
+        }
         guard let path = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
               let bundle = Bundle(path: path) else {
             return .main
         }
-
+        bundleCache[languageCode] = bundle
         return bundle
+    }
+
+    static func clearBundleCache() {
+        bundleCache.removeAll()
     }
 
     private static func normalizedLanguageCode(_ identifier: String) -> String? {

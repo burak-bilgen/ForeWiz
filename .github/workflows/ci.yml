@@ -8,22 +8,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-      - name: Install pods
-        run: pod install --project-directory=Weathra
-      - name: Select iPhone simulator
-        run: |
-          available=$(xcrun simctl list devices available | grep "iPhone" | head -5)
-          echo "Available simulators:"
-          echo "$available"
-          echo "iPhone 17e" > /tmp/selected_simulator.txt
+      - name: SwiftLint
+        run: swiftlint lint --strict
       - name: Build
-        run: xcodebuild build -workspace Weathra.xcworkspace -scheme Weathra -destination 'platform=iOS Simulator,name=iPhone 17e' CODE_SIGNING_ALLOWED=NO
+        run: xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' CODE_SIGNING_ALLOWED=NO
       - name: Run Tests
-        run: xcodebuild test -workspace Weathra.xcworkspace -scheme WeathraTests -destination 'platform=iOS Simulator,name=iPhone 17e'
+        run: xcodebuild test -project ForeWiz.xcodeproj -scheme ForeWiz -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' CODE_SIGNING_ALLOWED=NO

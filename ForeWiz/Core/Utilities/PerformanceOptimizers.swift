@@ -2,6 +2,8 @@ import Foundation
 import SwiftUI
 import OSLog
 
+#if DEBUG
+
 final class PerformanceMonitor {
     static let shared = PerformanceMonitor()
     private let logger = AppLogger.performance
@@ -659,3 +661,5 @@ final class MemoryPressureHandler {
         handler()
     }
 }
+
+#endif

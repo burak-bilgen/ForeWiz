@@ -1,12 +1,11 @@
 import SwiftUI
-import Combine
 
 @available(iOS 17.0, *)
 @Observable
 final class ThemeManager {
     static let shared = ThemeManager()
     
-    var colorScheme: ColorScheme = .light
+    var colorScheme: ColorScheme = .dark
     var accentColor: Color = .blue
     var isDarkMode: Bool {
         colorScheme == .dark
@@ -53,12 +52,8 @@ final class ThemeManager {
 }
 
 struct ThemeModifier: ViewModifier {
-    @State private var themeManager = ThemeManager.shared
-    
     func body(content: Content) -> some View {
         content
-            .preferredColorScheme(themeManager.colorScheme)
-            .tint(themeManager.accentColor)
     }
 }
 

@@ -32,7 +32,8 @@ final class ReviewManager {
         UserDefaults.standard.set(0, forKey: keyUserActionsCount)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+            guard let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else { return }
             AppStore.requestReview(in: windowScene)
         }
     }

@@ -2,7 +2,7 @@ import Foundation
 import BackgroundTasks
 import UIKit
 import OSLog
-import SystemConfiguration
+import Network
 import WidgetKit
 
 final class BackgroundRefreshManager {
@@ -205,6 +205,8 @@ final class AppLifecycleManager {
 
         logStateTransition(from: .inactive, to: .active)
 
+        UIApplication.shared.applicationIconBadgeNumber = 0
+
         NotificationCenter.default.post(name: .appDidBecomeActive, object: nil)
     }
 
@@ -381,7 +383,8 @@ final class RefreshController {
 final class NetworkConnectivityMonitor {
     static let shared = NetworkConnectivityMonitor()
     private let logger = AppLogger.network
-
+    private let monitor = NWPathMonitor()
+    private let queue = DispatchQueue(label: "com.forewiz.network-monitor", qos: .utility)
     private var isMonitoring = false
     private var lastKnownStatus: NetworkStatus = .unknown
 
@@ -390,65 +393,30 @@ final class NetworkConnectivityMonitor {
     func startMonitoring() {
         guard !isMonitoring else { return }
         isMonitoring = true
-
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleNetworkChange),
-            name: NSNotification.Name("com.apple.system.config.network_change"),
-            object: nil
-        )
-
-        logger.info("Network monitoring started")
+        monitor.pathUpdateHandler = { [weak self] path in
+            let newStatus: NetworkStatus = path.status == .satisfied ? .reachable : .notReachable
+            let oldStatus = self?.lastKnownStatus ?? .unknown
+            if newStatus != oldStatus {
+                self?.logger.info("Network status changed: \(oldStatus.rawValue) -> \(newStatus.rawValue)")
+                self?.lastKnownStatus = newStatus
+                if newStatus == .reachable {
+                    NotificationCenter.default.post(name: .networkDidBecomeReachable, object: nil)
+                } else {
+                    NotificationCenter.default.post(name: .networkDidBecomeUnreachable, object: nil)
+                }
+            }
+        }
+        monitor.start(queue: queue)
     }
 
     func stopMonitoring() {
+        guard isMonitoring else { return }
+        monitor.cancel()
         isMonitoring = false
-        NotificationCenter.default.removeObserver(self)
-        logger.info("Network monitoring stopped")
-    }
-
-    @objc private func handleNetworkChange() {
-        let newStatus = currentStatus
-        let oldStatus = lastKnownStatus
-
-        if newStatus != oldStatus {
-            logger.info("Network status changed: \(oldStatus.rawValue) -> \(newStatus.rawValue)")
-            lastKnownStatus = newStatus
-
-            if newStatus == .reachable {
-                NotificationCenter.default.post(name: .networkDidBecomeReachable, object: nil)
-            } else {
-                NotificationCenter.default.post(name: .networkDidBecomeUnreachable, object: nil)
-            }
-        }
     }
 
     var currentStatus: NetworkStatus {
-        var flags: SCNetworkReachabilityFlags = []
-        var address = sockaddr_in()
-        address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        address.sin_family = sa_family_t(AF_INET)
-
-        guard let defaultRouteReachability = withUnsafePointer(to: &address, {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                SCNetworkReachabilityCreateWithAddress(nil, $0)
-            }
-        }) else {
-            return .unknown
-        }
-
-        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
-            return .unknown
-        }
-
-        let isReachable = flags.contains(.reachable)
-        let needsConnection = flags.contains(.connectionRequired)
-
-        if isReachable && !needsConnection {
-            return .reachable
-        } else {
-            return .notReachable
-        }
+        monitor.currentPath.status == .satisfied ? .reachable : .notReachable
     }
 
     var isReachable: Bool {
@@ -479,6 +447,10 @@ final class BatteryAwareRefreshManager {
 
     private init() {
         UIDevice.current.isBatteryMonitoringEnabled = true
+    }
+
+    deinit {
+        UIDevice.current.isBatteryMonitoringEnabled = false
     }
 
     var shouldAllowBackgroundRefresh: Bool {
