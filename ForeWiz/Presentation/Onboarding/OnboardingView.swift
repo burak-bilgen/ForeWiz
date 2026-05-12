@@ -90,7 +90,7 @@ struct OnboardingView: View {
                                         .font(.system(size: 18))
                                         .scaleEffect(selected ? 1.15 : 1.0)
                                     Text(sensitivity.localizedTitle)
-                                        .font(.system(size: 11, weight: selected ? .semibold : .regular))
+                                        .font(.system(size: 14, weight: selected ? .semibold : .regular))
                                 }
                                 .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.4))
                                 .frame(maxWidth: .infinity)
@@ -149,9 +149,9 @@ struct OnboardingView: View {
                             } label: {
                                 HStack(spacing: 5) {
                                     Image(systemName: OnboardingView.icon(for: activity))
-                                        .font(.system(size: 11, weight: .semibold))
+                                        .font(.system(size: 14, weight: .semibold))
                                     Text(activity.localizedTitle)
-                                        .font(.system(size: 12, weight: selected ? .semibold : .regular))
+                                        .font(.system(size: 14, weight: selected ? .semibold : .regular))
                                 }
                                 .foregroundStyle(selected ? Color(red: 0.3, green: 0.85, blue: 0.58) : Color.white.opacity(0.5))
                                 .padding(.horizontal, 12)
@@ -203,7 +203,7 @@ struct OnboardingView: View {
 
         if let error = viewModel.errorMessage {
             Text(error)
-                .font(.system(size: 13))
+                .font(.system(size: 14))
                 .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 8)
@@ -264,10 +264,10 @@ struct OnboardingView: View {
     private func sectionLabel(icon: String, title: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.white.opacity(0.5))
             Text(title)
-                .font(.system(size: 13, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.white.opacity(0.5))
         }
     }
@@ -320,7 +320,7 @@ private struct PermissionRow: View {
                             .foregroundStyle(.white)
                         if isRequired {
                             Text(L10n.text("required"))
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.system(size: 14, weight: .bold))
                                 .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.15))
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 2)
@@ -328,7 +328,7 @@ private struct PermissionRow: View {
                         }
                     }
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(.system(size: 14))
                         .foregroundStyle(Color.white.opacity(0.45))
                 }
 
@@ -340,7 +340,7 @@ private struct PermissionRow: View {
                         .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.58))
                 } else {
                     Text(L10n.text("allow"))
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(color)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)

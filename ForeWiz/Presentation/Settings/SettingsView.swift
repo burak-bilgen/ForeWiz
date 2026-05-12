@@ -34,7 +34,7 @@ struct SettingsView: View {
                 ) {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(L10n.text("settings_temp_sensitivity_desc"))
-                            .font(.system(size: 12))
+                            .font(.system(size: 13))
                             .foregroundStyle(Color.white.opacity(0.4))
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.top, 6)
@@ -50,7 +50,7 @@ struct SettingsView: View {
                 ) {
                     VStack(alignment: .leading, spacing: 5) {
                         Text(L10n.text("settings_activities_desc"))
-                            .font(.system(size: 12))
+                            .font(.system(size: 13))
                             .foregroundStyle(Color.white.opacity(0.4))
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.vertical, 6)
@@ -77,7 +77,7 @@ struct SettingsView: View {
                                 .font(.system(size: 15))
                                 .foregroundStyle(.white)
                             Text(L10n.text("settings_wake_desc"))
-                                .font(.system(size: 12))
+                                .font(.system(size: 13))
                                 .foregroundStyle(Color.white.opacity(0.38))
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -277,10 +277,10 @@ private struct SettingsSection<Content: View>: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 7) {
                 Image(systemName: icon)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(color)
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.45))
                     .textCase(.uppercase)
                     .tracking(0.6)
@@ -340,7 +340,7 @@ private struct SettingsRow: View {
                     .lineLimit(2)
                 if let subtitle {
                     Text(subtitle)
-                        .font(.system(size: 12))
+                        .font(.system(size: 13))
                         .foregroundStyle(Color.white.opacity(0.38))
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -361,7 +361,7 @@ private struct SettingsInfoRow: View {
         HStack(alignment: .top, spacing: 12) {
             SettingsIcon(systemName: icon, color: color)
             Text(text)
-                .font(.system(size: 12))
+                .font(.system(size: 13))
                 .foregroundStyle(Color.white.opacity(0.42))
                 .fixedSize(horizontal: false, vertical: true)
                 .layoutPriority(1)
@@ -481,7 +481,7 @@ private struct SettingsSensitivitySelector: View {
                             .font(.system(size: 16))
                             .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
                         Text(L10n.text(key))
-                            .font(.system(size: 12, weight: selected ? .semibold : .regular))
+                            .font(.system(size: 13, weight: selected ? .semibold : .regular))
                             .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
                             .lineLimit(2)
                             .minimumScaleFactor(0.75)

@@ -38,7 +38,7 @@ struct LocationPickerView: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(.white)
                         Text(L10n.text("location_picker_empty_hint"))
-                            .font(.system(size: 13))
+                            .font(.system(size: 14))
                             .foregroundStyle(Color.white.opacity(0.4))
                     }
                     Spacer()
@@ -203,7 +203,7 @@ private struct AddLocationMapView: View {
 
                     if let addr = item.address?.fullAddress, !addr.isEmpty {
                         Text(addr)
-                            .font(.system(size: 13))
+                            .font(.system(size: 14))
                             .foregroundStyle(Color.white.opacity(0.6))
                             .lineLimit(2)
                     }
@@ -309,7 +309,7 @@ private struct SearchResultRow: View {
 
                     if let addr = item.address?.fullAddress {
                         Text(addr)
-                            .font(.system(size: 12))
+                            .font(.system(size: 14))
                             .foregroundStyle(Color.white.opacity(0.5))
                             .lineLimit(1)
                     }
@@ -318,7 +318,7 @@ private struct SearchResultRow: View {
                 Spacer()
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.3))
             }
             .padding(.horizontal, 16)
@@ -383,7 +383,7 @@ private struct LocationPickerNavBar: View {
                         .fill(Color.white.opacity(0.1))
                         .frame(width: 32, height: 32)
                     Image(systemName: "plus")
-                        .font(.system(size: 13, weight: .bold))
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(.white)
                 }
             }
@@ -393,7 +393,7 @@ private struct LocationPickerNavBar: View {
                         .fill(Color.white.opacity(0.1))
                         .frame(width: 32, height: 32)
                     Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Color.white.opacity(0.6))
                 }
             }
@@ -423,7 +423,7 @@ private struct LocationRow: View {
                 Button(action: onDelete) {
                     ZStack {
                         Circle().fill(AppTheme.danger.opacity(0.15)).frame(width: 26, height: 26)
-                        Image(systemName: "minus").font(.system(size: 11, weight: .bold)).foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
+                        Image(systemName: "minus").font(.system(size: 14, weight: .bold)).foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
                     }
                 }
                 .transition(.scale.combined(with: .opacity))
@@ -452,7 +452,7 @@ private struct LocationRow: View {
                             .fixedSize(horizontal: false, vertical: true)
                         if !location.address.isEmpty {
                             Text(location.address)
-                                .font(.system(size: 12))
+                                .font(.system(size: 14))
                                 .foregroundStyle(Color.white.opacity(0.4))
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.75)

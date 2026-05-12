@@ -79,14 +79,14 @@ struct HomeView: View {
             } label: {
                 HStack(spacing: 5) {
                     Image(systemName: "location.fill")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(Color(red: 0.4, green: 0.75, blue: 1.0))
                     Text(viewModel.selectedLocationName)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     Image(systemName: "chevron.down")
-                        .font(.system(size: 9, weight: .bold))
+                        .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(Color.white.opacity(0.4))
                 }
             }
@@ -182,9 +182,9 @@ private struct HomeLoadedContent: View {
                 if !state.lastUpdatedText.isEmpty {
                     HStack(spacing: 4) {
                         Image(systemName: "clock.arrow.circlepath")
-                            .font(.system(size: 9))
+                            .font(.system(size: 12))
                         Text(state.lastUpdatedText)
-                            .font(.system(size: 10))
+                            .font(.system(size: 12))
                     }
                     .foregroundStyle(Color.white.opacity(0.22))
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -292,10 +292,10 @@ private struct UnifiedHeroCard: View {
                         if let sunrise = weather.sunriseText {
                             HStack(spacing: 4) {
                                 Image(systemName: "sunrise.fill")
-                                    .font(.system(size: 10))
+                                    .font(.system(size: 12))
                                     .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
                                 Text(sunrise)
-                                    .font(.system(size: 11, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundStyle(Color.white.opacity(0.7))
                             }
                         }
@@ -305,10 +305,10 @@ private struct UnifiedHeroCard: View {
                         if let sunset = weather.sunsetText {
                             HStack(spacing: 4) {
                                 Image(systemName: "sunset.fill")
-                                    .font(.system(size: 10))
+                                    .font(.system(size: 12))
                                     .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.2))
                                 Text(sunset)
-                                    .font(.system(size: 11, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundStyle(Color.white.opacity(0.7))
                             }
                         }
@@ -328,7 +328,7 @@ private struct UnifiedHeroCard: View {
     private func metricInline(icon: String, label: String, value: String) -> some View {
         VStack(spacing: 2) {
             Image(systemName: icon)
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.white.opacity(0.5))
             Text(value)
                 .font(.system(size: 12, weight: .semibold))
@@ -336,7 +336,7 @@ private struct UnifiedHeroCard: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Text(label)
-                .font(.system(size: 8))
+                .font(.system(size: 13))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .lineLimit(1)
         }
@@ -369,7 +369,7 @@ private struct CriticalAlertCard: View {
                     .lineLimit(3)
                 if !signal.hint.isEmpty {
                     Text(signal.hint)
-                        .font(.system(size: 11))
+                        .font(.system(size: 13))
                         .foregroundStyle(Color.white.opacity(0.5))
                         .lineLimit(2)
                 }
@@ -404,7 +404,7 @@ private struct DailyPlanCard: View {
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Color.white.opacity(0.5))
                         Text(plan.subtitle)
-                            .font(.system(size: 10))
+                            .font(.system(size: 12))
                             .foregroundStyle(Color.white.opacity(0.3))
                     }
                 }
@@ -447,7 +447,7 @@ private struct PlanItemRow: View {
                     .font(.system(size: 12, weight: item.isPrimary ? .bold : .semibold))
                     .foregroundStyle(item.isPrimary ? .white : Color.white.opacity(0.8))
                 Text(item.detail)
-                    .font(.system(size: 10))
+                    .font(.system(size: 12))
                     .foregroundStyle(Color.white.opacity(0.5))
                     .lineLimit(2)
             }
@@ -455,7 +455,7 @@ private struct PlanItemRow: View {
             Spacer(minLength: 6)
 
             Text(item.timeText)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(toneColor)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
@@ -507,7 +507,7 @@ private struct ForecastPill: View {
     var body: some View {
         VStack(spacing: 6) {
             Text(forecast.dayName)
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(forecast.isToday
                     ? Color(red: 1.0, green: 0.85, blue: 0.3)
                     : Color.white.opacity(0.6))
@@ -519,11 +519,11 @@ private struct ForecastPill: View {
                 .shadow(color: skyColor.opacity(0.3), radius: 4)
 
             Text(forecast.highTemp.formatted(.number.precision(.fractionLength(0))) + "°")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.white)
 
             Text(forecast.lowTemp.formatted(.number.precision(.fractionLength(0))) + "°")
-                .font(.system(size: 10))
+                .font(.system(size: 12))
                 .foregroundStyle(Color.white.opacity(0.4))
 
             // Skor göstergesi
@@ -532,7 +532,7 @@ private struct ForecastPill: View {
                     .stroke(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)), lineWidth: 2)
                     .frame(width: 18, height: 18)
                 Text(String(forecast.outdoorScore))
-                    .font(.system(size: 8, weight: .bold))
+                    .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(.white)
             }
         }
@@ -582,7 +582,7 @@ private struct HourlyPill: View {
     var body: some View {
         VStack(spacing: 4) {
             Text(String(format: "%02d:00", item.hour))
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color.white.opacity(0.5))
 
             ZStack {
@@ -590,7 +590,7 @@ private struct HourlyPill: View {
                     .fill(color.opacity(0.2))
                     .frame(width: 22, height: 22)
                 Text(String(item.score))
-                    .font(.system(size: 9, weight: .bold))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(color)
             }
 
@@ -600,7 +600,7 @@ private struct HourlyPill: View {
                 .foregroundStyle(color)
 
             Text(item.temperatureText)
-                .font(.system(size: 9))
+                .font(.system(size: 12))
                 .foregroundStyle(.white.opacity(0.6))
 
             if item.precipitationChance > 0.05 {
@@ -608,7 +608,7 @@ private struct HourlyPill: View {
                     Image(systemName: "drop.fill")
                         .font(.system(size: 7))
                     Text(String(format: "%0.0f%%", item.precipitationChance * 100))
-                        .font(.system(size: 8, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                 }
                 .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.8))
             }
@@ -823,9 +823,9 @@ private struct HomeAttributionView: View {
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "info.circle")
-                .font(.system(size: 10))
+                .font(.system(size: 12))
             Text(info.serviceName)
-                .font(.system(size: 11))
+                .font(.system(size: 13))
         }
         .foregroundStyle(Color.white.opacity(0.22))
         .frame(maxWidth: .infinity, alignment: .center)
