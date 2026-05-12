@@ -32,13 +32,13 @@ struct RecommendationDetailView: View {
                 .padding(.vertical, 16)
             }
             .scrollIndicators(.hidden)
+            .refreshable { }
             .safeAreaPadding(.bottom, 12)
         }
         .navigationTitle(L10n.text("recommendation_detail_title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .dynamicTypeSize(.large ... .xxxLarge)
         .onAppear { withAnimation { appeared = true } }
     }
 }
