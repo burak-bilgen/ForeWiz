@@ -284,7 +284,7 @@ state = .loaded(
         return HomePlanViewState(
             title: isTomorrow ? L10n.text("tomorrows_plan") : L10n.text("todays_plan"),
             subtitle: L10n.text("a_short_action_plan_built"),
-            items: Array(items.prefix(3))
+            items: Array(items.prefix(5))
         )
     }
 
@@ -650,7 +650,7 @@ private func resolveLocationName(for location: LocationCoordinate) {
             if let city {
                 name = city
             } else {
-                name = city ?? L10n.text("home_current_location")
+                name = L10n.text("home_current_location")
             }
 
             Task { @MainActor in

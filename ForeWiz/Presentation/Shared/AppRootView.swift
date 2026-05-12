@@ -22,7 +22,7 @@ struct AppRootView: View {
                 HomeRootView(coordinator: coordinator)
             }
         }
-        .preferredColorScheme(coordinator.profile.appearance.colorScheme)
+        .preferredColorScheme(.dark)
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
         .task {
@@ -46,7 +46,11 @@ struct AppRootView: View {
             coordinator.showSettings = true
         case .onboarding:
             coordinator.rootFlow = .onboarding
-        case .insights, .home, .recommendationDetail:
+        case .home:
+            break
+        case .insights:
+            break
+        case .recommendationDetail:
             break
         }
 
@@ -91,7 +95,8 @@ private struct HomeRootView: View {
                         profile: coordinator.profile,
                         updateUserPreferencesUseCase: coordinator.container.updateUserPreferencesUseCase,
                         onProfileSaved: coordinator.applyProfile,
-                        onResetOnboarding: coordinator.resetToOnboarding
+                        onResetOnboarding: coordinator.resetToOnboarding,
+                        onDeleteAllData: coordinator.deleteAllData
                     )
                 )
             }

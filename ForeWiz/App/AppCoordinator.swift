@@ -62,4 +62,21 @@ final class AppCoordinator: ObservableObject {
     func dismissSettings() {
         showSettings = false
     }
+
+    func deleteAllData() {
+        Task {
+            try? await container.preferencesRepository.deleteAll()
+            try? await container.weatherCacheRepository.deleteAll()
+
+            let defaults = UserDefaults.standard
+            let suite = UserDefaults(suiteName: "group.forewiz")
+            defaults.removeObject(forKey: "forewiz.languageOverride.v1")
+            defaults.removeObject(forKey: "app_theme")
+            defaults.removeObject(forKey: "app_accent_color")
+            suite?.removeObject(forKey: "forewiz.languageOverride.v1")
+
+            profile = .default
+            rootFlow = .onboarding
+        }
+    }
 }

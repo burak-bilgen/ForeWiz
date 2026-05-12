@@ -6,11 +6,8 @@ struct OnboardingView: View {
     let onCompleted: (UserComfortProfile) async throws -> Void
 
     @State private var isCompleting = false
-    @State private var currentStep = 0
-
-    private let accentBlue = Color(red: 0.4, green: 0.72, blue: 1.0)
-    private let accentGreen = Color(red: 0.3, green: 0.85, blue: 0.58)
-    private let accentOrange = Color(red: 1.0, green: 0.55, blue: 0.3)
+    @State private var pageAppeared = false
+    private var accentOrange: Color { Color(red: 1.0, green: 0.55, blue: 0.3) }
 
     var body: some View {
         ZStack {
@@ -21,74 +18,62 @@ struct OnboardingView: View {
             )
             .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                stepIndicator
-                    .padding(.top, 32)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    welcomeSection
+                        .padding(.top, 48)
 
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 18) {
-                        Group {
-                            switch currentStep {
-                            case 0: comfortStep
-                            case 1: permissionsStep
-                            default: comfortStep
-                            }
-                        }
-                        .transition(.asymmetric(
-                            insertion: .move(edge: .trailing).combined(with: .opacity),
-                            removal: .move(edge: .leading).combined(with: .opacity)
-                        ))
-                    }
-                    .padding(.horizontal, 20)
-                }
-                .frame(maxHeight: .infinity)
+                    preferencesSection
+                        .padding(.bottom, 8)
 
-                if currentStep == 1 {
+                    permissionsSection
+                        .padding(.bottom, 8)
+
                     startButton
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
-                } else {
-                    nextButton
-                        .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
+                        .padding(.bottom, 24)
                 }
+                .padding(.horizontal, 20)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .navigationBarHidden(true)
-        .dynamicTypeSize(.large ... .xxxLarge)
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: currentStep)
+        .onAppear { pageAppeared = true }
     }
 
-    // MARK: - Step Indicator
-
-    private var stepIndicator: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<2, id: \.self) { index in
-                Capsule()
-                    .fill(index <= currentStep ? accentBlue : Color.white.opacity(0.2))
-                    .frame(width: index == currentStep ? 20 : 8, height: 4)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentStep)
+    private var welcomeSection: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(Color.white.opacity(0.08))
+                    .frame(width: 72, height: 72)
+                Image(systemName: "cloud.sun.fill")
+                    .font(.system(size: 34))
+                    .symbolRenderingMode(.hierarchical)
+                    .foregroundStyle(Color(red: 0.4, green: 0.72, blue: 1.0))
             }
+            .staggerEntrance(index: 0, appeared: pageAppeared)
+
+            Text(L10n.text("onboarding_welcome_title"))
+                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .staggerEntrance(index: 1, appeared: pageAppeared)
+
+            Text(L10n.text("onboarding_welcome_subtitle"))
+                .font(.system(size: 14))
+                .foregroundStyle(Color.white.opacity(0.5))
+                .multilineTextAlignment(.center)
+                .lineSpacing(3)
+                .padding(.horizontal, 16)
+                .staggerEntrance(index: 2, appeared: pageAppeared)
         }
-        .padding(.bottom, 24)
     }
 
-    // MARK: - Step 0: Comfort
-
-    private var comfortStep: some View {
-        VStack(spacing: 18) {
-            stepTitle(
-                icon: "thermometer.sun.fill",
-                color: accentOrange,
-                title: L10n.text("onboarding_comfort_title"),
-                subtitle: L10n.text("onboarding_comfort_subtitle")
-            )
-
-            GlassCard(accentColor: accentOrange) {
+    private var preferencesSection: some View {
+        VStack(spacing: 12) {
+            sectionCard {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text(L10n.text("how_do_you_feel"))
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
+                    sectionLabel(icon: "thermometer.sun.fill", title: L10n.text("how_do_you_feel"))
 
                     HStack(spacing: 8) {
                         ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
@@ -98,7 +83,7 @@ struct OnboardingView: View {
                                 viewModel.selectSensitivity(sensitivity)
                             } label: {
                                 VStack(spacing: 5) {
-                                    Image(systemName: icon(for: sensitivity))
+                                    Image(systemName: OnboardingView.icon(for: sensitivity))
                                         .font(.system(size: 18))
                                     Text(sensitivity.localizedTitle)
                                         .font(.system(size: 11, weight: selected ? .semibold : .regular))
@@ -106,28 +91,19 @@ struct OnboardingView: View {
                                 .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.4))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
-                                .background(
-                                    selected
-                                        ? accentOrange.opacity(0.12)
-                                        : Color.white.opacity(0.05),
-                                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .stroke(selected ? accentOrange.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1)
-                                )
+                                .background(selected ? accentOrange.opacity(0.12) : Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(selected ? accentOrange.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
                             }
+                            .accessibilityLabel(sensitivity.localizedTitle)
                             .buttonStyle(.plain)
                         }
                     }
                 }
             }
 
-            GlassCard(accentColor: accentBlue) {
+            sectionCard {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(L10n.text("onboarding_wake_time"))
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
+                    sectionLabel(icon: "sunrise.fill", title: L10n.text("onboarding_wake_time"))
 
                     HStack {
                         Image(systemName: "sunrise.fill")
@@ -151,11 +127,9 @@ struct OnboardingView: View {
                 }
             }
 
-            GlassCard(accentColor: accentGreen) {
+            sectionCard {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(L10n.text("which_activities_do_you"))
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
+                    sectionLabel(icon: "figure.run", title: L10n.text("which_activities_do_you"))
 
                     FlowLayout(spacing: 8) {
                         ForEach(ActivityType.allCases, id: \.self) { activity in
@@ -165,27 +139,18 @@ struct OnboardingView: View {
                                 viewModel.toggleActivity(activity)
                             } label: {
                                 HStack(spacing: 5) {
-                                    Image(systemName: icon(for: activity))
+                                    Image(systemName: OnboardingView.icon(for: activity))
                                         .font(.system(size: 11, weight: .semibold))
                                     Text(activity.localizedTitle)
                                         .font(.system(size: 12, weight: selected ? .semibold : .regular))
                                 }
-                                .foregroundStyle(selected ? accentGreen : Color.white.opacity(0.5))
+                                .foregroundStyle(selected ? Color(red: 0.3, green: 0.85, blue: 0.58) : Color.white.opacity(0.5))
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
-                                .background(
-                                    selected
-                                        ? accentGreen.opacity(0.12)
-                                        : Color.white.opacity(0.05),
-                                    in: Capsule()
-                                )
-                                .overlay(
-                                    Capsule().stroke(
-                                        selected ? accentGreen.opacity(0.35) : Color.white.opacity(0.06),
-                                        lineWidth: 1
-                                    )
-                                )
+                                .background(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.12) : Color.white.opacity(0.05), in: Capsule())
+                                .overlay(Capsule().stroke(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
                             }
+                            .accessibilityLabel(activity.localizedTitle)
                             .buttonStyle(.plain)
                         }
                     }
@@ -194,80 +159,43 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Step 2: Permissions
+    @ViewBuilder
+    private var permissionsSection: some View {
+        sectionCard {
+            VStack(spacing: 10) {
+                sectionLabel(icon: "lock.shield.fill", title: L10n.text("permissions"))
 
-    private var permissionsStep: some View {
-        VStack(spacing: 18) {
-            stepTitle(
-                icon: "lock.shield.fill",
-                color: accentBlue,
-                title: L10n.text("permissions"),
-                subtitle: L10n.text("onboarding_permissions_subtitle")
-            )
+                PermissionRow(
+                    icon: "location.fill",
+                    color: Color(red: 0.4, green: 0.72, blue: 1.0),
+                    title: L10n.text("location"),
+                    subtitle: L10n.text("required_for_local_weather"),
+                    isGranted: viewModel.locationStatus == .authorized,
+                    isRequired: true
+                ) {
+                    viewModel.requestLocationPermission()
+                }
 
-            GlassCard(accentColor: accentBlue, innerPadding: 20) {
-                VStack(spacing: 10) {
-                    PermissionRow(
-                        icon: "location.fill",
-                        color: accentBlue,
-                        title: L10n.text("location"),
-                        subtitle: L10n.text("required_for_local_weather"),
-                        isGranted: viewModel.locationStatus == .authorized,
-                        isRequired: true
-                    ) {
-                        viewModel.requestLocationPermission()
-                    }
-
-                    PermissionRow(
-                        icon: "bell.badge.fill",
-                        color: accentOrange,
-                        title: L10n.text("notifications"),
-                        subtitle: L10n.text("for_timely_reminders"),
-                        isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
-                        isRequired: false
-                    ) {
-                        viewModel.requestNotificationPermission()
-                    }
+                PermissionRow(
+                    icon: "bell.badge.fill",
+                    color: accentOrange,
+                    title: L10n.text("notifications"),
+                    subtitle: L10n.text("for_timely_reminders"),
+                    isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
+                    isRequired: false
+                ) {
+                    viewModel.requestNotificationPermission()
                 }
             }
-
-            if let error = viewModel.errorMessage {
-                Text(error)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 8)
-            }
         }
-    }
 
-    // MARK: - Navigation Buttons
-
-    private var nextButton: some View {
-        Button {
-            HapticManager.light()
-            withAnimation { currentStep += 1 }
-        } label: {
-            HStack(spacing: 8) {
-                Text(L10n.text("continue_button"))
-                    .font(.system(size: 16, weight: .semibold))
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 13, weight: .semibold))
-            }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: 52)
-            .background(
-                LinearGradient(
-                    colors: [Color(red: 0.3, green: 0.55, blue: 1.0), Color(red: 0.15, green: 0.4, blue: 0.9)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-            )
+        if let error = viewModel.errorMessage {
+            Text(error)
+                .font(.system(size: 13))
+                .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 8)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
-        .padding(.top, 8)
     }
 
     private var startButton: some View {
@@ -301,7 +229,7 @@ struct OnboardingView: View {
             .frame(height: 56)
             .background(
                 LinearGradient(
-                    colors: [accentGreen, Color(red: 0.2, green: 0.6, blue: 0.45)],
+                    colors: [Color(red: 0.2, green: 0.5, blue: 1.0), Color(red: 0.15, green: 0.4, blue: 0.9)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 ),
@@ -310,37 +238,27 @@ struct OnboardingView: View {
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
         .disabled(isCompleting)
-        .padding(.top, 8)
     }
 
-    // MARK: - Helpers
+    private func sectionCard(@ViewBuilder content: () -> some View) -> some View {
+        content()
+            .padding(16)
+            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
+    }
 
-    private func stepTitle(icon: String, color: Color, title: String, subtitle: String) -> some View {
-        VStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.14))
-                    .frame(width: 56, height: 56)
-                Image(systemName: icon)
-                    .font(.system(size: 24))
-                    .foregroundStyle(color)
-            }
-
+    private func sectionLabel(icon: String, title: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.5))
             Text(title)
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-
-            Text(subtitle)
-                .font(.system(size: 13))
-                .foregroundStyle(Color.white.opacity(0.45))
-                .multilineTextAlignment(.center)
-                .lineSpacing(3)
-                .padding(.horizontal, 8)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color.white.opacity(0.5))
         }
     }
 
-    private func icon(for sensitivity: TemperatureSensitivity) -> String {
+    private static func icon(for sensitivity: TemperatureSensitivity) -> String {
         switch sensitivity {
         case .getsColdEasily: return "snowflake"
         case .normal: return "thermometer.medium"
@@ -348,7 +266,7 @@ struct OnboardingView: View {
         }
     }
 
-    private func icon(for activity: ActivityType) -> String {
+    private static func icon(for activity: ActivityType) -> String {
         switch activity {
         case .running: return "figure.run"
         case .walking: return "figure.walk"
@@ -417,7 +335,7 @@ private struct PermissionRow: View {
                 }
             }
             .padding(12)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(isGranted ? color.opacity(0.3) : Color.white.opacity(0.05), lineWidth: 1)

@@ -68,7 +68,6 @@ struct HomeView: View {
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
             }
         }
-        .dynamicTypeSize(.large ... .xxxLarge)
     }
 
     @ToolbarContentBuilder
@@ -91,6 +90,7 @@ struct HomeView: View {
                         .foregroundStyle(Color.white.opacity(0.4))
                 }
             }
+            .accessibilityLabel("Choose location")
             .opacity(toolbarAppeared ? 1 : 0)
             .offset(y: toolbarAppeared ? 0 : -4)
             .animation(.easeOut(duration: 0.4).delay(0.1), value: toolbarAppeared)
@@ -105,6 +105,7 @@ struct HomeView: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.7))
             }
+            .accessibilityLabel("Open settings")
             .opacity(toolbarAppeared ? 1 : 0)
             .offset(y: toolbarAppeared ? 0 : -4)
             .animation(.easeOut(duration: 0.4).delay(0.15), value: toolbarAppeared)
@@ -285,6 +286,36 @@ private struct UnifiedHeroCard: View {
                     metricInline(icon: "humidity.fill", label: L10n.text("humidity"), value: weather.humidityText)
                 }
                 .padding(.top, 4)
+
+                if weather.sunriseText != nil || weather.sunsetText != nil {
+                    HStack(spacing: 12) {
+                        if let sunrise = weather.sunriseText {
+                            HStack(spacing: 4) {
+                                Image(systemName: "sunrise.fill")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
+                                Text(sunrise)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(Color.white.opacity(0.7))
+                            }
+                        }
+                        if weather.sunriseText != nil, weather.sunsetText != nil {
+                            Spacer()
+                        }
+                        if let sunset = weather.sunsetText {
+                            HStack(spacing: 4) {
+                                Image(systemName: "sunset.fill")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(Color(red: 1.0, green: 0.5, blue: 0.2))
+                                Text(sunset)
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(Color.white.opacity(0.7))
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                }
             }
             .padding(14)
         }
@@ -321,17 +352,17 @@ private struct CriticalAlertCard: View {
         HStack(alignment: .top, spacing: 12) {
             ZStack {
                 Circle()
-                    .fill(Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.18))
+                    .fill(AppTheme.danger.opacity(0.18))
                     .frame(width: 36, height: 36)
                 Image(systemName: signal.icon)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(Color(red: 1.0, green: 0.35, blue: 0.35))
+                    .foregroundStyle(AppTheme.danger)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(signal.title)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Color(red: 1.0, green: 0.35, blue: 0.35))
+                    .foregroundStyle(AppTheme.danger)
                 Text(signal.subtitle)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
@@ -346,12 +377,12 @@ private struct CriticalAlertCard: View {
         }
         .padding(14)
         .background(
-            Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.10),
+            AppTheme.danger.opacity(0.10),
             in: RoundedRectangle(cornerRadius: 16, style: .continuous)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.25), lineWidth: 1)
+                .stroke(AppTheme.danger.opacity(0.25), lineWidth: 1)
         )
     }
 }
@@ -449,15 +480,13 @@ private struct CompactForecastCard: View {
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
-                        ForEach(dailyForecasts.prefix(3)) { forecast in
+                        ForEach(dailyForecasts) { forecast in
                             ForecastPill(forecast: forecast)
                         }
                     }
-                    .padding(.horizontal, 12)
                 }
             }
-            .padding(.horizontal, -16)
-            .padding(.vertical, 10)
+            .padding(.bottom, 10)
         }
     }
 }
@@ -513,12 +542,7 @@ private struct ForecastPill: View {
     }
 
     private func strokeColor(for score: WeatherScore) -> Color {
-        switch score.rawValue {
-        case 80...100: return Color(red: 0.3, green: 0.85, blue: 0.58)
-        case 60..<80: return Color(red: 0.4, green: 0.72, blue: 1.0)
-        case 40..<60: return Color(red: 1.0, green: 0.7, blue: 0.3)
-        default: return Color(red: 1.0, green: 0.4, blue: 0.4)
-        }
+        AppTheme.color(for: score)
     }
 }
 
@@ -537,15 +561,13 @@ private struct CompactHourlyCard: View {
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        ForEach(hourlyScores.prefix(4)) { item in
+                        ForEach(hourlyScores) { item in
                             HourlyPill(item: item)
                         }
                     }
-                    .padding(.horizontal, 12)
                 }
             }
-            .padding(.horizontal, -16)
-            .padding(.vertical, 10)
+            .padding(.bottom, 10)
         }
     }
 }
@@ -554,12 +576,7 @@ private struct HourlyPill: View {
     let item: HourlyScoreItem
 
     private var color: Color {
-        switch item.score {
-        case 80...100: Color(red: 0.3, green: 0.85, blue: 0.58)
-        case 60..<80: Color(red: 0.4, green: 0.72, blue: 1.0)
-        case 40..<60: Color(red: 1.0, green: 0.7, blue: 0.3)
-        default: Color(red: 1.0, green: 0.4, blue: 0.4)
-        }
+        AppTheme.color(for: WeatherScore(rawValue: item.score))
     }
 
     var body: some View {
@@ -627,6 +644,8 @@ private struct CompactWarningBanner: View {
         .padding(12)
         .background(Color(red: 1.0, green: 0.65, blue: 0.2).opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(red: 1.0, green: 0.55, blue: 0.15).opacity(0.2), lineWidth: 0.5))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Warning: \(message)")
     }
 }
 
@@ -746,7 +765,7 @@ private struct HomeErrorView: View {
         VStack(spacing: 28) {
             ZStack {
                 Circle()
-                    .fill(Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.12))
+                    .fill(AppTheme.danger.opacity(0.12))
                     .frame(width: 90, height: 90)
                     .blur(radius: 8)
                 Color.clear

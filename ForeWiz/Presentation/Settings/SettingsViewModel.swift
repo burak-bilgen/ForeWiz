@@ -9,6 +9,7 @@ final class SettingsViewModel: ObservableObject {
     private let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     private let onProfileSaved: (UserComfortProfile) -> Void
     private let onResetOnboarding: (() -> Void)?
+    private let onDeleteAllData: (() -> Void)?
     private var cancellables: Set<AnyCancellable> = []
     private var pendingSave: Task<Void, Never>?
     private let saveSubject = PassthroughSubject<UserComfortProfile, Never>()
@@ -17,12 +18,14 @@ final class SettingsViewModel: ObservableObject {
         profile: UserComfortProfile,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
         onProfileSaved: @escaping (UserComfortProfile) -> Void,
-        onResetOnboarding: (() -> Void)? = nil
+        onResetOnboarding: (() -> Void)? = nil,
+        onDeleteAllData: (() -> Void)? = nil
     ) {
         self.profile = profile
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.onProfileSaved = onProfileSaved
         self.onResetOnboarding = onResetOnboarding
+        self.onDeleteAllData = onDeleteAllData
 
         saveSubject
             .debounce(for: .milliseconds(800), scheduler: DispatchQueue.main)
@@ -63,5 +66,19 @@ final class SettingsViewModel: ObservableObject {
 
     func resetOnboarding() {
         onResetOnboarding?()
+    }
+
+    func deleteAllData() {
+        onDeleteAllData?()
+    }
+
+    func exportData() -> String? {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        guard let data = try? encoder.encode(profile),
+              let jsonString = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        return jsonString
     }
 }

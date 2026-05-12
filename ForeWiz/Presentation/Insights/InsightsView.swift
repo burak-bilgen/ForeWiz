@@ -17,13 +17,13 @@ struct InsightsView: View {
                 .padding(.vertical, 16)
             }
             .scrollIndicators(.hidden)
+            .refreshable { }
             .safeAreaPadding(.bottom, 12)
         }
         .navigationTitle(L10n.text("premium_feature_analytics"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .dynamicTypeSize(.large ... .xxxLarge)
     }
 }
 
@@ -450,6 +450,7 @@ private struct AnimatedBar: View {
     var delay: Double = 0
 
     @State private var appeared = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 0) {
@@ -457,7 +458,10 @@ private struct AnimatedBar: View {
             RoundedRectangle(cornerRadius: 4, style: .continuous)
                 .fill(color)
                 .frame(height: appeared ? height : 4)
-                .animation(.spring(response: 0.55, dampingFraction: 0.75).delay(delay), value: appeared)
+                .animation(
+                    reduceMotion ? nil : .spring(response: 0.55, dampingFraction: 0.75).delay(delay),
+                    value: appeared
+                )
         }
         .onAppear { appeared = true }
     }

@@ -30,7 +30,6 @@ struct WeatherInsightsView: View {
             .padding(.vertical, 16)
         }
         .safeAreaPadding(.bottom, 12)
-        .dynamicTypeSize(.large ... .xxxLarge)
         .navigationTitle(L10n.text("insights_title"))
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
@@ -88,9 +87,8 @@ struct WeatherInsightsView: View {
                 .frame(height: 200)
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8)
     }
 
     private var chartTitle: some View {
@@ -232,9 +230,8 @@ struct WeatherInsightsView: View {
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8)
     }
 
     private var trendsSection: some View {
@@ -263,9 +260,8 @@ struct WeatherInsightsView: View {
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8)
     }
 
     private var comfortAnalysisSection: some View {
@@ -280,9 +276,8 @@ struct WeatherInsightsView: View {
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8)
     }
 
     private var comfortWindows: [ComfortWindow] {
@@ -545,7 +540,7 @@ struct MetricButton: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(isSelected ? metric.color : Color(.systemBackground))
+            .background(isSelected ? metric.color : Color.white.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .shadow(color: isSelected ? metric.color.opacity(0.3) : .clear, radius: 8)
         }
@@ -594,7 +589,7 @@ struct StatisticCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(12)
-        .background(Color(.secondarySystemBackground))
+        .background(Color.white.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

@@ -1,4 +1,3 @@
-import Combine
 import SwiftUI
 
 // MARK: - Animated floating orb background
@@ -177,7 +176,6 @@ struct PulsingDotsLoader: View {
     var color: Color = .white
     var dotSize: CGFloat = 7
     @State private var phase: Int = 0
-    @State private var timer: AnyCancellable?
 
     var body: some View {
         HStack(spacing: 7) {
@@ -186,19 +184,10 @@ struct PulsingDotsLoader: View {
                     .fill(color.opacity(phase == i ? 1.0 : 0.28))
                     .frame(width: dotSize, height: dotSize)
                     .scaleEffect(phase == i ? 1.4 : 1.0)
-                    .animation(.spring(response: 0.28, dampingFraction: 0.55), value: phase)
             }
         }
-        .onAppear {
-            timer = Timer.publish(every: 0.35, on: .main, in: .common)
-                .autoconnect()
-                .sink { _ in
-                    phase = (phase + 1) % 3
-                }
-        }
-        .onDisappear {
-            timer?.cancel()
-            phase = 0
+        .onReceive(Timer.publish(every: 0.35, on: .main, in: .common).autoconnect()) { _ in
+            phase = (phase + 1) % 3
         }
     }
 }

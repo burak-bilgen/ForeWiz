@@ -1,4 +1,3 @@
-import Combine
 import SwiftUI
 
 struct AppSplashView: View {
@@ -63,7 +62,6 @@ struct AppSplashView: View {
 
 private struct LoadingDotsView: View {
     @State private var phase: Int = 0
-    private let timer = Timer.publish(every: 0.38, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(spacing: 6) {
@@ -75,7 +73,7 @@ private struct LoadingDotsView: View {
                     .animation(.spring(response: 0.3, dampingFraction: 0.6), value: phase)
             }
         }
-        .onReceive(timer) { _ in
+        .onReceive(Timer.publish(every: 0.38, on: .main, in: .common).autoconnect()) { _ in
             phase = (phase + 1) % 3
         }
     }

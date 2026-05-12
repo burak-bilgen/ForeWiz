@@ -4,6 +4,9 @@ import UIKit
 struct SettingsView: View {
     @StateObject var viewModel: SettingsViewModel
     @State private var showResetConfirmation = false
+    @State private var showDeleteAllDataConfirmation = false
+    @State private var showShareSheet = false
+    @State private var exportJSON = ""
     @State private var languageKey: String = L10n.currentLanguageCode
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
@@ -210,12 +213,51 @@ struct SettingsView: View {
                     .background(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 1.0, green: 0.45, blue: 0.45).opacity(0.2), lineWidth: 1))
                 }
+
+                Button {
+                    HapticManager.medium()
+                    showDeleteAllDataConfirmation = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 14))
+                        Text(L10n.text("settings_delete_all_data_title"))
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.red.opacity(0.2), lineWidth: 1))
+                }
+
+                Button {
+                    HapticManager.medium()
+                    if let json = viewModel.exportData() {
+                        exportJSON = json
+                        showShareSheet = true
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 14))
+                        Text(L10n.text("settings_export_data_title"))
+                            .font(.system(size: 15, weight: .medium))
+                    }
+                    .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.2), lineWidth: 1))
+                }
+
                 .padding(.bottom, 32)
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             }
             .scrollIndicators(.hidden)
+            .refreshable { }
             .safeAreaPadding(.bottom, 12)
         }
         .navigationTitle(L10n.text("settings_title"))
@@ -234,7 +276,6 @@ struct SettingsView: View {
                 }
             }
         }
-        .dynamicTypeSize(.large ... .xxxLarge)
         .onChange(of: viewModel.profile) { viewModel.save() }
         .onChange(of: viewModel.profile.language) { _, newLang in
             languageKey = newLang.localeIdentifier ?? "system"
@@ -250,6 +291,23 @@ struct SettingsView: View {
             Button(L10n.text("settings_cancel"), role: .cancel) {}
         } message: {
             Text(L10n.text("settings_reset_message"))
+        }
+
+        .confirmationDialog(
+            L10n.text("settings_delete_all_data_title"),
+            isPresented: $showDeleteAllDataConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(L10n.text("settings_delete_all_data_confirm"), role: .destructive) {
+                viewModel.deleteAllData()
+            }
+            Button(L10n.text("settings_cancel"), role: .cancel) {}
+        } message: {
+            Text(L10n.text("settings_delete_all_data_message"))
+        }
+
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(activityItems: [exportJSON])
         }
     }
 

@@ -60,13 +60,13 @@ struct LocationPickerView: View {
                         .padding(.bottom, 24)
                     }
                     .scrollIndicators(.hidden)
+                    .scrollDismissesKeyboard(.immediately)
                 }
             }
         }
         .sheet(isPresented: $showAddLocation) {
             AddLocationMapView(savedLocations: $savedLocations)
         }
-        .dynamicTypeSize(.large ... .xxxLarge)
     }
 
     private func select(_ location: SavedLocation) {
@@ -422,7 +422,7 @@ private struct LocationRow: View {
             if isEditing && !isCurrentLocation {
                 Button(action: onDelete) {
                     ZStack {
-                        Circle().fill(Color(red: 1.0, green: 0.35, blue: 0.35).opacity(0.15)).frame(width: 26, height: 26)
+                        Circle().fill(AppTheme.danger.opacity(0.15)).frame(width: 26, height: 26)
                         Image(systemName: "minus").font(.system(size: 11, weight: .bold)).foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
                     }
                 }
