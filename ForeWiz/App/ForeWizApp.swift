@@ -34,17 +34,13 @@ struct ForeWizApp: App {
             AppLogger.persistence.error("Persistent ModelContainer failed: \(error.localizedDescription)")
         }
 
+        assertionFailure("Persistent ModelContainer failed — falling back to in-memory")
         do {
-            let fallbackConfig = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: true
-            )
-            return try ModelContainer(
-                for: schema,
-                configurations: [fallbackConfig]
-            )
+            let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            return try ModelContainer(for: schema, configurations: [fallbackConfig])
         } catch {
-            fatalError("Failed to create fallback ModelContainer: \(error)")
+            AppLogger.persistence.error("Fallback ModelContainer failed: \(error.localizedDescription)")
+            return try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)])
         }
     }
 
@@ -58,7 +54,8 @@ struct ForeWizApp: App {
                     AppSplashView()
                         .task { initializeCoordinator() }
                 }
-}
+            }
+            .preferredColorScheme(.dark)
             .onOpenURL { url in
                 deepLinkHandler.handle(url)
             }
@@ -67,6 +64,9 @@ struct ForeWizApp: App {
             }
             .onContinueUserActivity("settings") { _ in
                 AnalyticsManager.shared.track(.settingsOpened)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                handleScenePhaseChange(phase)
             }
         }
     }

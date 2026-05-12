@@ -18,9 +18,7 @@ final class WeatherKitWeatherRepository: WeatherRepository {
     func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
         do {
             let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
-            AppLogger.weather.info(
-                "Fetching WeatherKit forecast for lat=\(location.latitude), lon=\(location.longitude)"
-            )
+            AppLogger.weather.info("Fetching WeatherKit forecast")
             let weather = try await service.weather(for: clLocation)
             let attribution = try? await makeAttributionInfo()
             AppLogger.weather.info("WeatherKit forecast fetched successfully")
@@ -42,7 +40,7 @@ final class WeatherKitWeatherRepository: WeatherRepository {
             throw AppError.weatherKitFailed(L10n.text("error_weatherkit_unknown"))
         } catch {
             let diagnostic = Self.diagnosticDescription(for: error)
-            AppLogger.weather.error("WeatherKit request failed: \(diagnostic, privacy: .public)")
+            AppLogger.weather.error("WeatherKit request failed: \(diagnostic, privacy: .private)")
             if Self.isAuthenticationFailure(diagnostic) {
                 throw AppError.weatherKitPermissionMissing
             }

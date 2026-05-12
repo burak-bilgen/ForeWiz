@@ -13,6 +13,10 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
     }
 
+    deinit {
+        manager.delegate = nil
+    }
+
     func requestAuthorization() async -> LocationAuthorizationStatus {
         let status = manager.authorizationStatus
 
@@ -21,6 +25,10 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
 
         return await withCheckedContinuation { continuation in
+            guard authorizationContinuation == nil else {
+                continuation.resume(returning: .notDetermined)
+                return
+            }
             authorizationContinuation = continuation
             manager.requestWhenInUseAuthorization()
         }
@@ -39,6 +47,10 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
 
         return try await withCheckedThrowingContinuation { continuation in
+            guard locationContinuation == nil else {
+                continuation.resume(throwing: AppError.locationUnavailable)
+                return
+            }
             locationContinuation = continuation
             manager.requestLocation()
         }

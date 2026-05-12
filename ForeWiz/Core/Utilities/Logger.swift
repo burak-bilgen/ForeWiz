@@ -75,34 +75,34 @@ struct StructuredLogger: Logging {
 
         switch level {
         case .debug:
-            logger.debug("\(fullMessage, privacy: .public)\(metadataString, privacy: .public)")
+            logger.debug("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
         case .info:
-            logger.info("\(fullMessage, privacy: .public)\(metadataString, privacy: .public)")
+            logger.info("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
         case .warning:
-            logger.warning("\(fullMessage, privacy: .public)\(metadataString, privacy: .public)")
+            logger.warning("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
         case .error:
-            logger.error("\(fullMessage, privacy: .public)\(metadataString, privacy: .public)")
+            logger.error("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
         case .critical:
-            logger.critical("\(fullMessage, privacy: .public)\(metadataString, privacy: .public)")
+            logger.critical("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
         }
     }
 }
 
 enum AppLog {
     static func debug(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.debug("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .public)")
+        AppLogger.app.debug("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func info(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.info("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .public)")
+        AppLogger.app.info("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func warning(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.warning("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .public)")
+        AppLogger.app.warning("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func error(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.error("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .public)")
+        AppLogger.app.error("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func performance(operation: String, duration: TimeInterval, file: String = #file, function: String = #function, line: Int = #line) {
@@ -145,10 +145,10 @@ extension AppLogger {
     static func logError(_ error: Error, category: String = "app", file: String = #file, function: String = #function, line: Int = #line) {
         let logger = Logger(subsystem: "com.forewiz.app", category: category)
         let fileName = (file as NSString).lastPathComponent
-        logger.error("Error at \(fileName):\(line) in \(function): \(error.localizedDescription, privacy: .public)")
+        logger.error("Error at \(fileName):\(line) in \(function): \(error.localizedDescription, privacy: .private)")
 
         if let appError = error as? AppError {
-            logger.error("AppError details: \(String(describing: appError), privacy: .public)")
+            logger.error("AppError details: \(String(describing: appError), privacy: .private)")
         }
     }
 
@@ -161,12 +161,12 @@ extension AppLogger {
 
     static func logCacheOperation(_ operation: String, key: String, file: String = #file, function: String = #function, line: Int = #line) {
         let fileName = (file as NSString).lastPathComponent
-        AppLogger.cache.info("[\(fileName):\(line)] \(operation) - key: \(key, privacy: .public)")
+        AppLogger.cache.info("[\(fileName):\(line)] \(operation) - key: \(key, privacy: .private)")
     }
 
     static func logLifecycle(_ event: String, object: String, file: String = #file, function: String = #function, line: Int = #line) {
         let fileName = (file as NSString).lastPathComponent
-        AppLogger.lifecycle.debug("[\(fileName):\(line)] \(event) - \(object)")
+        AppLogger.lifecycle.debug("[\(fileName):\(line)] \(event) - \(object, privacy: .private)")
     }
 }
 
@@ -177,11 +177,11 @@ protocol Loggable {
 extension Error where Self: Loggable {
     func log(to logger: Logger, level: LogLevel = .error) {
         switch level {
-        case .debug: logger.debug("\(logDescription, privacy: .public)")
-        case .info: logger.info("\(logDescription, privacy: .public)")
-        case .warning: logger.warning("\(logDescription, privacy: .public)")
-        case .error: logger.error("\(logDescription, privacy: .public)")
-        case .critical: logger.critical("\(logDescription, privacy: .public)")
+        case .debug: logger.debug("\(logDescription, privacy: .private)")
+        case .info: logger.info("\(logDescription, privacy: .private)")
+        case .warning: logger.warning("\(logDescription, privacy: .private)")
+        case .error: logger.error("\(logDescription, privacy: .private)")
+        case .critical: logger.critical("\(logDescription, privacy: .private)")
         }
     }
 }

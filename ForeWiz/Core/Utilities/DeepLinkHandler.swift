@@ -1,6 +1,5 @@
 import Foundation
 import SwiftUI
-import Combine
 
 enum DeepLink: Equatable {
     case home
@@ -21,15 +20,18 @@ enum DeepLink: Equatable {
             return .settings
         case "recommendation":
             let id = url.pathComponents.dropFirst().first ?? ""
-            return .recommendationDetail(id)
+            let sanitized = id.trimmingCharacters(in: .alphanumerics.inverted)
+            guard !sanitized.isEmpty else { return nil }
+            return .recommendationDetail(sanitized)
         case "onboarding":
+            // Intentionally accessible — allows deeplink to reset to onboarding flow
             return .onboarding
         default:
             return nil
         }
     }
 
-    var url: URL {
+    var url: URL? {
         var components = URLComponents()
         components.scheme = "forewiz"
 
@@ -47,7 +49,7 @@ enum DeepLink: Equatable {
             components.host = "onboarding"
         }
 
-        return components.url ?? URL(string: "forewiz://home")!
+        return components.url
     }
 }
 

@@ -16,7 +16,7 @@ struct GetWeatherRecommendationIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         AppLogger.shortcuts.info("GetWeatherRecommendationIntent executed")
 
-        let container = await ContainerProvider.shared.container
+        let container = try await ContainerProvider.shared.container
 
         do {
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: false)
@@ -59,7 +59,7 @@ struct GetCurrentTemperatureIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         AppLogger.shortcuts.info("GetCurrentTemperatureIntent executed")
 
-        let container = await ContainerProvider.shared.container
+        let container = try await ContainerProvider.shared.container
 
         do {
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: false)
@@ -89,7 +89,7 @@ struct GetOutfitRecommendationIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         AppLogger.shortcuts.info("GetOutfitRecommendationIntent executed")
 
-        let container = await ContainerProvider.shared.container
+        let container = try await ContainerProvider.shared.container
 
         do {
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: false)
@@ -123,7 +123,7 @@ struct GetBestActivityWindowIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         AppLogger.shortcuts.info("GetBestActivityWindowIntent executed for activity: \(activity ?? "any")")
 
-        let container = await ContainerProvider.shared.container
+        let container = try await ContainerProvider.shared.container
 
         do {
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: false)
@@ -181,7 +181,7 @@ struct CheckWeatherRisksIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         AppLogger.shortcuts.info("CheckWeatherRisksIntent executed")
 
-        let container = await ContainerProvider.shared.container
+        let container = try await ContainerProvider.shared.container
 
         do {
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: false)
@@ -216,7 +216,7 @@ struct RefreshWeatherDataIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         AppLogger.shortcuts.info("RefreshWeatherDataIntent executed")
 
-        let container = await ContainerProvider.shared.container
+        let container = try await ContainerProvider.shared.container
 
         do {
             _ = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
@@ -333,7 +333,7 @@ final class ContainerProvider {
     private var _container: DependencyContainer?
 
     var container: DependencyContainer {
-        get async {
+        get async throws {
             if let container = _container {
                 return container
             }
@@ -356,7 +356,8 @@ final class ContainerProvider {
                         configurations: fallbackConfig
                     )
                 } catch {
-                    fatalError("Failed to create shortcut ModelContainer: \(error)")
+                    AppLogger.shortcuts.error("Failed to create shortcut ModelContainer: \(error.localizedDescription)")
+                    throw error
                 }
             }
 
