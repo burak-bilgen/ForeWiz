@@ -222,6 +222,30 @@ struct PreferencesRepositoryTests {
         profile.temperatureSensitivity = .getsHotEasily
         profile.preferredActivities = [.running, .walking]
         profile.language = .english
+        profile.appearance = .light
+        profile.accentPalette = .ember
+        profile.maximumDailyNotifications = 3
+        profile.wakeUpTime = DateComponents(hour: 6, minute: 30)
+        profile.usualWorkoutTime = DateComponents(hour: 18, minute: 15)
+        let istanbul = SavedLocation(
+            id: "istanbul",
+            name: "Istanbul",
+            latitude: 41.0082,
+            longitude: 28.9784,
+            address: "Istanbul, Turkey",
+            isFavorite: true
+        )
+        profile.savedLocations = [.currentLocation, istanbul]
+        profile.selectedLocationID = istanbul.id
+        profile.notificationPreferences = [
+            NotificationPreference(category: .morningBriefing, isEnabled: false, preferredTime: DateComponents(hour: 8)),
+            NotificationPreference(category: .outfitSuggestion, isEnabled: true, preferredTime: DateComponents(hour: 7, minute: 45)),
+            NotificationPreference(category: .bestRunWindow, isEnabled: true, preferredTime: nil),
+            NotificationPreference(category: .rainWarning, isEnabled: true, preferredTime: nil),
+            NotificationPreference(category: .windWarning, isEnabled: true, preferredTime: nil),
+            NotificationPreference(category: .uvWarning, isEnabled: true, preferredTime: nil),
+            NotificationPreference(category: .avoidHeatWindow, isEnabled: true, preferredTime: nil)
+        ]
 
         try await repository.saveProfile(profile)
 
@@ -230,6 +254,15 @@ struct PreferencesRepositoryTests {
         #expect(loaded.temperatureSensitivity == .getsHotEasily)
         #expect(loaded.preferredActivities.contains(.running))
         #expect(loaded.language == .english)
+        #expect(loaded.appearance == .light)
+        #expect(loaded.accentPalette == .ember)
+        #expect(loaded.maximumDailyNotifications == 3)
+        #expect(loaded.wakeUpTime?.hour == 6)
+        #expect(loaded.wakeUpTime?.minute == 30)
+        #expect(loaded.usualWorkoutTime?.hour == 18)
+        #expect(loaded.savedLocations.contains(istanbul))
+        #expect(loaded.selectedLocationID == istanbul.id)
+        #expect(loaded.notificationPreferences.first { $0.category == .morningBriefing }?.isEnabled == false)
     }
 
     @Test("Onboarding completion status can be set and retrieved")

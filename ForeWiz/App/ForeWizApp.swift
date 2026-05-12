@@ -40,8 +40,7 @@ struct ForeWizApp: App {
             return try ModelContainer(for: schema, configurations: [fallbackConfig])
         } catch {
             AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription)")
-            let memoryConfig = ModelConfiguration(isStoredInMemoryOnly: true)
-            return try! ModelContainer(for: schema, configurations: [memoryConfig])
+            fatalError("Unable to create ForeWiz SwiftData ModelContainer")
         }
     }
 
@@ -56,7 +55,6 @@ struct ForeWizApp: App {
                         .task { initializeCoordinator() }
                 }
             }
-            .preferredColorScheme(.dark)
             .onOpenURL { url in
                 deepLinkHandler.handle(url)
             }

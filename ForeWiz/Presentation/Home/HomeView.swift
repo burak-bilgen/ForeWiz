@@ -7,6 +7,7 @@ struct HomeView: View {
 
     let onRecommendationLoaded: (DailyRecommendation) -> Void
     let onOpenSettings: () -> Void
+    let onLocationsChanged: ([SavedLocation], String) -> Void
 
     @State private var showLocationPicker = false
     @State private var showSplash = true
@@ -61,7 +62,8 @@ struct HomeView: View {
                 LocationPickerView(
                     savedLocations: $savedLocations,
                     selectedLocationID: $selectedLocationID,
-                    onSelect: { location in Task { await viewModel.changeLocation(to: location) } }
+                    onSelect: { location in Task { await viewModel.changeLocation(to: location) } },
+                    onLocationsChanged: { locations in onLocationsChanged(locations, selectedLocationID) }
                 )
             }
             .onChange(of: viewModel.state) { _, newState in
@@ -928,4 +930,3 @@ private struct HomeAttributionView: View {
         .padding(.bottom, 8)
     }
 }
-

@@ -3,6 +3,13 @@ import Foundation
 enum PremiumTier: String, Codable, Sendable {
     case free
     case premium
+
+    var rank: Int {
+        switch self {
+        case .free: 0
+        case .premium: 1
+        }
+    }
 }
 
 struct FeatureGate {
@@ -22,7 +29,7 @@ struct FeatureGate {
     }
     
     static func isUnlocked(_ feature: Feature, tier: PremiumTier = currentTier) -> Bool {
-        feature.requiredTier.rawValue <= tier.rawValue
+        tier.rank >= feature.requiredTier.rank
     }
     
     static func premiumPrompt(for feature: Feature) -> String {

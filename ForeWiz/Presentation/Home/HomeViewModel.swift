@@ -91,28 +91,28 @@ final class HomeViewModel: ObservableObject {
                 .execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
             let profile = try await preferencesRepository.loadProfile()
 
-state = .loaded(
-                    HomeViewState(
-                        recommendation: result.recommendation,
-                        assistant: makeAssistantState(from: result),
-                        plan: makePlanState(from: result),
-                        currentWeather: currentWeatherViewState(
-                            from: result.currentWeather,
-                            unitSystem: .current,
-                            dailyPoints: result.dailyPoints
-                        ),
-                        dailyForecasts: makeDailyForecastItems(from: result.dailyPoints, unitSystem: .current),
-                        hourlyScores: makeHourlyScores(
-                            from: result.hourlyPoints,
-                            profile: profile,
-                            unitSystem: .current
-                        ),
-                        lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
-                        isUsingCachedWeather: result.isUsingCachedWeather,
-                        warningMessage: result.warningMessage,
-                        attribution: result.attribution
-                    )
+            state = .loaded(
+                HomeViewState(
+                    recommendation: result.recommendation,
+                    assistant: makeAssistantState(from: result),
+                    plan: makePlanState(from: result),
+                    currentWeather: currentWeatherViewState(
+                        from: result.currentWeather,
+                        unitSystem: .current,
+                        dailyPoints: result.dailyPoints
+                    ),
+                    dailyForecasts: makeDailyForecastItems(from: result.dailyPoints, unitSystem: .current),
+                    hourlyScores: makeHourlyScores(
+                        from: result.hourlyPoints,
+                        profile: profile,
+                        unitSystem: .current
+                    ),
+                    lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
+                    isUsingCachedWeather: result.isUsingCachedWeather,
+                    warningMessage: result.warningMessage,
+                    attribution: result.attribution
                 )
+            )
 
             if selectedLocation == nil || selectedLocation?.id == "current-location",
                let location = result.usedLocation {
@@ -127,8 +127,6 @@ state = .loaded(
             } catch {
                 AppLogger.notifications.error("Failed to schedule notifications: \(error.localizedDescription)")
             }
-
-
         } catch {
             state = .failed(message(for: error))
         }

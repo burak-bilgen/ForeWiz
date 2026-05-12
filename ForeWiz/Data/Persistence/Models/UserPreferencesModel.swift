@@ -15,6 +15,15 @@ final class UserPreferencesModel {
     var preferredLanguageRaw: String?
     var preferredAppearanceRaw: String?
     var preferredUnitSystemRaw: String?
+    var wakeUpHour: Int?
+    var wakeUpMinute: Int?
+    var workoutHour: Int?
+    var workoutMinute: Int?
+    var notificationPreferencesData: Data?
+    var maximumDailyNotifications: Int = 2
+    var accentPaletteRaw: String?
+    var savedLocationsData: Data?
+    var selectedLocationID: String = "current-location"
     var createdAt: Date
     var updatedAt: Date
 
@@ -49,6 +58,8 @@ final class UserPreferencesModel {
         self.onboardingCompleted = onboardingCompleted
         self.preferredLanguageRaw = preferredLanguage?.rawValue
         self.preferredAppearanceRaw = preferredAppearance?.rawValue
+        self.accentPaletteRaw = AppAccentPalette.sky.rawValue
+        self.selectedLocationID = SavedLocation.currentLocation.id
         self.createdAt = Date()
         self.updatedAt = Date()
     }
@@ -56,6 +67,20 @@ final class UserPreferencesModel {
     func toProfile() -> UserComfortProfile {
         let sensitivity = TemperatureSensitivity(rawValue: temperatureSensitivityRaw) ?? .normal
         let activities = preferredActivitiesRaw.compactMap { ActivityType(rawValue: $0) }
+        let defaultProfile = UserComfortProfile.default
+        let language = preferredLanguageRaw.flatMap(AppLanguage.init(rawValue:)) ?? .system
+        let appearance = preferredAppearanceRaw.flatMap(AppAppearance.init(rawValue:)) ?? .system
+        let accentPalette = accentPaletteRaw.flatMap(AppAccentPalette.init(rawValue:)) ?? .sky
+        let notifications = decoded(
+            [NotificationPreference].self,
+            from: notificationPreferencesData
+        ) ?? defaultProfile.notificationPreferences
+        let locations = normalizedSavedLocations(
+            decoded([SavedLocation].self, from: savedLocationsData) ?? defaultProfile.savedLocations
+        )
+        let selectedID = locations.contains(where: { $0.id == selectedLocationID })
+            ? selectedLocationID
+            : SavedLocation.currentLocation.id
         
         var quietHours: TimeWindow?
         if quietHoursEnabled {
@@ -81,16 +106,26 @@ final class UserPreferencesModel {
         return UserComfortProfile(
             temperatureSensitivity: sensitivity,
             preferredActivities: Set(activities),
+            wakeUpTime: dateComponents(hour: wakeUpHour, minute: wakeUpMinute),
+            usualWorkoutTime: dateComponents(hour: workoutHour, minute: workoutMinute),
             quietHours: quietHours,
-            notificationPreferences: NotificationCategory.allCases.map {
-                NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
-            }
+            notificationPreferences: normalizedNotificationPreferences(notifications),
+            maximumDailyNotifications: maximumDailyNotifications,
+            appearance: appearance,
+            accentPalette: accentPalette,
+            language: language,
+            savedLocations: locations,
+            selectedLocationID: selectedID
         )
     }
 
     func update(from profile: UserComfortProfile) {
         self.temperatureSensitivityRaw = profile.temperatureSensitivity.rawValue
         self.preferredActivitiesRaw = profile.preferredActivities.map { $0.rawValue }
+        self.wakeUpHour = profile.wakeUpTime?.hour
+        self.wakeUpMinute = profile.wakeUpTime?.minute
+        self.workoutHour = profile.usualWorkoutTime?.hour
+        self.workoutMinute = profile.usualWorkoutTime?.minute
         
         if let quietHours = profile.quietHours {
             let calendar = Calendar.current
@@ -105,6 +140,46 @@ final class UserPreferencesModel {
 
         self.preferredLanguageRaw = profile.language.rawValue
         self.preferredAppearanceRaw = profile.appearance.rawValue
+        self.notificationPreferencesData = encoded(profile.notificationPreferences)
+        self.maximumDailyNotifications = profile.maximumDailyNotifications.clamped(to: 1...3)
+        self.accentPaletteRaw = profile.accentPalette.rawValue
+        self.savedLocationsData = encoded(normalizedSavedLocations(profile.savedLocations))
+        self.selectedLocationID = profile.selectedLocationID
         self.updatedAt = Date()
+    }
+
+    private func dateComponents(hour: Int?, minute: Int?) -> DateComponents? {
+        guard let hour else { return nil }
+        return DateComponents(hour: hour, minute: minute ?? 0)
+    }
+
+    private func normalizedNotificationPreferences(
+        _ preferences: [NotificationPreference]
+    ) -> [NotificationPreference] {
+        var byCategory: [NotificationCategory: NotificationPreference] = [:]
+        preferences.forEach { byCategory[$0.category] = $0 }
+        for category in NotificationCategory.allCases where byCategory[category] == nil {
+            byCategory[category] = NotificationPreference(category: category, isEnabled: true, preferredTime: nil)
+        }
+        return NotificationCategory.allCases.compactMap { byCategory[$0] }
+    }
+
+    private func normalizedSavedLocations(_ locations: [SavedLocation]) -> [SavedLocation] {
+        var result = locations
+        if let index = result.firstIndex(where: { $0.id == SavedLocation.currentLocation.id }) {
+            result[index] = SavedLocation.currentLocation
+        } else {
+            result.insert(.currentLocation, at: 0)
+        }
+        return result
+    }
+
+    private func encoded<T: Encodable>(_ value: T) -> Data? {
+        try? JSONEncoder().encode(value)
+    }
+
+    private func decoded<T: Decodable>(_ type: T.Type, from data: Data?) -> T? {
+        guard let data else { return nil }
+        return try? JSONDecoder().decode(type, from: data)
     }
 }

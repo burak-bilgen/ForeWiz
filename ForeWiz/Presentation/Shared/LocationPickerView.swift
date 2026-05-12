@@ -9,6 +9,7 @@ struct LocationPickerView: View {
     @Binding var savedLocations: [SavedLocation]
     @Binding var selectedLocationID: String
     let onSelect: (SavedLocation) -> Void
+    let onLocationsChanged: ([SavedLocation]) -> Void
 
     @State private var showAddLocation = false
     @State private var editMode: EditMode = .inactive
@@ -41,6 +42,7 @@ struct LocationPickerView: View {
         .sheet(isPresented: $showAddLocation) {
             ModernAddLocationView { location in
                 savedLocations.append(location)
+                onLocationsChanged(savedLocations)
             }
         }
     }
@@ -308,7 +310,11 @@ struct LocationPickerView: View {
         guard location.id != "current-location" else { return }
         withAnimation {
             savedLocations.removeAll { $0.id == location.id }
+            if selectedLocationID == location.id {
+                selectedLocationID = SavedLocation.currentLocation.id
+            }
         }
+        onLocationsChanged(savedLocations)
         HapticManager.medium()
     }
 }
@@ -680,7 +686,8 @@ private struct ModernAddLocationView: View {
             SavedLocation(name: "London", latitude: 51.5074, longitude: -0.1278, address: "London, United Kingdom")
         ]),
         selectedLocationID: .constant("current-location"),
-        onSelect: { _ in }
+        onSelect: { _ in },
+        onLocationsChanged: { _ in }
     )
 }
 
@@ -688,7 +695,8 @@ private struct ModernAddLocationView: View {
     LocationPickerView(
         savedLocations: .constant([]),
         selectedLocationID: .constant("current-location"),
-        onSelect: { _ in }
+        onSelect: { _ in },
+        onLocationsChanged: { _ in }
     )
 }
 #endif

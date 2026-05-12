@@ -35,7 +35,9 @@ final class SettingsViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    var isPremium: Bool { true }
+    var isPremium: Bool {
+        FeatureGate.currentTier == .premium
+    }
 
     func save() {
         saveSubject.send(profile)

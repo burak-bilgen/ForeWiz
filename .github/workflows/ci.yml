@@ -11,9 +11,15 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - name: Install SwiftLint
+        run: brew install swiftlint
+      - name: Xcode Diagnostics
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks
       - name: SwiftLint
         run: swiftlint lint --strict
       - name: Build
-        run: xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' CODE_SIGNING_ALLOWED=NO
+        run: xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
       - name: Run Tests
         run: xcodebuild test -project ForeWiz.xcodeproj -scheme ForeWiz -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' CODE_SIGNING_ALLOWED=NO

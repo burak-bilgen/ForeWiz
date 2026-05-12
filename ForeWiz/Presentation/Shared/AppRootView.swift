@@ -22,7 +22,7 @@ struct AppRootView: View {
                 HomeRootView(coordinator: coordinator)
             }
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(coordinator.profile.appearance.colorScheme)
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
         .task {
@@ -86,7 +86,20 @@ private struct HomeRootView: View {
             onRecommendationLoaded: { recommendation in
                 coordinator.updateRecommendation(recommendation)
             },
-            onOpenSettings: { showSettings = true }
+            onOpenSettings: { showSettings = true },
+            onLocationsChanged: { locations, selectedID in
+                Task {
+                    var profile = coordinator.profile
+                    profile.savedLocations = locations
+                    profile.selectedLocationID = selectedID
+                    do {
+                        try await coordinator.container.updateUserPreferencesUseCase.execute(profile: profile)
+                        coordinator.applyProfile(profile)
+                    } catch {
+                        AppLogger.persistence.error("Failed to save locations: \(error.localizedDescription)")
+                    }
+                }
+            }
         )
         .sheet(isPresented: $showSettings) {
             NavigationStack {
