@@ -633,6 +633,12 @@ private struct CompactHourlyCard: View {
                     .foregroundStyle(Color.white.opacity(0.5))
                     .padding(.horizontal, 12)
 
+                if !hourlyScores.isEmpty {
+                    TemperatureTrendChart(hourlyScores: hourlyScores)
+                        .padding(.horizontal, 8)
+                        .frame(height: 140)
+                }
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         ForEach(hourlyScores) { item in
