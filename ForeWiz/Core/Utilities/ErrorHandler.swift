@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 enum ErrorHandler {
     static func normalized(_ error: any Error) -> AppError {

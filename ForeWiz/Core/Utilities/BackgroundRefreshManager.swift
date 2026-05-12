@@ -101,7 +101,7 @@ final class BackgroundRefreshManager {
     @MainActor
     private func performBackgroundRefresh() async -> Bool {
         do {
-            let container = await ContainerProvider.shared.container
+            let container = try await ContainerProvider.shared.container
 
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
 
@@ -125,7 +125,7 @@ final class BackgroundRefreshManager {
         logger.info("Performing background processing")
 
         do {
-            let container = await ContainerProvider.shared.container
+            let container = try await ContainerProvider.shared.container
 
             let snapshot = try await container.weatherCacheRepository.loadLatest()
 
@@ -319,7 +319,7 @@ final class RefreshController {
         do {
             logger.info("Starting manual refresh")
 
-            let container = await ContainerProvider.shared.container
+            let container = try await ContainerProvider.shared.container
             let result = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
 
             NotificationCenter.default.post(

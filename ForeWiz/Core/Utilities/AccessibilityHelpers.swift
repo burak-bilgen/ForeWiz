@@ -400,7 +400,7 @@ struct AccessibleScrollView<Content: View>: View {
     init(
         axis: Axis.Set = .horizontal,
         showsIndicators: Bool = true,
-        pageSize: CGFloat = UIScreen.main.bounds.width,
+        pageSize: CGFloat = 0,
         @ViewBuilder content: () -> Content
     ) {
         self.axis = axis

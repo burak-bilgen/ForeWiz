@@ -39,8 +39,8 @@ struct ForeWizApp: App {
             let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             return try ModelContainer(for: schema, configurations: [fallbackConfig])
         } catch {
-            AppLogger.persistence.error("Fallback ModelContainer failed: \(error.localizedDescription)")
-            return try ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)])
+            AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription)")
+            return try! ModelContainer(for: schema, configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)])
         }
     }
 
