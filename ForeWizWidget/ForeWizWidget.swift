@@ -29,6 +29,7 @@ struct WeatherEntry: TimelineEntry {
 
 struct ForeWizWidgetEntryView: View {
     var entry: WeatherEntry
+    @Environment(\.widgetFamily) var family
 
     private var gradientColors: [Color] {
         let s = entry.symbol.lowercased()
@@ -51,6 +52,51 @@ struct ForeWizWidgetEntryView: View {
     }
 
     var body: some View {
+        switch family {
+        case .accessoryCircular:
+            accessoryCircularView
+        case .accessoryRectangular:
+            accessoryRectangularView
+        default:
+            systemView
+        }
+    }
+
+    private var accessoryCircularView: some View {
+        ZStack {
+            AccessoryWidgetBackground()
+            VStack(spacing: 2) {
+                Image(systemName: entry.symbol)
+                    .font(.system(size: 18))
+                    .symbolRenderingMode(.hierarchical)
+                Text(entry.temperature)
+                    .font(.system(size: 16, weight: .medium))
+            }
+        }
+    }
+
+    private var accessoryRectangularView: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 4) {
+                Image(systemName: entry.symbol)
+                    .font(.system(size: 12))
+                Text(entry.temperature)
+                    .font(.system(size: 16, weight: .bold))
+                Spacer()
+            }
+            Text(entry.condition)
+                .font(.system(size: 11))
+            HStack(spacing: 8) {
+                Label(entry.high, systemImage: "arrow.up")
+                    .font(.system(size: 10))
+                Label(entry.low, systemImage: "arrow.down")
+                    .font(.system(size: 10))
+            }
+            .foregroundStyle(.secondary)
+        }
+    }
+
+    private var systemView: some View {
         ZStack {
             LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
@@ -96,6 +142,7 @@ struct ForeWizWidgetEntryView: View {
         }
     }
 }
+}
 
 @main
 struct ForeWizWidget: Widget {
@@ -107,7 +154,7 @@ struct ForeWizWidget: Widget {
         }
         .configurationDisplayName("ForeWiz Weather")
         .description("Current weather at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular])
     }
 }
 
