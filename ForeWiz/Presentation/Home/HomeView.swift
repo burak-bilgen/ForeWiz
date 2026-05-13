@@ -19,8 +19,8 @@ struct HomeView: View {
         return "cloud.fill"
     }
 
-    private var splashKind: WeatherSplashKind {
-        WeatherSplashKind.from(symbolName: currentSymbol)
+    private var splashKind: EnhancedWeatherSplashKind {
+        EnhancedWeatherSplashKind.from(symbolName: currentSymbol)
     }
 
     var body: some View {
@@ -32,7 +32,7 @@ struct HomeView: View {
                 content
 
                 if showSplash {
-                    WeatherSplashOverlay(
+                    EnhancedWeatherSplashOverlay(
                         kind: splashKind,
                         onDismiss: { showSplash = false },
                         onFadeOut: {

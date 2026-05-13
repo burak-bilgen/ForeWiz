@@ -54,7 +54,7 @@ struct RefactoredHomeView: View {
                 content
                 
                 if showSplash {
-                    WeatherSplashOverlay(
+                    EnhancedWeatherSplashOverlay(
                         kind: splashKind,
                         onDismiss: { showSplash = false },
                         onFadeOut: { contentReady = true }
@@ -195,8 +195,8 @@ struct RefactoredHomeView: View {
     
     // MARK: - Helpers
     
-    private var splashKind: WeatherSplashKind {
-        WeatherSplashKind.from(symbolName: currentSymbol)
+    private var splashKind: EnhancedWeatherSplashKind {
+        EnhancedWeatherSplashKind.from(symbolName: currentSymbol)
     }
     
     private var currentConditionCode: String? {
