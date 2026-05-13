@@ -147,7 +147,7 @@ struct LocationPickerView: View {
                     in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fullTapArea)
             .opacity(appears ? 1 : 0)
             .animation(.easeOut(duration: 0.5).delay(0.25), value: appears)
 
@@ -225,7 +225,7 @@ struct LocationPickerView: View {
                             .stroke(Color.white.opacity(0.06), lineWidth: 1)
                     )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fullTapArea)
                 .padding(.horizontal, 16)
                 .padding(.top, 4)
 
@@ -291,7 +291,7 @@ struct LocationPickerView: View {
                     )
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fullTapArea)
     }
 
     // MARK: - Actions
@@ -347,7 +347,7 @@ private struct LocationCard: View {
                             .frame(width: 50, height: 50)
                             .background(Color(red: 1.0, green: 0.35, blue: 0.3), in: Circle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.fullTapArea)
                     .padding(.trailing, 16)
                     .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
@@ -405,7 +405,7 @@ private struct LocationCard: View {
                         )
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fullTapArea)
             .offset(x: offset)
             .gesture(
                 DragGesture(minimumDistance: 20)
@@ -559,7 +559,7 @@ private struct ModernAddLocationView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.fullTapArea)
 
                         if item != searchResults.prefix(5).last {
                             Divider()
@@ -616,7 +616,7 @@ private struct ModernAddLocationView: View {
                     in: RoundedRectangle(cornerRadius: 14, style: .continuous)
                 )
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fullTapArea)
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 34)

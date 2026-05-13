@@ -503,7 +503,7 @@ private struct SettingsSensitivitySelector: View {
                         )
                     )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fullTapArea)
                 .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
             }
         }
@@ -533,7 +533,7 @@ private struct SettingsActivityRow: View {
             }
             .padding(.vertical, 5)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fullTapArea)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 

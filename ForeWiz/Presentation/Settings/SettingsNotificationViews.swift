@@ -34,7 +34,7 @@ struct NotificationSettingsSection: View {
                         .foregroundStyle(profile.maximumDailyNotifications > 1 ? notifColor : Color.white.opacity(0.2))
                         .frame(width: 30, height: 30)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fullTapArea)
 
                 Text("\(profile.maximumDailyNotifications)")
                     .font(.system(size: 15, weight: .semibold))
@@ -53,7 +53,7 @@ struct NotificationSettingsSection: View {
                         .foregroundStyle(profile.maximumDailyNotifications < 3 ? notifColor : Color.white.opacity(0.2))
                         .frame(width: 30, height: 30)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fullTapArea)
             }
             .glassEffect(.regular, in: Capsule())
         }

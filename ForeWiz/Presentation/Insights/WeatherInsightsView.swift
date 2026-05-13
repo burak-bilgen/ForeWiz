@@ -544,7 +544,7 @@ struct MetricButton: View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .shadow(color: isSelected ? metric.color.opacity(0.3) : .clear, radius: 8)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fullTapArea)
     }
 
     private func iconName(for metric: MetricType) -> String {

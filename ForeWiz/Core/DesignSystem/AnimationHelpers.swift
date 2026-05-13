@@ -111,9 +111,23 @@ struct PressScaleButtonStyle: ButtonStyle {
     var scale: CGFloat = 0.96
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .contentShape(Rectangle())
             .scaleEffect(configuration.isPressed ? scale : 1.0)
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
+}
+
+struct FullTapAreaButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.78 : 1.0)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == FullTapAreaButtonStyle {
+    static var fullTapArea: FullTapAreaButtonStyle { FullTapAreaButtonStyle() }
 }
 
 extension View {

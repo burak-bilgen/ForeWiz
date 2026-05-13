@@ -15,6 +15,7 @@ final class HomeViewModel: ObservableObject {
     private let dateProvider: DateProvider
     private let activityWindowScoringEngine: ActivityWindowScoringEngine
     private var didLoad = false
+    private var liveRetryTask: Task<Void, Never>?
 
     private var selectedLocation: SavedLocation?
     private var selectedLocationID: String = "current-location"
@@ -35,6 +36,10 @@ final class HomeViewModel: ObservableObject {
         self.selectedLocationName = selectedLocationName
     }
 
+    deinit {
+        liveRetryTask?.cancel()
+    }
+
     func onAppear() {
         guard didLoad == false else {
             return
@@ -42,17 +47,26 @@ final class HomeViewModel: ObservableObject {
 
         didLoad = true
         Task {
-            await load(forceRefresh: false)
+            await load(forceRefresh: true, retryCachedResult: true)
         }
     }
 
     func reloadForLanguageChange() async {
         didLoad = false
-        await load(forceRefresh: false)
+        await load(forceRefresh: true, retryCachedResult: true)
     }
 
     func refresh() async {
-        await load(forceRefresh: true)
+        liveRetryTask?.cancel()
+        await load(forceRefresh: true, retryCachedResult: true)
+    }
+
+    func refreshWhenAppBecomesActive() async {
+        guard didLoad else {
+            return
+        }
+
+        await load(forceRefresh: true, showsLoading: false, retryCachedResult: true)
     }
 
     func changeLocation(to location: SavedLocation) async {
@@ -69,11 +83,18 @@ final class HomeViewModel: ObservableObject {
         }
 
         didLoad = false
-        await load(forceRefresh: true)
+        await load(forceRefresh: true, retryCachedResult: true)
     }
 
-    private func load(forceRefresh: Bool) async {
-        state = .loading
+    private func load(
+        forceRefresh: Bool,
+        showsLoading: Bool = true,
+        retryCachedResult: Bool = false
+    ) async {
+        let previousState = state
+        if showsLoading {
+            state = .loading
+        }
 
         do {
             let targetLocation: LocationCoordinate?
@@ -114,6 +135,12 @@ final class HomeViewModel: ObservableObject {
                 )
             )
 
+            if result.isUsingCachedWeather, retryCachedResult {
+                scheduleLiveRetry()
+            } else if result.isUsingCachedWeather == false {
+                liveRetryTask?.cancel()
+            }
+
             if selectedLocation == nil || selectedLocation?.id == "current-location",
                let location = result.usedLocation {
                 resolveLocationName(for: location)
@@ -128,8 +155,35 @@ final class HomeViewModel: ObservableObject {
                 AppLogger.notifications.error("Failed to schedule notifications: \(error.localizedDescription)")
             }
         } catch {
-            state = .failed(message(for: error))
+            if showsLoading {
+                state = .failed(message(for: error))
+            } else {
+                state = previousState
+            }
         }
+    }
+
+    private func scheduleLiveRetry() {
+        liveRetryTask?.cancel()
+        liveRetryTask = Task { [weak self] in
+            for delaySeconds in [6, 18, 45] {
+                try? await Task.sleep(nanoseconds: UInt64(delaySeconds) * 1_000_000_000)
+                guard Task.isCancelled == false else { return }
+                guard await self?.retryLiveWeatherOnce() == true else {
+                    return
+                }
+            }
+        }
+    }
+
+    private func retryLiveWeatherOnce() async -> Bool {
+        await load(forceRefresh: true, showsLoading: false, retryCachedResult: false)
+
+        guard case .loaded(let state) = state else {
+            return false
+        }
+
+        return state.isUsingCachedWeather
     }
 
     private func makeAssistantState(from result: HomeRecommendationResult) -> HomeAssistantViewState {
@@ -173,6 +227,9 @@ final class HomeViewModel: ObservableObject {
 
         return HomeAssistantViewState(
             headline: headline,
+            summary: assistantSummaryText(for: recommendation),
+            primaryActionTitle: primaryActionTitle(for: recommendation),
+            primaryActionDetail: primaryActionDetail(for: recommendation),
             symbolName: symbolName,
             tone: tone,
             criticalAlert: criticalAlert
@@ -331,6 +388,72 @@ final class HomeViewModel: ObservableObject {
             return prefix + L10n.text("plan_carefully")
         case .avoid:
             return prefix + L10n.text("better_to_postpone_outdoor_plans")
+        }
+    }
+
+    private func assistantSummaryText(for recommendation: DailyRecommendation) -> String {
+        if let risk = recommendation.risks.first(where: { $0.severity >= .high }) {
+            return String(format: L10n.text("home_assistant_summary_risk_format"), risk.title, actionText(for: risk))
+        }
+
+        if let bestWindow = recommendation.bestOutdoorWindow {
+            switch recommendation.outdoorDecision {
+            case .good:
+                return String(format: L10n.text("home_assistant_summary_good_format"), bestWindow.shortDisplayText)
+            case .moderate:
+                return String(format: L10n.text("home_assistant_summary_moderate_format"), bestWindow.shortDisplayText)
+            case .risky:
+                return String(format: L10n.text("home_assistant_summary_risky_format"), bestWindow.shortDisplayText)
+            case .avoid:
+                return L10n.text("home_assistant_summary_avoid")
+            }
+        }
+
+        switch recommendation.outdoorDecision {
+        case .good:
+            return L10n.text("home_assistant_summary_good_no_window")
+        case .moderate:
+            return L10n.text("home_assistant_summary_moderate_no_window")
+        case .risky:
+            return L10n.text("home_assistant_summary_risky_no_window")
+        case .avoid:
+            return L10n.text("home_assistant_summary_avoid")
+        }
+    }
+
+    private func primaryActionTitle(for recommendation: DailyRecommendation) -> String {
+        if recommendation.outdoorDecision == .avoid {
+            return L10n.text("home_assistant_action_indoor_title")
+        }
+
+        if recommendation.bestOutdoorWindow != nil {
+            return L10n.text("home_assistant_action_window_title")
+        }
+
+        return L10n.text("home_assistant_action_flexible_title")
+    }
+
+    private func primaryActionDetail(for recommendation: DailyRecommendation) -> String {
+        if recommendation.outdoorDecision == .avoid {
+            return L10n.text("home_assistant_action_indoor_detail")
+        }
+
+        if let bestWindow = recommendation.bestOutdoorWindow {
+            return bestWindow.shortDisplayText
+        }
+
+        return L10n.text("home_assistant_action_flexible_detail")
+    }
+
+    private func actionText(for risk: WeatherRisk) -> String {
+        switch risk.type {
+        case .heat: return L10n.text("stick_to_shade_water_and")
+        case .uv: return L10n.text("use_sunscreen_a_hat_and")
+        case .rain: return L10n.text("bring_an_umbrella_or_move")
+        case .wind, .storm: return L10n.text("avoid_long_exposed_outdoor_time")
+        case .humidity: return L10n.text("slow_the_pace_and_keep")
+        case .cold: return L10n.text("dress_in_layers_and_avoid")
+        case .poorComfort: return L10n.text("keeping_outdoor_time_short_is")
         }
     }
 

@@ -61,6 +61,7 @@ struct AppRootView: View {
 
 private struct HomeRootView: View {
     @ObservedObject var coordinator: AppCoordinator
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var homeViewModel: HomeViewModel
     @State private var showSettings = false
 
@@ -123,6 +124,13 @@ private struct HomeRootView: View {
         }
         .onChange(of: coordinator.profile.language) { _, _ in
             Task { await homeViewModel.reloadForLanguageChange() }
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else {
+                return
+            }
+
+            Task { await homeViewModel.refreshWhenAppBecomesActive() }
         }
     }
 

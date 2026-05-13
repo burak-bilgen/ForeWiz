@@ -68,6 +68,7 @@ struct ForeWizApp: App {
                 handleScenePhaseChange(phase)
             }
             .preferredColorScheme(.dark)
+            .buttonStyle(.fullTapArea)
         }
     }
 

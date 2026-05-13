@@ -31,6 +31,9 @@ struct HomePlanItem: Equatable, Identifiable {
 
 struct HomeAssistantViewState: Equatable {
     let headline: String
+    let summary: String
+    let primaryActionTitle: String
+    let primaryActionDetail: String
     let symbolName: String
     let tone: HomeAssistantTone
     let criticalAlert: HomeAssistantSignal?

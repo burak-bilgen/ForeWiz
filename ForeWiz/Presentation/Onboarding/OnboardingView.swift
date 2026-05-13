@@ -100,7 +100,7 @@ struct OnboardingView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(selected ? accentOrange.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
                             }
                             .accessibilityLabel(sensitivity.localizedTitle)
-                            .buttonStyle(.plain)
+                            .buttonStyle(.fullTapArea)
                         }
                     }
                     .frame(minHeight: 72)
@@ -163,7 +163,7 @@ struct OnboardingView: View {
                                 .scaleEffect(selected ? 1.05 : 1.0)
                             }
                             .accessibilityLabel(activity.localizedTitle)
-                            .buttonStyle(.plain)
+                            .buttonStyle(.fullTapArea)
                         }
                     }
                 }
@@ -357,7 +357,7 @@ private struct PermissionRow: View {
                     .stroke(isGranted ? color.opacity(0.3) : Color.white.opacity(0.05), lineWidth: 1)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fullTapArea)
         .disabled(isGranted)
     }
 }

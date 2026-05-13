@@ -150,35 +150,39 @@ private struct HomeLoadedContent: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 20) {
+                if let alert = state.assistant.criticalAlert {
+                    CriticalAlertCard(signal: alert)
+                        .cardEntrance(appeared: contentReady, delay: 0.0)
+                }
+
                 UnifiedHeroCard(
                     assistant: state.assistant,
                     weather: state.currentWeather,
-                    recommendation: state.recommendation
+                    recommendation: state.recommendation,
+                    isUsingCachedWeather: state.isUsingCachedWeather
                 )
-                .cardEntrance(appeared: contentReady, delay: 0.0)
-
-                if let alert = state.assistant.criticalAlert {
-                    CriticalAlertCard(signal: alert)
-                        .cardEntrance(appeared: contentReady, delay: 0.08)
-                }
-
-                DailyPlanCard(plan: state.plan)
-                    .cardEntrance(appeared: contentReady, delay: 0.16)
-
-                CompactHourlyCard(hourlyScores: state.hourlyScores)
-                    .cardEntrance(appeared: contentReady, delay: 0.24)
-
-                CompactForecastCard(dailyForecasts: state.dailyForecasts)
-                    .cardEntrance(appeared: contentReady, delay: 0.32)
+                .cardEntrance(appeared: contentReady, delay: 0.08)
 
                 if let warning = state.warningMessage {
                     CompactWarningBanner(message: warning)
-                        .cardEntrance(appeared: contentReady, delay: 0.40)
+                        .cardEntrance(appeared: contentReady, delay: 0.16)
                 }
+
+                DailyPlanCard(plan: state.plan)
+                    .cardEntrance(appeared: contentReady, delay: 0.24)
+
+                OutfitSuggestionCard(outfit: state.recommendation.outfit)
+                    .cardEntrance(appeared: contentReady, delay: 0.32)
+
+                CompactHourlyCard(hourlyScores: state.hourlyScores)
+                    .cardEntrance(appeared: contentReady, delay: 0.40)
+
+                CompactForecastCard(dailyForecasts: state.dailyForecasts)
+                    .cardEntrance(appeared: contentReady, delay: 0.48)
 
                 if let attribution = state.attribution {
                     HomeAttributionView(info: attribution)
-                        .cardEntrance(appeared: contentReady, delay: 0.48)
+                        .cardEntrance(appeared: contentReady, delay: 0.56)
                 }
 
                 if !state.lastUpdatedText.isEmpty {
@@ -208,93 +212,106 @@ private struct UnifiedHeroCard: View {
     let assistant: HomeAssistantViewState
     let weather: HomeCurrentWeatherViewState
     let recommendation: DailyRecommendation
+    let isUsingCachedWeather: Bool
 
     @State private var iconPulse = false
-    @State private var aiOutfitTip: String?
-    @State private var isLoadingAITip = false
-    @State private var showAITip = false
-
-    private let ai = WeatherIntelligenceService.shared
 
     private var accentColor: Color { AppTheme.toneColor(for: assistant.tone) }
     private var decisionColor: Color { AppTheme.color(for: recommendation.outdoorDecision) }
 
     var body: some View {
         GlassCard(accentColor: accentColor) {
-            VStack(spacing: 16) {
-                HStack(alignment: .center, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(weather.temperatureText)
-                            .font(.system(size: 56, weight: .thin, design: .rounded))
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack(spacing: 7) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 11, weight: .bold))
+                            Text(L10n.text("home_assistant_badge"))
+                                .font(.system(size: 11, weight: .bold))
+                        }
+                        .foregroundStyle(accentColor)
+                        .textCase(.uppercase)
+
+                        Text(assistant.headline)
+                            .font(.system(size: 25, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-                            .accessibilityLabel(L10n.formatted("home.accessibility.temperature", weather.temperatureText))
-                        Text(weather.conditionText)
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(Color.white.opacity(0.8))
-                            .accessibilityLabel(L10n.formatted("home.accessibility.condition", weather.conditionText))
+                            .fixedSize(horizontal: false, vertical: true)
+                            .minimumScaleFactor(0.85)
+
+                        Text(assistant.summary)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.68))
+                            .lineSpacing(2)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Spacer()
+                    .layoutPriority(1)
+
                     ZStack {
                         Circle()
                             .fill(decisionColor.opacity(0.15))
-                            .frame(width: 64, height: 64)
+                            .frame(width: 60, height: 60)
                             .scaleEffect(iconPulse ? 1.08 : 1.0)
                         Image(systemName: assistant.symbolName)
-                            .font(.system(size: 28, weight: .semibold))
+                            .font(.system(size: 27, weight: .semibold))
                             .foregroundStyle(decisionColor)
                             .symbolEffect(.pulse, options: .speed(0.5), value: iconPulse)
                     }
                 }
 
-                HStack(spacing: 8) {
-                    Circle()
-                        .fill(decisionColor)
-                        .frame(width: 10, height: 10)
-                        .shadow(color: decisionColor.opacity(0.8), radius: 5)
-                    Text(assistant.headline)
-                        .font(.system(size: 17, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.85)
-                    Spacer()
+                HStack(spacing: 10) {
+                    assistantActionPill(
+                        icon: "clock.fill",
+                        title: assistant.primaryActionTitle,
+                        detail: assistant.primaryActionDetail,
+                        color: accentColor
+                    )
+
+                    assistantActionPill(
+                        icon: isUsingCachedWeather ? "arrow.clockwise.icloud.fill" : "checkmark.icloud.fill",
+                        title: L10n.text("home_assistant_data_title"),
+                        detail: isUsingCachedWeather
+                            ? L10n.text("home_assistant_data_cached")
+                            : L10n.text("home_assistant_data_live"),
+                        color: isUsingCachedWeather ? AppTheme.warning : AppTheme.success
+                    )
                 }
 
-                if let bestWindow = recommendation.bestOutdoorWindow {
-                    HStack(spacing: 6) {
-                        Image(systemName: "clock.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(accentColor)
-                        Text(bestWindow.shortDisplayText)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundStyle(Color.white.opacity(0.8))
-                        Spacer()
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(weather.temperatureText)
+                            .font(.system(size: 38, weight: .thin, design: .rounded))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                            .accessibilityLabel(L10n.formatted("home.accessibility.temperature", weather.temperatureText))
+                        Text(weather.conditionText)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.55))
+                            .lineLimit(2)
+                            .accessibilityLabel(L10n.formatted("home.accessibility.condition", weather.conditionText))
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(accentColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-                }
+                    .frame(minWidth: 78, alignment: .leading)
 
-                HStack(spacing: 6) {
+                    Spacer()
+
                     metricInline(
                         icon: "thermometer.medium",
                         label: L10n.text("feels_like_short"),
                         value: weather.feelsLikeText
                             .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: "")
                     )
-                    Spacer()
+
                     if weather.highTempText != "–" {
                         metricInline(icon: "arrow.up", label: L10n.text("high_label"), value: weather.highTempText)
-                        Spacer()
                     }
+
                     if weather.lowTempText != "–" {
                         metricInline(icon: "arrow.down", label: L10n.text("low_label"), value: weather.lowTempText)
-                        Spacer()
                     }
+
                     metricInline(icon: "humidity.fill", label: L10n.text("humidity"), value: weather.humidityText)
                 }
-                .padding(.top, 4)
 
                 if weather.sunriseText != nil || weather.sunsetText != nil {
                     HStack(spacing: 12) {
@@ -325,80 +342,45 @@ private struct UnifiedHeroCard: View {
                     .padding(.horizontal, 4)
                     .padding(.vertical, 2)
                 }
-
-                aiTipSection
             }
             .padding(14)
         }
         .onAppear {
             iconPulse = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                withAnimation { showAITip = true }
-            }
         }
         .animation(.spring(response: 0.6, dampingFraction: 0.7), value: iconPulse)
         .accessibilityElement(children: .combine)
-            .accessibilityLabel(L10n.formatted("home.accessibility.summary", weather.temperatureText, weather.conditionText, assistant.headline))
+        .accessibilityLabel(L10n.formatted("home.accessibility.summary", weather.temperatureText, weather.conditionText, assistant.headline))
     }
 
-    @ViewBuilder
-    private var aiTipSection: some View {
-        if let tip = aiOutfitTip {
-            HStack(spacing: 8) {
-                Image(systemName: "sparkle")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
-                Text(tip)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.8))
-                    .lineSpacing(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(10)
-            .background(Color(red: 1.0, green: 0.7, blue: 0.3).opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-            .transition(.opacity.combined(with: .move(edge: .bottom)))
-        } else if !isLoadingAITip && showAITip {
-            Button {
-                loadAITip()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 11))
-                    Text(L10n.text("home_ai_outfit_tip"))
-                        .font(.system(size: 11, weight: .medium))
-                }
-                .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.3))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .background(Color(red: 1.0, green: 0.7, blue: 0.3).opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-            }
-            .buttonStyle(.plain)
-        } else if isLoadingAITip {
-            HStack(spacing: 8) {
-                ProgressView()
-                    .tint(Color(red: 1.0, green: 0.7, blue: 0.3))
-                    .scaleEffect(0.7)
-                Text(L10n.text("home_ai_thinking"))
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(Color.white.opacity(0.5))
-            }
-        }
-    }
+    private func assistantActionPill(icon: String, title: String, detail: String, color: Color) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 18)
 
-    private func loadAITip() {
-        isLoadingAITip = true
-        Task {
-            let temp = weather.temperatureText
-            let condition = weather.conditionText
-            let wind = weather.windText
-            let tip = await ai.generateOutfitSuggestion(temperature: temp, condition: condition, wind: wind)
-            await MainActor.run {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                    aiOutfitTip = tip
-                    isLoadingAITip = false
-                }
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.42))
+                    .lineLimit(1)
+                Text(detail)
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
+            .layoutPriority(1)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 9)
+        .background(color.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(color.opacity(0.16), lineWidth: 1)
+        )
     }
 
     private func metricInline(icon: String, label: String, value: String) -> some View {
@@ -499,6 +481,73 @@ private struct DailyPlanCard: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
         }
+    }
+}
+
+private struct OutfitSuggestionCard: View {
+    let outfit: OutfitRecommendation
+
+    var body: some View {
+        GlassCard(accentColor: Color(red: 1.0, green: 0.68, blue: 0.32)) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(alignment: .top, spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 1.0, green: 0.68, blue: 0.32).opacity(0.16))
+                            .frame(width: 34, height: 34)
+                        Image(systemName: "tshirt.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(Color(red: 1.0, green: 0.72, blue: 0.35))
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(L10n.text("home_outfit_card_title"))
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white)
+                        Text(L10n.text("home_outfit_card_subtitle"))
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.white.opacity(0.48))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(outfit.title)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if outfit.items.isEmpty == false {
+                        Text(L10n.formatted("home_outfit_items_intro", outfit.items.prefix(4).joined(separator: ", ")))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.72))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                if outfit.accessories.isEmpty == false || outfit.warning != nil {
+                    VStack(alignment: .leading, spacing: 8) {
+                        if outfit.accessories.isEmpty == false {
+                            Label(
+                                L10n.formatted("home_outfit_accessories", outfit.accessories.prefix(3).joined(separator: ", ")),
+                                systemImage: "sparkles"
+                            )
+                        }
+
+                        if let warning = outfit.warning {
+                            Label(warning, systemImage: "exclamationmark.circle.fill")
+                        }
+                    }
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.62))
+                    .labelStyle(.titleAndIcon)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(14)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(L10n.text("home_outfit_card_title")). \(outfit.title)")
     }
 }
 
@@ -906,7 +955,7 @@ private struct HomeErrorView: View {
                 .padding(.vertical, 14)
                 .glassEffect(.regular, in: Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fullTapArea)
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

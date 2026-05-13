@@ -8,6 +8,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
     private let weatherDecisionEngine: WeatherDecisionEngine
     private let dateProvider: DateProvider
     private let cachePolicy: WeatherCachePolicy
+    private let liveFetchAttempts = 3
 
     init(
         locationRepository: LocationRepository,
@@ -52,7 +53,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
                 location = try await locationRepository.getCurrentLocation()
             }
 
-            let snapshot = try await weatherRepository.fetchWeather(for: location)
+            let snapshot = try await fetchLiveWeather(for: location)
             try await weatherCacheRepository.save(snapshot)
             return makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false, usedLocation: location)
         } catch {
@@ -82,6 +83,23 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         case .expired:
             return nil
         }
+    }
+
+    private func fetchLiveWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
+        var lastError: (any Error)?
+
+        for attempt in 1...liveFetchAttempts {
+            do {
+                return try await weatherRepository.fetchWeather(for: location)
+            } catch {
+                lastError = error
+                guard attempt < liveFetchAttempts else { break }
+                let delay = UInt64(attempt) * 650_000_000
+                try? await Task.sleep(nanoseconds: delay)
+            }
+        }
+
+        throw lastError ?? AppError.weatherUnavailable
     }
 
     private func makeResult(
