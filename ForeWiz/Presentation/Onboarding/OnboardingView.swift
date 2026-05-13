@@ -80,7 +80,7 @@ struct OnboardingView: View {
                         ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
                             let selected = viewModel.selectedSensitivity == sensitivity
                             Button {
-                                HapticManager.selection()
+                                await HapticEngine.shared.selectionChanged()
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     viewModel.selectSensitivity(sensitivity)
                                 }
@@ -144,7 +144,7 @@ struct OnboardingView: View {
                         ForEach(ActivityType.allCases, id: \.self) { activity in
                             let selected = viewModel.preferredActivities.contains(activity)
                             Button {
-                                HapticManager.selection()
+                                await HapticEngine.shared.selectionChanged()
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     viewModel.toggleActivity(activity)
                                 }
@@ -214,7 +214,7 @@ struct OnboardingView: View {
 
     private var startButton: some View {
         Button {
-            HapticManager.medium()
+            await HapticEngine.shared.medium()
             guard !isCompleting else { return }
             isCompleting = true
             Task {

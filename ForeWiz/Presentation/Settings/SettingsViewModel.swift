@@ -50,7 +50,7 @@ final class SettingsViewModel: ObservableObject {
                 try await updateUserPreferencesUseCase.execute(profile: profile)
                 onProfileSaved(profile)
                 saveMessage = L10n.text("settings_save_success")
-                HapticManager.success()
+                await HapticEngine.shared.success()
                 try? await Task.sleep(nanoseconds: 2_500_000_000)
                 if !Task.isCancelled {
                     saveMessage = nil
@@ -58,7 +58,7 @@ final class SettingsViewModel: ObservableObject {
             } catch {
                 if !Task.isCancelled {
                     saveMessage = AppError.persistenceFailed.userMessage
-                    HapticManager.error()
+                    await HapticEngine.shared.error()
                     try? await Task.sleep(nanoseconds: 2_500_000_000)
                     saveMessage = nil
                 }

@@ -60,7 +60,7 @@ struct AnimatedMeshGradient: View {
     }
 }
 
-struct ParticleEffect: ViewModifier {
+struct ParticleEffectModifier: ViewModifier {
     @State private var particles: [Particle] = []
     let particleCount: Int
     let particleColor: Color
@@ -507,7 +507,7 @@ struct ConfettiPiece {
 
 extension View {
     func particleEffect(count: Int = 30, color: Color = .white, speed: Double = 1.0) -> some View {
-        modifier(ParticleEffect(particleCount: count, particleColor: color, speed: speed))
+        modifier(ParticleEffectModifier(particleCount: count, particleColor: color, speed: speed))
     }
 
     func glitchEffect(intensity: CGFloat = 5, frequency: Double = 3) -> some View {

@@ -76,7 +76,7 @@ struct HomeView: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .principal) {
             Button {
-                HapticManager.light()
+                await HapticEngine.shared.light()
                 showLocationPicker = true
             } label: {
                 HStack(spacing: 5) {
@@ -100,7 +100,7 @@ struct HomeView: View {
 
         ToolbarItem(placement: .topBarTrailing) {
             Button {
-                HapticManager.light()
+                await HapticEngine.shared.light()
                 onOpenSettings()
             } label: {
                 Image(systemName: "gearshape.fill")
@@ -551,45 +551,6 @@ private struct OutfitSuggestionCard: View {
     }
 }
 
-private struct PlanItemRow: View {
-    let item: HomePlanItem
-
-    private var toneColor: Color { AppTheme.toneColor(for: item.tone) }
-
-    var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(toneColor.opacity(item.isPrimary ? 0.18 : 0.08))
-                    .frame(width: 28, height: 28)
-                Image(systemName: item.icon)
-                    .font(.system(size: 12, weight: item.isPrimary ? .semibold : .medium))
-                    .foregroundStyle(toneColor)
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(item.title)
-                    .font(.system(size: 12, weight: item.isPrimary ? .bold : .semibold))
-                    .foregroundStyle(item.isPrimary ? .white : Color.white.opacity(0.8))
-                Text(item.detail)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.white.opacity(0.5))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 6)
-
-            Text(item.timeText)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(toneColor)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(toneColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
-        }
-        .padding(.vertical, 8)
-    }
-}
-
 // MARK: - Forecast Card
 
 private struct CompactForecastCard: View {
@@ -613,63 +574,6 @@ private struct CompactForecastCard: View {
             }
             .padding(.bottom, 10)
         }
-    }
-}
-
-private struct ForecastPill: View {
-    let forecast: DailyForecastItem
-
-    private var skyColor: Color {
-        let c = forecast.conditionSymbol.lowercased()
-        if c.contains("rain") || c.contains("drizzle") { return Color(red: 0.3, green: 0.55, blue: 0.9) }
-        if c.contains("sun") || c.contains("clear") { return Color(red: 1.0, green: 0.7, blue: 0.2) }
-        if c.contains("cloud") { return Color(red: 0.5, green: 0.55, blue: 0.65) }
-        if c.contains("storm") || c.contains("thunder") { return Color(red: 0.6, green: 0.3, blue: 0.8) }
-        if c.contains("snow") { return Color(red: 0.7, green: 0.8, blue: 0.9) }
-        return Color(red: 0.4, green: 0.72, blue: 1.0)
-    }
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Text(forecast.dayName)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(forecast.isToday
-                    ? Color(red: 1.0, green: 0.85, blue: 0.3)
-                    : Color.white.opacity(0.6))
-
-            Image(systemName: forecast.conditionSymbol)
-                .font(.system(size: 18))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(skyColor)
-                .shadow(color: skyColor.opacity(0.3), radius: 4)
-
-            Text(forecast.highTemp.formatted(.number.precision(.fractionLength(0))) + "°")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(.white)
-
-            Text(forecast.lowTemp.formatted(.number.precision(.fractionLength(0))) + "°")
-                .font(.system(size: 12))
-                .foregroundStyle(Color.white.opacity(0.4))
-
-            ZStack {
-                Circle()
-                    .fill(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)).opacity(0.15))
-                    .frame(width: 30, height: 30)
-                Circle()
-                    .stroke(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)).opacity(0.5), lineWidth: 2)
-                    .frame(width: 30, height: 30)
-                Text(String(forecast.outdoorScore))
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(strokeColor(for: WeatherScore(rawValue: forecast.outdoorScore)))
-            }
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func strokeColor(for score: WeatherScore) -> Color {
-        AppTheme.color(for: score)
     }
 }
 
@@ -705,54 +609,6 @@ private struct CompactHourlyCard: View {
     }
 }
 
-private struct HourlyPill: View {
-    let item: HourlyScoreItem
-
-    private var color: Color {
-        AppTheme.color(for: WeatherScore(rawValue: item.score))
-    }
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Text(String(format: "%02d:00", item.hour))
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.5))
-
-            ZStack {
-                Circle()
-                    .fill(color.opacity(0.2))
-                    .frame(width: 22, height: 22)
-                Text(String(item.score))
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(color)
-            }
-
-            Image(systemName: item.symbolName)
-                .font(.system(size: 13))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(color)
-
-            Text(item.temperatureText)
-                .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.6))
-
-            if item.precipitationChance > 0.05 {
-                HStack(spacing: 2) {
-                    Image(systemName: "drop.fill")
-                        .font(.system(size: 7))
-                    Text(String(format: "%0.0f%%", item.precipitationChance * 100))
-                        .font(.system(size: 13, weight: .medium))
-                }
-                .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.8))
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(color.opacity(0.06), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(color.opacity(0.12), lineWidth: 0.5))
-    }
-}
-
 // MARK: - Kompakt uyarı
 
 private struct CompactWarningBanner: View {
@@ -779,32 +635,6 @@ private struct CompactWarningBanner: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(red: 1.0, green: 0.55, blue: 0.15).opacity(0.2), lineWidth: 0.5))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Warning: \(message)")
-    }
-}
-
-// MARK: - Card entrance modifier
-
-private extension View {
-    func cardEntrance(appeared: Bool, delay: Double) -> some View {
-        modifier(CardEntranceModifier(appeared: appeared, delay: delay))
-    }
-}
-
-private struct CardEntranceModifier: ViewModifier {
-    let appeared: Bool
-    let delay: Double
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-
-    func body(content: Content) -> some View {
-        if reduceMotion {
-            content.opacity(appeared ? 1 : 0)
-        } else {
-            content
-                .opacity(appeared ? 1 : 0)
-                .offset(y: appeared ? 0 : 12)
-                .scaleEffect(appeared ? 1 : 0.98)
-                .animation(.spring(response: 0.4, dampingFraction: 0.82).delay(delay), value: appeared)
-        }
     }
 }
 
@@ -941,7 +771,7 @@ private struct HomeErrorView: View {
             }
 
             Button {
-                HapticManager.medium()
+                await HapticEngine.shared.medium()
                 retry()
             } label: {
                 HStack(spacing: 8) {
@@ -959,23 +789,5 @@ private struct HomeErrorView: View {
         }
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-// MARK: - Attribution
-
-private struct HomeAttributionView: View {
-    let info: WeatherAttributionInfo
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "info.circle")
-                .font(.system(size: 12))
-            Text(info.serviceName)
-                .font(.system(size: 13))
-        }
-        .foregroundStyle(Color.white.opacity(0.22))
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.bottom, 8)
     }
 }

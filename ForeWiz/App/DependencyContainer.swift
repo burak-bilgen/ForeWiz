@@ -18,6 +18,11 @@ final class DependencyContainer {
     let completeOnboardingUseCase: CompleteOnboardingUseCase
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
+    
+    // MARK: - New Architecture Components
+    let homeViewStateFactory: HomeViewStateFactory
+    let weatherGradientService: WeatherGradientService
+    let retryPolicy: NetworkRetryPolicy
 
     init(
         environment: AppEnvironment,
@@ -34,7 +39,10 @@ final class DependencyContainer {
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
         completeOnboardingUseCase: CompleteOnboardingUseCase,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
-        scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
+        scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
+        homeViewStateFactory: HomeViewStateFactory,
+        weatherGradientService: WeatherGradientService,
+        retryPolicy: NetworkRetryPolicy
     ) {
         self.environment = environment
         self.dateProvider = dateProvider
@@ -51,6 +59,9 @@ final class DependencyContainer {
         self.completeOnboardingUseCase = completeOnboardingUseCase
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
+        self.homeViewStateFactory = homeViewStateFactory
+        self.weatherGradientService = weatherGradientService
+        self.retryPolicy = retryPolicy
     }
 
     static func simulator(modelContext: ModelContext) -> DependencyContainer {
@@ -64,9 +75,21 @@ final class DependencyContainer {
         let notificationEngine = DefaultNotificationPlanningEngine()
         let preferencesRepository = SwiftDataPreferencesRepository(modelContext: modelContext)
         let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
+        
+        // MARK: - New Architecture Services
         let locationRepository = MockLocationRepository()
         let weatherRepository = MockWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()
+        let homeViewStateFactory = HomeViewStateFactory(
+            dateProvider: dateProvider,
+            activityWindowScoringEngine: activityEngine
+        )
+        let weatherGradientService = WeatherGradientService.shared
+        let retryPolicy = NetworkRetryPolicy.default
+        
+        // Prepare haptic engine on launch
+        HapticEngine.shared.prepare()
+        
         let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(
             locationRepository: locationRepository,
             weatherRepository: weatherRepository,
@@ -102,7 +125,10 @@ final class DependencyContainer {
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
-            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase
+            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
+            homeViewStateFactory: homeViewStateFactory,
+            weatherGradientService: weatherGradientService,
+            retryPolicy: retryPolicy
         )
     }
 
@@ -117,9 +143,21 @@ final class DependencyContainer {
         let notificationEngine = DefaultNotificationPlanningEngine()
         let preferencesRepository = SwiftDataPreferencesRepository(modelContext: modelContext)
         let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
-        let locationRepository = CoreLocationRepository()
+        
+        // MARK: - New Architecture Services (Production)
+        let locationRepository = LocationService(timeout: 8.0) // Hardened with timeout
         let weatherRepository = WeatherKitWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()
+        let homeViewStateFactory = HomeViewStateFactory(
+            dateProvider: dateProvider,
+            activityWindowScoringEngine: activityEngine
+        )
+        let weatherGradientService = WeatherGradientService.shared
+        let retryPolicy = NetworkRetryPolicy.aggressive // More retries for production
+        
+        // Prepare haptic engine on launch
+        HapticEngine.shared.prepare()
+        
         let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(
             locationRepository: locationRepository,
             weatherRepository: weatherRepository,
@@ -155,7 +193,10 @@ final class DependencyContainer {
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
-            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase
+            scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
+            homeViewStateFactory: homeViewStateFactory,
+            weatherGradientService: weatherGradientService,
+            retryPolicy: retryPolicy
         )
     }
 }

@@ -111,11 +111,12 @@ struct WeatherSplashOverlay: View {
         .onAppear { runAnimation() }
     }
 
+    @MainActor
     private func runAnimation() {
         switch kind.hapticStyle {
-        case .light: HapticManager.light()
-        case .medium: HapticManager.medium()
-        case .heavy: HapticManager.heavy()
+        case .light: HapticEngine.shared.light()
+        case .medium: HapticEngine.shared.medium()
+        case .heavy: HapticEngine.shared.heavy()
         }
 
         withAnimation(.easeOut(duration: fadeInDuration)) {

@@ -134,7 +134,7 @@ struct SettingsView: View {
                 }
 
                 Button {
-                    HapticManager.medium()
+                    await HapticEngine.shared.medium()
                     showDeleteAllDataConfirmation = true
                 } label: {
                     HStack(spacing: 10) {
@@ -166,7 +166,7 @@ struct SettingsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    HapticManager.light()
+                    await HapticEngine.shared.light()
                     dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -209,7 +209,7 @@ struct SettingsView: View {
     }
 
     private func toggle(_ activity: ActivityType) {
-        HapticManager.selection()
+        await HapticEngine.shared.selectionChanged()
         if viewModel.profile.preferredActivities.contains(activity) {
             viewModel.profile.preferredActivities.remove(activity)
         } else {
@@ -474,7 +474,7 @@ private struct SettingsSensitivitySelector: View {
             ForEach(options, id: \.0) { sensitivity, icon, key in
                 let selected = selection == sensitivity
                 Button {
-                    HapticManager.selection()
+                    await HapticEngine.shared.selectionChanged()
                     selection = sensitivity
                 } label: {
                     VStack(spacing: 6) {
