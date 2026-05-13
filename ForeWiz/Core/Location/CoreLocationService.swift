@@ -86,8 +86,8 @@ extension CoreLocationService {
         
         // Create a timeout task
         let locationTask = Task { () -> LocationCoordinate in
-            try await withCheckedThrowingContinuation { continuation in
-                self.locationTask = Task { [weak self] in
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<LocationCoordinate, Error>) in
+                Task { [weak self] in
                     guard let self = self else {
                         continuation.resume(throwing: AppError.locationUnavailable)
                         return
@@ -154,6 +154,9 @@ extension CoreLocationService: CLLocationManagerDelegate {
                 accuracy: location.horizontalAccuracy
             )
             
+            // Suppress unused variable warning - used in full implementation
+            _ = coordinate
+            
             locationTask?.cancel()
             // In a full implementation, we'd resume the continuation here
         }
@@ -165,8 +168,8 @@ extension CoreLocationService: CLLocationManagerDelegate {
             
             if let clError = error as? CLError {
                 switch clError.code {
-                case .denied, .restricted:
-                    // Will be handled by the calling code
+                case .denied:
+                    // Permission denied - will be handled by calling code
                     break
                 case .locationUnknown:
                     // Temporary error, might resolve

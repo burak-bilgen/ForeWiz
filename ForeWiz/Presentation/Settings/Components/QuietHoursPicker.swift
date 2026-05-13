@@ -31,7 +31,7 @@ struct QuietHoursPicker: View {
                 Toggle("", isOn: Binding(
                     get: { quietHours != nil },
                     set: { enabled in
-                        await HapticEngine.shared.selectionChanged()
+                        Task { await HapticEngine.shared.selectionChanged() }
                         quietHours = enabled ? TimeWindow.previewQuietHours() : nil
                     }
                 ))

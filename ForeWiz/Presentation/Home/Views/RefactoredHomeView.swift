@@ -47,8 +47,7 @@ struct RefactoredHomeView: View {
                     condition: currentConditionCode,
                     isDaylight: isDaylight,
                     temperature: currentTemperature,
-                    decision: currentDecision,
-                    colorScheme: colorScheme
+                    decision: currentDecision
                 )
                 
                 content
@@ -271,8 +270,8 @@ struct HomeAttributionView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.3))
             
-            if !info.legalAttributionText.isEmpty {
-                Text(info.legalAttributionText)
+            if let legalText = info.legalAttributionText, !legalText.isEmpty {
+                Text(legalText)
                     .font(.system(size: 9))
                     .foregroundStyle(Color.white.opacity(0.2))
                     .multilineTextAlignment(.center)

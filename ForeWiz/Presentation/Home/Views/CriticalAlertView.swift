@@ -22,7 +22,6 @@ struct CriticalAlertView: View {
         .frame(minHeight: 44)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Critical Alert: \(signal.title). \(signal.subtitle)")
-        .accessibilityPriority(.high)
     }
     
     private var iconContainer: some View {

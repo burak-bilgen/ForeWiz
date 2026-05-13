@@ -76,7 +76,7 @@ struct HomeView: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .principal) {
             Button {
-                await HapticEngine.shared.light()
+                Task { await HapticEngine.shared.light() }
                 showLocationPicker = true
             } label: {
                 HStack(spacing: 5) {
@@ -100,7 +100,7 @@ struct HomeView: View {
 
         ToolbarItem(placement: .topBarTrailing) {
             Button {
-                await HapticEngine.shared.light()
+                Task { await HapticEngine.shared.light() }
                 onOpenSettings()
             } label: {
                 Image(systemName: "gearshape.fill")
@@ -674,7 +674,7 @@ private struct HomeBackground: View {
 
 // MARK: - Loading
 
-private struct HomeLoadingView: View {
+struct HomeLoadingView: View {
     @State private var appeared = false
 
     var body: some View {
@@ -733,7 +733,7 @@ private struct SkeletonCard: View {
 
 // MARK: - Error
 
-private struct HomeErrorView: View {
+struct HomeErrorView: View {
     let message: String
     let retry: () -> Void
     @State private var shake = false
@@ -771,7 +771,7 @@ private struct HomeErrorView: View {
             }
 
             Button {
-                await HapticEngine.shared.medium()
+                Task { await HapticEngine.shared.medium() }
                 retry()
             } label: {
                 HStack(spacing: 8) {

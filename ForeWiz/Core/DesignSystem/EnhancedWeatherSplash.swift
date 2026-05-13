@@ -13,7 +13,7 @@ final class WeatherSoundManager: ObservableObject {
     
     private init() {}
     
-    func playSound(for kind: WeatherSplashKind) {
+    func playSound(for kind: EnhancedWeatherSplashKind) {
         // Use system sounds for different weather types
         // These are built-in iOS system sounds - no external files needed
         let soundID: SystemSoundID
@@ -54,7 +54,7 @@ final class WeatherSoundManager: ObservableObject {
         }
     }
     
-    private func playSecondarySound(for kind: WeatherSplashKind) {
+    private func playSecondarySound(for kind: EnhancedWeatherSplashKind) {
         let secondarySoundID: SystemSoundID
         
         switch kind {

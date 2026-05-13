@@ -187,48 +187,46 @@ struct AnimatedWeatherSymbol: View {
     let symbolName: String
     let condition: WeatherCondition
     @State private var isAnimating = false
+    @State private var scale: CGFloat = 1.0
     @Environment(\.accessibilityReduceMotion) var reduceMotion
     
     var body: some View {
         Image(systemName: symbolName)
-            .symbolEffect(
-                animationEffect,
-                options: animationOptions
-            )
+            .scaleEffect(scale)
+            .opacity(isAnimating ? 1.0 : 0.8)
             .onAppear {
                 if !reduceMotion {
                     isAnimating = true
+                    startAnimation()
                 }
             }
     }
     
-    private var animationEffect: some SymbolEffect {
-        switch condition {
-        case .rainy, .stormy:
-            return .bounce.down
-        case .snowy:
-            return .bounce.up
-        case .cloudy:
-            return .wiggle
-        case .clear:
-            return .pulse
-        case .foggy:
-            return .breathe
+    private func startAnimation() {
+        let baseAnimation = Animation.easeInOut(duration: animationDuration)
+        
+        withAnimation(baseAnimation.repeatForever(autoreverses: true)) {
+            scale = animationScale
         }
     }
     
-    private var animationOptions: SymbolEffectOptions {
+    private var animationDuration: Double {
         switch condition {
-        case .rainy, .stormy:
-            return .speed(0.5)
-        case .snowy:
-            return .speed(0.3)
-        case .cloudy:
-            return .speed(0.4)
-        case .clear:
-            return .speed(0.2)
-        case .foggy:
-            return .speed(0.15)
+        case .rainy, .stormy: return 0.5
+        case .snowy: return 0.8
+        case .cloudy: return 1.0
+        case .clear: return 2.0
+        case .foggy: return 3.0
+        }
+    }
+    
+    private var animationScale: CGFloat {
+        switch condition {
+        case .rainy, .stormy: return 1.1
+        case .snowy: return 1.05
+        case .cloudy: return 1.08
+        case .clear: return 1.15
+        case .foggy: return 1.03
         }
     }
 }

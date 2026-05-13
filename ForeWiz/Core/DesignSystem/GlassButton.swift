@@ -58,6 +58,7 @@ struct GlassButton: View {
         case selection
         case none
         
+        @MainActor
         func trigger() {
             switch self {
             case .light: HapticEngine.shared.light()

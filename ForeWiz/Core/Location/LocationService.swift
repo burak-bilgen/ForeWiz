@@ -13,7 +13,7 @@ final class LocationService: NSObject, LocationRepository {
     private let manager: CLLocationManager
     private let timeout: TimeInterval
     private var authContinuation: CheckedContinuation<LocationAuthorizationStatus, Never>?
-    private var locationContinuation: CheckedContinuation<Result<LocationCoordinate, any Error>, Never>?
+    private var locationContinuation: CheckedContinuation<LocationCoordinate, any Error>?
     
     init(timeout: TimeInterval = 8.0) {
         self.manager = CLLocationManager()
@@ -26,7 +26,7 @@ final class LocationService: NSObject, LocationRepository {
     
     deinit {
         manager.delegate = nil
-        locationContinuation?.resume(returning: .failure(AppError.locationUnavailable))
+        locationContinuation?.resume(throwing: AppError.locationUnavailable)
         authContinuation?.resume(returning: .notDetermined)
     }
 }
@@ -78,36 +78,27 @@ extension LocationService {
             throw AppError.locationUnavailable
         }
         
-        // Timeout wrapper
-        let locationTask = Task { () -> LocationCoordinate in
-            try await withCheckedThrowingContinuation { continuation in
-                self.locationContinuation = CheckedContinuation { result in
-                    switch result {
-                    case .success(let coordinate):
-                        continuation.resume(returning: coordinate)
-                    case .failure(let error):
-                        continuation.resume(throwing: error)
-                    }
-                }
+        // Request location with timeout
+        return try await withTimeout(seconds: timeout) {
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<LocationCoordinate, Error>) in
+                self.locationContinuation = continuation
                 self.manager.requestLocation()
             }
         }
-        
-        // Timeout task
-        let timeoutTask = Task {
-            try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-            locationTask.cancel()
-        }
-        
-        do {
-            let coordinate = try await locationTask.value
-            timeoutTask.cancel()
-            return coordinate
-        } catch is CancellationError {
-            throw AppError.locationUnavailable
-        } catch {
-            timeoutTask.cancel()
-            throw error
+    }
+    
+    private func withTimeout<T>(seconds: Double, operation: @escaping () async throws -> T) async throws -> T {
+        try await withThrowingTaskGroup(of: T.self) { group in
+            group.addTask {
+                try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+                throw AppError.locationUnavailable
+            }
+            group.addTask {
+                try await operation()
+            }
+            let result = try await group.next()!
+            group.cancelAll()
+            return result
         }
     }
 }
@@ -126,7 +117,7 @@ extension LocationService: CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         Task { @MainActor in
             guard let location = locations.last else {
-                locationContinuation?.resume(returning: .failure(AppError.locationUnavailable))
+                locationContinuation?.resume(throwing: AppError.locationUnavailable)
                 locationContinuation = nil
                 return
             }
@@ -136,7 +127,7 @@ extension LocationService: CLLocationManagerDelegate {
                 longitude: location.coordinate.longitude
             )
             
-            locationContinuation?.resume(returning: .success(coordinate))
+            locationContinuation?.resume(returning: coordinate)
             locationContinuation = nil
         }
     }
@@ -144,9 +135,9 @@ extension LocationService: CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         Task { @MainActor in
             if let clError = error as? CLError, clError.code == .denied {
-                locationContinuation?.resume(returning: .failure(AppError.locationPermissionDenied))
+                locationContinuation?.resume(throwing: AppError.locationPermissionDenied)
             } else {
-                locationContinuation?.resume(returning: .failure(AppError.locationUnavailable))
+                locationContinuation?.resume(throwing: AppError.locationUnavailable)
             }
             locationContinuation = nil
         }

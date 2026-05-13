@@ -26,7 +26,7 @@ struct NotificationSettingsSection: View {
                 Button {
                     if profile.maximumDailyNotifications > 1 {
                         profile.maximumDailyNotifications -= 1
-                        await HapticEngine.shared.selectionChanged()
+                        Task { await HapticEngine.shared.selectionChanged() }
                     }
                 } label: {
                     Image(systemName: "minus")
@@ -45,7 +45,7 @@ struct NotificationSettingsSection: View {
                 Button {
                     if profile.maximumDailyNotifications < 3 {
                         profile.maximumDailyNotifications += 1
-                        await HapticEngine.shared.selectionChanged()
+                        Task { await HapticEngine.shared.selectionChanged() }
                     }
                 } label: {
                     Image(systemName: "plus")

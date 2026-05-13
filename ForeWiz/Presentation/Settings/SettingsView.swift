@@ -70,32 +70,7 @@ struct SettingsView: View {
                     icon: "sunrise.fill",
                     color: Color(red: 1.0, green: 0.7, blue: 0.35)
                 ) {
-                    HStack(spacing: 14) {
-                        SettingsIcon(systemName: "sunrise.fill", color: Color(red: 1.0, green: 0.7, blue: 0.35))
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(L10n.text("settings_wake_time"))
-                                .font(.system(size: 15))
-                                .foregroundStyle(.white)
-                            Text(L10n.text("settings_wake_desc"))
-                                .font(.system(size: 13))
-                                .foregroundStyle(Color.white.opacity(0.38))
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .layoutPriority(1)
-                        Spacer(minLength: 8)
-                        Picker("", selection: Binding(
-                            get: { viewModel.profile.wakeUpTime?.hour ?? 7 },
-                            set: { viewModel.profile.wakeUpTime = DateComponents(hour: $0, minute: 0) }
-                        )) {
-                            ForEach(5...11, id: \.self) { hour in
-                                Text(String(format: "%02d:00", hour)).tag(hour)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .tint(Color.white.opacity(0.6))
-                    }
-                    .padding(.top, 14)
-                    .padding(.bottom, 20)
+                    wakeTimePicker
                 }
 
                 SettingsSection(
@@ -134,20 +109,10 @@ struct SettingsView: View {
                 }
 
                 Button {
-                    await HapticEngine.shared.medium()
+                    Task { await HapticEngine.shared.medium() }
                     showDeleteAllDataConfirmation = true
                 } label: {
-                    HStack(spacing: 10) {
-                        Image(systemName: "trash")
-                            .font(.system(size: 14))
-                        Text(L10n.text("settings_delete_all_data_title"))
-                            .font(.system(size: 15, weight: .medium))
-                    }
-                    .foregroundStyle(.red)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.red.opacity(0.2), lineWidth: 1))
+                    deleteButtonLabelWithStroke()
                 }
 
                 .padding(.bottom, 32)
@@ -166,7 +131,7 @@ struct SettingsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    await HapticEngine.shared.light()
+                    Task { await HapticEngine.shared.light() }
                     dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
@@ -209,7 +174,7 @@ struct SettingsView: View {
     }
 
     private func toggle(_ activity: ActivityType) {
-        await HapticEngine.shared.selectionChanged()
+        Task { await HapticEngine.shared.selectionChanged() }
         if viewModel.profile.preferredActivities.contains(activity) {
             viewModel.profile.preferredActivities.remove(activity)
         } else {
@@ -224,6 +189,61 @@ struct SettingsView: View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         return "\(version) (\(build))"
+    }
+    
+    private var wakeTimePicker: some View {
+        HStack(spacing: 14) {
+            let accentColor = Color(red: 1.0, green: 0.7, blue: 0.35)
+            SettingsIcon(systemName: "sunrise.fill", color: accentColor)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(L10n.text("settings_wake_time"))
+                    .font(.system(size: 15))
+                    .foregroundStyle(.white)
+                Text(L10n.text("settings_wake_desc"))
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.white.opacity(0.38))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
+            Spacer(minLength: 8)
+            wakeTimeSelector
+        }
+        .padding(.top, 14)
+        .padding(.bottom, 20)
+    }
+    
+    private var wakeTimeSelector: some View {
+        Picker("", selection: Binding(
+            get: { viewModel.profile.wakeUpTime?.hour ?? 7 },
+            set: { viewModel.profile.wakeUpTime = DateComponents(hour: $0, minute: 0) }
+        )) {
+            ForEach(5...11, id: \.self) { hour in
+                Text(String(format: "%02d:00", hour)).tag(hour)
+            }
+        }
+        .pickerStyle(.menu)
+        .tint(Color.white.opacity(0.6))
+    }
+    
+    private func deleteButtonLabel() -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "trash")
+                .font(.system(size: 14))
+            Text(L10n.text("settings_delete_all_data_title"))
+                .font(.system(size: 15, weight: .medium))
+        }
+        .foregroundStyle(.red)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(Color.red.opacity(0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+    
+    private func deleteButtonLabelWithStroke() -> some View {
+        deleteButtonLabel()
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.red.opacity(0.2), lineWidth: 1)
+            )
     }
 }
 
@@ -474,39 +494,46 @@ private struct SettingsSensitivitySelector: View {
             ForEach(options, id: \.0) { sensitivity, icon, key in
                 let selected = selection == sensitivity
                 Button {
-                    await HapticEngine.shared.selectionChanged()
+                    Task { await HapticEngine.shared.selectionChanged() }
                     selection = sensitivity
                 } label: {
-                    VStack(spacing: 6) {
-                        Image(systemName: icon)
-                            .font(.system(size: 16))
-                            .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
-                        Text(L10n.text(key))
-                            .font(.system(size: 13, weight: selected ? .semibold : .regular))
-                            .foregroundStyle(selected ? Color(red: 1.0, green: 0.55, blue: 0.3) : Color.white.opacity(0.4))
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.75)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(
-                        selected
-                            ? Color(red: 1.0, green: 0.55, blue: 0.3).opacity(0.14)
-                            : Color.white.opacity(0.05),
-                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(
-                            selected ? Color(red: 1.0, green: 0.55, blue: 0.3).opacity(0.35) : Color.white.opacity(0.08),
-                            lineWidth: 1
-                        )
-                    )
+                    sensitivityButtonLabel(icon: icon, key: key, selected: selected)
                 }
                 .buttonStyle(.fullTapArea)
                 .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
             }
         }
+    }
+    
+    private func sensitivityButtonLabel(icon: String, key: String, selected: Bool) -> some View {
+        let selectedColor = Color(red: 1.0, green: 0.55, blue: 0.3)
+        let unselectedColor = Color.white.opacity(0.4)
+        
+        return VStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundStyle(selected ? selectedColor : unselectedColor)
+            Text(L10n.text(key))
+                .font(.system(size: 13, weight: selected ? .semibold : .regular))
+                .foregroundStyle(selected ? selectedColor : unselectedColor)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(
+            selected
+                ? selectedColor.opacity(0.14)
+                : Color.white.opacity(0.05),
+            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(
+                selected ? selectedColor.opacity(0.35) : Color.white.opacity(0.08),
+                lineWidth: 1
+            )
+        )
     }
 }
 

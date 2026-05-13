@@ -80,23 +80,12 @@ struct OnboardingView: View {
                         ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
                             let selected = viewModel.selectedSensitivity == sensitivity
                             Button {
-                                await HapticEngine.shared.selectionChanged()
+                                Task { await HapticEngine.shared.selectionChanged() }
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     viewModel.selectSensitivity(sensitivity)
                                 }
                             } label: {
-                                VStack(spacing: 5) {
-                                    Image(systemName: OnboardingView.icon(for: sensitivity))
-                                        .font(.system(size: 18))
-                                        .scaleEffect(selected ? 1.15 : 1.0)
-                                    Text(sensitivity.localizedTitle)
-                                        .font(.system(size: 14, weight: selected ? .semibold : .regular))
-                                        .multilineTextAlignment(.center)
-                                }
-                                .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.4))
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .padding(.vertical, 12)
-                                .background(selected ? accentOrange.opacity(0.12) : Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                sensitivityButtonLabel(sensitivity: sensitivity, selected: selected, accentOrange: accentOrange)
                                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(selected ? accentOrange.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
                             }
                             .accessibilityLabel(sensitivity.localizedTitle)
@@ -144,23 +133,12 @@ struct OnboardingView: View {
                         ForEach(ActivityType.allCases, id: \.self) { activity in
                             let selected = viewModel.preferredActivities.contains(activity)
                             Button {
-                                await HapticEngine.shared.selectionChanged()
+                                Task { await HapticEngine.shared.selectionChanged() }
                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                     viewModel.toggleActivity(activity)
                                 }
                             } label: {
-                                HStack(spacing: 5) {
-                                    Image(systemName: OnboardingView.icon(for: activity))
-                                        .font(.system(size: 14, weight: .semibold))
-                                    Text(activity.localizedTitle)
-                                        .font(.system(size: 14, weight: selected ? .semibold : .regular))
-                                }
-                                .foregroundStyle(selected ? Color(red: 0.3, green: 0.85, blue: 0.58) : Color.white.opacity(0.5))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.12) : Color.white.opacity(0.05), in: Capsule())
-                                .overlay(Capsule().stroke(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
-                                .scaleEffect(selected ? 1.05 : 1.0)
+                                activityButtonLabel(activity: activity, selected: selected)
                             }
                             .accessibilityLabel(activity.localizedTitle)
                             .buttonStyle(.fullTapArea)
@@ -214,7 +192,7 @@ struct OnboardingView: View {
 
     private var startButton: some View {
         Button {
-            await HapticEngine.shared.medium()
+            Task { await HapticEngine.shared.medium() }
             guard !isCompleting else { return }
             isCompleting = true
             Task {
@@ -274,7 +252,7 @@ struct OnboardingView: View {
         }
     }
 
-    private static func icon(for sensitivity: TemperatureSensitivity) -> String {
+    static func icon(for sensitivity: TemperatureSensitivity) -> String {
         switch sensitivity {
         case .getsColdEasily: return "snowflake"
         case .normal: return "thermometer.medium"
@@ -282,13 +260,45 @@ struct OnboardingView: View {
         }
     }
 
-    private static func icon(for activity: ActivityType) -> String {
+    static func icon(for activity: ActivityType) -> String {
         switch activity {
         case .running: return "figure.run"
         case .walking: return "figure.walk"
         case .cycling: return "bicycle"
         case .goingOutside: return "sun.max.fill"
         }
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func sensitivityButtonLabel(sensitivity: TemperatureSensitivity, selected: Bool, accentOrange: Color) -> some View {
+        VStack(spacing: 5) {
+            Image(systemName: OnboardingView.icon(for: sensitivity))
+                .font(.system(size: 18))
+                .scaleEffect(selected ? 1.15 : 1.0)
+            Text(sensitivity.localizedTitle)
+                .font(.system(size: 14, weight: selected ? .semibold : .regular))
+                .multilineTextAlignment(.center)
+        }
+        .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.4))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.vertical, 12)
+        .background(selected ? accentOrange.opacity(0.12) : Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+    
+    private func activityButtonLabel(activity: ActivityType, selected: Bool) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: OnboardingView.icon(for: activity))
+                .font(.system(size: 14, weight: .semibold))
+            Text(activity.localizedTitle)
+                .font(.system(size: 14, weight: selected ? .semibold : .regular))
+        }
+        .foregroundStyle(selected ? Color(red: 0.3, green: 0.85, blue: 0.58) : Color.white.opacity(0.5))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.12) : Color.white.opacity(0.05), in: Capsule())
+        .overlay(Capsule().stroke(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
+        .scaleEffect(selected ? 1.05 : 1.0)
     }
 }
 

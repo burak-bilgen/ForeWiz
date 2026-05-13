@@ -31,8 +31,6 @@ final class WeatherStateTransitionManager: ObservableObject {
         // Don't transition to the same state
         guard newState != currentState else { return }
         
-        let previousState = currentState
-        
         transitionTask = Task { [weak self] in
             guard let self = self else { return }
             
