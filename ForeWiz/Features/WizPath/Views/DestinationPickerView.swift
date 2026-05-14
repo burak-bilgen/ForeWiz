@@ -6,7 +6,7 @@ import Combine
 
 // MARK: - Destination Picker View
 struct DestinationPickerView: View {
-    let onSelect: (CLLocation) -> Void
+    let onSelect: (CLLocation, String) -> Void
     @Environment(\.dismiss) private var dismiss
     
     @StateObject private var searchCompleter = LocationSearchCompleter()
@@ -18,6 +18,7 @@ struct DestinationPickerView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     @State private var selectedCoordinate: CLLocationCoordinate2D?
+    @State private var selectedName: String = ""
     @State private var showConfirmButton = false
     @State private var hasCenteredOnUser = false
     
@@ -113,6 +114,7 @@ struct DestinationPickerView: View {
                 if let mapItem = response.mapItems.first {
                     let coordinate = mapItem.placemark.coordinate
                     selectedCoordinate = coordinate
+                    selectedName = result.title  // Use search result title as name
                     
                     // Center map on selection
                     withAnimation {
@@ -128,15 +130,26 @@ struct DestinationPickerView: View {
     
     private func handleMapTap(at location: CGPoint) {
         // Convert tap point to coordinate (simplified)
-        // In production, use proper map projection
-        // For now, just use center as example
         selectedCoordinate = mapRegion.center
+        
+        // Geocode to get name
+        Task {
+            let coordinate = mapRegion.center
+            do {
+                let name = try await GeocodingHelper.shared.reverseGeocode(coordinate: coordinate)
+                selectedName = name
+            } catch {
+                selectedName = "\(coordinate.latitude), \(coordinate.longitude)"
+            }
+        }
+        
         showConfirmButton = true
     }
     
     private func confirmSelection(_ coordinate: CLLocationCoordinate2D) {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        onSelect(location)
+        let name = selectedName.isEmpty ? "\(coordinate.latitude), \(coordinate.longitude)" : selectedName
+        onSelect(location, name)
         dismiss()
     }
 }

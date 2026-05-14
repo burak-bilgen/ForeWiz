@@ -174,6 +174,49 @@ extension LocationService {
     }
 }
 
+// MARK: - Geocoding Helper
+@MainActor
+final class GeocodingHelper {
+    static let shared = GeocodingHelper()
+    private let geocoder = CLGeocoder()
+    
+    func reverseGeocode(coordinate: CLLocationCoordinate2D) async throws -> String {
+        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let placemarks = try await geocoder.reverseGeocodeLocation(location)
+        
+        guard let placemark = placemarks.first else {
+            return "Unknown Location"
+        }
+        
+        // Build location name from available components
+        var components: [String] = []
+        
+        if let name = placemark.name, !name.isEmpty {
+            components.append(name)
+        } else if let thoroughfare = placemark.thoroughfare, !thoroughfare.isEmpty {
+            components.append(thoroughfare)
+        }
+        
+        if let subLocality = placemark.subLocality, !subLocality.isEmpty {
+            components.append(subLocality)
+        }
+        
+        if let locality = placemark.locality, !locality.isEmpty {
+            components.append(locality)
+        }
+        
+        if let adminArea = placemark.administrativeArea, !adminArea.isEmpty {
+            components.append(adminArea)
+        }
+        
+        if components.isEmpty {
+            return "Unknown Location"
+        }
+        
+        return components.joined(separator: ", ")
+    }
+}
+
 // MARK: - CLLocation Extension
 extension CLLocation {
     var name: String? {
