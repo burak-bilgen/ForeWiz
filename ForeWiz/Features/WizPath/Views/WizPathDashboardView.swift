@@ -2,50 +2,58 @@ import SwiftUI
 @preconcurrency import MapKit
 import CoreLocation
 
-// MARK: - WizPath Dashboard View
+// MARK: - WizPath Dashboard View (Native Apple HIG)
 struct WizPathDashboardView: View {
     @StateObject private var viewModel = WizPathViewModel()
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        ZStack {
-            // Background
-            Color.black.ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                // Trip Planner (Collapsible)
-                TripPlannerView(viewModel: viewModel)
+        NavigationStack {
+            ZStack {
+                // System background
+                Color(.systemGroupedBackground)
+                    .ignoresSafeArea()
                 
-                // Map with Route Overlay
-                WizPathMapView(viewModel: viewModel)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                
-                // Route Detail Cards
-                if let route = viewModel.currentRoute {
-                    RouteDetailPanel(route: route)
-                        .transition(.move(edge: .bottom))
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        // Trip Planner Section
+                        TripPlannerSection(viewModel: viewModel)
+                        
+                        // Map with Route Overlay
+                        WizPathMapView(viewModel: viewModel)
+                            .frame(height: 300)
+                            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                            .padding(.horizontal, 16)
+                        
+                        // Departure Timeline (when route calculated)
+                        if let route = viewModel.currentRoute {
+                            DepartureTimelineSection(route: route)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Route Details
+                        if let route = viewModel.currentRoute {
+                            RouteDetailPanel(route: route)
+                                .padding(.horizontal, 16)
+                                .transition(.move(edge: .bottom))
+                        }
+                    }
+                    .padding(.vertical, 16)
                 }
             }
-        }
-        .navigationBarBackButtonHidden(true)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    Task { await HapticEngine.shared.light() }
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color.white.opacity(0.5))
+            .navigationTitle("Route Planner")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Task { await HapticEngine.shared.light() }
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundStyle(.secondary)
+                    }
                 }
-            }
-            
-            ToolbarItem(placement: .principal) {
-                Text(L10n.text("wizpath_title"))
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
             }
         }
         .alert("Route Error", isPresented: $viewModel.showError) {
@@ -401,14 +409,160 @@ extension Color {
     }
 }
 
+// MARK: - Trip Planner Section (Native Design)
+struct TripPlannerSection: View {
+    @ObservedObject var viewModel: WizPathViewModel
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            // Header
+            HStack {
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.blue)
+                
+                Text("Plan Your Route")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.primary)
+                
+                Spacer()
+            }
+            
+            // Destination
+            Button {
+                // Show destination picker
+            } label: {
+                HStack {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundStyle(.blue)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Destination")
+                            .font(.system(size: 13))
+                            .foregroundStyle(.secondary)
+                        
+                        Text(viewModel.destinationName.isEmpty ? "Select destination" : viewModel.destinationName)
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(viewModel.destinationName.isEmpty ? .secondary : .primary)
+                    }
+                    
+                    Spacer()
+                    
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            
+            // Mode Toggle
+            Picker("Travel Mode", selection: $viewModel.travelMode) {
+                ForEach(TravelMode.allCases) { mode in
+                    Label(mode.rawValue.capitalized, systemImage: mode.icon)
+                        .tag(mode)
+                }
+            }
+            .pickerStyle(.segmented)
+            
+            // Calculate Button
+            Button {
+                Task {
+                    await viewModel.calculateRoute()
+                }
+            } label: {
+                HStack {
+                    if viewModel.isCalculating {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 18))
+                    }
+                    
+                    Text(viewModel.isCalculating ? "Calculating..." : "Calculate Route")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(
+                    viewModel.canCalculate ? Color.blue : Color.gray
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .disabled(!viewModel.canCalculate || viewModel.isCalculating)
+            .buttonStyle(.plain)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .padding(.horizontal, 16)
+    }
+}
+
+// MARK: - Departure Timeline Section
+struct DepartureTimelineSection: View {
+    let route: WizPathRoute
+    @State private var selectedSlot: DepartureSlot?
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 18))
+                    .foregroundStyle(.blue)
+                
+                Text("Departure Times")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.primary)
+                
+                Spacer()
+            }
+            
+            // Placeholder for timeline
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(0..<5) { index in
+                        VStack(spacing: 6) {
+                            Text("\(8 + index):00")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                            
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color.green.opacity(0.3))
+                                .frame(width: 48, height: 64)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.green.opacity(0.5), lineWidth: 1)
+                                )
+                            
+                            Text("45m")
+                                .font(.system(size: 10))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+}
+
 // MARK: - Weather Severity Color Extension
 extension SegmentWeatherSeverity {
     var color: Color {
         switch self {
-        case .good: return Color(red: 0.0, green: 1.0, blue: 0.25) // Neon Green
-        case .fair: return Color(red: 1.0, green: 0.8, blue: 0.0) // Yellow
-        case .caution: return Color(red: 1.0, green: 0.6, blue: 0.0) // Orange
-        case .severe: return Color(red: 1.0, green: 0.23, blue: 0.19) // Red
+        case .good: return .green
+        case .fair: return .yellow
+        case .caution: return .orange
+        case .severe: return .red
         }
     }
 }

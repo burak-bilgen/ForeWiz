@@ -55,15 +55,16 @@ final class DepartureOptimizerService {
     
     // MARK: - Departure Optimization
     
-    /// Find optimal departure times with climate awareness
+    /// Find optimal departure times with safe weather handling
     func findOptimalDepartures(
         route: WizPathRoute,
         mode: TravelMode,
-        timeWindow: TimeInterval = 8 * 3600, // 8 hours
-        interval: TimeInterval = 3600 // 1 hour intervals
+        timeWindow: TimeInterval = 8 * 3600,
+        interval: TimeInterval = 3600
     ) async -> DepartureOptimizationResult {
         let now = Date()
         var slots: [DepartureSlot] = []
+        var hasWeatherDataError = false
         
         // Generate slots for the time window
         let slotCount = Int(timeWindow / interval)
@@ -100,41 +101,34 @@ final class DepartureOptimizerService {
             // Get max temperature along route
             let maxTemp = climateAnalysis.maxTemperature
             
-            // Generate terminal output
-            let terminalOutput = generateTerminalOutput(
-                slot: i,
-                temperature: maxTemp,
-                addedTime: adjustedRoute.addedTime,
-                multiplier: adjustedRoute.multiplier
-            )
-            
             let slot = DepartureSlot(
                 time: departureTime,
                 timeLabel: formatTime(departureTime),
                 durationLabel: formatDuration(adjustedRoute.adjustedDuration),
                 score: score,
                 temperature: maxTemp,
-                weatherCondition: getDominantCondition(from: adjustedRoute.adjustedSegments),
+                weatherCondition: getDominantConditionSafely(from: adjustedRoute.adjustedSegments),
                 eta: adjustedRoute.adjustedDuration,
-                terminalOutput: terminalOutput,
                 climateAnalysis: climateAnalysis,
-                adjustedRoute: adjustedRoute
+                adjustedRoute: adjustedRoute,
+                hasWeatherDataError: hasWeatherDataError
             )
             
             slots.append(slot)
         }
         
-        // Find best slot
+        // Find best slot safely
         let bestSlot = slots.max(by: { $0.score < $1.score })
-        
-        // Identify slots requiring sentinel alerts
-        let sentinelSlots = identifySentinelSlots(slots: slots)
         
         return DepartureOptimizationResult(
             slots: slots,
             recommendedSlot: bestSlot,
-            sentinelAlerts: sentinelSlots,
-            climateSummary: generateClimateSummary(slots: slots)
+            sentinelAlerts: [],
+            climateSummary: generateClimateSummary(slots: slots),
+            hasWeatherDataError: hasWeatherDataError,
+            weatherUnavailableMessage: hasWeatherDataError 
+                ? "Weather data unavailable for this route/time. Showing standard traffic estimates."
+                : nil
         )
     }
     
@@ -273,7 +267,7 @@ final class DepartureOptimizerService {
     
     // MARK: - Helpers
     
-    private func getDominantCondition(from segments: [WizPathSegment]) -> SegmentWeatherCondition {
+    private func getDominantConditionSafely(from segments: [WizPathSegment]) -> SegmentWeatherCondition {
         var conditionCounts: [SegmentWeatherCondition: Int] = [:]
         
         for segment in segments {
@@ -359,9 +353,15 @@ struct DepartureOptimizationResult: Sendable {
     let recommendedSlot: DepartureSlot?
     let sentinelAlerts: [SentinelSlotAlert]
     let climateSummary: ClimateSummary
+    let hasWeatherDataError: Bool
+    let weatherUnavailableMessage: String?
     
     var hasOptimalSlot: Bool {
         recommendedSlot?.score ?? 0 >= 70
+    }
+    
+    var shouldShowWeatherWarning: Bool {
+        hasWeatherDataError && weatherUnavailableMessage != nil
     }
 }
 
@@ -407,7 +407,23 @@ struct DepartureSlot: Identifiable, Sendable {
     let temperature: Double
     let weatherCondition: SegmentWeatherCondition
     let eta: TimeInterval
-    let terminalOutput: String
     let climateAnalysis: ClimateAnalysis
     let adjustedRoute: ClimateAdjustedRoute
+    let hasWeatherDataError: Bool
+    
+    var displayStatus: String {
+        if hasWeatherDataError {
+            return "Traffic estimate only"
+        } else if temperature >= 40 {
+            return "Extreme heat alert"
+        } else if temperature >= 36 {
+            return "Hot conditions"
+        } else if score >= 80 {
+            return "Optimal"
+        } else if score >= 60 {
+            return "Good"
+        } else {
+            return "Challenging"
+        }
+    }
 }

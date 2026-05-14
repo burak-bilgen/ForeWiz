@@ -1,55 +1,35 @@
 import SwiftUI
 
-// MARK: - Climate-Aware Departure Timeline View
+// MARK: - Climate-Aware Departure Timeline View (Native Apple HIG)
 struct ClimateAwareTimelineView: View {
     let slots: [DepartureSlot]
     let selectedSlot: DepartureSlot?
     let onSelect: (DepartureSlot) -> Void
-    
-    @State private var hoveredSlot: DepartureSlot?
+    let weatherUnavailableMessage: String?
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header with terminal aesthetic
-            HStack {
-                Text("> DEPARTURE_TIMELINE")
-                    .font(.system(size: 12, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#00FF41"))
-                
-                Spacer()
-                
-                // Legend
-                HStack(spacing: 8) {
-                    ClimateLegendItem(color: "#00FF41", label: "Optimal")
-                    ClimateLegendItem(color: "#FFCC00", label: "Heat")
-                    ClimateLegendItem(color: "#FF3B30", label: "Extreme")
-                }
+        VStack(alignment: .leading, spacing: 16) {
+            // Header
+            headerView
+            
+            // Weather unavailable warning if needed
+            if let message = weatherUnavailableMessage {
+                WeatherUnavailableBanner(message: message)
             }
             
             // Timeline bars
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
+                HStack(spacing: 12) {
                     ForEach(slots) { slot in
                         TimelineBar(
                             slot: slot,
                             isSelected: selectedSlot?.id == slot.id,
-                            isHovered: hoveredSlot?.id == slot.id,
                             onTap: { onSelect(slot) }
                         )
-                        .onHover { isHovered in
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                hoveredSlot = isHovered ? slot : nil
-                            }
-                        }
                     }
                 }
                 .padding(.horizontal, 4)
                 .padding(.vertical, 8)
-            }
-            
-            // Climate warning if extreme heat detected
-            if let extremeSlot = slots.first(where: { $0.temperature >= 40 }) {
-                ClimateWarningBanner(slot: extremeSlot)
             }
             
             // Selected slot details
@@ -58,14 +38,33 @@ struct ClimateAwareTimelineView: View {
             }
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color.black.opacity(0.8))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color(hex: "#00FF41").opacity(0.3), lineWidth: 1)
-        )
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+    
+    // MARK: - Components
+    
+    private var headerView: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Departure Times")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.primary)
+                
+                Text("Optimal windows based on conditions")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+            }
+            
+            Spacer()
+            
+            // Legend
+            HStack(spacing: 8) {
+                LegendItem(color: .green, label: "Optimal")
+                LegendItem(color: .orange, label: "Caution")
+                LegendItem(color: .red, label: "Avoid")
+            }
+        }
     }
 }
 
@@ -73,122 +72,105 @@ struct ClimateAwareTimelineView: View {
 struct TimelineBar: View {
     let slot: DepartureSlot
     let isSelected: Bool
-    let isHovered: Bool
     let onTap: () -> Void
-    
-    @State private var heatAnimation = false
     
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 4) {
+            VStack(spacing: 6) {
                 // Time label
                 Text(slot.timeLabel)
-                    .font(.system(size: 11, weight: isSelected ? .bold : .medium, design: .monospaced))
-                    .foregroundStyle(isSelected ? .white : Color.white.opacity(0.7))
+                    .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
+                    .foregroundStyle(isSelected ? .primary : .secondary)
                 
-                // Main bar
+                // Main bar with gradient
                 ZStack {
                     // Background
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(barColor.opacity(0.2))
-                        .frame(width: 44, height: 80)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(barColor.opacity(0.15))
+                        .frame(width: 48, height: 72)
                     
-                    // Fill level (represents score/quality)
+                    // Fill level
                     VStack {
                         Spacer()
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle(cornerRadius: 8)
                             .fill(barGradient)
-                            .frame(width: 44, height: 80 * fillPercentage)
+                            .frame(width: 48, height: 72 * fillPercentage)
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     
-                    // Heat overlay effect for extreme temperatures
-                    if slot.temperature >= 36 {
-                        HeatHazeOverlay(
-                            intensity: heatIntensity,
-                            isAnimating: heatAnimation
-                        )
-                    }
-                    
-                    // Sun flare for extreme heat
-                    if slot.temperature >= 40 {
-                        SunFlareEffect(
-                            intensity: heatAnimation ? 1.0 : 0.7
-                        )
-                    }
-                    
-                    // Selection border
+                    // Selection indicator
                     if isSelected {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(Color.white, lineWidth: 2)
-                            .frame(width: 44, height: 80)
-                    }
-                }
-                .frame(width: 44, height: 80)
-                
-                // Temperature indicator
-                HStack(spacing: 2) {
-                    if slot.temperature >= 36 {
-                        Image(systemName: "sun.max.fill")
-                            .font(.system(size: 8))
-                            .foregroundStyle(heatColor)
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(.primary, lineWidth: 2)
+                            .frame(width: 48, height: 72)
                     }
                     
-                    Text("\(Int(slot.temperature))°")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(heatColor)
+                    // Warning indicator for weather errors
+                    if slot.hasWeatherDataError {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(.orange)
+                            .offset(y: -20)
+                    }
                 }
+                .frame(width: 48, height: 72)
                 
-                // Duration label
+                // Temperature
+                Text("\(Int(slot.temperature))°")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(temperatureColor)
+                
+                // Duration
                 Text(slot.durationLabel)
-                    .font(.system(size: 9, design: .monospaced))
-                    .foregroundStyle(isSelected ? Color(hex: "#00FF41") : Color.white.opacity(0.5))
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
             }
-            .frame(width: 56)
+            .frame(width: 60)
             .padding(.vertical, 4)
             .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isHovered ? Color.white.opacity(0.05) : Color.clear)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color.secondary.opacity(0.1) : Color.clear)
             )
         }
         .buttonStyle(.plain)
-        .onAppear {
-            if slot.temperature >= 36 {
-                withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                    heatAnimation.toggle()
-                }
-            }
-        }
     }
     
+    // MARK: - Computed Properties
+    
     private var barColor: Color {
-        if slot.temperature >= 40 {
-            return Color(hex: "#FF3B30") // Extreme heat - red
-        } else if slot.temperature >= 36 {
-            return Color(hex: "#FF9500") // High heat - orange
-        } else if slot.temperature >= 32 {
-            return Color(hex: "#FFCC00") // Moderate heat - yellow
+        if slot.hasWeatherDataError {
+            return .gray
+        } else if slot.temperature >= 40 || slot.score < 40 {
+            return .red
+        } else if slot.temperature >= 36 || slot.score < 60 {
+            return .orange
         } else {
-            return Color(hex: "#00FF41") // Optimal - green
+            return .green
         }
     }
     
     private var barGradient: LinearGradient {
-        if slot.temperature >= 40 {
+        if slot.hasWeatherDataError {
             return LinearGradient(
-                colors: [Color(hex: "#FF3B30"), Color(hex: "#FF9500")],
+                colors: [.gray.opacity(0.6), .gray.opacity(0.3)],
                 startPoint: .bottom,
                 endPoint: .top
             )
-        } else if slot.temperature >= 36 {
+        } else if slot.temperature >= 40 || slot.score < 40 {
             return LinearGradient(
-                colors: [Color(hex: "#FF9500"), Color(hex: "#FFCC00")],
+                colors: [.red.opacity(0.7), .red.opacity(0.3)],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+        } else if slot.temperature >= 36 || slot.score < 60 {
+            return LinearGradient(
+                colors: [.orange.opacity(0.7), .orange.opacity(0.3)],
                 startPoint: .bottom,
                 endPoint: .top
             )
         } else {
             return LinearGradient(
-                colors: [Color(hex: "#00FF41"), Color(hex: "#00D9FF")],
+                colors: [.green.opacity(0.7), .green.opacity(0.3)],
                 startPoint: .bottom,
                 endPoint: .top
             )
@@ -196,169 +178,70 @@ struct TimelineBar: View {
     }
     
     private var fillPercentage: CGFloat {
-        // Lower score if extreme heat
         let baseScore = CGFloat(slot.score) / 100.0
+        
+        // Reduce score for extreme conditions
         if slot.temperature >= 40 {
-            return baseScore * 0.6 // Reduce by 40% for extreme heat
+            return baseScore * 0.5
         } else if slot.temperature >= 36 {
-            return baseScore * 0.8 // Reduce by 20% for high heat
+            return baseScore * 0.7
+        } else if slot.hasWeatherDataError {
+            return baseScore * 0.6
         }
+        
         return baseScore
     }
     
-    private var heatColor: Color {
-        if slot.temperature >= 40 {
-            return Color(hex: "#FF3B30")
+    private var temperatureColor: Color {
+        if slot.hasWeatherDataError {
+            return .secondary
+        } else if slot.temperature >= 40 {
+            return .red
         } else if slot.temperature >= 36 {
-            return Color(hex: "#FF9500")
-        }
-        return Color.white.opacity(0.5)
-    }
-    
-    private var heatIntensity: Double {
-        if slot.temperature >= 40 {
-            return 1.0
-        } else if slot.temperature >= 36 {
-            return 0.6
-        }
-        return 0.0
-    }
-}
-
-// MARK: - Heat Haze Overlay
-struct HeatHazeOverlay: View {
-    let intensity: Double
-    let isAnimating: Bool
-    
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                // Wavy distortion effect
-                ForEach(0..<3) { i in
-                    HeatWave(
-                        offset: CGFloat(i) * 20,
-                        isAnimating: isAnimating,
-                        speed: Double(i) * 0.5 + 1.0
-                    )
-                    .stroke(
-                        Color(hex: "#FF9500").opacity(0.3 * intensity),
-                        lineWidth: 1
-                    )
-                }
-            }
+            return .orange
+        } else {
+            return .secondary
         }
     }
 }
 
-// MARK: - Heat Wave Animation
-struct HeatWave: Shape {
-    let offset: CGFloat
-    let isAnimating: Bool
-    let speed: Double
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let width = rect.width
-        let height = rect.height
-        
-        for x in stride(from: 0, to: width, by: 2) {
-            let normalizedX = Double(x) / Double(width)
-            let waveOffset = isAnimating ? sin(normalizedX * 10 + speed) * 5 : 0
-            let y = height / 2 + CGFloat(waveOffset) + offset
-            
-            if x == 0 {
-                path.move(to: CGPoint(x: x, y: y))
-            } else {
-                path.addLine(to: CGPoint(x: x, y: y))
-            }
-        }
-        
-        return path
-    }
-}
-
-// MARK: - Sun Flare Effect
-struct SunFlareEffect: View {
-    let intensity: Double
-    
-    var body: some View {
-        ZStack {
-            // Central glow
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Color(hex: "#FFCC00").opacity(0.6 * intensity),
-                            Color(hex: "#FF9500").opacity(0.3 * intensity),
-                            Color.clear
-                        ],
-                        center: .center,
-                        startRadius: 5,
-                        endRadius: 30
-                    )
-                )
-                .frame(width: 40, height: 40)
-            
-            // Rays
-            ForEach(0..<8) { i in
-                Rectangle()
-                    .fill(Color(hex: "#FFCC00").opacity(0.4 * intensity))
-                    .frame(width: 2, height: 25)
-                    .offset(y: -20)
-                    .rotationEffect(.degrees(Double(i) * 45))
-            }
-        }
-    }
-}
-
-// MARK: - Climate Legend Item
-struct ClimateLegendItem: View {
-    let color: String
+// MARK: - Legend Item
+struct LegendItem: View {
+    let color: Color
     let label: String
     
     var body: some View {
         HStack(spacing: 4) {
             Circle()
-                .fill(Color(hex: color))
+                .fill(color)
                 .frame(width: 6, height: 6)
             Text(label)
-                .font(.system(size: 9, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.6))
+                .font(.system(size: 10))
+                .foregroundStyle(.secondary)
         }
     }
 }
 
-// MARK: - Climate Warning Banner
-struct ClimateWarningBanner: View {
-    let slot: DepartureSlot
+// MARK: - Weather Unavailable Banner
+struct WeatherUnavailableBanner: View {
+    let message: String
     
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 16))
-                .foregroundStyle(Color(hex: "#FF3B30"))
+                .foregroundStyle(.orange)
             
-            VStack(alignment: .leading, spacing: 2) {
-                Text("EXTREME HEAT WARNING")
-                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#FF3B30"))
-                
-                Text("\(Int(slot.temperature))°C at \(slot.timeLabel) - ETA increased by 25%")
-                    .font(.system(size: 10))
-                    .foregroundStyle(Color.white.opacity(0.7))
-            }
+            Text(message)
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.leading)
             
             Spacer()
         }
-        .padding(10)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color(hex: "#FF3B30").opacity(0.1))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(hex: "#FF3B30").opacity(0.3), lineWidth: 1)
-        )
+        .padding(12)
+        .background(.regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
 
@@ -367,49 +250,89 @@ struct SelectedSlotDetail: View {
     let slot: DepartureSlot
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Terminal header
-            Text("> SELECTED: \(slot.timeLabel.uppercased())")
-                .font(.system(size: 10, weight: .bold, design: .monospaced))
-                .foregroundStyle(Color(hex: "#00FF41"))
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(slot.timeLabel)
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.primary)
+                    
+                    Text(slot.displayStatus)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(statusColor)
+                }
+                
+                Spacer()
+                
+                // Score indicator
+                ZStack {
+                    Circle()
+                        .stroke(scoreColor.opacity(0.3), lineWidth: 3)
+                        .frame(width: 50, height: 50)
+                    
+                    Circle()
+                        .trim(from: 0, to: CGFloat(slot.score) / 100.0)
+                        .stroke(scoreColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .frame(width: 50, height: 50)
+                        .rotationEffect(.degrees(-90))
+                    
+                    Text("\(slot.score)")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.primary)
+                }
+            }
             
-            HStack(spacing: 16) {
-                // Duration
+            Divider()
+            
+            HStack(spacing: 20) {
                 DetailItem(
                     icon: "clock.fill",
                     label: "Duration",
-                    value: slot.durationLabel,
-                    color: "#00FF41"
+                    value: slot.durationLabel
                 )
                 
-                // Temperature
                 DetailItem(
-                    icon: "thermometer.sun.fill",
+                    icon: "thermometer",
                     label: "Temperature",
-                    value: "\(Int(slot.temperature))°C",
-                    color: slot.temperature >= 40 ? "#FF3B30" : (slot.temperature >= 36 ? "#FF9500" : "#00FF41")
+                    value: "\(Int(slot.temperature))°C"
                 )
                 
-                // Score
-                DetailItem(
-                    icon: "checkmark.shield.fill",
-                    label: "Route Score",
-                    value: "\(slot.score)/100",
-                    color: slot.score >= 70 ? "#00FF41" : (slot.score >= 40 ? "#FFCC00" : "#FF3B30")
-                )
+                if slot.hasWeatherDataError {
+                    DetailItem(
+                        icon: "exclamationmark.triangle.fill",
+                        label: "Status",
+                        value: "Estimates only"
+                    )
+                }
             }
-            
-            // Terminal output
-            Text(slot.terminalOutput)
-                .font(.system(size: 9, design: .monospaced))
-                .foregroundStyle(Color.white.opacity(0.6))
-                .padding(.top, 4)
         }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.white.opacity(0.03))
-        )
+        .padding(16)
+        .background(.regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+    
+    private var statusColor: Color {
+        if slot.hasWeatherDataError {
+            return .orange
+        } else if slot.score >= 80 {
+            return .green
+        } else if slot.score >= 60 {
+            return .orange
+        } else {
+            return .red
+        }
+    }
+    
+    private var scoreColor: Color {
+        if slot.hasWeatherDataError {
+            return .gray
+        } else if slot.score >= 80 {
+            return .green
+        } else if slot.score >= 60 {
+            return .orange
+        } else {
+            return .red
+        }
     }
 }
 
@@ -418,22 +341,21 @@ struct DetailItem: View {
     let icon: String
     let label: String
     let value: String
-    let color: String
     
     var body: some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 14))
-                .foregroundStyle(Color(hex: color))
+                .font(.system(size: 16))
+                .foregroundStyle(.secondary)
             
             Text(value)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.white)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.primary)
             
             Text(label)
-                .font(.system(size: 8))
-                .foregroundStyle(Color.white.opacity(0.4))
+                .font(.system(size: 11))
+                .foregroundStyle(.secondary)
         }
-        .frame(minWidth: 60)
+        .frame(minWidth: 70)
     }
 }

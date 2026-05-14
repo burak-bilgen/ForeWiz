@@ -1,138 +1,135 @@
 import SwiftUI
 
-// MARK: - WizPath HUD Card
-/// Home screen entry point for WizPath - Dynamic HUD with terminal aesthetic
+// MARK: - WizPath HUD Card (Native Apple HIG)
+/// Home screen entry point for WizPath - Clean, minimalist iOS design
 struct WizPathHUDCard: View {
     let routeStatus: RouteStatus
     let onTap: () -> Void
     
-    @State private var cursorVisible = true
     @State private var isPressed = false
     
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                // Route icon
+                // Route icon with hierarchical rendering
                 routeIcon
                 
-                // Terminal-style text
-                HStack(spacing: 0) {
-                    Text("> ")
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(statusColor)
+                // Status text
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(statusTitle)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.primary)
                     
-                    Text(statusText)
-                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(textColor)
-                    
-                    // Blinking cursor
-                    Text(cursorVisible ? "_" : " ")
-                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                        .foregroundStyle(statusColor)
-                        .opacity(cursorVisible ? 1.0 : 0.0)
+                    Text(statusSubtitle)
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
                 
                 Spacer()
                 
-                // Chevron indicator
+                // Chevron with subtle color
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(Color(hex: "#00FF41").opacity(0.6))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.tertiary)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.black)
-            )
+            .background(.ultraThinMaterial)
+            .background(statusBackgroundColor.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(borderColor, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(statusBorderColor, lineWidth: 0.5)
             )
-            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .scaleEffect(isPressed ? 0.97 : 1.0)
         }
         .buttonStyle(.plain)
-        .pressEvents {
-            withAnimation(.easeInOut(duration: 0.1)) {
-                isPressed = true
-            }
-        } onRelease: {
-            withAnimation(.easeInOut(duration: 0.1)) {
-                isPressed = false
-            }
-        }
+        .pressEvents(
+            onPress: { withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } },
+            onRelease: { withAnimation(.easeInOut(duration: 0.1)) { isPressed = false } }
+        )
         .frame(minHeight: 44)
-        .onAppear {
-            // Start cursor blink animation
-            withAnimation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true)) {
-                cursorVisible.toggle()
-            }
-        }
     }
     
     // MARK: - Components
     
     private var routeIcon: some View {
-        ZStack {
-            Circle()
-                .fill(statusColor.opacity(0.15))
-                .frame(width: 32, height: 32)
-            
-            Image(systemName: routeStatus.iconName)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(statusColor)
-        }
+        Image(systemName: routeStatus.iconName)
+            .font(.system(size: 22, weight: .medium))
+            .symbolRenderingMode(.hierarchical)
+            .foregroundStyle(statusIconColor)
+            .frame(width: 40, height: 40)
+            .background(
+                Circle()
+                    .fill(statusIconColor.opacity(0.15))
+            )
     }
     
     // MARK: - Computed Properties
     
-    private var statusText: String {
+    private var statusTitle: String {
         switch routeStatus {
         case .optimal(let destination, let eta):
-            return "SYSTEM: Commute to [ /\(destination.uppercased()) ] is Clear. ETA: \(eta)"
-        case .warning(let destination, let hazard, let eta):
-            return "WARNING: \(hazard) on Route to [ /\(destination.uppercased()) ]. Tap to Optimize."
-        case .critical(let destination, let hazard):
-            return "ALERT: \(hazard) - Route to [ /\(destination.uppercased()) ] Compromised."
+            return "Commute to \(destination)"
+        case .warning(let destination, let hazard, _):
+            return "Commute to \(destination)"
+        case .critical(let destination, _):
+            return "Alert: \(destination)"
         case .noRoute:
-            return "SYSTEM: No Active Route. Tap to Plan Journey."
+            return "Plan Your Journey"
         }
     }
     
-    private var statusColor: Color {
+    private var statusSubtitle: String {
+        switch routeStatus {
+        case .optimal(_, let eta):
+            return "Clear conditions • ETA \(eta)"
+        case .warning(_, let hazard, let eta):
+            return "\(hazard) on route • ETA \(eta)"
+        case .critical(_, let hazard):
+            return "\(hazard) - Check route"
+        case .noRoute:
+            return "Tap to set destination"
+        }
+    }
+    
+    private var statusIconColor: Color {
         switch routeStatus {
         case .optimal:
-            return Color(hex: "#00FF41")
+            return .green
         case .warning:
-            return Color(hex: "#FF9500")
+            return .orange
         case .critical:
-            return Color(hex: "#FF3B30")
+            return .red
         case .noRoute:
-            return Color(hex: "#00FF41").opacity(0.5)
+            return .blue
         }
     }
     
-    private var textColor: Color {
-        switch routeStatus {
-        case .optimal, .noRoute:
-            return Color.white.opacity(0.9)
-        case .warning, .critical:
-            return Color.white
-        }
-    }
-    
-    private var borderColor: Color {
+    private var statusBackgroundColor: Color {
         switch routeStatus {
         case .optimal:
-            return Color(hex: "#00FF41").opacity(0.4)
+            return .green
         case .warning:
-            return Color(hex: "#FF9500").opacity(0.5)
+            return .orange
         case .critical:
-            return Color(hex: "#FF3B30").opacity(0.6)
+            return .red
         case .noRoute:
-            return Color.white.opacity(0.1)
+            return .blue
+        }
+    }
+    
+    private var statusBorderColor: Color {
+        switch routeStatus {
+        case .optimal:
+            return .green.opacity(0.3)
+        case .warning:
+            return .orange.opacity(0.3)
+        case .critical:
+            return .red.opacity(0.3)
+        case .noRoute:
+            return .blue.opacity(0.3)
         }
     }
 }
@@ -147,7 +144,7 @@ enum RouteStatus: Equatable {
     var iconName: String {
         switch self {
         case .optimal:
-            return "checkmark.shield.fill"
+            return "car.fill"
         case .warning:
             return "exclamationmark.triangle.fill"
         case .critical:
@@ -160,19 +157,19 @@ enum RouteStatus: Equatable {
 
 // MARK: - Preview
 #Preview {
-    VStack(spacing: 20) {
+    VStack(spacing: 16) {
         WizPathHUDCard(
-            routeStatus: .optimal(destination: "WORK", eta: "45m"),
+            routeStatus: .optimal(destination: "Work", eta: "45m"),
             onTap: {}
         )
         
         WizPathHUDCard(
-            routeStatus: .warning(destination: "HOME", hazard: "Rain", eta: "55m"),
+            routeStatus: .warning(destination: "Home", hazard: "Rain", eta: "55m"),
             onTap: {}
         )
         
         WizPathHUDCard(
-            routeStatus: .critical(destination: "WORK", hazard: "Severe Storm"),
+            routeStatus: .critical(destination: "Work", hazard: "Severe Storm"),
             onTap: {}
         )
         
@@ -182,5 +179,11 @@ enum RouteStatus: Equatable {
         )
     }
     .padding()
-    .background(Color.black)
+    .background(
+        LinearGradient(
+            colors: [.blue.opacity(0.1), .purple.opacity(0.1)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    )
 }
