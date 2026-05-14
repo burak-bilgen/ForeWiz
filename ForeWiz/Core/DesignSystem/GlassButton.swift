@@ -327,9 +327,9 @@ private extension View {
             // Primary button
             GlassButton(
                 icon: "location.fill",
-                label: "Current Location",
+                label: L10n.text("home_current_location"),
                 style: .primary,
-                accessibilityLabel: "Select location"
+                accessibilityLabel: L10n.text("select_location")
             ) {}
             
             // Icon-only button
@@ -337,16 +337,16 @@ private extension View {
                 icon: "gearshape.fill",
                 style: .secondary,
                 hapticStyle: .medium,
-                accessibilityLabel: "Settings"
+                accessibilityLabel: L10n.text("settings_title")
             ) {}
             
             // Danger button
             GlassButton(
                 icon: "exclamationmark.triangle.fill",
-                label: "Alert",
+                label: L10n.text("preview_severe_weather_alert"),
                 style: .danger,
                 hapticStyle: .heavy,
-                accessibilityLabel: "Weather alert"
+                accessibilityLabel: L10n.text("preview_severe_weather_alert")
             ) {}
             
             // Ghost button
@@ -354,13 +354,13 @@ private extension View {
                 icon: "info.circle",
                 style: .ghost,
                 hapticStyle: .selection,
-                accessibilityLabel: "Information"
+                accessibilityLabel: L10n.text("information")
             ) {}
             
             // Card action
             CardActionButton(
                 icon: "clock.fill",
-                title: "Best Window",
+                title: L10n.text("preview_outdoor_plan"),
                 detail: "14:00 - 16:00",
                 color: .green
             ) {}

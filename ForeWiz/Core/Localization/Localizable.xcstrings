@@ -11683,6 +11683,40 @@
         }
       }
     },
+    "select_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select location"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konum seç"
+          }
+        }
+      }
+    },
+    "information" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilgi"
+          }
+        }
+      }
+    },
     "slow_the_pace_and_keep" : {
       "extractionState" : "manual",
       "localizations" : {
