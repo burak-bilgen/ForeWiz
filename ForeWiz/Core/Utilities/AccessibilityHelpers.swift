@@ -381,7 +381,7 @@ extension Text {
     func accessibleTimeRange(start: Date, end: Date) -> some View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
-        return self.accessibilityLabel("From \(formatter.string(from: start)) to \(formatter.string(from: end))")
+        return self.accessibilityLabel(L10n.formatted("accessibility_from_to_time", formatter.string(from: start), formatter.string(from: end)))
     }
 
     func accessibleRisk(severity: String, type: String) -> some View {

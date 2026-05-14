@@ -150,7 +150,7 @@ struct ForecastPill: View {
     }
     
     private var accessibilityLabel: String {
-        "\(forecast.dayName): \(forecast.conditionSymbol), High \(forecast.highTemp.formatted(.number.precision(.fractionLength(0)))) degrees, Low \(forecast.lowTemp.formatted(.number.precision(.fractionLength(0)))) degrees, Outdoor score \(forecast.outdoorScore)"
+        "\(forecast.dayName): \(forecast.conditionSymbol), High \(forecast.highTemp.formatted(.number.precision(.fractionLength(0)))) \(L10n.text("accessibility_degrees")), Low \(forecast.lowTemp.formatted(.number.precision(.fractionLength(0)))) \(L10n.text("accessibility_degrees")), Outdoor score \(forecast.outdoorScore)"
     }
 }
 
@@ -162,7 +162,7 @@ struct ForecastPill: View {
         
         ForecastCarousel(dailyForecasts: [
             DailyForecastItem(
-                dayName: "Today",
+                dayName: L10n.text("today_label"),
                 date: Date(),
                 highTemp: 24,
                 lowTemp: 18,
@@ -173,7 +173,7 @@ struct ForecastPill: View {
                 precipitationChance: 0.1
             ),
             DailyForecastItem(
-                dayName: "Wed",
+                dayName: L10n.text("wednesday"),
                 date: Date().addingTimeInterval(86400),
                 highTemp: 22,
                 lowTemp: 16,
@@ -184,7 +184,7 @@ struct ForecastPill: View {
                 precipitationChance: 0.2
             ),
             DailyForecastItem(
-                dayName: "Thu",
+                dayName: L10n.text("thursday"),
                 date: Date().addingTimeInterval(172800),
                 highTemp: 19,
                 lowTemp: 14,

@@ -110,14 +110,14 @@ struct PlanItemRow: View {
         Color.black.ignoresSafeArea()
         
         PlanCardView(plan: HomePlanViewState(
-            title: "Today's Plan",
-            subtitle: "A short action plan built for you",
+            title: L10n.text("todays_plan"),
+            subtitle: L10n.text("a_short_action_plan_built"),
             items: [
                 HomePlanItem(
                     id: "now",
                     icon: "checkmark.seal.fill",
-                    title: "Now",
-                    timeText: "Good to go",
+                    title: L10n.text("preview_now"),
+                    timeText: L10n.text("preview_good_to_go"),
                     detail: "Outdoor score: 85",
                     tone: .good,
                     isPrimary: true
@@ -125,18 +125,18 @@ struct PlanItemRow: View {
                 HomePlanItem(
                     id: "best-window",
                     icon: "clock.fill",
-                    title: "Outdoor Plan",
+                    title: L10n.text("preview_outdoor_plan"),
                     timeText: "14:00 - 16:00",
-                    detail: "Best window for activities",
+                    detail: L10n.text("preview_best_window_activities"),
                     tone: .good,
                     isPrimary: false
                 ),
                 HomePlanItem(
                     id: "outfit",
                     icon: "tshirt.fill",
-                    title: "Prep",
-                    timeText: "Light layers",
-                    detail: "T-shirt, light jacket",
+                    title: L10n.text("preview_prep"),
+                    timeText: L10n.text("preview_light_layers"),
+                    detail: L10n.text("preview_tshirt_light_jacket"),
                     tone: .info,
                     isPrimary: false
                 )

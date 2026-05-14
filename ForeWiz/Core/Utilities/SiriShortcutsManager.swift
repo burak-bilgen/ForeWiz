@@ -148,7 +148,7 @@ struct GetBestActivityWindowIntent: AppIntent {
                 let startTime = formatter.string(from: window.bestWindow.start)
                 let endTime = formatter.string(from: window.bestWindow.end)
 
-                let response = "Best time for \(targetActivity.localizedTitle) is from \(startTime) to \(endTime). Score: \(window.score.displayValue) out of 100."
+                let response = L10n.formatted("siri_best_time_for_activity", targetActivity.localizedTitle, startTime, endTime, String(window.score.displayValue))
 
                 return .result(value: response, dialog: IntentDialog(stringLiteral: response))
             } else {
@@ -159,7 +159,7 @@ struct GetBestActivityWindowIntent: AppIntent {
                 let startTime = formatter.string(from: firstWindow.bestWindow.start)
                 let endTime = formatter.string(from: firstWindow.bestWindow.end)
 
-                let response = "Best time for \(firstWindow.activityType.localizedTitle) is from \(startTime) to \(endTime). Score: \(firstWindow.score.displayValue) out of 100."
+                let response = L10n.formatted("siri_best_time_for_activity", firstWindow.activityType.localizedTitle, startTime, endTime, String(firstWindow.score.displayValue))
 
                 return .result(value: response, dialog: IntentDialog(stringLiteral: response))
             }

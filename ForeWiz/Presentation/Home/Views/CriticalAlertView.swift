@@ -111,9 +111,9 @@ struct WarningBanner: View {
             CriticalAlertView(signal: HomeAssistantSignal(
                 id: "test",
                 icon: "exclamationmark.triangle.fill",
-                title: "Severe Weather Alert",
-                subtitle: "Thunderstorm warning in effect until 6:00 PM",
-                hint: "San Francisco Bay Area - NWS",
+                title: L10n.text("preview_severe_weather_alert"),
+                subtitle: L10n.text("preview_thunderstorm_warning"),
+                hint: L10n.text("preview_area_nws"),
                 tone: .danger
             ))
             
