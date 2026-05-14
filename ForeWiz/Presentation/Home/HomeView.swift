@@ -391,12 +391,12 @@ private struct UnifiedHeroCard: View {
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.6)
             Text(label)
-                .font(.system(size: 13))
+                .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .lineLimit(1)
-                .minimumScaleFactor(0.55)
+                .minimumScaleFactor(0.5)
         }
-        .frame(minWidth: 52)
+        .frame(minWidth: 44)
     }
 }
 

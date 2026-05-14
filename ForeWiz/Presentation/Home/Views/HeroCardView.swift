@@ -89,7 +89,7 @@ struct HeroCardView: View {
     }
     
     private var weatherMetricsSection: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
                 temperatureDisplay
                 conditionDisplay
@@ -229,12 +229,12 @@ private struct MetricInlineView: View {
                 .minimumScaleFactor(0.6)
             
             Text(label)
-                .font(.system(size: 13))
+                .font(.system(size: 11))
                 .foregroundStyle(Color.white.opacity(0.35))
                 .lineLimit(1)
-                .minimumScaleFactor(0.55)
+                .minimumScaleFactor(0.5)
         }
-        .frame(minWidth: 52)
+        .frame(minWidth: 44)
         // Apple HIG: Ensure minimum touch target for VoiceOver
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(label): \(value)")
