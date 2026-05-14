@@ -85,6 +85,12 @@ final class DepartureOptimizerService {
                 travelMode: mode
             )
             
+            // Check if weather data is missing or incomplete
+            let hasSegmentWeatherData = routeResult.route.segments.contains { $0.weather != nil }
+            if !hasSegmentWeatherData || climateAnalysis.maxTemperature == 0 {
+                hasWeatherDataError = true
+            }
+            
             // Apply climate adjustments
             let adjustedRoute = climateService.applyClimateAdjustment(
                 to: routeResult.route,

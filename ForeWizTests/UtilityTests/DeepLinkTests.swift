@@ -54,13 +54,13 @@ struct DeepLinkTests {
 
     @Test func deepLinkToURLConversion() {
         let homeLink = DeepLink.home
-        #expect(homeLink.url.scheme == "forewiz")
-        #expect(homeLink.url.host == "home")
+        #expect(homeLink.url?.scheme == "forewiz")
+        #expect(homeLink.url?.host == "home")
     }
 
     @Test func recommendationDetailURLConversion() {
         let detailLink = DeepLink.recommendationDetail("abc123")
-        #expect(detailLink.url.host == "recommendation")
-        #expect(detailLink.url.pathComponents.contains("abc123"))
+        #expect(detailLink.url?.host == "recommendation")
+        #expect(detailLink.url?.pathComponents.contains("abc123") == true)
     }
 }
