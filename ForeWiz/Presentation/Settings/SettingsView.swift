@@ -514,14 +514,14 @@ private struct SettingsSensitivitySelector: View {
                 .font(.system(size: 16))
                 .foregroundStyle(selected ? selectedColor : unselectedColor)
             Text(L10n.text(key))
-                .font(.system(size: 13, weight: selected ? .semibold : .regular))
+                .font(.system(size: 12, weight: selected ? .semibold : .regular))
                 .foregroundStyle(selected ? selectedColor : unselectedColor)
-                .lineLimit(2)
-                .minimumScaleFactor(0.75)
+                .lineLimit(1)
+                .minimumScaleFactor(0.55)
                 .multilineTextAlignment(.center)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, minHeight: 64)
+        .padding(.vertical, 10)
         .background(
             selected
                 ? selectedColor.opacity(0.14)

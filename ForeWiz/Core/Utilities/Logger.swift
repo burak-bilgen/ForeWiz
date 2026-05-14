@@ -15,6 +15,8 @@ enum AppLogger {
     static let cache = Logger(subsystem: "com.forewiz.app", category: "cache")
     static let widget = Logger(subsystem: "com.forewiz.app", category: "widget")
     static let shortcuts = Logger(subsystem: "com.forewiz.app", category: "shortcuts")
+    static let wizPath = Logger(subsystem: "com.forewiz.app", category: "wizpath")
+    static let search = Logger(subsystem: "com.forewiz.app", category: "search")
 }
 
 enum LogLevel: String, CaseIterable {

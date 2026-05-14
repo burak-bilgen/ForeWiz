@@ -337,210 +337,6 @@
         }
       }
     },
-    "accessibility_degrees" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "degrees"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "derece"
-          }
-        }
-      }
-    },
-    "accessibility_from_to_time" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "From %@ to %@"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ - %@ arası"
-          }
-        }
-      }
-    },
-    "preview_severe_weather_alert" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Severe Weather Alert"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ciddi Hava Uyarısı"
-          }
-        }
-      }
-    },
-    "preview_thunderstorm_warning" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Thunderstorm warning in effect until 6:00 PM"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "18:00'e kadar fırtına uyarısı geçerli"
-          }
-        }
-      }
-    },
-    "preview_area_nws" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "San Francisco Bay Area - NWS"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "San Francisco Körfezi - NWS"
-          }
-        }
-      }
-    },
-    "preview_now" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Now"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Şimdi"
-          }
-        }
-      }
-    },
-    "preview_good_to_go" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Good to go"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hazır"
-          }
-        }
-      }
-    },
-    "preview_outdoor_plan" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Outdoor Plan"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dışarı Planı"
-          }
-        }
-      }
-    },
-    "preview_best_window_activities" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Best window for activities"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktiviteler için en iyi zaman"
-          }
-        }
-      }
-    },
-    "preview_prep" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prep"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hazırlık"
-          }
-        }
-      }
-    },
-    "preview_light_layers" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Light layers"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hafif katmanlar"
-          }
-        }
-      }
-    },
-    "preview_tshirt_light_jacket" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "T-shirt, light jacket"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tişört, hafif ceket"
-          }
-        }
-      }
-    },
     "a_short_action_plan_built" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -554,23 +350,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gün için planın"
-          }
-        }
-      }
-    },
-    "siri_best_time_for_activity" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Best time for %@ is from %@ to %@. Score: %@ out of 100."
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ için en iyi zaman %@ - %@ arası. Puan: %@/100."
           }
         }
       }
@@ -639,6 +418,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veriler Apple Weather'den."
+          }
+        }
+      }
+    },
+    "accessibility_degrees" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "degrees"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "derece"
+          }
+        }
+      }
+    },
+    "accessibility_from_to_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From %@ to %@"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ - %@ arası"
           }
         }
       }
@@ -2804,18 +2617,6 @@
         }
       }
     },
-    "From %@ to %@" : {
-      "comment" : "A label that describes a time range. The first argument is the start time. The second argument is the end time.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "From %1$@ to %2$@"
-          }
-        }
-      }
-    },
     "Get Best Time to Exercise" : {
       "comment" : "Title of the intent to get the best time window for outdoor activities.",
       "extractionState" : "manual",
@@ -4341,6 +4142,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Polen, duman ve hava kalitesi hassasiyetlerini asistan kararlarına ve bildirimlere dahil eder."
+          }
+        }
+      }
+    },
+    "information" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilgi"
           }
         }
       }
@@ -8816,6 +8634,176 @@
         }
       }
     },
+    "preview_area_nws" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "San Francisco Bay Area - NWS"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "San Francisco Körfezi - NWS"
+          }
+        }
+      }
+    },
+    "preview_best_window_activities" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best window for activities"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviteler için en iyi zaman"
+          }
+        }
+      }
+    },
+    "preview_good_to_go" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good to go"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hazır"
+          }
+        }
+      }
+    },
+    "preview_light_layers" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light layers"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hafif katmanlar"
+          }
+        }
+      }
+    },
+    "preview_now" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Şimdi"
+          }
+        }
+      }
+    },
+    "preview_outdoor_plan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outdoor Plan"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dışarı Planı"
+          }
+        }
+      }
+    },
+    "preview_prep" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prep"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hazırlık"
+          }
+        }
+      }
+    },
+    "preview_severe_weather_alert" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Severe Weather Alert"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciddi Hava Uyarısı"
+          }
+        }
+      }
+    },
+    "preview_thunderstorm_warning" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thunderstorm warning in effect until 6:00 PM"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "18:00'e kadar fırtına uyarısı geçerli"
+          }
+        }
+      }
+    },
+    "preview_tshirt_light_jacket" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "T-shirt, light jacket"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tişört, hafif ceket"
+          }
+        }
+      }
+    },
     "quick_tip_avoid" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10151,6 +10139,23 @@
         }
       }
     },
+    "select_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select location"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konum seç"
+          }
+        }
+      }
+    },
     "sensitive_groups_may_need_caution" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10214,7 +10219,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sıcaktan çabuk etkilenirim"
+            "value" : "Sıcak severim"
           }
         }
       }
@@ -11421,7 +11426,7 @@
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Senin için 'rahat'ın ne demek olduğunu söyler."
+            "value" : "Senin için ideal hava sıcaklığı nedir?"
           }
         }
       }
@@ -11683,36 +11688,444 @@
         }
       }
     },
-    "select_location" : {
+    "siri_best_time_for_activity" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select location"
+            "value" : "Best time for %@ is from %@ to %@. Score: %@ out of 100."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konum seç"
+            "value" : "%@ için en iyi zaman %@ - %@ arası. Puan: %@/100."
           }
         }
       }
     },
-    "information" : {
+    "wizpath_title" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Information"
+            "value" : "WizPath"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bilgi"
+            "value" : "WizPath"
+          }
+        }
+      }
+    },
+    "wizpath_mode_car" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Car"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Araba"
+          }
+        }
+      }
+    },
+    "wizpath_mode_walking" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Walking"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yürüyüş"
+          }
+        }
+      }
+    },
+    "wizpath_risk_good" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good conditions"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "İyi koşullar"
+          }
+        }
+      }
+    },
+    "wizpath_risk_caution" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use caution"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dikkatli olun"
+          }
+        }
+      }
+    },
+    "wizpath_risk_severe" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dangerous conditions"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tehlikeli koşullar"
+          }
+        }
+      }
+    },
+    "wizpath_destination" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varış noktası"
+          }
+        }
+      }
+    },
+    "wizpath_tap_to_select" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to select"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seçmek için dokun"
+          }
+        }
+      }
+    },
+    "wizpath_departure_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Departure time"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kalkış saati"
+          }
+        }
+      }
+    },
+    "wizpath_calculate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculate Route"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rota Hesapla"
+          }
+        }
+      }
+    },
+    "wizpath_calculating" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating..."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hesaplanıyor..."
+          }
+        }
+      }
+    },
+    "wizpath_route_weather" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Route weather"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rota hava durumu"
+          }
+        }
+      }
+    },
+    "wizpath_total_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total time"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toplam süre"
+          }
+        }
+      }
+    },
+    "wizpath_search_destination" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search destination..."
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varış noktası ara..."
+          }
+        }
+      }
+    },
+    "wizpath_select_destination" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Destination"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varış Noktası Seç"
+          }
+        }
+      }
+    },
+    "wizpath_selected_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected location"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seçilen konum"
+          }
+        }
+      }
+    },
+    "wizpath_confirm_destination" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onayla"
+          }
+        }
+      }
+    },
+    "wizpath_unknown_location" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown location"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bilinmeyen konum"
+          }
+        }
+      }
+    },
+    "wizpath_error_route_blocked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ROUTE BLOCKED / SYSTEM ERROR"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ROTA ENGELLİ / SİSTEM HATASI"
+          }
+        }
+      }
+    },
+    "wizpath_error_no_walking" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This route requires a vehicle"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bu rota araç gerektirir"
+          }
+        }
+      }
+    },
+    "wizpath_error_weather_unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weather forecast unavailable - check connection"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hava durumu kullanılamıyor - bağlantıyı kontrol edin"
+          }
+        }
+      }
+    },
+    "wizpath_error_unreachable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination is unreachable"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Varış noktasına ulaşılamıyor"
+          }
+        }
+      }
+    },
+    "wizpath_error_invalid_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid departure time"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geçersiz kalkış saati"
+          }
+        }
+      }
+    },
+    "wizpath_error_no_destination" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please select a destination"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lütfen bir varış noktası seçin"
+          }
+        }
+      }
+    },
+    "wizpath_error_unknown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An error occurred"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bir hata oluştu"
           }
         }
       }
