@@ -71,6 +71,10 @@ struct ForecastPill: View {
             highTemp
             lowTemp
             scoreBadge
+            
+            if forecast.precipitationChance > 0 {
+                rainBadge
+            }
         }
         .frame(width: 72)
         .padding(.vertical, 8)
@@ -129,6 +133,22 @@ struct ForecastPill: View {
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(scoreColor)
         }
+    }
+    
+    private var rainBadge: some View {
+        HStack(spacing: 2) {
+            Image(systemName: "cloud.rain.fill")
+                .font(.system(size: 8))
+            Text("\(Int(forecast.precipitationChance * 100))%")
+                .font(.system(size: 9, weight: .medium))
+        }
+        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
+        .padding(.horizontal, 4)
+        .padding(.vertical, 2)
+        .background(
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
+                .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.15))
+        )
     }
     
     private var accessibilityLabel: String {
