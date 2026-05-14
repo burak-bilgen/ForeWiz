@@ -1,50 +1,5 @@
 import SwiftUI
-import AVFoundation
 import Combine
-
-// MARK: - Weather Sound Manager
-/// Plays ambient weather sounds during splash animation
-@MainActor
-final class WeatherSoundManager: ObservableObject {
-    static let shared = WeatherSoundManager()
-    
-    private var audioPlayer: AVAudioPlayer?
-    private var systemSoundID: SystemSoundID = 0
-    
-    private init() {}
-    
-    func playSound(for kind: EnhancedWeatherSplashKind) {
-        // Subtle single sound per weather type - no jarring system alert sounds
-        // Using only soft, ambient-appropriate system sounds
-        let soundID: SystemSoundID
-        
-        switch kind {
-        case .sunny:
-            soundID = 1075 // Soft chime - gentle and bright
-        case .rainy:
-            soundID = 1104 // Single water droplet
-        case .snowy:
-            soundID = 1074 // Very soft chime
-        case .stormy:
-            soundID = 1057 // Low whoosh - not an alarm
-        case .cloudy:
-            soundID = 1070 // Muted bell
-        case .foggy:
-            soundID = 1033 // Soft ambient
-        case .windy:
-            soundID = 1052 // Gentle swish
-        case .nightClear:
-            soundID = 1075 // Peaceful chime (same as sunny)
-        }
-        
-        AudioServicesPlaySystemSound(soundID)
-    }
-    
-    func playTransitionSound() {
-        // Soft transition only
-        AudioServicesPlaySystemSound(1074) // Very soft chime
-    }
-}
 
 // MARK: - Enhanced Weather Splash Kind
 enum EnhancedWeatherSplashKind: String, CaseIterable {
@@ -186,8 +141,6 @@ struct EnhancedWeatherSplashOverlay: View {
     let onDismiss: () -> Void
     var onFadeOut: (() -> Void)?
     
-    @StateObject private var soundManager = WeatherSoundManager.shared
-    
     @State private var opacity = 0.0
     @State private var iconScale: CGFloat = 0.2
     @State private var iconOpacity: Double = 0.0
@@ -272,12 +225,7 @@ struct EnhancedWeatherSplashOverlay: View {
         .allowsHitTesting(false)
         .onAppear { 
             runAnimation()
-            playSound()
         }
-    }
-    
-    private func playSound() {
-        soundManager.playSound(for: kind)
     }
     
     private func runAnimation() {
@@ -338,9 +286,6 @@ struct EnhancedWeatherSplashOverlay: View {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + totalDuration - fadeOutDuration) {
-            // Play transition sound
-            soundManager.playTransitionSound()
-            
             onFadeOut?()
             withAnimation(.easeOut(duration: fadeOutDuration)) {
                 opacity = 0.0
