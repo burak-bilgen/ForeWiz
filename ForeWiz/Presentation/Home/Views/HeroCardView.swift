@@ -116,8 +116,7 @@ struct HeroCardView: View {
         Text(weather.temperatureText)
             .font(.system(size: 38, weight: .thin, design: .rounded))
             .foregroundStyle(.white)
-            .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .minimumScaleFactor(0.6)
             .accessibilityLabel(L10n.formatted("home.accessibility.temperature", weather.temperatureText))
     }
     
@@ -227,13 +226,12 @@ private struct MetricInlineView: View {
             Text(value)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.6)
             
             Text(label)
                 .font(.system(size: 13))
                 .foregroundStyle(Color.white.opacity(0.35))
-                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
         // Apple HIG: Ensure minimum touch target for VoiceOver
         .accessibilityElement(children: .combine)

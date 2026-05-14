@@ -14,74 +14,35 @@ final class WeatherSoundManager: ObservableObject {
     private init() {}
     
     func playSound(for kind: EnhancedWeatherSplashKind) {
-        // Use system sounds for different weather types
-        // These are built-in iOS system sounds - no external files needed
+        // Subtle single sound per weather type - no jarring system alert sounds
+        // Using only soft, ambient-appropriate system sounds
         let soundID: SystemSoundID
         
         switch kind {
         case .sunny:
-            // Bright, cheerful sound
-            soundID = 1005 // Tock sound - bright and positive
+            soundID = 1075 // Soft chime - gentle and bright
         case .rainy:
-            // Soft water droplet sound
-            soundID = 1104 // Water droplet
+            soundID = 1104 // Single water droplet
         case .snowy:
-            // Soft, crystalline sound
-            soundID = 1070 // Soft bell-like sound
+            soundID = 1074 // Very soft chime
         case .stormy:
-            // Dramatic thunder-like
-            soundID = 1109 // Alert sound with impact
+            soundID = 1057 // Low whoosh - not an alarm
         case .cloudy:
-            // Gentle, muted sound
-            soundID = 1057 // Soft whoosh
+            soundID = 1070 // Muted bell
         case .foggy:
-            // Mysterious, soft
-            soundID = 1034 // Soft mysterious
+            soundID = 1033 // Soft ambient
         case .windy:
-            // Swishing sound
-            soundID = 1052 // Whoosh/swish
+            soundID = 1052 // Gentle swish
         case .nightClear:
-            // Peaceful, calm
-            soundID = 1075 // Peaceful chime
+            soundID = 1075 // Peaceful chime (same as sunny)
         }
         
-        // Play system sound
         AudioServicesPlaySystemSound(soundID)
-        
-        // Also play a secondary ambient sound for richer experience
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            self.playSecondarySound(for: kind)
-        }
-    }
-    
-    private func playSecondarySound(for kind: EnhancedWeatherSplashKind) {
-        let secondarySoundID: SystemSoundID
-        
-        switch kind {
-        case .sunny:
-            secondarySoundID = 1016 // Page flip - energetic
-        case .rainy:
-            secondarySoundID = 1103 // Another droplet
-        case .snowy:
-            secondarySoundID = 1101 // Soft tap
-        case .stormy:
-            secondarySoundID = 1110 // Alert
-        case .cloudy:
-            secondarySoundID = 1055 // Soft transition
-        case .foggy:
-            secondarySoundID = 1033 // Mysterious
-        case .windy:
-            secondarySoundID = 1051 // Whoosh
-        case .nightClear:
-            secondarySoundID = 1074 // Soft chime
-        }
-        
-        AudioServicesPlaySystemSound(secondarySoundID)
     }
     
     func playTransitionSound() {
-        // Play a smooth transition sound when splash fades
-        AudioServicesPlaySystemSound(1057) // Soft transition whoosh
+        // Soft transition only
+        AudioServicesPlaySystemSound(1074) // Very soft chime
     }
 }
 

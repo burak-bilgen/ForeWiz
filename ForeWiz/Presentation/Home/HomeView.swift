@@ -86,7 +86,7 @@ struct HomeView: View {
                     Text(viewModel.selectedLocationName)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
-                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                     Image(systemName: "chevron.down")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(Color.white.opacity(0.4))
@@ -282,8 +282,7 @@ private struct UnifiedHeroCard: View {
                         Text(weather.temperatureText)
                             .font(.system(size: 38, weight: .thin, design: .rounded))
                             .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
+                            .minimumScaleFactor(0.6)
                             .accessibilityLabel(L10n.formatted("home.accessibility.temperature", weather.temperatureText))
                         Text(weather.conditionText)
                             .font(.system(size: 13, weight: .medium))
@@ -364,12 +363,11 @@ private struct UnifiedHeroCard: View {
                 Text(title)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.white.opacity(0.42))
-                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Text(detail)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+                    .minimumScaleFactor(0.6)
             }
             .layoutPriority(1)
         }
@@ -391,12 +389,11 @@ private struct UnifiedHeroCard: View {
             Text(value)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.6)
             Text(label)
                 .font(.system(size: 13))
                 .foregroundStyle(Color.white.opacity(0.35))
-                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
     }
 }
