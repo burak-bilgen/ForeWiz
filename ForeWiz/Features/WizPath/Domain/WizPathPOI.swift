@@ -1,6 +1,6 @@
 import Foundation
 import CoreLocation
-import MapKit
+@preconcurrency import MapKit
 
 // MARK: - Smart Stop (Weather-Aware POI)
 struct SmartStop: Identifiable, Sendable {

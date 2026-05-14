@@ -28,14 +28,14 @@ final class WizPathViewModel: ObservableObject {
     
     // MARK: - Initialization
     init(
-        wizPathService: WizPathService = .shared,
-        locationService: LocationService = .shared
+        wizPathService: WizPathService = WizPathService.shared,
+        locationService: LocationService = LocationService.shared
     ) {
         self.wizPathService = wizPathService
         self.locationService = locationService
         
         // Get current location on init
-        Task {
+        Task { @MainActor in
             await fetchCurrentLocation()
         }
     }

@@ -1,5 +1,5 @@
 import SwiftUI
-import MapKit
+@preconcurrency import MapKit
 import CoreLocation
 
 // MARK: - WizPath Dashboard View

@@ -1,6 +1,6 @@
 import Foundation
 import CoreLocation
-import MapKit
+@preconcurrency import MapKit
 import OSLog
 
 // MARK: - POI Service

@@ -1,5 +1,5 @@
 import SwiftUI
-import MapKit
+@preconcurrency import MapKit
 
 // MARK: - Smart POI Map Annotation View
 struct SmartPOIAnnotationView: View {

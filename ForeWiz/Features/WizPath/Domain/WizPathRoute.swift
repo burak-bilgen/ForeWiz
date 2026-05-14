@@ -1,6 +1,6 @@
 import Foundation
 import CoreLocation
-import MapKit
+@preconcurrency import MapKit
 
 // MARK: - Travel Mode
 enum TravelMode: String, CaseIterable, Identifiable {
