@@ -3,77 +3,141 @@ import CoreLocation
 import Combine
 import OSLog
 
-// MARK: - WizPath View Model
+// MARK: - WizPath View State
+
+enum WizPathViewState: Equatable {
+    case idle
+    case calculating
+    case routeReady(WizPathRoute)
+    case error(String)
+
+    static func == (lhs: WizPathViewState, rhs: WizPathViewState) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle), (.calculating, .calculating):
+            return true
+        case (.routeReady(let l), .routeReady(let r)):
+            return l.id == r.id
+        case (.error(let l), .error(let r)):
+            return l == r
+        default:
+            return false
+        }
+    }
+
+    var isIdle: Bool {
+        if case .idle = self { return true }
+        return false
+    }
+    var isCalculating: Bool {
+        if case .calculating = self { return true }
+        return false
+    }
+    var route: WizPathRoute? {
+        if case .routeReady(let r) = self { return r }
+        return nil
+    }
+    var errorMessage: String? {
+        if case .error(let m) = self { return m }
+        return nil
+    }
+}
+
+// MARK: - WizPath ViewModel
+
 @MainActor
 final class WizPathViewModel: ObservableObject {
     // MARK: - Dependencies
     private let wizPathService: WizPathService
     private let locationService: LocationService
-    
+
     // MARK: - Published State
-    @Published var currentRoute: WizPathRoute?
-    @Published var isCalculating = false
+    @Published var state: WizPathViewState = .idle
     @Published var travelMode: TravelMode = .car
     @Published var departureTime: Date = Date()
     @Published var destinationName: String = ""
     @Published var destinationCoordinate: CLLocationCoordinate2D?
     @Published var originCoordinate: CLLocationCoordinate2D?
-    @Published var showError = false
-    @Published var errorMessage = ""
-    
-    // MARK: - Computed Properties
+    @Published var originName: String = L10n.text("wizpath_current_location")
+    @Published var recentDestinations: [RecentDestination] = []
+    @Published var isShowingRoute = true
+    @Published var showJourneyHUD = false
+
+    // MARK: - Computed
     var canCalculate: Bool {
-        destinationCoordinate != nil && !isCalculating
+        destinationCoordinate != nil && !state.isCalculating
     }
-    
-    // MARK: - Initialization
+
+    var currentRoute: WizPathRoute? { state.route }
+    var isCalculating: Bool { state.isCalculating }
+    var errorMessage: String? { state.errorMessage }
+    var routeSegments: [WizPathSegment] { currentRoute?.segments ?? [] }
+    var weatherChangePoints: [WizPathSegment] { currentRoute?.weatherChangePoints ?? [] }
+    var overallRisk: RouteRisk { currentRoute?.overallRisk ?? .good }
+
+    // MARK: - Init
     init(
-        wizPathService: WizPathService = WizPathService.shared,
-        locationService: LocationService = LocationService.wizPathShared
+        wizPathService: WizPathService = .shared,
+        locationService: LocationService? = nil
     ) {
         self.wizPathService = wizPathService
-        self.locationService = locationService
-        
-        // Get current location on init
-        Task { @MainActor in
-            await fetchCurrentLocation()
+        self.locationService = locationService ?? DependencyContainer.shared.locationService
+        loadCurrentLocation()
+        loadRecentDestinations()
+    }
+
+    // MARK: - Location
+
+    func loadCurrentLocation() {
+        Task {
+            do {
+                let locationCoord = try await wizPathService.getCurrentLocation()
+                originCoordinate = CLLocationCoordinate2D(
+                    latitude: locationCoord.latitude,
+                    longitude: locationCoord.longitude
+                )
+                AppLogger.wizPath.info("Location loaded: \(locationCoord.latitude), \(locationCoord.longitude)")
+            } catch {
+                AppLogger.wizPath.error("Location error: \(error.localizedDescription)")
+                // Fallback to a default location
+                originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
+                originName = L10n.text("wizpath_fallback_location")
+            }
         }
     }
-    
-    // MARK: - Location Management
-    
-    private func fetchCurrentLocation() async {
-        do {
-            originCoordinate = try await locationService.requestCurrentLocationCoordinate()
-        } catch {
-            AppLogger.location.error("Failed to get current location: \(error)")
-            // Use Derince, Kocaeli as fallback (NOT San Francisco)
-            originCoordinate = locationService.fallbackCoordinate
-        }
-    }
-    
-    func setDestination(_ location: CLLocation) {
-        destinationCoordinate = location.coordinate
-        destinationName = location.name ?? L10n.text("wizpath_unknown_location")
-    }
-    
+
     func setDestination(coordinate: CLLocationCoordinate2D, name: String) {
         destinationCoordinate = coordinate
         destinationName = name
+        state = .idle
+        // Save to recents
+        wizPathService.saveRecentDestination(name: name, coordinate: coordinate)
+        loadRecentDestinations()
+        // Auto-calculate
+        Task { await calculateRoute() }
     }
-    
+
+    // MARK: - Recent Destinations
+
+    func loadRecentDestinations() {
+        recentDestinations = wizPathService.loadRecentDestinations()
+    }
+
+    func selectRecentDestination(_ recent: RecentDestination) {
+        setDestination(coordinate: recent.coordinate, name: recent.name)
+    }
+
     // MARK: - Route Calculation
-    
+
     func calculateRoute() async {
         guard let origin = originCoordinate,
               let destination = destinationCoordinate else {
-            showError(message: L10n.text("wizpath_error_no_destination"))
+            state = .error(L10n.text("wizpath_error_no_destination"))
             return
         }
-        
-        isCalculating = true
-        defer { isCalculating = false }
-        
+
+        state = .calculating
+        HapticEngine.shared.medium()
+
         do {
             let route = try await wizPathService.calculateRoute(
                 origin: origin,
@@ -81,146 +145,54 @@ final class WizPathViewModel: ObservableObject {
                 mode: travelMode,
                 departureTime: departureTime
             )
-            
-            self.currentRoute = route
-            
+            state = .routeReady(route)
+            showJourneyHUD = true
+            HapticEngine.shared.success()
+            AppLogger.wizPath.info("Route calculated: \(route.totalDuration)s, risk: \(route.overallRisk.rawValue)")
         } catch let error as WizPathError {
-            showError(message: error.localizedDescription ?? L10n.text("wizpath_error_unknown"))
+            state = .error(error.localizedDescription)
+            HapticEngine.shared.warning()
         } catch {
-            showError(message: L10n.text("wizpath_error_unknown"))
+            AppLogger.wizPath.error("Route calculation failed: \(error.localizedDescription)")
+            state = .error(L10n.text("wizpath_error_route_failed"))
+            HapticEngine.shared.error()
         }
     }
-    
-    // MARK: - Route Updates
-    
-    func recalculateWithTraffic() async {
-        // Only recalculate if we have a current route
-        guard currentRoute != nil else { return }
-        
-        // Update departure time to now
-        departureTime = Date()
-        
-        // Recalculate
-        await calculateRoute()
-    }
-    
-    func switchTravelMode(to mode: TravelMode) async {
+
+    // MARK: - Actions
+
+    func switchTravelMode(to mode: TravelMode) {
         travelMode = mode
-        
-        // Recalculate if we have a route
+        HapticEngine.shared.selectionChanged()
         if currentRoute != nil {
-            await calculateRoute()
+            Task { await calculateRoute() }
         }
     }
-    
-    func updateDepartureTime(_ date: Date) async {
+
+    func updateDepartureTime(_ date: Date) {
         departureTime = date
-        
-        // Recalculate if we have a route (weather may change)
+        HapticEngine.shared.selectionChanged()
         if currentRoute != nil {
-            await calculateRoute()
+            Task { await calculateRoute() }
         }
     }
-    
-    // MARK: - Error Handling
-    
-    private func showError(message: String) {
-        errorMessage = message
-        showError = true
+
+    func refreshRoute() {
+        HapticEngine.shared.weatherRefresh()
+        if currentRoute != nil {
+            Task { await calculateRoute() }
+        }
     }
-    
-    // MARK: - Route Segments
-    
-    var routeSegments: [WizPathSegment] {
-        currentRoute?.segments ?? []
-    }
-    
-    var weatherChangePoints: [WizPathSegment] {
-        currentRoute?.weatherChangePoints ?? []
-    }
-    
-    var overallRisk: RouteRisk {
-        currentRoute?.overallRisk ?? .good
-    }
-    
-    // MARK: - Cleanup
-    
+
     func reset() {
-        currentRoute = nil
+        state = .idle
         destinationCoordinate = nil
         destinationName = ""
-        errorMessage = ""
-        showError = false
+        showJourneyHUD = false
+        HapticEngine.shared.light()
     }
-}
 
-// MARK: - Location Service Extension for WizPath
-extension LocationService {
-    /// Shared instance for WizPath feature
-    static let wizPathShared = LocationService()
-    
-    /// Request location as CLLocationCoordinate2D for routing
-    func requestCurrentLocationCoordinate() async throws -> CLLocationCoordinate2D {
-        let coordinate = try await getCurrentLocation()
-        return CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
-    }
-    
-    /// Fallback to Derince, Kocaeli, Türkiye (NOT San Francisco)
-    var fallbackCoordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(
-            latitude: 40.7563,  // Derince, Kocaeli
-            longitude: 29.8303   // Türkiye
-        )
-    }
-}
-
-// MARK: - Geocoding Helper
-@MainActor
-final class GeocodingHelper {
-    static let shared = GeocodingHelper()
-    private let geocoder = CLGeocoder()
-    
-    func reverseGeocode(coordinate: CLLocationCoordinate2D) async throws -> String {
-        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        let placemarks = try await geocoder.reverseGeocodeLocation(location)
-        
-        guard let placemark = placemarks.first else {
-            return "Unknown Location"
-        }
-        
-        // Build location name from available components
-        var components: [String] = []
-        
-        if let name = placemark.name, !name.isEmpty {
-            components.append(name)
-        } else if let thoroughfare = placemark.thoroughfare, !thoroughfare.isEmpty {
-            components.append(thoroughfare)
-        }
-        
-        if let subLocality = placemark.subLocality, !subLocality.isEmpty {
-            components.append(subLocality)
-        }
-        
-        if let locality = placemark.locality, !locality.isEmpty {
-            components.append(locality)
-        }
-        
-        if let adminArea = placemark.administrativeArea, !adminArea.isEmpty {
-            components.append(adminArea)
-        }
-        
-        if components.isEmpty {
-            return "Unknown Location"
-        }
-        
-        return components.joined(separator: ", ")
-    }
-}
-
-// MARK: - CLLocation Extension
-extension CLLocation {
-    var name: String? {
-        // Would use CLGeocoder in production
-        return nil
+    func dismissError() {
+        state = .idle
     }
 }

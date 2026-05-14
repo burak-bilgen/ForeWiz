@@ -6,7 +6,7 @@ import OSLog
 /// Updated for v3.0: Extreme heat integration and Sentinel notification thresholds
 @MainActor
 final class DepartureOptimizerService {
-    static let shared = DepartureOptimizerService()
+    @MainActor static let shared = DepartureOptimizerService()
     
     // MARK: - Multiplier Matrix (Gridlock & Climate)
     struct MultiplierMatrix {

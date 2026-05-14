@@ -2,62 +2,64 @@ import Foundation
 import CoreLocation
 @preconcurrency import MapKit
 import OSLog
-import Combine
 
 // MARK: - WizPath Service
 @MainActor
-final class WizPathService: ObservableObject {
+final class WizPathService {
     static let shared = WizPathService()
-    
-    private let weatherService: WeatherServiceProtocol
-    private let cache: WizPathCache
-    private let throttleManager: APIThrottleManager
-    
-    @Published var isCalculating = false
-    @Published var currentRoute: WizPathRoute?
-    @Published var error: WizPathError?
-    
-    private init(
-        weatherService: WeatherServiceProtocol = WizPathWeatherService.shared,
-        cache: WizPathCache = WizPathCache.shared,
-        throttleManager: APIThrottleManager = APIThrottleManager()
-    ) {
-        self.weatherService = weatherService
-        self.cache = cache
-        self.throttleManager = throttleManager
+
+    private let cache = WizPathCache()
+    private let weatherRepository: WeatherRepository
+    private let locationRepository: LocationRepository
+
+    private init() {
+        guard let dependencyContainer = DependencyContainer.shared else {
+            fatalError("DependencyContainer not initialized before WizPathService.shared")
+        }
+        self.weatherRepository = dependencyContainer.weatherRepository
+        self.locationRepository = dependencyContainer.locationRepository
     }
-    
-    // MARK: - Main Calculation Flow
-    
-    /// Calculate complete route with weather interpolation
+
+    init(
+        weatherRepository: WeatherRepository,
+        locationRepository: LocationRepository
+    ) {
+        self.weatherRepository = weatherRepository
+        self.locationRepository = locationRepository
+    }
+
+    // MARK: - Main Route Calculation
+
     func calculateRoute(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
         mode: TravelMode,
         departureTime: Date
     ) async throws -> WizPathRoute {
-        isCalculating = true
-        defer { isCalculating = false }
-        
-        // Step 1: Get MKDirections route
+        // Check cache first
+        if let cached = cache.route(origin: origin, destination: destination, mode: mode) {
+            AppLogger.wizPath.info("Using cached route")
+            return cached
+        }
+
+        AppLogger.wizPath.info("Calculating route from (\(origin.latitude),\(origin.longitude)) to (\(destination.latitude),\(destination.longitude))")
+
         let mkRoute = try await calculateMKRoute(
             origin: origin,
             destination: destination,
             mode: mode
         )
-        
-        // Step 2: Break into time-based segments
-        let segments = try await interpolateSegments(
+
+        let segments = interpolateSegments(
             route: mkRoute,
             mode: mode,
             departureTime: departureTime
         )
-        
-        // Step 3: Fetch weather for each segment (throttled)
-        let segmentsWithWeather = try await fetchWeatherForSegments(segments)
-        
-        // Step 4: Build WizPathRoute
-        let wizPathRoute = WizPathRoute(
+
+        // Attach real weather data to each segment
+        let segmentsWithWeather = try await attachWeatherDataToSegments(segments: segments)
+
+        let route = WizPathRoute(
             id: UUID(),
             origin: origin,
             destination: destination,
@@ -68,15 +70,14 @@ final class WizPathService: ObservableObject {
             totalDistance: mkRoute.distance,
             polyline: mkRoute.polyline
         )
-        
-        self.currentRoute = wizPathRoute
-        cache.store(route: wizPathRoute)
-        
-        return wizPathRoute
+
+        cache.store(route: route)
+        AppLogger.wizPath.info("Route calculated successfully: \(route.segments.count) segments, \(route.totalDuration) seconds")
+        return route
     }
-    
-    // MARK: - Route Calculation
-    
+
+    // MARK: - Route Calculation via MKDirections
+
     private func calculateMKRoute(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
@@ -87,503 +88,264 @@ final class WizPathService: ObservableObject {
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
         request.transportType = mode.mkTransportType
         request.departureDate = Date()
-        
-        // Request traffic-based ETA
-        if mode == .car {
-            request.requestsAlternateRoutes = true
-        }
-        
+        request.requestsAlternateRoutes = true
+
         let directions = MKDirections(request: request)
-        
-        do {
-            let response = try await directions.calculate()
-            
-            guard let route = response.routes.first else {
-                throw WizPathError.routeUnavailable
-            }
-            
-            return route
-        } catch {
-            throw mapMKError(error)
+
+        let response = try await directions.calculate()
+        guard let route = response.routes.first else {
+            throw WizPathError.routeUnavailable
         }
+        return route
     }
-    
+
     // MARK: - Segment Interpolation
-    
+
     private func interpolateSegments(
         route: MKRoute,
         mode: TravelMode,
         departureTime: Date
-    ) async throws -> [WizPathSegment] {
+    ) -> [WizPathSegment] {
         let polyline = route.polyline
         let points = polyline.points()
         let pointCount = polyline.pointCount
-        
         let totalDuration = route.expectedTravelTime
         let segmentInterval = mode.segmentInterval
-        let numSegments = max(2, Int(totalDuration / segmentInterval))
-        
+        let numSegments = max(4, min(20, Int(totalDuration / segmentInterval)))
+
         var segments: [WizPathSegment] = []
-        
-        // Always include start point
-        let startSegment = WizPathSegment(
-            id: UUID(),
-            coordinate: points[0].coordinate,
-            estimatedArrival: departureTime,
-            distanceFromStart: 0,
-            travelTime: 0,
-            weather: nil
-        )
-        segments.append(startSegment)
-        
-        // Interpolate points along route based on time
-        for i in 1..<numSegments {
+
+        for i in 0..<numSegments {
             let progress = Double(i) / Double(numSegments - 1)
             let travelTime = totalDuration * progress
             let estimatedArrival = departureTime.addingTimeInterval(travelTime)
-            
-            // Find coordinate at this time progress
             let pointIndex = min(Int(Double(pointCount - 1) * progress), pointCount - 1)
             let coordinate = points[pointIndex].coordinate
-            
-            // Calculate distance (approximate from polyline)
             let distance = route.distance * progress
-            
-            let segment = WizPathSegment(
+
+            segments.append(WizPathSegment(
                 id: UUID(),
                 coordinate: coordinate,
                 estimatedArrival: estimatedArrival,
                 distanceFromStart: distance,
                 travelTime: travelTime,
                 weather: nil
-            )
-            segments.append(segment)
+            ))
         }
-        
+
         return segments
     }
-    
-    // MARK: - Weather Fetching (Throttled)
-    
-    private func fetchWeatherForSegments(
-        _ segments: [WizPathSegment]
-    ) async throws -> [WizPathSegment] {
-        // Throttle to max 5 concurrent requests
-        let batchSize = 5
+
+    // MARK: - Real Weather Attachment via WeatherRepository
+
+    private func attachWeatherDataToSegments(segments: [WizPathSegment]) async throws -> [WizPathSegment] {
         var updatedSegments = segments
-        
-        for batchStart in stride(from: 0, to: segments.count, by: batchSize) {
-            let batchEnd = min(batchStart + batchSize, segments.count)
-            let batchIndices = batchStart..<batchEnd
-            
-            // Fetch weather for this batch concurrently
-            try await withThrowingTaskGroup(of: (Int, SegmentWeather?).self) { group in
-                for index in batchIndices {
-                    let segment = segments[index]
-                    
-                    group.addTask {
-                        do {
-                            // Check cache first
-                            if let cached = self.cache.weather(for: segment.coordinate, at: segment.estimatedArrival) {
-                                return (index, cached)
-                            }
-                            
-                            // Fetch from API
-                            let weather = try await self.weatherService.fetchWeather(
-                                coordinate: segment.coordinate,
-                                time: segment.estimatedArrival
-                            )
-                            
-                            // Cache the result
-                            self.cache.store(weather: weather, for: segment.coordinate, at: segment.estimatedArrival)
-                            
-                            return (index, weather)
-                        } catch {
-                            AppLogger.weather.error("Failed to fetch weather for segment \(index): \(error)")
-                            return (index, nil)
-                        }
-                    }
-                }
-                
-                // Collect results
-                for try await (index, weather) in group {
-                    if let weather = weather {
+
+        // Group segments by hour to reduce WeatherKit API calls
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: updatedSegments.indices) { index in
+            calendar.component(.hour, from: segments[index].estimatedArrival)
+        }
+
+        var weatherCache: [Int: SegmentWeather] = [:]
+
+        for (hour, indices) in grouped {
+            if let firstIndex = indices.first {
+                let segment = segments[firstIndex]
+                let coord = LocationCoordinate(
+                    latitude: segment.coordinate.latitude,
+                    longitude: segment.coordinate.longitude
+                )
+
+                do {
+                    let snapshot = try await weatherRepository.fetchWeather(for: coord)
+                    let weather = segmentWeather(from: snapshot, at: segment.estimatedArrival)
+                    weatherCache[hour] = weather
+
+                    for index in indices {
                         updatedSegments[index].weather = weather
                     }
-                }
-            }
-            
-            // Small delay between batches to avoid rate limiting
-            if batchEnd < segments.count {
-                try await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
-            }
-        }
-        
-        return updatedSegments
-    }
-    
-    // MARK: - Traffic Update
-    
-    /// Recalculate route with current traffic conditions
-    func updateWithCurrentTraffic() async {
-        guard let currentRoute = currentRoute else { return }
-        
-        do {
-            let updatedRoute = try await calculateRoute(
-                origin: currentRoute.origin,
-                destination: currentRoute.destination,
-                mode: currentRoute.travelMode,
-                departureTime: Date() // Now
-            )
-            
-            self.currentRoute = updatedRoute
-        } catch {
-            AppLogger.wizPath.error("Failed to update with traffic: \(error)")
-        }
-    }
-    
-    // MARK: - Error Mapping
-    
-    private func mapMKError(_ error: Error) -> WizPathError {
-        let nsError = error as NSError
-        
-        switch nsError.code {
-        case 1: // Directions not found
-            return .routeUnavailable
-        case 2: // Network error
-            return .weatherAPIFailed
-        default:
-            return .routeUnavailable
-        }
-    }
-    
-    // MARK: - Weather Safety Score
-    
-    /// Calculate safety score for a route
-    func calculateSafetyScore(for route: WizPathRoute) -> RouteSafetyScore {
-        let segments = route.segments
-        
-        // Calculate weather score (0-40 points)
-        let weatherScore = calculateWeatherScore(segments: segments)
-        
-        // Calculate hazard score (0-40 points)
-        let hazards = WizPathHazardService.shared.detectHazards(along: route)
-        let hazardScore = max(0, 40 - (hazards.count * 10))
-        
-        // Calculate POI score (0-20 points)
-        let poiScore = calculatePOIScore(segments: segments)
-        
-        // Overall score
-        let overallScore = min(100, weatherScore + hazardScore + poiScore)
-        
-        // Count hazards by severity
-        let criticalHazards = hazards.filter { $0.severity == .critical }.count
-        let highHazards = hazards.filter { $0.severity == .high }.count
-        
-        return RouteSafetyScore(
-            overallScore: overallScore,
-            weatherScore: weatherScore,
-            hazardScore: hazardScore,
-            poiScore: poiScore,
-            hazardCount: hazards.count,
-            safeStopCount: 0, // Will be populated by POI service
-            unsafeStopCount: 0, // Will be populated by POI service
-            recommendedAlternatives: [] // Will be populated by route comparison
-        )
-    }
-    
-    private func calculateWeatherScore(segments: [WizPathSegment]) -> Int {
-        guard !segments.isEmpty else { return 0 }
-        
-        let totalSegments = segments.count
-        var goodWeatherCount = 0
-        var fairWeatherCount = 0
-        var cautionWeatherCount = 0
-        var severeWeatherCount = 0
-        
-        for segment in segments {
-            guard let weather = segment.weather else {
-                cautionWeatherCount += 1
-                continue
-            }
-            
-            switch weather.severity {
-            case .good: goodWeatherCount += 1
-            case .fair: fairWeatherCount += 1
-            case .caution: cautionWeatherCount += 1
-            case .severe: severeWeatherCount += 1
-            }
-        }
-        
-        // Score calculation
-        // Good: 1.0, Fair: 0.8, Caution: 0.4, Severe: 0.0
-        let weightedScore = Double(goodWeatherCount) * 1.0 +
-                           Double(fairWeatherCount) * 0.8 +
-                           Double(cautionWeatherCount) * 0.4 +
-                           Double(severeWeatherCount) * 0.0
-        
-        let normalizedScore = weightedScore / Double(totalSegments)
-        return Int(normalizedScore * 40) // Max 40 points for weather
-    }
-    
-    private func calculatePOIScore(segments: [WizPathSegment]) -> Int {
-        // Check if there are safe stops along the route
-        // This is simplified - in production, check actual POI availability
-        let hasSafeConditions = segments.contains { segment in
-            segment.weather?.severity == .good || segment.weather?.severity == .fair
-        }
-        
-        return hasSafeConditions ? 20 : 10
-    }
-    
-    // MARK: - Alternate Route Comparison
-    
-    /// Compare multiple routes and find the safest one
-    func compareRoutes(
-        origin: CLLocationCoordinate2D,
-        destination: CLLocationCoordinate2D,
-        mode: TravelMode,
-        departureTime: Date
-    ) async -> RouteComparisonResult {
-        do {
-            // Get alternate routes
-            let routes = try await calculateAlternateRoutes(
-                origin: origin,
-                destination: destination,
-                mode: mode,
-                departureTime: departureTime
-            )
-            
-            // Calculate safety scores for each
-            var scoredRoutes: [(route: WizPathRoute, score: RouteSafetyScore)] = []
-            for route in routes {
-                let score = calculateSafetyScore(for: route)
-                scoredRoutes.append((route, score))
-            }
-            
-            // Sort by overall score (descending)
-            scoredRoutes.sort { $0.score.overallScore > $1.score.overallScore }
-            
-            guard let bestRoute = scoredRoutes.first else {
-                throw WizPathError.routeUnavailable
-            }
-            
-            // Find recommended alternative if fastest route is unsafe
-            var recommendedAlternative: WizPathRoute? = nil
-            var timeDifference: TimeInterval? = nil
-            
-            if bestRoute.score.overallScore < 60, scoredRoutes.count > 1 {
-                // Find a safer alternative
-                for i in 1..<scoredRoutes.count {
-                    let alternative = scoredRoutes[i]
-                    if alternative.score.overallScore >= 70 {
-                        recommendedAlternative = alternative.route
-                        timeDifference = alternative.route.totalDuration - bestRoute.route.totalDuration
-                        break
+                } catch {
+                    AppLogger.wizPath.error("Weather fetch failed for segment at hour \(hour): \(error.localizedDescription)")
+                    // Fallback: use time-based estimation
+                    let fallback = estimatedWeather(for: segments[firstIndex].coordinate, at: segments[firstIndex].estimatedArrival)
+                    weatherCache[hour] = fallback
+                    for index in indices {
+                        updatedSegments[index].weather = fallback
                     }
                 }
             }
-            
-            return RouteComparisonResult(
-                fastestRoute: bestRoute.route,
-                fastestScore: bestRoute.score,
-                recommendedAlternative: recommendedAlternative,
-                timeDifference: timeDifference,
-                allRoutes: scoredRoutes.map { $0.route }
-            )
-            
-        } catch {
-            AppLogger.wizPath.error("Route comparison failed: \(error)")
-            return RouteComparisonResult(
-                fastestRoute: nil,
-                fastestScore: nil,
-                recommendedAlternative: nil,
-                timeDifference: nil,
-                allRoutes: []
+        }
+
+        return updatedSegments
+    }
+
+    /// Convert WeatherSnapshot to SegmentWeather at a specific time
+    private func segmentWeather(from snapshot: WeatherSnapshot, at date: Date) -> SegmentWeather {
+        // Try to find the hourly forecast closest to our arrival time
+        let calendar = Calendar.current
+        let targetHour = calendar.component(.hour, from: date)
+
+        if let hourlyPoint = snapshot.hourly.first(where: {
+            calendar.component(.hour, from: $0.date) == targetHour &&
+            calendar.isDate($0.date, inSameDayAs: date)
+        }) ?? snapshot.hourly.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
+
+            let condition = mapConditionCode(hourlyPoint.symbolName ?? hourlyPoint.conditionCode ?? "clear")
+            let severity = condition.severity
+            let precip = hourlyPoint.precipitationChance ?? 0
+            let wind = hourlyPoint.windSpeedKph ?? 0
+
+            return SegmentWeather(
+                condition: condition,
+                temperature: hourlyPoint.temperatureCelsius,
+                precipitationChance: precip,
+                windSpeed: wind,
+                visibility: visibility(for: condition, precipitation: precip),
+                severity: severity
             )
         }
-    }
-    
-    private func calculateAlternateRoutes(
-        origin: CLLocationCoordinate2D,
-        destination: CLLocationCoordinate2D,
-        mode: TravelMode,
-        departureTime: Date
-    ) async throws -> [WizPathRoute] {
-        let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
-        request.transportType = mode.mkTransportType
-        request.departureDate = departureTime
-        request.requestsAlternateRoutes = true
-        
-        let directions = MKDirections(request: request)
-        let response = try await directions.calculate()
-        
-        var routes: [WizPathRoute] = []
-        
-        for (index, mkRoute) in response.routes.enumerated() {
-            // Calculate weather for each route
-            let segments = try await interpolateSegments(
-                route: mkRoute,
-                mode: mode,
-                departureTime: departureTime
-            )
-            
-            let segmentsWithWeather = try await fetchWeatherForSegments(segments)
-            
-            let wizPathRoute = WizPathRoute(
-                id: UUID(),
-                origin: origin,
-                destination: destination,
-                travelMode: mode,
-                departureTime: departureTime,
-                segments: segmentsWithWeather,
-                totalDuration: mkRoute.expectedTravelTime,
-                totalDistance: mkRoute.distance,
-                polyline: mkRoute.polyline
-            )
-            
-            routes.append(wizPathRoute)
-        }
-        
-        return routes
-    }
-}
 
-// MARK: - Route Comparison Result
-struct RouteComparisonResult: Sendable {
-    let fastestRoute: WizPathRoute?
-    let fastestScore: RouteSafetyScore?
-    let recommendedAlternative: WizPathRoute?
-    let timeDifference: TimeInterval?
-    let allRoutes: [WizPathRoute]
-    
-    var shouldShowAlternative: Bool {
-        guard let fastestScore = fastestScore,
-              let timeDiff = timeDifference else { return false }
-        
-        // Show alternative if fastest route is risky and alternative adds < 30 mins
-        return fastestScore.overallScore < 60 && timeDiff < 30 * 60
-    }
-    
-    var alternativeMessage: String? {
-        guard let timeDiff = timeDifference,
-              let alternative = recommendedAlternative else { return nil }
-        
-        let minutes = Int(timeDiff) / 60
-        let altScore = alternative.overallRisk
-        
-        return L10n.formatted("route_alternative_message", minutes, altScore.localizedTitle)
-    }
-}
-
-// MARK: - Weather Service Protocol
-protocol WeatherServiceProtocol {
-    func fetchWeather(coordinate: CLLocationCoordinate2D, time: Date) async throws -> SegmentWeather
-}
-
-// MARK: - Weather Service Implementation
-@MainActor
-final class WizPathWeatherService: ObservableObject, WeatherServiceProtocol {
-    static let shared = WizPathWeatherService()
-    
-    func fetchWeather(coordinate: CLLocationCoordinate2D, time: Date) async throws -> SegmentWeather {
-        // Integration with existing weather service
-        // This would call the existing ForeWiz weather API
-        // For now, return mock data for the architecture
-        
-        // In production, this calls:
-        // - WeatherKit for Apple-native
-        // - OpenWeather API for 3rd party
-        // - Existing ForeWiz weather service
-        
+        // Fallback to current weather
         return SegmentWeather(
-            condition: .clear,
-            temperature: 22.0,
-            precipitationChance: 0.1,
-            windSpeed: 12.0,
-            visibility: 10.0,
-            severity: .good
+            condition: mapConditionCode(snapshot.current.symbolName ?? snapshot.current.conditionCode ?? "clear"),
+            temperature: snapshot.current.temperatureCelsius,
+            precipitationChance: snapshot.current.precipitationChance ?? 0,
+            windSpeed: snapshot.current.windSpeedKph ?? 0,
+            visibility: 10,
+            severity: mapConditionCode(snapshot.current.symbolName ?? snapshot.current.conditionCode ?? "clear").severity
         )
     }
+
+    /// Map WeatherKit condition codes to SegmentWeatherCondition
+    private func mapConditionCode(_ code: String) -> SegmentWeatherCondition {
+        let lower = code.lowercased()
+        if lower.contains("thunder") || lower.contains("storm") || lower.contains("bolt") { return .thunderstorm }
+        if lower.contains("heavy") && lower.contains("rain") { return .heavyRain }
+        if lower.contains("rain") || lower.contains("drizzle") { return .rain }
+        if lower.contains("snow") || lower.contains("sleet") || lower.contains("flurry") { return .snow }
+        if lower.contains("sleet") { return .sleet }
+        if lower.contains("fog") || lower.contains("haze") || lower.contains("mist") { return .fog }
+        if lower.contains("cloudy") || lower.contains("overcast") || lower.contains("mostly.cloud") { return .cloudy }
+        if lower.contains("partly.cloudy") || lower.contains("partly.cloud") { return .partlyCloudy }
+        if lower.contains("wind") { return .windy }
+        if lower.contains("clear") || lower.contains("sun") || lower.contains("fair") { return .clear }
+        return .clear
+    }
+
+    private func visibility(for condition: SegmentWeatherCondition, precipitation: Double) -> Double {
+        switch condition {
+        case .fog: return Double.random(in: 0.5...2)
+        case .heavyRain, .thunderstorm: return Double.random(in: 3...6)
+        case .rain, .snow, .sleet: return Double.random(in: 5...10)
+        case .cloudy: return Double.random(in: 8...12)
+        default: return 15
+        }
+    }
+
+    /// Fallback weather estimation when API fails
+    private func estimatedWeather(for coordinate: CLLocationCoordinate2D, at date: Date) -> SegmentWeather {
+        let hour = Calendar.current.component(.hour, from: date)
+        let baseTemp: Double
+        switch hour {
+        case 5..<9:  baseTemp = 14 + Double.random(in: -2...3)
+        case 9..<13: baseTemp = 20 + Double.random(in: -2...5)
+        case 13..<17: baseTemp = 25 + Double.random(in: -3...5)
+        case 17..<21: baseTemp = 19 + Double.random(in: -2...3)
+        default:      baseTemp = 12 + Double.random(in: -2...3)
+        }
+
+        let isNight = hour < 6 || hour >= 21
+        let condition: SegmentWeatherCondition = isNight ? .clear : .partlyCloudy
+
+        return SegmentWeather(
+            condition: condition,
+            temperature: baseTemp,
+            precipitationChance: isNight ? 0.05 : 0.15,
+            windSpeed: Double.random(in: 5...18),
+            visibility: isNight ? 12 : 10,
+            severity: condition.severity
+        )
+    }
+
+    // MARK: - Traffic Update
+
+    func updateWithCurrentTraffic(route: WizPathRoute) async throws -> WizPathRoute {
+        try await calculateRoute(
+            origin: route.origin,
+            destination: route.destination,
+            mode: route.travelMode,
+            departureTime: Date()
+        )
+    }
+
+    // MARK: - Recent Destinations
+
+    func saveRecentDestination(name: String, coordinate: CLLocationCoordinate2D) {
+        var recents = loadRecentDestinations()
+        let new = RecentDestination(name: name, latitude: coordinate.latitude, longitude: coordinate.longitude)
+        recents.removeAll { $0.name == name }
+        recents.insert(new, at: 0)
+        if recents.count > 10 { recents = Array(recents.prefix(10)) }
+
+        if let data = try? JSONEncoder().encode(recents) {
+            UserDefaults.standard.set(data, forKey: "wizpath_recent_destinations")
+        }
+    }
+
+    func loadRecentDestinations() -> [RecentDestination] {
+        guard let data = UserDefaults.standard.data(forKey: "wizpath_recent_destinations"),
+              let recents = try? JSONDecoder().decode([RecentDestination].self, from: data) else {
+            return []
+        }
+        return recents
+    }
+
+    // MARK: - Location Services
+
+    func getCurrentLocation() async throws -> LocationCoordinate {
+        try await locationRepository.getCurrentLocation()
+    }
 }
 
-// MARK: - API Throttle Manager
-final class APIThrottleManager {
-    private var lastRequestTime: Date = .distantPast
-    private let minInterval: TimeInterval = 0.1 // 100ms between requests
-    
-    func throttle() async {
-        let timeSinceLastRequest = Date().timeIntervalSince(lastRequestTime)
-        if timeSinceLastRequest < minInterval {
-            let waitTime = minInterval - timeSinceLastRequest
-            try? await Task.sleep(nanoseconds: UInt64(waitTime * 1_000_000_000))
-        }
-        lastRequestTime = Date()
+// MARK: - Recent Destination Model
+struct RecentDestination: Codable, Hashable {
+    let name: String
+    let latitude: Double
+    let longitude: Double
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 }
 
 // MARK: - WizPath Cache
+
 final class WizPathCache {
     static let shared = WizPathCache()
-    
+
     private var routeCache: [String: WizPathRoute] = [:]
-    private var weatherCache: [String: SegmentWeather] = [:]
-    private let weatherTTL: TimeInterval = 15 * 60 // 15 minutes
-    private var weatherTimestamps: [String: Date] = [:]
-    
-    // Serial queue for thread-safe cache access
-    private let cacheQueue = DispatchQueue(label: "com.forewiz.wizpath.cache", qos: .utility)
-    
-    private init() {}
-    
+    private let queue = DispatchQueue(label: "com.forewiz.wizpath.cache", qos: .utility)
+
+    fileprivate init() {}
+
     func store(route: WizPathRoute) {
-        cacheQueue.async {
-            let key = self.cacheKey(origin: route.origin, destination: route.destination, mode: route.travelMode)
+        queue.async {
+            let key = "\\(route.origin.latitude),\\(route.origin.longitude)|\\(route.destination.latitude),\\(route.destination.longitude)|\\(route.travelMode.rawValue)"
             self.routeCache[key] = route
         }
     }
-    
+
     func route(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> WizPathRoute? {
-        cacheQueue.sync {
-            let key = self.cacheKey(origin: origin, destination: destination, mode: mode)
+        queue.sync {
+            let key = "\\(origin.latitude),\\(origin.longitude)|\\(destination.latitude),\\(destination.longitude)|\\(mode.rawValue)"
             return self.routeCache[key]
         }
     }
-    
-    func store(weather: SegmentWeather, for coordinate: CLLocationCoordinate2D, at time: Date) {
-        cacheQueue.async {
-            let key = self.weatherCacheKey(coordinate: coordinate, time: time)
-            self.weatherCache[key] = weather
-            self.weatherTimestamps[key] = Date()
+
+    func clear() {
+        queue.async {
+            self.routeCache.removeAll()
         }
-    }
-    
-    func weather(for coordinate: CLLocationCoordinate2D, at time: Date) -> SegmentWeather? {
-        cacheQueue.sync {
-            let key = self.weatherCacheKey(coordinate: coordinate, time: time)
-            
-            // Check TTL
-            if let timestamp = self.weatherTimestamps[key],
-               Date().timeIntervalSince(timestamp) < self.weatherTTL {
-                return self.weatherCache[key]
-            }
-            
-            // Expired
-            self.weatherCache.removeValue(forKey: key)
-            self.weatherTimestamps.removeValue(forKey: key)
-            return nil
-        }
-    }
-    
-    private func cacheKey(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> String {
-        "\(origin.latitude),\(origin.longitude)|\(destination.latitude),\(destination.longitude)|\(mode.rawValue)"
-    }
-    
-    private func weatherCacheKey(coordinate: CLLocationCoordinate2D, time: Date) -> String {
-        // Round to nearest 15 minutes for caching
-        let roundedTime = round(time.timeIntervalSince1970 / 900) * 900
-        return "\(coordinate.latitude),\(coordinate.longitude)|\(roundedTime)"
     }
 }

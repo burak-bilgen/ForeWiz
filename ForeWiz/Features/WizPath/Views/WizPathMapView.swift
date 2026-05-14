@@ -1,451 +1,282 @@
 import SwiftUI
 @preconcurrency import MapKit
 import CoreLocation
-import Combine
-import OSLog
 
-// MARK: - WizPath Map View
+// MARK: - WizPath Map View (iOS 17+ MapKit)
 struct WizPathMapView: View {
     @ObservedObject var viewModel: WizPathViewModel
-    @StateObject private var locationManager = WizPathLocationManager()
-    
-    @State private var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 40.7563, longitude: 29.8303),
-        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-    )
-    @State private var routePolyline: MKPolyline?
-    @State private var weatherAnnotations: [WeatherAnnotation] = []
-    @State private var hasCenteredOnUser = false
-    
+    @State private var position: MapCameraPosition = .automatic
+    @State private var selectedAnnotation: MKMapItem?
+
     var body: some View {
-        ZStack {
-            Map(coordinateRegion: $mapRegion,
-                showsUserLocation: true,
-                annotationItems: weatherAnnotations) { annotation in
-                MapAnnotation(coordinate: annotation.coordinate) {
-                    WeatherMapMarker(annotation: annotation)
+        Map(position: $position, selection: $selectedAnnotation) {
+            // User location
+            UserAnnotation()
+
+            // Route overlay
+            if let route = viewModel.currentRoute, viewModel.isShowingRoute {
+                let coords = route.routeCoordinates
+                if coords.count > 1 {
+                    // Main route polyline
+                    MapPolyline(coordinates: coords)
+                        .stroke(routeColor(for: route), lineWidth: 3)
+
                 }
-            }
-            .overlay(
-                RouteOverlayView(route: viewModel.currentRoute)
-            )
-            .onChange(of: viewModel.currentRoute) { newRoute in
-                if let route = newRoute {
-                    updateMapWithRoute(route)
+
+                // Destination marker
+                Annotation(coordinate: route.destination) {
+                    DestinationFlag()
+                } label: {
+                    Text(L10n.text("wizpath_destination"))
+                        .font(.system(size: 11, weight: .semibold))
                 }
-            }
-            .onChange(of: locationManager.userLocation) { location in
-                if let location = location, !hasCenteredOnUser {
-                    // Center on user's actual location when first available
-                    withAnimation(.easeOut(duration: 0.5)) {
-                        mapRegion.center = location.coordinate
+
+                // Weather change point markers (max 6)
+                let changePoints = Array(route.weatherChangePoints.prefix(6))
+                ForEach(changePoints) { segment in
+                    if let weather = segment.weather {
+                        Annotation(coordinate: segment.coordinate) {
+                            WeatherMarker(weather: weather, eta: segment.etaShortDisplay)
+                        } label: {
+                            Text(segment.etaShortDisplay)
+                        }
                     }
-                    hasCenteredOnUser = true
                 }
             }
-            .onAppear {
-                locationManager.requestLocation()
+
+            // Origin marker when route exists
+            if let origin = viewModel.originCoordinate, viewModel.currentRoute != nil {
+                Annotation(coordinate: origin) {
+                    OriginMarker()
+                } label: {
+                    Text(L10n.text("wizpath_start"))
+                        .font(.system(size: 11, weight: .semibold))
+                }
             }
-            
-            // Map Controls
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    MapControlsView(
-                        onRecenter: { recenterOnUserLocation() },
-                        onTrafficToggle: { toggleTraffic() }
-                    )
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
+
+            // Destination preview when no route yet
+            if let dest = viewModel.destinationCoordinate, viewModel.currentRoute == nil {
+                Annotation(coordinate: dest) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 28))
+                        .foregroundStyle(.red)
+                        .background(Circle().fill(.white).frame(width: 22, height: 22))
+                } label: {
+                    Text(viewModel.destinationName)
+                        .font(.system(size: 11, weight: .semibold))
                 }
             }
         }
-    }
-    
-    private func updateMapWithRoute(_ route: WizPathRoute) {
-        // Update region to fit route
-        if let polyline = route.polyline {
-            let rect = polyline.boundingMapRect
-            let region = MKCoordinateRegion(rect)
-            withAnimation(.easeOut(duration: 0.5)) {
-                mapRegion = region
-            }
+        .mapStyle(.standard(elevation: .realistic))
+        .mapControls {
+            MapUserLocationButton()
+            MapCompass()
+            MapScaleView()
         }
-        
-        // Create weather annotations for change points
-        weatherAnnotations = route.weatherChangePoints.map { segment in
-            WeatherAnnotation(
-                id: segment.id,
-                coordinate: segment.coordinate,
-                weather: segment.weather,
-                eta: segment.etaDisplay
-            )
-        }
-    }
-    
-    private func recenterOnUserLocation() {
-        if let userLocation = locationManager.userLocation {
-            withAnimation(.easeOut(duration: 0.5)) {
-                mapRegion.center = userLocation.coordinate
-            }
-        } else if let route = viewModel.currentRoute,
-                  let polyline = route.polyline {
-            let rect = polyline.boundingMapRect
-            let region = MKCoordinateRegion(rect)
-            withAnimation(.easeOut(duration: 0.5)) {
-                mapRegion = region
-            }
-        }
-    }
-    
-    private func toggleTraffic() {
-        viewModel.showTraffic.toggle()
-    }
-}
-
-// MARK: - Location Manager for Map
-@MainActor
-final class WizPathLocationManager: NSObject, ObservableObject {
-    @Published var userLocation: CLLocation?
-    @Published var authorizationStatus: CLAuthorizationStatus?
-    
-    private let manager = CLLocationManager()
-    
-    override init() {
-        super.init()
-        manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-    }
-    
-    func requestLocation() {
-        let status = manager.authorizationStatus
-        
-        switch status {
-        case .notDetermined:
-            manager.requestWhenInUseAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways:
-            manager.requestLocation()
-        case .denied, .restricted:
-            // Location denied - will use fallback
-            break
-        @unknown default:
-            break
-        }
-    }
-    
-    func requestAuthorization() {
-        manager.requestWhenInUseAuthorization()
-    }
-}
-
-extension WizPathLocationManager: CLLocationManagerDelegate {
-    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        Task { @MainActor in
-            if let location = locations.last {
-                self.userLocation = location
-            }
-        }
-    }
-    
-    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        AppLogger.location.error("Location manager error: \(error)")
-    }
-    
-    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        Task { @MainActor in
-            self.authorizationStatus = manager.authorizationStatus
-            
-            if manager.authorizationStatus == .authorizedWhenInUse ||
-               manager.authorizationStatus == .authorizedAlways {
-                manager.requestLocation()
-            }
-        }
-    }
-}
-
-// MARK: - Route Overlay View
-struct RouteOverlayView: View {
-    let route: WizPathRoute?
-    
-    var body: some View {
-        GeometryReader { geometry in
-            if let route = route,
-               let polyline = route.polyline {
-                RoutePolylineShape(
-                    polyline: polyline,
-                    segments: route.segments,
-                    riskColor: Color(hex: route.overallRisk.color)
-                )
-                .stroke(
-                    routeRiskGradient(for: route),
-                    style: StrokeStyle(
-                        lineWidth: 6,
-                        lineCap: .round,
-                        lineJoin: .round
-                    )
-                )
-            }
-        }
-    }
-    
-    private func routeRiskGradient(for route: WizPathRoute) -> LinearGradient {
-        // Create gradient based on weather severity along the route
-        let colors = route.segments.compactMap { segment in
-            segment.weather?.severity.color
-        }
-        
-        if colors.isEmpty {
-            return LinearGradient(
-                colors: [Color(red: 0.0, green: 1.0, blue: 0.25)],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-        }
-        
-        return LinearGradient(
-            colors: colors,
-            startPoint: .leading,
-            endPoint: .trailing
-        )
-    }
-}
-
-// MARK: - Route Polyline Shape
-struct RoutePolylineShape: Shape {
-    let polyline: MKPolyline
-    let segments: [WizPathSegment]
-    let riskColor: Color
-    
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let points = polyline.points()
-        let pointCount = polyline.pointCount
-        
-        guard pointCount > 0 else { return path }
-        
-        // Convert MKMapPoint to local coordinates (simplified)
-        // In production, use proper map projection
-        let firstPoint = CGPoint(
-            x: CGFloat(points[0].x),
-            y: CGFloat(points[0].y)
-        )
-        path.move(to: firstPoint)
-        
-        for i in 1..<pointCount {
-            let point = CGPoint(
-                x: CGFloat(points[i].x),
-                y: CGFloat(points[i].y)
-            )
-            path.addLine(to: point)
-        }
-        
-        return path
-    }
-}
-
-// MARK: - Weather Annotation
-struct WeatherAnnotation: Identifiable {
-    let id: UUID
-    let coordinate: CLLocationCoordinate2D
-    let weather: SegmentWeather?
-    let eta: String
-}
-
-// MARK: - Weather Map Marker
-struct WeatherMapMarker: View {
-    let annotation: WeatherAnnotation
-    @State private var isHovered = false
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            // Weather Icon
-            ZStack {
-                Circle()
-                    .fill(Color.black.opacity(0.7))
-                    .frame(width: 36, height: 36)
-                
-                if let weather = annotation.weather {
-                    Image(systemName: weather.iconName)
-                        .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(weather.severity.color)
-                        .shadow(color: weather.severity.color.opacity(0.8), radius: 4)
-                } else {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(0.7)
+        .onChange(of: viewModel.currentRoute) { _, route in
+            if let r = route {
+                withAnimation(.easeInOut(duration: 0.6)) {
+                    position = .region(routeRegion(r))
                 }
             }
-            
-            // ETA Label
-            Text(annotation.eta)
-                .font(.system(size: 10, weight: .bold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(
-                    RoundedRectangle(cornerRadius: 4, style: .continuous)
-                        .fill(Color.black.opacity(0.7))
-                )
-            
-            // Tooltip on hover
-            if isHovered, let weather = annotation.weather {
-                WeatherTooltip(weather: weather)
-                    .transition(.scale.combined(with: .opacity))
+        }
+        .overlay(alignment: .topTrailing) {
+            mapControlsOverlay
+                .padding(10)
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if viewModel.currentRoute != nil {
+                toggleRouteButton
+                    .padding(10)
             }
         }
-        .onTapGesture {
+        .onAppear {
+            // Center on user location initially
+            if let origin = viewModel.originCoordinate, viewModel.currentRoute == nil {
+                position = .region(MKCoordinateRegion(
+                    center: origin,
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                ))
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+// MARK: - Map Controls Overlay
+    private var mapControlsOverlay: some View {
+        VStack(spacing: 6) {
+            if viewModel.currentRoute != nil {
+                legendControl
+            }
+        }
+    }
+
+    private var legendControl: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            legendRow(color: .green, label: L10n.text("wizpath_weather_good"))
+            legendRow(color: .orange, label: L10n.text("wizpath_weather_caution"))
+            legendRow(color: .red, label: L10n.text("wizpath_weather_severe"))
+        }
+        .padding(8)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .font(.system(size: 10, weight: .medium))
+    }
+
+    private func legendRow(color: Color, label: String) -> some View {
+        HStack(spacing: 4) {
+            Circle()
+                .fill(color)
+                .frame(width: 6, height: 6)
+            Text(label)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var toggleRouteButton: some View {
+        Button {
             withAnimation(.spring(response: 0.3)) {
-                isHovered.toggle()
+                viewModel.isShowingRoute.toggle()
             }
-        }
-    }
-}
-
-// MARK: - Weather Tooltip
-struct WeatherTooltip: View {
-    let weather: SegmentWeather
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Image(systemName: weather.iconName)
-                    .foregroundStyle(weather.severity.color)
-                Text("\(Int(weather.temperature))°C")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-            
-            if weather.precipitationChance > 0 {
-                HStack(spacing: 4) {
-                    Image(systemName: "drop.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
-                    Text("\(Int(weather.precipitationChance * 100))%")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Color.white.opacity(0.8))
-                }
-            }
-            
-            if weather.windSpeed > 20 {
-                HStack(spacing: 4) {
-                    Image(systemName: "wind")
-                        .font(.system(size: 10))
-                        .foregroundStyle(Color.orange)
-                    Text("\(Int(weather.windSpeed)) km/h")
-                        .font(.system(size: 11))
-                        .foregroundStyle(Color.orange)
-                }
-            }
-        }
-        .padding(10)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.black.opacity(0.9))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .stroke(weather.severity.color.opacity(0.5), lineWidth: 1)
-        )
-    }
-}
-
-// MARK: - Map Controls View
-struct MapControlsView: View {
-    let onRecenter: () -> Void
-    let onTrafficToggle: () -> Void
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            // Recenter Button
-            MapControlButton(
-                icon: "location.fill",
-                action: onRecenter,
-                accentColor: Color(red: 0.0, green: 1.0, blue: 0.25)
-            )
-            
-            // Traffic Toggle
-            MapControlButton(
-                icon: "car.fill",
-                action: onTrafficToggle,
-                accentColor: Color.orange
-            )
-        }
-    }
-}
-
-// MARK: - Map Control Button
-struct MapControlButton: View {
-    let icon: String
-    let action: () -> Void
-    let accentColor: Color
-    
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(accentColor)
-                .frame(width: 44, height: 44)
-                .background(
-                    Circle()
-                        .fill(Color.black.opacity(0.8))
-                )
-                .overlay(
-                    Circle()
-                        .stroke(accentColor.opacity(0.3), lineWidth: 1)
-                )
+            HapticEngine.shared.light()
+        } label: {
+            Image(systemName: viewModel.isShowingRoute ? "eye.fill" : "eye.slash.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
         }
         .buttonStyle(.plain)
     }
+
+    // MARK: - Helpers
+    private func routeColor(for route: WizPathRoute) -> Color {
+        switch route.overallRisk {
+        case .good: return .green
+        case .caution: return .orange
+        case .severe: return .red
+        }
+    }
+
+    private func routeRegion(_ route: WizPathRoute) -> MKCoordinateRegion {
+        let coords = route.routeCoordinates
+        guard !coords.isEmpty else {
+            return MKCoordinateRegion(
+                center: route.destination,
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            )
+        }
+        var minLat = 90.0, maxLat = -90.0, minLon = 180.0, maxLon = -180.0
+        for c in coords {
+            minLat = min(minLat, c.latitude)
+            maxLat = max(maxLat, c.latitude)
+            minLon = min(minLon, c.longitude)
+            maxLon = max(maxLon, c.longitude)
+        }
+        let center = CLLocationCoordinate2D(
+            latitude: (minLat + maxLat) / 2,
+            longitude: (minLon + maxLon) / 2
+        )
+        let span = MKCoordinateSpan(
+            latitudeDelta: max((maxLat - minLat) * 1.3, 0.01),
+            longitudeDelta: max((maxLon - minLon) * 1.3, 0.01)
+        )
+        return MKCoordinateRegion(center: center, span: span)
+    }
 }
 
-// MARK: - Destination Marker View
-struct DestinationMarkerView: View {
-    let title: String
-    let eta: String
-    let risk: RouteRisk
-    
+// MARK: - Origin Marker
+struct OriginMarker: View {
+    @State private var pulse = false
+
     var body: some View {
-        VStack(spacing: 4) {
-            // Destination Pin
-            ZStack {
-                Image(systemName: "mappin.circle.fill")
-                    .font(.system(size: 40))
-                    .foregroundStyle(Color(hex: risk.color))
-                
-                Image(systemName: "flag.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.white)
-                    .offset(y: -2)
-            }
-            
-            // Arrival Info Card
-            VStack(spacing: 2) {
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white)
-                Text("ETA: \(eta)")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(Color(hex: risk.color))
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+        ZStack {
+            Circle()
+                .fill(.blue.opacity(pulse ? 0.3 : 0.15))
+                .frame(width: pulse ? 40 : 30, height: pulse ? 40 : 30)
+                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
+
+            Image(systemName: "location.circle.fill")
+                .font(.system(size: 24))
+                .foregroundStyle(.white)
+                .background(Circle().fill(.blue).frame(width: 20, height: 20))
+        }
+        .onAppear { pulse = true }
+    }
+}
+
+// MARK: - Destination Flag
+struct DestinationFlag: View {
+    @State private var bounce = false
+
+    var body: some View {
+        Image(systemName: "mappin.circle.fill")
+            .font(.system(size: 32))
+            .foregroundStyle(.red)
             .background(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(Color.black.opacity(0.8))
+                Circle()
+                    .fill(.white)
+                    .frame(width: 24, height: 24)
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .stroke(Color(hex: risk.color).opacity(0.5), lineWidth: 1)
-            )
+            .scaleEffect(bounce ? 1.15 : 1.0)
+            .onAppear {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.5).repeatForever(autoreverses: true)) {
+                    bounce = true
+                }
+            }
+    }
+}
+
+// MARK: - Weather Marker
+struct WeatherMarker: View {
+    let weather: SegmentWeather
+    let eta: String
+
+    @State private var isVisible = false
+
+    var body: some View {
+        VStack(spacing: 2) {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: weather.severity.colorHex).opacity(0.2))
+                    .frame(width: isVisible ? 36 : 24, height: isVisible ? 36 : 24)
+
+                Image(systemName: weather.iconName)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(Color(hex: weather.severity.colorHex))
+                    .shadow(color: Color(hex: weather.severity.colorHex).opacity(0.5), radius: 3)
+            }
+
+            Text(eta)
+                .font(.system(size: 8, weight: .bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 4)
+                .padding(.vertical, 1)
+                .background(.black.opacity(0.6))
+                .clipShape(Capsule())
+        }
+        .scaleEffect(isVisible ? 1 : 0.5)
+        .opacity(isVisible ? 1 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.4).delay(0.2)) {
+                isVisible = true
+            }
         }
     }
 }
 
-// MARK: - WizPath View Model Extension
-extension WizPathViewModel {
-    var showTraffic: Bool {
-        get { UserDefaults.standard.bool(forKey: "wizpath_show_traffic") }
-        set { UserDefaults.standard.set(newValue, forKey: "wizpath_show_traffic") }
+// MARK: - WizPathSegment + ETA Short Display
+extension WizPathSegment {
+    var etaShortDisplay: String {
+        let f = DateFormatter()
+        f.dateFormat = "HH:mm"
+        return f.string(from: estimatedArrival)
     }
+}
+
+// MARK: - Preview
+#Preview {
+    WizPathMapView(viewModel: WizPathViewModel())
+        .frame(height: 300)
 }

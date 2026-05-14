@@ -114,7 +114,7 @@ struct SmartPOITooltip: View {
                     HStack(spacing: 4) {
                         Image(systemName: weather.iconName)
                             .font(.system(size: 10))
-                            .foregroundStyle(weather.severity.color)
+                            .foregroundStyle(Color(hex: weather.severity.colorHex))
                         Text("\(Int(weather.temperature))°")
                             .font(.system(size: 12))
                             .foregroundStyle(.white)
@@ -216,15 +216,6 @@ struct HazardAnnotationView: View {
                         .stroke(Color(hex: hazard.severity.color).opacity(0.5), lineWidth: 1)
                 )
         }
-    }
-}
-
-// MARK: - Date Extension
-extension Date {
-    func formattedTime() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: self)
     }
 }
 

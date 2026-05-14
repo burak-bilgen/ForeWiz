@@ -4,7 +4,7 @@ import CoreLocation
 
 // MARK: - Mock Weather Service
 /// Simulates weather API responses for testing - both success and failure scenarios
-final class MockWeatherService: WeatherServiceProtocol {
+final class MockWeatherService {
     
     // MARK: - Configuration
     enum MockScenario {
@@ -31,7 +31,7 @@ final class MockWeatherService: WeatherServiceProtocol {
     var lastTime: Date?
     var delay: TimeInterval = 0
     
-    // MARK: - WeatherServiceProtocol
+    // MARK: - Weather Fetching (for testing route segment weather)
     func fetchWeather(coordinate: CLLocationCoordinate2D, time: Date) async throws -> SegmentWeather {
         callCount += 1
         lastCoordinate = coordinate

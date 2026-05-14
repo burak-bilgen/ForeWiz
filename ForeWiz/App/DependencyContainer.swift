@@ -3,6 +3,7 @@ import SwiftData
 
 @MainActor
 final class DependencyContainer {
+    nonisolated(unsafe) static var shared: DependencyContainer!
     let environment: AppEnvironment
     let dateProvider: DateProvider
     let activityWindowScoringEngine: ActivityWindowScoringEngine
@@ -18,6 +19,10 @@ final class DependencyContainer {
     let completeOnboardingUseCase: CompleteOnboardingUseCase
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
+    
+    // MARK: - WizPath
+    let wizPathService: WizPathService
+    let locationService: LocationService
     
     // MARK: - New Architecture Components
     let homeViewStateFactory: HomeViewStateFactory
@@ -42,7 +47,9 @@ final class DependencyContainer {
         scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
         homeViewStateFactory: HomeViewStateFactory,
         weatherGradientService: WeatherGradientService,
-        retryPolicy: NetworkRetryPolicy
+        retryPolicy: NetworkRetryPolicy,
+        wizPathService: WizPathService,
+        locationService: LocationService
     ) {
         self.environment = environment
         self.dateProvider = dateProvider
@@ -62,6 +69,9 @@ final class DependencyContainer {
         self.homeViewStateFactory = homeViewStateFactory
         self.weatherGradientService = weatherGradientService
         self.retryPolicy = retryPolicy
+        self.wizPathService = wizPathService
+        self.locationService = locationService
+        Self.shared = self
     }
 
     static func simulator(modelContext: ModelContext) -> DependencyContainer {
@@ -86,6 +96,12 @@ final class DependencyContainer {
         )
         let weatherGradientService = WeatherGradientService.shared
         let retryPolicy = NetworkRetryPolicy.default
+        
+        let locationService = LocationService(timeout: 8.0)
+        let wizPathService = WizPathService(
+            weatherRepository: weatherRepository,
+            locationRepository: locationService as LocationRepository
+        )
         
         // Prepare haptic engine on launch
         HapticEngine.shared.prepare()
@@ -128,7 +144,9 @@ final class DependencyContainer {
             scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
             homeViewStateFactory: homeViewStateFactory,
             weatherGradientService: weatherGradientService,
-            retryPolicy: retryPolicy
+            retryPolicy: retryPolicy,
+            wizPathService: wizPathService,
+            locationService: locationService
         )
     }
 
@@ -145,7 +163,8 @@ final class DependencyContainer {
         let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
         
         // MARK: - New Architecture Services (Production)
-        let locationRepository = LocationService(timeout: 8.0) // Hardened with timeout
+        let locationService = LocationService(timeout: 8.0) // Hardened with timeout
+        let locationRepository = locationService as LocationRepository
         let weatherRepository = WeatherKitWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()
         let homeViewStateFactory = HomeViewStateFactory(
@@ -154,6 +173,11 @@ final class DependencyContainer {
         )
         let weatherGradientService = WeatherGradientService.shared
         let retryPolicy = NetworkRetryPolicy.aggressive // More retries for production
+        
+        let wizPathService = WizPathService(
+            weatherRepository: weatherRepository,
+            locationRepository: locationRepository
+        )
         
         // Prepare haptic engine on launch
         HapticEngine.shared.prepare()
@@ -196,7 +220,9 @@ final class DependencyContainer {
             scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
             homeViewStateFactory: homeViewStateFactory,
             weatherGradientService: weatherGradientService,
-            retryPolicy: retryPolicy
+            retryPolicy: retryPolicy,
+            wizPathService: wizPathService,
+            locationService: locationService
         )
     }
 }

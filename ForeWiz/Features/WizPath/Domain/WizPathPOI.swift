@@ -193,56 +193,6 @@ enum HazardSeverity: String, Sendable {
     }
 }
 
-// MARK: - Route Safety Score
-struct RouteSafetyScore: Sendable {
-    let overallScore: Int // 0-100
-    let weatherScore: Int
-    let hazardScore: Int
-    let poiScore: Int
-    let hazardCount: Int
-    let safeStopCount: Int
-    let unsafeStopCount: Int
-    let recommendedAlternatives: [WizPathRoute]
-    
-    var safetyRating: SafetyRating {
-        switch overallScore {
-        case 80...100: return .excellent
-        case 60..<80: return .good
-        case 40..<60: return .moderate
-        case 20..<40: return .poor
-        default: return .dangerous
-        }
-    }
-    
-    var localizedDescription: String {
-        safetyRating.localizedTitle
-    }
-}
-
-// MARK: - Safety Rating
-enum SafetyRating: String, Sendable {
-    case excellent, good, moderate, poor, dangerous
-    
-    var localizedTitle: String {
-        switch self {
-        case .excellent: return L10n.text("safety_excellent")
-        case .good: return L10n.text("safety_good")
-        case .moderate: return L10n.text("safety_moderate")
-        case .poor: return L10n.text("safety_poor")
-        case .dangerous: return L10n.text("safety_dangerous")
-        }
-    }
-    
-    var color: String {
-        switch self {
-        case .excellent: return "#00FF41"
-        case .good: return "#7FFF00"
-        case .moderate: return "#FFCC00"
-        case .poor: return "#FF9500"
-        case .dangerous: return "#FF3B30"
-        }
-    }
-}
 
 // MARK: - Journey HUD Data
 struct JourneyHUDData: Sendable {

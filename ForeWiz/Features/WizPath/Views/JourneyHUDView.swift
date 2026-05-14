@@ -2,412 +2,354 @@ import SwiftUI
 @preconcurrency import MapKit
 import CoreLocation
 
-// MARK: - Journey HUD View
+// MARK: - Journey HUD View (Native iOS Design)
 struct JourneyHUDView: View {
     let data: JourneyHUDData
     @State private var isExpanded = false
-    
+
     var body: some View {
         VStack(spacing: 0) {
-            // Main HUD Bar - Terminal Style
+            // Main HUD Bar - Native iOS Style
             HStack(spacing: 0) {
-                // System indicator
-                HStack(spacing: 4) {
-                    Text("[ SYSTEM ]")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color(hex: "#00FF41"))
-                    
-                    // Pulsing status dot
-                    Circle()
-                        .fill(Color(hex: "#00FF41"))
-                        .frame(width: 6, height: 6)
-                        .opacity(isExpanded ? 1.0 : 0.5)
-                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isExpanded)
+                // Icon
+                Circle()
+                    .fill(safetyTint.opacity(0.15))
+                    .frame(width: 28, height: 28)
+                    .overlay(
+                        Image(systemName: safetyIcon)
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(safetyTint)
+                    )
+
+                // Stats
+                HStack(spacing: 0) {
+                    StatItem(
+                        value: data.durationDisplay,
+                        label: "ETA",
+                        color: .primary
+                    )
+
+                    Divider()
+                        .frame(height: 20)
+                        .padding(.horizontal, 8)
+
+                    StatItem(
+                        value: "\(data.hazardCount)",
+                        label: "Hazards",
+                        color: data.hazardCount > 0 ? .orange : .secondary
+                    )
+
+                    Divider()
+                        .frame(height: 20)
+                        .padding(.horizontal, 8)
+
+                    StatItem(
+                        value: "\(data.safetyScore)",
+                        label: "Safety",
+                        color: safetyTint
+                    )
                 }
-                .padding(.trailing, 8)
-                
-                Divider()
-                    .background(Color.white.opacity(0.2))
-                    .frame(height: 20)
-                
-                // Route duration
-                HUDStatItem(
-                    label: "ROUTE",
-                    value: data.durationDisplay,
-                    color: "#00FF41"
-                )
-                
-                Divider()
-                    .background(Color.white.opacity(0.2))
-                    .frame(height: 20)
-                
-                // Hazards count
-                HUDStatItem(
-                    label: "HAZARDS",
-                    value: "\(data.hazardCount)",
-                    color: data.hazardCount > 0 ? "#FF3B30" : "#00FF41"
-                )
-                
-                Divider()
-                    .background(Color.white.opacity(0.2))
-                    .frame(height: 20)
-                
-                // Safe stops
-                HUDStatItem(
-                    label: "SAFE STOPS",
-                    value: "\(data.safeStops)",
-                    color: data.safeStops > 0 ? "#00FF41" : "#FF9500"
-                )
-                
-                Divider()
-                    .background(Color.white.opacity(0.2))
-                    .frame(height: 20)
-                
-                // Safety score
-                HStack(spacing: 4) {
-                    Text("SAFETY:")
-                        .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(Color.white.opacity(0.5))
-                    
-                    Text("\(data.safetyScore)/100")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(safetyScoreColor)
-                }
-                .padding(.horizontal, 8)
-                
+
                 Spacer()
-                
-                // Expand/collapse button
+
+                // Expand
                 Button {
-                    withAnimation(.spring(response: 0.3)) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         isExpanded.toggle()
+                        HapticEngine.shared.light()
                     }
                 } label: {
                     Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(Color.white.opacity(0.5))
-                        .frame(width: 32, height: 32)
+                        .foregroundStyle(.tertiary)
+                        .frame(width: 28, height: 28)
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(Circle())
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 14)
             .padding(.vertical, 10)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.black.opacity(0.85))
-            )
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Color(hex: "#00FF41").opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(safetyTint.opacity(0.15), lineWidth: 1)
             )
-            
-            // Expanded details panel
+
+            // Expanded Details
             if isExpanded {
                 HUDDetailPanel(
+                    safetyScore: data.safetyScore,
                     hazards: data.activeHazards,
-                    nextSafeStop: data.nextSafeStop,
-                    safetyScore: data.safetyScore
+                    nextSafeStop: data.nextSafeStop
                 )
                 .transition(.move(edge: .top).combined(with: .opacity))
+                .padding(.top, 6)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
     }
-    
-    private var safetyScoreColor: Color {
+
+    private var safetyTint: Color {
         switch data.safetyScore {
-        case 80...100: return Color(hex: "#00FF41")
-        case 60..<80: return Color(hex: "#7FFF00")
-        case 40..<60: return Color(hex: "#FFCC00")
-        case 20..<40: return Color(hex: "#FF9500")
-        default: return Color(hex: "#FF3B30")
+        case 80...100: return .green
+        case 60..<80: return .blue
+        case 40..<60: return .orange
+        default: return .red
+        }
+    }
+
+    private var safetyIcon: String {
+        switch data.safetyScore {
+        case 80...100: return "checkmark.shield.fill"
+        case 60..<80: return "shield.fill"
+        case 40..<60: return "exclamationmark.shield.fill"
+        default: return "xmark.shield.fill"
         }
     }
 }
 
-// MARK: - HUD Stat Item
-struct HUDStatItem: View {
-    let label: String
+// MARK: - Stat Item
+struct StatItem: View {
     let value: String
-    let color: String
-    
+    let label: String
+    let color: Color
+
     var body: some View {
-        HStack(spacing: 4) {
-            Text(label + ":")
-                .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                .foregroundStyle(Color.white.opacity(0.5))
-            
+        VStack(spacing: 1) {
             Text(value)
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                .foregroundStyle(Color(hex: color))
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .foregroundStyle(color)
+                .monospacedDigit()
+            Text(label)
+                .font(.system(size: 9, weight: .medium))
+                .foregroundStyle(.tertiary)
         }
-        .padding(.horizontal, 8)
     }
 }
 
 // MARK: - HUD Detail Panel
 struct HUDDetailPanel: View {
+    let safetyScore: Int
     let hazards: [EnvironmentalHazard]
     let nextSafeStop: SmartStop?
-    let safetyScore: Int
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Active hazards list
+            // Safety Score Bar
+            safetyScoreBar
+
+            // Active Hazards
             if !hazards.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("⚠️ ACTIVE HAZARDS")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color(hex: "#FF3B30"))
-                    
+                    Label("\(hazards.count) Active Hazard\(hazards.count > 1 ? "s" : "")", systemImage: "exclamationmark.triangle.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.orange)
+
                     ForEach(hazards.prefix(3)) { hazard in
-                        HazardRow(hazard: hazard)
+                        HStack(spacing: 8) {
+                            Circle()
+                                .fill(Color(hex: hazard.severity.color))
+                                .frame(width: 6, height: 6)
+
+                            Image(systemName: hazard.iconName)
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color(hex: hazard.severity.color))
+                                .frame(width: 16)
+
+                            Text(hazard.localizedTitle)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            Text(hazard.severity.localizedTitle)
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundStyle(Color(hex: hazard.severity.color))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color(hex: hazard.severity.color).opacity(0.12))
+                                .clipShape(Capsule())
+                        }
                     }
-                    
+
                     if hazards.count > 3 {
-                        Text("+\(hazards.count - 3) more hazards...")
-                            .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(Color.white.opacity(0.4))
+                        Text("+\(hazards.count - 3) more")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.tertiary)
                     }
                 }
-                
-                Divider()
-                    .background(Color.white.opacity(0.1))
+                .padding(10)
+                .background(Color.orange.opacity(0.06))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
-            
-            // Next safe stop
+
+            // Next Safe Stop
             if let stop = nextSafeStop {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("✓ NEXT SAFE STOP")
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color(hex: "#00FF41"))
-                    
-                    HStack {
-                        Image(systemName: stop.category.iconName)
-                            .font(.system(size: 14))
-                            .foregroundStyle(Color(hex: stop.category.color))
-                        
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(stop.displayTitle)
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.white)
-                            
-                            HStack(spacing: 8) {
-                                Text("ETA: \(stop.etaDisplay)")
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(Color.white.opacity(0.6))
-                                
-                                if let weather = stop.weatherAtArrival {
-                                    HStack(spacing: 2) {
-                                        Image(systemName: weather.iconName)
-                                            .font(.system(size: 8))
-                                        Text("\(Int(weather.temperature))°")
-                                            .font(.system(size: 10))
-                                    }
-                                    .foregroundStyle(.white.opacity(0.6))
-                                }
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(.green.opacity(0.12))
+                        .frame(width: 32, height: 32)
+                        .overlay(
+                            Image(systemName: stop.category.iconName)
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color(hex: stop.category.color))
+                        )
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(stop.displayTitle)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+
+                        HStack(spacing: 8) {
+                            Label(stop.etaDisplay, systemImage: "clock")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.tertiary)
+
+                            if let weather = stop.weatherAtArrival {
+                                Label("\(Int(weather.temperature))°", systemImage: weather.iconName)
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(.tertiary)
                             }
                         }
-                        
-                        Spacer()
-                        
-                        // Safety badge
-                        Text(stop.safetyStatus.localizedTitle)
-                            .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(Color(hex: stop.safetyStatus.color))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color(hex: stop.safetyStatus.color).opacity(0.15))
-                            )
                     }
-                }
-            } else {
-                Text("⚠️ NO SAFE STOPS ALONG ROUTE")
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#FF9500"))
-            }
-            
-            // Safety score bar
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text("SAFETY SCORE")
-                        .font(.system(size: 9, weight: .semibold, design: .monospaced))
-                        .foregroundStyle(Color.white.opacity(0.5))
-                    
+
                     Spacer()
-                    
-                    Text(safetyRatingText)
-                        .font(.system(size: 9, weight: .bold, design: .monospaced))
-                        .foregroundStyle(safetyScoreColor)
+
+                    Text(stop.safetyStatus.localizedTitle)
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(Color(hex: stop.safetyStatus.color))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color(hex: stop.safetyStatus.color).opacity(0.12))
+                        .clipShape(Capsule())
                 }
-                
-                // Progress bar
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        // Background
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(Color.white.opacity(0.1))
-                            .frame(height: 4)
-                        
-                        // Fill
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(safetyScoreColor)
-                            .frame(width: geometry.size.width * (Double(safetyScore) / 100.0), height: 4)
-                    }
-                }
-                .frame(height: 4)
+                .padding(10)
+                .background(.regularMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
         }
         .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.black.opacity(0.9))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color(hex: "#00FF41").opacity(0.2), lineWidth: 1)
-        )
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
-    
-    private var safetyRatingText: String {
-        switch safetyScore {
-        case 80...100: return "EXCELLENT"
-        case 60..<80: return "GOOD"
-        case 40..<60: return "MODERATE"
-        case 20..<40: return "POOR"
-        default: return "DANGEROUS"
+
+    private var safetyScoreBar: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Label("Journey Safety", systemImage: "shield.checkered")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(safetyRatingText)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(safetyScoreColor)
+            }
+
+            // Progress bar
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color(.tertiarySystemBackground))
+                        .frame(height: 6)
+
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(safetyScoreColor)
+                        .frame(width: geometry.size.width * (Double(safetyScore) / 100.0), height: 6)
+                        .animation(.spring(response: 0.6), value: safetyScore)
+                }
+            }
+            .frame(height: 6)
         }
     }
-    
+
+    private var safetyRatingText: String {
+        switch safetyScore {
+        case 80...100: return "Excellent"
+        case 60..<80: return "Good"
+        case 40..<60: return "Moderate"
+        case 20..<40: return "Poor"
+        default: return "Dangerous"
+        }
+    }
+
     private var safetyScoreColor: Color {
         switch safetyScore {
-        case 80...100: return Color(hex: "#00FF41")
-        case 60..<80: return Color(hex: "#7FFF00")
-        case 40..<60: return Color(hex: "#FFCC00")
-        case 20..<40: return Color(hex: "#FF9500")
-        default: return Color(hex: "#FF3B30")
+        case 80...100: return .green
+        case 60..<80: return .blue
+        case 40..<60: return .orange
+        case 20..<40: return .orange
+        default: return .red
         }
     }
 }
 
-// MARK: - Hazard Row
+// MARK: - Hazard Row (Reusable)
 struct HazardRow: View {
     let hazard: EnvironmentalHazard
-    
+
     var body: some View {
         HStack(spacing: 8) {
-            // Severity indicator
             Circle()
                 .fill(Color(hex: hazard.severity.color))
-                .frame(width: 8, height: 8)
-            
-            // Hazard icon
+                .frame(width: 6, height: 6)
+
             Image(systemName: hazard.iconName)
-                .font(.system(size: 12))
+                .font(.system(size: 11))
                 .foregroundStyle(Color(hex: hazard.severity.color))
-                .frame(width: 20)
-            
-            // Hazard details
+                .frame(width: 16)
+
             VStack(alignment: .leading, spacing: 1) {
                 Text(hazard.localizedTitle)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white)
-                
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.primary)
                 Text("at \(hazard.etaAtLocation.formattedTime())")
-                    .font(.system(size: 9))
-                    .foregroundStyle(Color.white.opacity(0.5))
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
             }
-            
+
             Spacer()
-            
-            // Severity badge
+
             Text(hazard.severity.localizedTitle)
                 .font(.system(size: 8, weight: .semibold))
                 .foregroundStyle(Color(hex: hazard.severity.color))
                 .padding(.horizontal, 4)
                 .padding(.vertical, 1)
-                .background(
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Color(hex: hazard.severity.color).opacity(0.15))
-                )
+                .background(Color(hex: hazard.severity.color).opacity(0.12))
+                .clipShape(Capsule())
         }
     }
 }
 
-// MARK: - Route Alternative Banner
-struct RouteAlternativeBanner: View {
-    let comparison: RouteComparisonResult
-    let onSelectAlternative: () -> Void
-    
-    var body: some View {
-        if comparison.shouldShowAlternative,
-           let message = comparison.alternativeMessage {
-            HStack(spacing: 12) {
-                // Warning icon
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 20))
-                    .foregroundStyle(Color(hex: "#FF9500"))
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("SAFER ALTERNATIVE AVAILABLE")
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Color(hex: "#FF9500"))
-                    
-                    Text(message)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                }
-                
-                Spacer()
-                
-                // Switch button
-                Button(action: onSelectAlternative) {
-                    Text("SWITCH")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(.black)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color(hex: "#00FF41"))
-                        )
-                }
-            }
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.black.opacity(0.9))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Color(hex: "#FF9500").opacity(0.5), lineWidth: 2)
-            )
-            .padding(.horizontal, 16)
-            .transition(.move(edge: .top).combined(with: .opacity))
-        }
+// MARK: - Date Extension
+extension Date {
+    func formattedTime() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: self)
     }
 }
 
 // MARK: - Preview
 #Preview {
     ZStack {
-        Color.black.ignoresSafeArea()
-        
+        Color(.systemGroupedBackground).ignoresSafeArea()
+
         VStack(spacing: 20) {
             JourneyHUDView(data: JourneyHUDData(
-                totalDuration: 8100, // 2h 15m
+                totalDuration: 8100,
                 totalDistance: 145000,
-                hazardCount: 1,
+                hazardCount: 2,
                 safeStops: 3,
                 safetyScore: 72,
                 activeHazards: [
                     EnvironmentalHazard(
                         id: UUID(),
                         type: .crosswind,
-                        coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                        coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
                         routeSegmentIndex: 5,
                         severity: .high,
                         details: "Crosswinds up to 45 km/h",
@@ -418,43 +360,17 @@ struct RouteAlternativeBanner: View {
                 nextSafeStop: SmartStop(
                     id: UUID(),
                     mapItem: MKMapItem(),
-                    coordinate: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-                    name: "Tesla Supercharger",
-                    category: .evCharger,
+                    coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
+                    name: "Shell Station",
+                    category: .gasStation,
                     etaArrival: Date().addingTimeInterval(3600),
-                    weatherAtArrival: SegmentWeather(
-                        condition: .clear,
-                        temperature: 22,
-                        precipitationChance: 0,
-                        windSpeed: 10,
-                        visibility: 10,
-                        severity: .good
-                    ),
+                    weatherAtArrival: nil,
                     safetyStatus: .safe,
                     distanceFromRoute: 150,
-                    estimatedStopDuration: 1800
+                    estimatedStopDuration: 600
                 )
             ))
-            
-            RouteAlternativeBanner(
-                comparison: RouteComparisonResult(
-                    fastestRoute: nil,
-                    fastestScore: RouteSafetyScore(
-                        overallScore: 45,
-                        weatherScore: 20,
-                        hazardScore: 15,
-                        poiScore: 10,
-                        hazardCount: 2,
-                        safeStopCount: 0,
-                        unsafeStopCount: 2,
-                        recommendedAlternatives: []
-                    ),
-                    recommendedAlternative: nil,
-                    timeDifference: 15 * 60, // 15 minutes
-                    allRoutes: []
-                ),
-                onSelectAlternative: {}
-            )
+            .padding(.horizontal, 16)
         }
     }
 }
