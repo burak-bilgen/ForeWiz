@@ -72,7 +72,7 @@ struct ForecastPill: View {
             lowTemp
             scoreBadge
         }
-        .padding(.horizontal, 10)
+        .frame(width: 72)
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -91,6 +91,8 @@ struct ForecastPill: View {
                 ? Color(red: 1.0, green: 0.85, blue: 0.3)
                 : Color.white.opacity(0.6)
             )
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
     }
     
     private var weatherIcon: some View {
