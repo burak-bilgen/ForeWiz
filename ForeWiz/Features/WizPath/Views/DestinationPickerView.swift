@@ -10,13 +10,16 @@ struct DestinationPickerView: View {
     @Environment(\.dismiss) private var dismiss
     
     @StateObject private var searchCompleter = LocationSearchCompleter()
+    @StateObject private var locationManager = DestinationLocationManager()
     @State private var searchText = ""
+    // Default to Derince, Kocaeli, Türkiye (not San Francisco) - will update to user location
     @State private var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+        center: CLLocationCoordinate2D(latitude: 40.7563, longitude: 29.8303),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
     @State private var selectedCoordinate: CLLocationCoordinate2D?
     @State private var showConfirmButton = false
+    @State private var hasCenteredOnUser = false
     
     var body: some View {
         ZStack {
@@ -57,6 +60,18 @@ struct DestinationPickerView: View {
                 .onTapGesture { location in
                     // Handle map tap to select coordinate
                     handleMapTap(at: location)
+                }
+                .onChange(of: locationManager.userLocation) { location in
+                    if let location = location, !hasCenteredOnUser {
+                        // Center on user's actual location when first available
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            mapRegion.center = location.coordinate
+                        }
+                        hasCenteredOnUser = true
+                    }
+                }
+                .onAppear {
+                    locationManager.requestLocation()
                 }
                 
                 // Selected Location Info
@@ -322,6 +337,62 @@ final class LocationSearchCompleter: NSObject, ObservableObject {
     
     deinit {
         cancellable?.cancel()
+    }
+}
+
+// MARK: - Location Manager for Destination Picker
+@MainActor
+final class DestinationLocationManager: NSObject, ObservableObject {
+    @Published var userLocation: CLLocation?
+    @Published var authorizationStatus: CLAuthorizationStatus?
+    
+    private let manager = CLLocationManager()
+    
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+    
+    func requestLocation() {
+        let status = manager.authorizationStatus
+        
+        switch status {
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            manager.requestLocation()
+        case .denied, .restricted:
+            // Location denied - will use fallback
+            break
+        @unknown default:
+            break
+        }
+    }
+}
+
+extension DestinationLocationManager: CLLocationManagerDelegate {
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        Task { @MainActor in
+            if let location = locations.last {
+                self.userLocation = location
+            }
+        }
+    }
+    
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        AppLogger.location.error("Destination picker location error: \(error)")
+    }
+    
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Task { @MainActor in
+            self.authorizationStatus = manager.authorizationStatus
+            
+            if manager.authorizationStatus == .authorizedWhenInUse ||
+               manager.authorizationStatus == .authorizedAlways {
+                manager.requestLocation()
+            }
+        }
     }
 }
 

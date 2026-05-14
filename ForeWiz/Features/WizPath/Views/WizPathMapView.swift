@@ -1,16 +1,21 @@
 import SwiftUI
 @preconcurrency import MapKit
 import CoreLocation
+import Combine
+import OSLog
 
 // MARK: - WizPath Map View
 struct WizPathMapView: View {
     @ObservedObject var viewModel: WizPathViewModel
+    @StateObject private var locationManager = WizPathLocationManager()
+    
     @State private var mapRegion = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+        center: CLLocationCoordinate2D(latitude: 40.7563, longitude: 29.8303),
         span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
     )
     @State private var routePolyline: MKPolyline?
     @State private var weatherAnnotations: [WeatherAnnotation] = []
+    @State private var hasCenteredOnUser = false
     
     var body: some View {
         ZStack {
@@ -29,6 +34,18 @@ struct WizPathMapView: View {
                     updateMapWithRoute(route)
                 }
             }
+            .onChange(of: locationManager.userLocation) { location in
+                if let location = location, !hasCenteredOnUser {
+                    // Center on user's actual location when first available
+                    withAnimation(.easeOut(duration: 0.5)) {
+                        mapRegion.center = location.coordinate
+                    }
+                    hasCenteredOnUser = true
+                }
+            }
+            .onAppear {
+                locationManager.requestLocation()
+            }
             
             // Map Controls
             VStack {
@@ -36,7 +53,7 @@ struct WizPathMapView: View {
                 HStack {
                     Spacer()
                     MapControlsView(
-                        onRecenter: { recenterOnRoute() },
+                        onRecenter: { recenterOnUserLocation() },
                         onTrafficToggle: { toggleTraffic() }
                     )
                     .padding(.trailing, 20)
@@ -67,9 +84,13 @@ struct WizPathMapView: View {
         }
     }
     
-    private func recenterOnRoute() {
-        if let route = viewModel.currentRoute,
-           let polyline = route.polyline {
+    private func recenterOnUserLocation() {
+        if let userLocation = locationManager.userLocation {
+            withAnimation(.easeOut(duration: 0.5)) {
+                mapRegion.center = userLocation.coordinate
+            }
+        } else if let route = viewModel.currentRoute,
+                  let polyline = route.polyline {
             let rect = polyline.boundingMapRect
             let region = MKCoordinateRegion(rect)
             withAnimation(.easeOut(duration: 0.5)) {
@@ -79,8 +100,67 @@ struct WizPathMapView: View {
     }
     
     private func toggleTraffic() {
-        // Toggle traffic overlay
         viewModel.showTraffic.toggle()
+    }
+}
+
+// MARK: - Location Manager for Map
+@MainActor
+final class WizPathLocationManager: NSObject, ObservableObject {
+    @Published var userLocation: CLLocation?
+    @Published var authorizationStatus: CLAuthorizationStatus?
+    
+    private let manager = CLLocationManager()
+    
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+    
+    func requestLocation() {
+        let status = manager.authorizationStatus
+        
+        switch status {
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            manager.requestLocation()
+        case .denied, .restricted:
+            // Location denied - will use fallback
+            break
+        @unknown default:
+            break
+        }
+    }
+    
+    func requestAuthorization() {
+        manager.requestWhenInUseAuthorization()
+    }
+}
+
+extension WizPathLocationManager: CLLocationManagerDelegate {
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        Task { @MainActor in
+            if let location = locations.last {
+                self.userLocation = location
+            }
+        }
+    }
+    
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        AppLogger.location.error("Location manager error: \(error)")
+    }
+    
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        Task { @MainActor in
+            self.authorizationStatus = manager.authorizationStatus
+            
+            if manager.authorizationStatus == .authorizedWhenInUse ||
+               manager.authorizationStatus == .authorizedAlways {
+                manager.requestLocation()
+            }
+        }
     }
 }
 

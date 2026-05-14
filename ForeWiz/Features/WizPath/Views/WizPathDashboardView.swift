@@ -413,6 +413,7 @@ extension Color {
 struct TripPlannerSection: View {
     @ObservedObject var viewModel: WizPathViewModel
     @State private var showDestinationPicker = false
+    @State private var showNoDestinationAlert = false
     
     var body: some View {
         VStack(spacing: 12) {
@@ -472,6 +473,11 @@ struct TripPlannerSection: View {
             
             // Calculate Button
             Button {
+                // Check if destination is valid before calculating
+                guard viewModel.destinationCoordinate != nil else {
+                    showNoDestinationAlert = true
+                    return
+                }
                 Task {
                     await viewModel.calculateRoute()
                 }
@@ -496,8 +502,13 @@ struct TripPlannerSection: View {
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
-            .disabled(!viewModel.canCalculate || viewModel.isCalculating)
+            .disabled(viewModel.isCalculating)
             .buttonStyle(.plain)
+            .alert("Please select a valid location first", isPresented: $showNoDestinationAlert) {
+                Button("OK") {}
+            } message: {
+                Text("You need to select a destination before calculating the route.")
+            }
         }
         .padding(16)
         .background(.ultraThinMaterial)

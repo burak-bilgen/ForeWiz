@@ -29,7 +29,7 @@ final class WizPathViewModel: ObservableObject {
     // MARK: - Initialization
     init(
         wizPathService: WizPathService = WizPathService.shared,
-        locationService: LocationService = LocationService.shared
+        locationService: LocationService = LocationService.wizPathShared
     ) {
         self.wizPathService = wizPathService
         self.locationService = locationService
@@ -44,10 +44,11 @@ final class WizPathViewModel: ObservableObject {
     
     private func fetchCurrentLocation() async {
         do {
-            let location = try await locationService.requestCurrentLocation()
-            originCoordinate = location.coordinate
+            originCoordinate = try await locationService.requestCurrentLocationCoordinate()
         } catch {
             AppLogger.location.error("Failed to get current location: \(error)")
+            // Use Derince, Kocaeli as fallback (NOT San Francisco)
+            originCoordinate = locationService.fallbackCoordinate
         }
     }
     
@@ -153,16 +154,22 @@ final class WizPathViewModel: ObservableObject {
     }
 }
 
-// MARK: - Location Service Extension
+// MARK: - Location Service Extension for WizPath
 extension LocationService {
-    static let shared = LocationService()
+    /// Shared instance for WizPath feature
+    static let wizPathShared = LocationService()
     
-    func requestCurrentLocation() async throws -> CLLocation {
-        // Implementation would use CoreLocation
-        // For architecture, returning a mock
-        return CLLocation(
-            latitude: 37.7749,
-            longitude: -122.4194
+    /// Request location as CLLocationCoordinate2D for routing
+    func requestCurrentLocationCoordinate() async throws -> CLLocationCoordinate2D {
+        let coordinate = try await getCurrentLocation()
+        return CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+    }
+    
+    /// Fallback to Derince, Kocaeli, Türkiye (NOT San Francisco)
+    var fallbackCoordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: 40.7563,  // Derince, Kocaeli
+            longitude: 29.8303   // Türkiye
         )
     }
 }
