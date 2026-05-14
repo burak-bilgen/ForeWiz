@@ -40,11 +40,11 @@ enum POICategory: String, Sendable {
     case restStop
     case restaurant
     
-    var mkCategory: MKPointOfInterestCategory {
+    var mkCategory: MKPointOfInterestCategory? {
         switch self {
         case .gasStation: return .gasStation
         case .evCharger: return .evCharger
-        case .restStop: return .restStop
+        case .restStop: return nil // Custom search needed
         case .restaurant: return .restaurant
         }
     }

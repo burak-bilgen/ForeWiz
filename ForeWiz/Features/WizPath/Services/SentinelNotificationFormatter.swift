@@ -161,6 +161,8 @@ final class SentinelNotificationFormatter {
         default:
             return "Tap to see updated route and safe stopping points"
         }
+        
+        return nil
     }
     
     // MARK: - Configuration

@@ -1,6 +1,7 @@
 import Foundation
 import UserNotifications
 import OSLog
+import CoreLocation
 
 // MARK: - Sentinel Service
 /// High-value notification system for critical route changes
@@ -340,7 +341,7 @@ final class WizPathAnalytics {
     static let shared = WizPathAnalytics()
     
     func trackSentinelTriggered(_ alert: SentinelAlert) {
-        AppLogger.analytics.info("Sentinel triggered: \(alert.severity) - \(alert.title)")
+        AppLogger.analytics.info("Sentinel triggered: \(alert.severity.rawValue) - \(alert.title)")
         // In production: Send to analytics backend
     }
 }

@@ -56,10 +56,12 @@ final class WizPathPOIService {
         maxResults: Int
     ) async -> [MKMapItem] {
         // Create a polygon around the route
-        let routePolyline = route.polyline
-        let routePoints = routePolyline?.points() ?? []
+        guard let routePolyline = route.polyline else { return [] }
         
-        guard routePoints.count > 0 else { return [] }
+        let pointCount = routePolyline.pointCount
+        guard pointCount > 0 else { return [] }
+        
+        let routePoints = routePolyline.points()
         
         // Sample points along route for search (every 30 mins)
         let searchInterval: TimeInterval = 30 * 60 // 30 minutes
@@ -206,10 +208,12 @@ final class WizPathPOIService {
     // MARK: - Helpers
     
     private func samplePointsAlongRoute(_ route: WizPathRoute, interval: TimeInterval) -> [CLLocationCoordinate2D] {
-        let polyline = route.polyline
-        let points = polyline?.points() ?? []
+        guard let polyline = route.polyline else { return [] }
         
-        guard points.count > 0 else { return [] }
+        let pointCount = polyline.pointCount
+        guard pointCount > 0 else { return [] }
+        
+        let points = polyline.points()
         
         var sampledPoints: [CLLocationCoordinate2D] = []
         let totalDuration = route.totalDuration
@@ -217,7 +221,7 @@ final class WizPathPOIService {
         
         for i in 0..<numSamples {
             let progress = Double(i) / Double(numSamples - 1)
-            let pointIndex = min(Int(Double(points.count - 1) * progress), points.count - 1)
+            let pointIndex = min(Int(Double(pointCount - 1) * progress), pointCount - 1)
             sampledPoints.append(points[pointIndex].coordinate)
         }
         
@@ -228,12 +232,17 @@ final class WizPathPOIService {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         
         // Find closest point on route polyline
-        let polyline = route.polyline
-        let points = polyline?.points() ?? []
+        guard let polyline = route.polyline else { return .greatestFiniteMagnitude }
+        
+        let pointCount = polyline.pointCount
+        guard pointCount > 0 else { return .greatestFiniteMagnitude }
+        
+        let points = polyline.points()
         
         var minDistance: CLLocationDistance = .greatestFiniteMagnitude
         
-        for point in points {
+        for i in 0..<pointCount {
+            let point = points[i]
             let pointLocation = CLLocation(
                 latitude: point.coordinate.latitude,
                 longitude: point.coordinate.longitude
@@ -247,10 +256,12 @@ final class WizPathPOIService {
     
     private func distanceAlongRoute(to coordinate: CLLocationCoordinate2D, route: WizPathRoute) -> CLLocationDistance {
         // Approximate distance along route to the closest point
-        let polyline = route.polyline
-        let points = polyline?.points() ?? []
+        guard let polyline = route.polyline else { return 0 }
         
-        guard points.count > 0 else { return 0 }
+        let pointCount = polyline.pointCount
+        guard pointCount > 0 else { return 0 }
+        
+        let points = polyline.points()
         
         let targetLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         
@@ -258,7 +269,8 @@ final class WizPathPOIService {
         var closestIndex = 0
         var minDistance = Double.greatestFiniteMagnitude
         
-        for (index, point) in points.enumerated() {
+        for index in 0..<pointCount {
+            let point = points[index]
             let pointLocation = CLLocation(
                 latitude: point.coordinate.latitude,
                 longitude: point.coordinate.longitude
@@ -273,13 +285,15 @@ final class WizPathPOIService {
         // Calculate cumulative distance to that point
         var cumulativeDistance: CLLocationDistance = 0
         for i in 1...closestIndex {
+            let prevPoint = points[i-1]
+            let currPoint = points[i]
             let prevLocation = CLLocation(
-                latitude: points[i-1].coordinate.latitude,
-                longitude: points[i-1].coordinate.longitude
+                latitude: prevPoint.coordinate.latitude,
+                longitude: prevPoint.coordinate.longitude
             )
             let currLocation = CLLocation(
-                latitude: points[i].coordinate.latitude,
-                longitude: points[i].coordinate.longitude
+                latitude: currPoint.coordinate.latitude,
+                longitude: currPoint.coordinate.longitude
             )
             cumulativeDistance += prevLocation.distance(from: currLocation)
         }

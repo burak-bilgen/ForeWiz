@@ -1,9 +1,11 @@
 import SwiftUI
+import MapKit
+import CoreLocation
 
 // MARK: - Journey HUD View
 struct JourneyHUDView: View {
     let data: JourneyHUDData
-    @State private isExpanded = false
+    @State private var isExpanded = false
     
     var body: some View {
         VStack(spacing: 0) {
