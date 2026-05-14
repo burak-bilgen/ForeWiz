@@ -412,6 +412,7 @@ extension Color {
 // MARK: - Trip Planner Section (Native Design)
 struct TripPlannerSection: View {
     @ObservedObject var viewModel: WizPathViewModel
+    @State private var showDestinationPicker = false
     
     var body: some View {
         VStack(spacing: 12) {
@@ -430,7 +431,7 @@ struct TripPlannerSection: View {
             
             // Destination
             Button {
-                // Show destination picker
+                showDestinationPicker = true
             } label: {
                 HStack {
                     Image(systemName: "mappin.circle.fill")
@@ -502,6 +503,14 @@ struct TripPlannerSection: View {
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .padding(.horizontal, 16)
+        .sheet(isPresented: $showDestinationPicker) {
+            DestinationPickerView(
+                onSelect: { location in
+                    viewModel.setDestination(location)
+                    showDestinationPicker = false
+                }
+            )
+        }
     }
 }
 

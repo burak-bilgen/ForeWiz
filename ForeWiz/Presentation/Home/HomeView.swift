@@ -68,10 +68,8 @@ struct HomeView: View {
                     onLocationsChanged: { locations in onLocationsChanged(locations, selectedLocationID) }
                 )
             }
-            .sheet(isPresented: $showWizPathSheet) {
+            .fullScreenCover(isPresented: $showWizPathSheet) {
                 WizPathDashboardView()
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
             }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
