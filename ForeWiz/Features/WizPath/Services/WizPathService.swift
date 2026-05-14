@@ -18,7 +18,7 @@ final class WizPathService: ObservableObject {
     @Published var error: WizPathError?
     
     private init(
-        weatherService: WeatherServiceProtocol = WeatherService.shared,
+        weatherService: WeatherServiceProtocol = WizPathWeatherService.shared,
         cache: WizPathCache = WizPathCache.shared,
         throttleManager: APIThrottleManager = APIThrottleManager()
     ) {
@@ -485,8 +485,8 @@ protocol WeatherServiceProtocol {
 
 // MARK: - Weather Service Implementation
 @MainActor
-final class WeatherService: ObservableObject, WeatherServiceProtocol {
-    static let shared = WeatherService()
+final class WizPathWeatherService: ObservableObject, WeatherServiceProtocol {
+    static let shared = WizPathWeatherService()
     
     func fetchWeather(coordinate: CLLocationCoordinate2D, time: Date) async throws -> SegmentWeather {
         // Integration with existing weather service
