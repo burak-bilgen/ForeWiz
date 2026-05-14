@@ -33,14 +33,12 @@ struct WizPathHUDCard: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.tertiary)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
-            .background(.ultraThinMaterial)
-            .background(statusBackgroundColor.opacity(0.1))
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
+            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(statusBorderColor, lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(statusBorderColor, lineWidth: 1)
             )
             .scaleEffect(isPressed ? 0.97 : 1.0)
         }

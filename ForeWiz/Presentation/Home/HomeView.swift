@@ -216,7 +216,7 @@ private struct HomeLoadedContent: View {
                     .padding(.top, 2)
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 24)
             .padding(.vertical, 14)
         }
         .scrollIndicators(.hidden)
