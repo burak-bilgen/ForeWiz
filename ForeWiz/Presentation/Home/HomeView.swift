@@ -393,8 +393,10 @@ private struct UnifiedHeroCard: View {
             Text(label)
                 .font(.system(size: 13))
                 .foregroundStyle(Color.white.opacity(0.35))
-                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+                .minimumScaleFactor(0.55)
         }
+        .frame(minWidth: 52)
     }
 }
 
