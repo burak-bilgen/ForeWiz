@@ -256,6 +256,226 @@ final class WizPathService: ObservableObject {
             return .routeUnavailable
         }
     }
+    
+    // MARK: - Weather Safety Score
+    
+    /// Calculate safety score for a route
+    func calculateSafetyScore(for route: WizPathRoute) -> RouteSafetyScore {
+        let segments = route.segments
+        
+        // Calculate weather score (0-40 points)
+        let weatherScore = calculateWeatherScore(segments: segments)
+        
+        // Calculate hazard score (0-40 points)
+        let hazards = WizPathHazardService.shared.detectHazards(along: route)
+        let hazardScore = max(0, 40 - (hazards.count * 10))
+        
+        // Calculate POI score (0-20 points)
+        let poiScore = calculatePOIScore(segments: segments)
+        
+        // Overall score
+        let overallScore = min(100, weatherScore + hazardScore + poiScore)
+        
+        // Count hazards by severity
+        let criticalHazards = hazards.filter { $0.severity == .critical }.count
+        let highHazards = hazards.filter { $0.severity == .high }.count
+        
+        return RouteSafetyScore(
+            overallScore: overallScore,
+            weatherScore: weatherScore,
+            hazardScore: hazardScore,
+            poiScore: poiScore,
+            hazardCount: hazards.count,
+            safeStopCount: 0, // Will be populated by POI service
+            unsafeStopCount: 0, // Will be populated by POI service
+            recommendedAlternatives: [] // Will be populated by route comparison
+        )
+    }
+    
+    private func calculateWeatherScore(segments: [WizPathSegment]) -> Int {
+        guard !segments.isEmpty else { return 0 }
+        
+        let totalSegments = segments.count
+        var goodWeatherCount = 0
+        var fairWeatherCount = 0
+        var cautionWeatherCount = 0
+        var severeWeatherCount = 0
+        
+        for segment in segments {
+            guard let weather = segment.weather else {
+                cautionWeatherCount += 1
+                continue
+            }
+            
+            switch weather.severity {
+            case .good: goodWeatherCount += 1
+            case .fair: fairWeatherCount += 1
+            case .caution: cautionWeatherCount += 1
+            case .severe: severeWeatherCount += 1
+            }
+        }
+        
+        // Score calculation
+        // Good: 1.0, Fair: 0.8, Caution: 0.4, Severe: 0.0
+        let weightedScore = Double(goodWeatherCount) * 1.0 +
+                           Double(fairWeatherCount) * 0.8 +
+                           Double(cautionWeatherCount) * 0.4 +
+                           Double(severeWeatherCount) * 0.0
+        
+        let normalizedScore = weightedScore / Double(totalSegments)
+        return Int(normalizedScore * 40) // Max 40 points for weather
+    }
+    
+    private func calculatePOIScore(segments: [WizPathSegment]) -> Int {
+        // Check if there are safe stops along the route
+        // This is simplified - in production, check actual POI availability
+        let hasSafeConditions = segments.contains { segment in
+            segment.weather?.severity == .good || segment.weather?.severity == .fair
+        }
+        
+        return hasSafeConditions ? 20 : 10
+    }
+    
+    // MARK: - Alternate Route Comparison
+    
+    /// Compare multiple routes and find the safest one
+    func compareRoutes(
+        origin: CLLocationCoordinate2D,
+        destination: CLLocationCoordinate2D,
+        mode: TravelMode,
+        departureTime: Date
+    ) async -> RouteComparisonResult {
+        do {
+            // Get alternate routes
+            let routes = try await calculateAlternateRoutes(
+                origin: origin,
+                destination: destination,
+                mode: mode,
+                departureTime: departureTime
+            )
+            
+            // Calculate safety scores for each
+            var scoredRoutes: [(route: WizPathRoute, score: RouteSafetyScore)] = []
+            for route in routes {
+                let score = calculateSafetyScore(for: route)
+                scoredRoutes.append((route, score))
+            }
+            
+            // Sort by overall score (descending)
+            scoredRoutes.sort { $0.score.overallScore > $1.score.overallScore }
+            
+            guard let bestRoute = scoredRoutes.first else {
+                throw WizPathError.routeUnavailable
+            }
+            
+            // Find recommended alternative if fastest route is unsafe
+            var recommendedAlternative: WizPathRoute? = nil
+            var timeDifference: TimeInterval? = nil
+            
+            if bestRoute.score.overallScore < 60, scoredRoutes.count > 1 {
+                // Find a safer alternative
+                for i in 1..<scoredRoutes.count {
+                    let alternative = scoredRoutes[i]
+                    if alternative.score.overallScore >= 70 {
+                        recommendedAlternative = alternative.route
+                        timeDifference = alternative.route.totalDuration - bestRoute.route.totalDuration
+                        break
+                    }
+                }
+            }
+            
+            return RouteComparisonResult(
+                fastestRoute: bestRoute.route,
+                fastestScore: bestRoute.score,
+                recommendedAlternative: recommendedAlternative,
+                timeDifference: timeDifference,
+                allRoutes: scoredRoutes.map { $0.route }
+            )
+            
+        } catch {
+            AppLogger.wizPath.error("Route comparison failed: \(error)")
+            return RouteComparisonResult(
+                fastestRoute: nil,
+                fastestScore: nil,
+                recommendedAlternative: nil,
+                timeDifference: nil,
+                allRoutes: []
+            )
+        }
+    }
+    
+    private func calculateAlternateRoutes(
+        origin: CLLocationCoordinate2D,
+        destination: CLLocationCoordinate2D,
+        mode: TravelMode,
+        departureTime: Date
+    ) async throws -> [WizPathRoute] {
+        let request = MKDirections.Request()
+        request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
+        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+        request.transportType = mode.mkTransportType
+        request.departureDate = departureTime
+        request.requestsAlternateRoutes = true
+        
+        let directions = MKDirections(request: request)
+        let response = try await directions.calculate()
+        
+        var routes: [WizPathRoute] = []
+        
+        for (index, mkRoute) in response.routes.enumerated() {
+            // Calculate weather for each route
+            let segments = try await interpolateSegments(
+                route: mkRoute,
+                mode: mode,
+                departureTime: departureTime
+            )
+            
+            let segmentsWithWeather = try await fetchWeatherForSegments(segments)
+            
+            let wizPathRoute = WizPathRoute(
+                id: UUID(),
+                origin: origin,
+                destination: destination,
+                travelMode: mode,
+                departureTime: departureTime,
+                segments: segmentsWithWeather,
+                totalDuration: mkRoute.expectedTravelTime,
+                totalDistance: mkRoute.distance,
+                polyline: mkRoute.polyline
+            )
+            
+            routes.append(wizPathRoute)
+        }
+        
+        return routes
+    }
+}
+
+// MARK: - Route Comparison Result
+struct RouteComparisonResult: Sendable {
+    let fastestRoute: WizPathRoute?
+    let fastestScore: RouteSafetyScore?
+    let recommendedAlternative: WizPathRoute?
+    let timeDifference: TimeInterval?
+    let allRoutes: [WizPathRoute]
+    
+    var shouldShowAlternative: Bool {
+        guard let fastestScore = fastestScore,
+              let timeDiff = timeDifference else { return false }
+        
+        // Show alternative if fastest route is risky and alternative adds < 30 mins
+        return fastestScore.overallScore < 60 && timeDiff < 30 * 60
+    }
+    
+    var alternativeMessage: String? {
+        guard let timeDiff = timeDifference,
+              let alternative = recommendedAlternative else { return nil }
+        
+        let minutes = Int(timeDiff) / 60
+        let altScore = alternative.overallRisk
+        
+        return L10n.formatted("route_alternative_message", minutes, altScore.localizedTitle)
+    }
 }
 
 // MARK: - Weather Service Protocol
