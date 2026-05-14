@@ -11683,121 +11683,121 @@
         }
       }
     },
-    "sunday_short" : {
+    "sunday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sun"
+            "value" : "Sunday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Paz"
+            "value" : "Pazar"
           }
         }
       }
     },
-    "monday_short" : {
+    "monday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mon"
+            "value" : "Monday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pzt"
+            "value" : "Pazartesi"
           }
         }
       }
     },
-    "tuesday_short" : {
+    "tuesday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tue"
+            "value" : "Tuesday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sal"
+            "value" : "Salı"
           }
         }
       }
     },
-    "wednesday_short" : {
+    "wednesday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wed"
+            "value" : "Wednesday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Çar"
+            "value" : "Çarşamba"
           }
         }
       }
     },
-    "thursday_short" : {
+    "thursday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Thu"
+            "value" : "Thursday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Per"
+            "value" : "Perşembe"
           }
         }
       }
     },
-    "friday_short" : {
+    "friday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fri"
+            "value" : "Friday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cum"
+            "value" : "Cuma"
           }
         }
       }
     },
-    "saturday_short" : {
+    "saturday" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sat"
+            "value" : "Saturday"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cmt"
+            "value" : "Cumartesi"
           }
         }
       }

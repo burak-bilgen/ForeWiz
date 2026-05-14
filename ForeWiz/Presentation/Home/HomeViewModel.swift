@@ -668,13 +668,13 @@ final class HomeViewModel: ObservableObject {
                 // Localized weekday names
                 let weekdayIndex = calendar.component(.weekday, from: point.date) - 1
                 let weekdays = [
-                    L10n.text("sunday_short"),
-                    L10n.text("monday_short"),
-                    L10n.text("tuesday_short"),
-                    L10n.text("wednesday_short"),
-                    L10n.text("thursday_short"),
-                    L10n.text("friday_short"),
-                    L10n.text("saturday_short")
+                    L10n.text("sunday"),
+                    L10n.text("monday"),
+                    L10n.text("tuesday"),
+                    L10n.text("wednesday"),
+                    L10n.text("thursday"),
+                    L10n.text("friday"),
+                    L10n.text("saturday")
                 ]
                 dayName = weekdays[weekdayIndex]
             }
