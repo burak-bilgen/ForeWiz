@@ -657,19 +657,26 @@ final class HomeViewModel: ObservableObject {
         let calendar = Calendar.current
         let todayStart = calendar.startOfDay(for: dateProvider.now)
 
-        let formatter = DateFormatter()
-        formatter.locale = .current
-        formatter.dateFormat = "EEE"
-
         return dailyPoints.map { point in
             let dayStart = calendar.startOfDay(for: point.date)
             let isToday = dayStart == todayStart
 
             let dayName: String
             if isToday {
-                dayName = L10n.text( "today_label")
+                dayName = L10n.text("today_label")
             } else {
-                dayName = formatter.string(from: point.date).capitalized
+                // Localized weekday names
+                let weekdayIndex = calendar.component(.weekday, from: point.date) - 1
+                let weekdays = [
+                    L10n.text("sunday_short"),
+                    L10n.text("monday_short"),
+                    L10n.text("tuesday_short"),
+                    L10n.text("wednesday_short"),
+                    L10n.text("thursday_short"),
+                    L10n.text("friday_short"),
+                    L10n.text("saturday_short")
+                ]
+                dayName = weekdays[weekdayIndex]
             }
 
             let score = weeklyScore(
