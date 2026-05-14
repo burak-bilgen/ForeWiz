@@ -71,10 +71,7 @@ struct ForecastPill: View {
             highTemp
             lowTemp
             scoreBadge
-            
-            if forecast.precipitationChance > 0 {
-                rainBadge
-            }
+            rainBadge
         }
         .frame(width: 72)
         .padding(.vertical, 8)
@@ -139,7 +136,7 @@ struct ForecastPill: View {
         HStack(spacing: 2) {
             Image(systemName: "cloud.rain.fill")
                 .font(.system(size: 8))
-            Text("\(Int(forecast.precipitationChance * 100))%")
+            Text(forecast.precipitationChance > 0 ? "\(Int(forecast.precipitationChance * 100))%" : "0%")
                 .font(.system(size: 9, weight: .medium))
         }
         .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
@@ -147,8 +144,9 @@ struct ForecastPill: View {
         .padding(.vertical, 2)
         .background(
             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.15))
+                .fill(Color(red: 0.4, green: 0.7, blue: 1.0).opacity(forecast.precipitationChance > 0 ? 0.15 : 0))
         )
+        .opacity(forecast.precipitationChance > 0 ? 1 : 0)
     }
     
     private var accessibilityLabel: String {
