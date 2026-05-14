@@ -297,7 +297,7 @@ struct RefreshButton: View {
 
 // MARK: - Press Events Modifier
 
-private struct PressEventsModifier: ViewModifier {
+struct PressEventsModifier: ViewModifier {
     var onPress: () -> Void
     var onRelease: () -> Void
     
@@ -311,7 +311,7 @@ private struct PressEventsModifier: ViewModifier {
     }
 }
 
-private extension View {
+extension View {
     func pressEvents(onPress: @escaping () -> Void, onRelease: @escaping () -> Void) -> some View {
         modifier(PressEventsModifier(onPress: onPress, onRelease: onRelease))
     }

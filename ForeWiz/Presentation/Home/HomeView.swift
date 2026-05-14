@@ -13,6 +13,8 @@ struct HomeView: View {
     @State private var showSplash = true
     @State private var contentReady = false
     @State private var toolbarAppeared = false
+    @State private var showWizPathSheet = false
+    @State private var wizPathRouteStatus: RouteStatus = .noRoute
 
     private var currentSymbol: String {
         if case .loaded(let state) = viewModel.state { return state.currentWeather.symbolName }
@@ -65,6 +67,11 @@ struct HomeView: View {
                     onSelect: { location in Task { await viewModel.changeLocation(to: location) } },
                     onLocationsChanged: { locations in onLocationsChanged(locations, selectedLocationID) }
                 )
+            }
+            .sheet(isPresented: $showWizPathSheet) {
+                WizPathDashboardView()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
@@ -130,7 +137,9 @@ struct HomeView: View {
             HomeLoadedContent(
                 state: state,
                 contentReady: contentReady,
-                refresh: { await viewModel.refresh() }
+                refresh: { await viewModel.refresh() },
+                showWizPathSheet: $showWizPathSheet,
+                wizPathRouteStatus: $wizPathRouteStatus
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)).animation(.spring(response: 0.4, dampingFraction: 0.85)),
@@ -146,6 +155,8 @@ private struct HomeLoadedContent: View {
     let state: HomeViewState
     let contentReady: Bool
     let refresh: () async -> Void
+    @Binding var showWizPathSheet: Bool
+    @Binding var wizPathRouteStatus: RouteStatus
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -162,6 +173,16 @@ private struct HomeLoadedContent: View {
                     isUsingCachedWeather: state.isUsingCachedWeather
                 )
                 .cardEntrance(appeared: contentReady, delay: 0.08)
+
+                // WizPath HUD Card - Entry Point
+                WizPathHUDCard(
+                    routeStatus: wizPathRouteStatus,
+                    onTap: {
+                        Task { await HapticEngine.shared.light() }
+                        showWizPathSheet = true
+                    }
+                )
+                .cardEntrance(appeared: contentReady, delay: 0.12)
 
                 if let warning = state.warningMessage {
                     CompactWarningBanner(message: warning)
