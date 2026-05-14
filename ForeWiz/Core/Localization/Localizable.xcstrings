@@ -8229,6 +8229,9 @@
         }
       }
     },
+    "Please select a valid location first" : {
+
+    },
     "pollen" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -13764,6 +13767,9 @@
           }
         }
       }
+    },
+    "You need to select a destination before calculating the route." : {
+
     },
     "your_allergy_profile_is_on" : {
       "extractionState" : "manual",

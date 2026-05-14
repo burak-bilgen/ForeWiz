@@ -533,37 +533,48 @@ final class WizPathCache {
     private let weatherTTL: TimeInterval = 15 * 60 // 15 minutes
     private var weatherTimestamps: [String: Date] = [:]
     
+    // Serial queue for thread-safe cache access
+    private let cacheQueue = DispatchQueue(label: "com.forewiz.wizpath.cache", qos: .utility)
+    
     private init() {}
     
     func store(route: WizPathRoute) {
-        let key = cacheKey(origin: route.origin, destination: route.destination, mode: route.travelMode)
-        routeCache[key] = route
+        cacheQueue.async {
+            let key = self.cacheKey(origin: route.origin, destination: route.destination, mode: route.travelMode)
+            self.routeCache[key] = route
+        }
     }
     
     func route(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> WizPathRoute? {
-        let key = cacheKey(origin: origin, destination: destination, mode: mode)
-        return routeCache[key]
+        cacheQueue.sync {
+            let key = self.cacheKey(origin: origin, destination: destination, mode: mode)
+            return self.routeCache[key]
+        }
     }
     
     func store(weather: SegmentWeather, for coordinate: CLLocationCoordinate2D, at time: Date) {
-        let key = weatherCacheKey(coordinate: coordinate, time: time)
-        weatherCache[key] = weather
-        weatherTimestamps[key] = Date()
+        cacheQueue.async {
+            let key = self.weatherCacheKey(coordinate: coordinate, time: time)
+            self.weatherCache[key] = weather
+            self.weatherTimestamps[key] = Date()
+        }
     }
     
     func weather(for coordinate: CLLocationCoordinate2D, at time: Date) -> SegmentWeather? {
-        let key = weatherCacheKey(coordinate: coordinate, time: time)
-        
-        // Check TTL
-        if let timestamp = weatherTimestamps[key],
-           Date().timeIntervalSince(timestamp) < weatherTTL {
-            return weatherCache[key]
+        cacheQueue.sync {
+            let key = self.weatherCacheKey(coordinate: coordinate, time: time)
+            
+            // Check TTL
+            if let timestamp = self.weatherTimestamps[key],
+               Date().timeIntervalSince(timestamp) < self.weatherTTL {
+                return self.weatherCache[key]
+            }
+            
+            // Expired
+            self.weatherCache.removeValue(forKey: key)
+            self.weatherTimestamps.removeValue(forKey: key)
+            return nil
         }
-        
-        // Expired
-        weatherCache.removeValue(forKey: key)
-        weatherTimestamps.removeValue(forKey: key)
-        return nil
     }
     
     private func cacheKey(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> String {
