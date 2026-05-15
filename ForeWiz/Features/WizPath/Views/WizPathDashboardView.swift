@@ -4,7 +4,7 @@ import CoreLocation
 
 // MARK: - WizPath Dashboard View
 struct WizPathDashboardView: View {
-    @StateObject private var viewModel = WizPathViewModel()
+    @State private var viewModel = WizPathViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showDestinationPicker = false
     @State private var showDepartureOptimizer = false
@@ -738,7 +738,7 @@ extension WizPathRoute {
                 recommendation = L10n.text("wizpath_hazard_heavyrain_rec")
             case .fog:
                 hazardType = .fog
-                details = L10n.formatted("wizpath_hazard_fog_detail", Int(weather.visibility))
+                details = L10n.formatted("wizpath_hazard_fog_detail", Int(weather.visibility ?? 0))
                 recommendation = L10n.text("wizpath_hazard_fog_rec")
             case .snow, .sleet:
                 hazardType = .snow

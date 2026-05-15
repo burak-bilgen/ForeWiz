@@ -5,7 +5,7 @@ import SwiftData
 /// Premium weather assistant home screen with Liquid Glass aesthetic.
 /// Features animated orb backgrounds, glass cards, micro-interactions, and accessibility.
 struct HomeView: View {
-    @ObservedObject var viewModel: HomeViewModel
+    @Bindable var viewModel: HomeViewModel
     @Binding var savedLocations: [SavedLocation]
     @Binding var selectedLocationID: String
 
@@ -75,11 +75,6 @@ struct HomeView: View {
             .fullScreenCover(isPresented: $showWizPathSheet) {
                 WizPathDashboardView()
             }
-            .onChange(of: showWizPathSheet) { _, isPresented in
-                if !isPresented {
-                    objectWillChange.send()
-                }
-            }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
             }
@@ -131,7 +126,7 @@ struct HomeView: View {
                 contentReady: contentReady,
                 refresh: { await viewModel.refresh() },
                 showWizPathSheet: $showWizPathSheet,
-                wizPathRouteStatus: $wizPathRouteStatus
+                wizPathRouteStatus: wizPathRouteStatus
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)),
@@ -169,11 +164,11 @@ private struct HomeLoadedContent: View {
     let contentReady: Bool
     let refresh: () async -> Void
     @Binding var showWizPathSheet: Bool
-    @Binding var wizPathRouteStatus: RouteStatus
+    let wizPathRouteStatus: RouteStatus
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 18) {
+            VStack(spacing: 16) {
                 if let alert = state.assistant.criticalAlert {
                     CriticalAlertCard(signal: alert)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.0)
@@ -261,6 +256,7 @@ private struct HeroCard: View {
                             Text(L10n.text("home_assistant_badge"))
                                 .font(.system(size: 11, weight: .bold, design: .rounded))
                                 .foregroundStyle(accentColor)
+                                .lineLimit(1)
                         }
 
                         // Headline
@@ -324,6 +320,7 @@ private struct HeroCard: View {
                             .font(.system(size: 42, weight: .thin, design: .rounded))
                             .foregroundStyle(.white)
                             .minimumScaleFactor(0.6)
+                            .lineLimit(1)
                         Text(weather.conditionText)
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.5))
@@ -360,7 +357,6 @@ private struct HeroCard: View {
                             SunTimeRow(icon: "sunset.fill", color: .red.opacity(0.8), time: sunset)
                         }
                     }
-                    .padding(.horizontal, 4)
                 }
             }
         }
@@ -372,63 +368,63 @@ private struct HeroCard: View {
 
 // MARK: - Supporting Views
 
-private struct ActionPill: View {
-    let icon: String
-    let title: String
-    let detail: String
-    let color: Color
+    private struct ActionPill: View {
+        let icon: String
+        let title: String
+        let detail: String
+        let color: Color
 
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(color)
-                .frame(width: 18)
+        var body: some View {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(color)
+                    .frame(width: 18)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.4))
-                    .minimumScaleFactor(0.7)
-                Text(detail)
-                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.6)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title)
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                        .lineLimit(1)
+                    Text(detail)
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 9)
+            .background(color.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(color.opacity(0.16), lineWidth: 1)
+            )
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 9)
-        .background(color.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(color.opacity(0.16), lineWidth: 1)
-        )
     }
-}
 
-private struct MetricCell: View {
-    let icon: String
-    let value: String
-    let label: String
+    private struct MetricCell: View {
+        let icon: String
+        let value: String
+        let label: String
 
-    var body: some View {
-        VStack(spacing: 2) {
-            Image(systemName: icon)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(.white.opacity(0.45))
-            Text(value)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .minimumScaleFactor(0.6)
-            Text(label)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.3))
-                .lineLimit(1)
+        var body: some View {
+            VStack(spacing: 2) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.45))
+                Text(value)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(label)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.3))
+                    .lineLimit(1)
+            }
+            .frame(minWidth: 48)
         }
-        .frame(minWidth: 40)
     }
-}
 
 private struct SunTimeRow: View {
     let icon: String
@@ -443,6 +439,7 @@ private struct SunTimeRow: View {
             Text(time)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.65))
+                .lineLimit(1)
         }
     }
 }
@@ -467,6 +464,7 @@ private struct CriticalAlertCard: View {
                 Text(signal.title)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(AppTheme.danger)
+                    .lineLimit(1)
                 Text(signal.subtitle)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
@@ -513,6 +511,7 @@ private struct WarningBanner: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(AppTheme.warning.opacity(0.10))
@@ -542,9 +541,11 @@ private struct DailyPlanCard: View {
                         Text(plan.title)
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white.opacity(0.5))
+                            .lineLimit(1)
                         Text(plan.subtitle)
                             .font(.system(size: 11, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.3))
+                            .lineLimit(1)
                     }
                 }
 
@@ -590,9 +591,11 @@ private struct PlanItemRow: View {
                 Text(item.title)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
                 Text(item.timeText)
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(toneColor)
+                    .lineLimit(1)
             }
 
             Spacer()
@@ -605,7 +608,6 @@ private struct PlanItemRow: View {
                 .frame(maxWidth: 120, alignment: .trailing)
         }
         .padding(.vertical, 8)
-        .padding(.leading, 4)
     }
 }
 
@@ -631,17 +633,18 @@ private struct OutfitCard: View {
                         Text(L10n.text("home_outfit_card_title"))
                             .font(.system(size: 14, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
+                            .lineLimit(1)
                         Text(L10n.text("home_outfit_card_subtitle"))
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.45))
-                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(1)
                     }
                 }
 
                 Text(outfit.title)
                     .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(2)
 
                 if !outfit.items.isEmpty {
                     HStack(spacing: 6) {
@@ -652,6 +655,7 @@ private struct OutfitCard: View {
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
                                 .background(.white.opacity(0.08), in: Capsule())
+                                .lineLimit(1)
                         }
                     }
                 }
@@ -663,12 +667,14 @@ private struct OutfitCard: View {
                     )
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
+                    .lineLimit(1)
                 }
 
                 if let warning = outfit.warning {
                     Label(warning, systemImage: "exclamationmark.circle.fill")
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(AppTheme.warning)
+                        .lineLimit(1)
                 }
             }
         }
@@ -688,6 +694,7 @@ private struct HourlyForecastSection: View {
                 Label(L10n.text("home_hourly_label"), systemImage: "clock.fill")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.5))
+                    .lineLimit(1)
 
                 if !hourlyScores.isEmpty {
                     TemperatureTrendChart(hourlyScores: hourlyScores)
@@ -722,6 +729,7 @@ private struct HourlyPill: View {
             Text("\(item.hour)\(L10n.text("time_format_hour"))")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
+                .lineLimit(1)
 
             Image(systemName: item.symbolName)
                 .font(.system(size: 14))
@@ -730,6 +738,7 @@ private struct HourlyPill: View {
             Text(item.temperatureText)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
+                .lineLimit(1)
 
             RoundedRectangle(cornerRadius: 2)
                 .fill(scoreColor)
@@ -738,6 +747,7 @@ private struct HourlyPill: View {
             Text("\(item.score)")
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundStyle(scoreColor)
+                .lineLimit(1)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -756,6 +766,7 @@ private struct WeeklyForecastSection: View {
                 Label(L10n.text("home_forecast_label"), systemImage: "calendar")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.5))
+                    .lineLimit(1)
 
                 ForEach(dailyForecasts.prefix(7)) { forecast in
                     ForecastRow(forecast: forecast)
@@ -786,6 +797,7 @@ private struct ForecastRow: View {
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .foregroundStyle(forecast.isToday ? .white : .white.opacity(0.6))
                 .frame(width: 56, alignment: .leading)
+                .lineLimit(1)
 
             Image(systemName: forecast.conditionSymbol)
                 .font(.system(size: 14))
@@ -796,9 +808,11 @@ private struct ForecastRow: View {
                 Text("\(Int(forecast.highTemp))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
                 Text("\(Int(forecast.lowTemp))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.35))
+                    .lineLimit(1)
             }
             .frame(width: 60)
 
@@ -810,6 +824,7 @@ private struct ForecastRow: View {
                         .font(.system(size: 8))
                     Text("\(Int(forecast.precipitationChance * 100))\(L10n.text("unit_percent"))")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .lineLimit(1)
                 }
                 .foregroundStyle(AppTheme.sky)
                 .frame(width: 44)
@@ -825,8 +840,6 @@ private struct ForecastRow: View {
                 .foregroundStyle(scoreColor)
                 .frame(width: 28, alignment: .trailing)
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 4)
     }
 }
 

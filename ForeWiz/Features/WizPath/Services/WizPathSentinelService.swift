@@ -36,10 +36,10 @@ final class WizPathSentinelService {
     
     private init(
         notificationCenter: UNUserNotificationCenter = .current(),
-        analytics: WizPathAnalytics = .shared
+        analytics: WizPathAnalytics? = nil
     ) {
         self.notificationCenter = notificationCenter
-        self.analytics = analytics
+        self.analytics = analytics ?? .shared
     }
     
     // MARK: - Sentinel Evaluation

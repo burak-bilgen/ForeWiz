@@ -44,7 +44,8 @@ final class WizPathService {
         let mkRoute = try await calculateMKRoute(
             origin: origin,
             destination: destination,
-            mode: mode
+            mode: mode,
+            departureTime: departureTime
         )
 
         let segments = interpolateSegments(
@@ -78,7 +79,8 @@ final class WizPathService {
     private func calculateMKRoute(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
-        mode: TravelMode
+        mode: TravelMode,
+        departureTime: Date
     ) async throws -> MKRoute {
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))

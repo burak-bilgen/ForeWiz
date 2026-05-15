@@ -4,7 +4,7 @@ import CoreLocation
 
 // MARK: - WizPath Map View
 struct WizPathMapView: View {
-    @ObservedObject var viewModel: WizPathViewModel
+    @Bindable var viewModel: WizPathViewModel
     @State private var position: MapCameraPosition = .automatic
     @State private var selectedAnnotation: MKMapItem?
 

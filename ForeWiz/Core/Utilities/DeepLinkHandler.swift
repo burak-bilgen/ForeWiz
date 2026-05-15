@@ -1,4 +1,3 @@
-import Combine
 import Foundation
 import SwiftUI
 
@@ -25,7 +24,6 @@ enum DeepLink: Equatable {
             guard !sanitized.isEmpty else { return nil }
             return .recommendationDetail(sanitized)
         case "onboarding":
-            // Intentionally accessible - allows deeplink to reset to onboarding flow
             return .onboarding
         default:
             return nil
@@ -55,8 +53,9 @@ enum DeepLink: Equatable {
 }
 
 @MainActor
-final class DeepLinkHandler: ObservableObject {
-    @Published var pendingLink: DeepLink?
+@Observable
+final class DeepLinkHandler {
+    var pendingLink: DeepLink?
 
     func handle(_ url: URL) {
         if let link = DeepLink.from(url: url) {

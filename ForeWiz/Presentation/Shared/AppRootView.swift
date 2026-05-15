@@ -2,8 +2,8 @@ import OSLog
 import SwiftUI
 
 struct AppRootView: View {
-    @ObservedObject var coordinator: AppCoordinator
-    @ObservedObject var deepLinkHandler: DeepLinkHandler
+    @Bindable var coordinator: AppCoordinator
+    @Bindable var deepLinkHandler: DeepLinkHandler
     @State private var didStart = false
 
     var body: some View {
@@ -60,9 +60,9 @@ struct AppRootView: View {
 }
 
 private struct HomeRootView: View {
-    @ObservedObject var coordinator: AppCoordinator
+    @Bindable var coordinator: AppCoordinator
     @Environment(\.scenePhase) private var scenePhase
-    @StateObject private var homeViewModel: HomeViewModel
+    @State private var homeViewModel: HomeViewModel
     @State private var showSettings = false
 
     init(coordinator: AppCoordinator) {
@@ -70,7 +70,7 @@ private struct HomeRootView: View {
         let name = coordinator.profile.savedLocations
             .first { $0.id == coordinator.profile.selectedLocationID }?
             .name ?? L10n.text("home_current_location")
-        _homeViewModel = StateObject(wrappedValue: HomeViewModel(
+        _homeViewModel = State(wrappedValue: HomeViewModel(
             loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
             scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
             preferencesRepository: coordinator.container.preferencesRepository,

@@ -1,13 +1,13 @@
-import Combine
 import CoreLocation
 import Foundation
 import MapKit
 import OSLog
 
 @MainActor
-final class HomeViewModel: ObservableObject {
-    @Published private(set) var state: LoadableState<HomeViewState> = .idle
-    @Published private(set) var selectedLocationName: String = L10n.text( "home_current_location")
+@Observable
+final class HomeViewModel {
+    private(set) var state: LoadableState<HomeViewState> = .idle
+    private(set) var selectedLocationName: String = L10n.text( "home_current_location")
 
     private let loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase
     private let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
@@ -15,7 +15,7 @@ final class HomeViewModel: ObservableObject {
     private let dateProvider: DateProvider
     private let activityWindowScoringEngine: ActivityWindowScoringEngine
     private var didLoad = false
-    private var liveRetryTask: Task<Void, Never>?
+    @ObservationIgnored private nonisolated(unsafe) var liveRetryTask: Task<Void, Never>?
 
     private var selectedLocation: SavedLocation?
     private var selectedLocationID: String = "current-location"

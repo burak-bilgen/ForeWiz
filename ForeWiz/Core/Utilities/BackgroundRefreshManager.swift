@@ -1,5 +1,6 @@
 import Foundation
 import BackgroundTasks
+import Network
 import UIKit
 import OSLog
 import UserNotifications

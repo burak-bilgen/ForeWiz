@@ -1,8 +1,8 @@
-import Combine
 import Foundation
 
 @MainActor
-final class AppCoordinator: ObservableObject {
+@Observable
+final class AppCoordinator {
     enum RootFlow: Equatable {
         case onboarding
         case main
@@ -10,10 +10,10 @@ final class AppCoordinator: ObservableObject {
 
     let container: DependencyContainer
 
-    @Published var rootFlow: RootFlow
-    @Published var profile: UserComfortProfile = .default
-    @Published var latestRecommendation: DailyRecommendation?
-    @Published var showSettings = false
+    var rootFlow: RootFlow
+    var profile: UserComfortProfile = .default
+    var latestRecommendation: DailyRecommendation?
+    var showSettings = false
 
     init(container: DependencyContainer, rootFlow: RootFlow = .onboarding) {
         self.container = container  

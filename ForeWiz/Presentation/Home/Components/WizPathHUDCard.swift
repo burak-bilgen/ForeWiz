@@ -1,9 +1,10 @@
 import SwiftUI
 
 // MARK: - Shared HUD Status
-final class WizPathHUDStatus: ObservableObject {
+@Observable
+final class WizPathHUDStatus {
     static let shared = WizPathHUDStatus()
-    @Published var currentStatus: RouteStatus = .noRoute
+    var currentStatus: RouteStatus = .noRoute
     private init() {}
 }
 
@@ -38,6 +39,7 @@ struct WizPathHUDCard: View {
                     Text(statusTitle)
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
+                        .lineLimit(1)
                     Text(statusSubtitle)
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.5))

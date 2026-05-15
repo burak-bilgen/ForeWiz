@@ -1,6 +1,5 @@
 import Foundation
 import CoreLocation
-import Combine
 import OSLog
 
 // MARK: - WizPath View State
@@ -45,27 +44,28 @@ enum WizPathViewState: Equatable {
 // MARK: - WizPath ViewModel
 
 @MainActor
-final class WizPathViewModel: ObservableObject {
+@Observable
+final class WizPathViewModel {
     // MARK: - Dependencies
     private let wizPathService: WizPathService
     private let locationService: LocationService
     private let climateService = WizPathClimateService.shared
     private let sentinelService = WizPathSentinelService.shared
 
-    // MARK: - Published State
-    @Published var state: WizPathViewState = .idle
-    @Published var travelMode: TravelMode = .car
-    @Published var departureTime: Date = Date()
-    @Published var destinationName: String = ""
-    @Published var destinationCoordinate: CLLocationCoordinate2D?
-    @Published var originCoordinate: CLLocationCoordinate2D?
-    @Published var originName: String = L10n.text("wizpath_current_location")
-    @Published var recentDestinations: [RecentDestination] = []
-    @Published var isShowingRoute = true
-    @Published var showJourneyHUD = false
-    @Published var climateAnalysis: ClimateAnalysis?
-    @Published var routeStatusForHUD: RouteStatus = .noRoute
-    @Published var sentinelAlerts: [SentinelAlert] = []
+    // MARK: - State
+    var state: WizPathViewState = .idle
+    var travelMode: TravelMode = .car
+    var departureTime: Date = Date()
+    var destinationName: String = ""
+    var destinationCoordinate: CLLocationCoordinate2D?
+    var originCoordinate: CLLocationCoordinate2D?
+    var originName: String = L10n.text("wizpath_current_location")
+    var recentDestinations: [RecentDestination] = []
+    var isShowingRoute = true
+    var showJourneyHUD = false
+    var climateAnalysis: ClimateAnalysis?
+    var routeStatusForHUD: RouteStatus = .noRoute
+    var sentinelAlerts: [SentinelAlert] = []
 
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
@@ -84,15 +84,11 @@ final class WizPathViewModel: ObservableObject {
 
     // MARK: - Init
     init(
-        wizPathService: WizPathService = .shared,
+        wizPathService: WizPathService? = nil,
         locationService: LocationService? = nil
     ) {
-        self.wizPathService = wizPathService
-        self.locationService = locationService ?? DependencyContainer.shared?.locationService ?? {
-            let ls = LocationService()
-            ls.requestPermission()
-            return ls
-        }()
+        self.wizPathService = wizPathService ?? .shared
+        self.locationService = locationService ?? DependencyContainer.shared?.locationService ?? LocationService()
         loadCurrentLocation()
         loadRecentDestinations()
     }
@@ -170,7 +166,8 @@ final class WizPathViewModel: ObservableObject {
                     case .thunderstorm: return .severeStorm
                     case .heavyRain: return .flooding
                     case .snow, .sleet:
-                        let avgTemp = route.segments.compactMap { $0.weather?.temperature }.reduce(0, +) / max(1, route.segments.count)
+                        let temperatures = route.segments.compactMap { $0.weather?.temperature }
+                        let avgTemp = temperatures.reduce(0.0, +) / Double(max(1, temperatures.count))
                         return avgTemp < 0 ? .blizzard : .heavySnow
                     default:
                         return climateAnalysis?.isExtremeHeat == true ? .extremeHeat : nil

@@ -1,14 +1,14 @@
-import Combine
 import Foundation
 
 @MainActor
-final class OnboardingViewModel: ObservableObject {
-    @Published private(set) var selectedSensitivity: TemperatureSensitivity = .normal
-    @Published private(set) var preferredActivities: Set<ActivityType> = [.walking, .goingOutside]
-    @Published private(set) var wakeUpTime: DateComponents
-    @Published private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
-    @Published private(set) var notificationStatus: NotificationAuthorizationStatus = .notDetermined
-    @Published private(set) var errorMessage: String?
+@Observable
+final class OnboardingViewModel {
+    private(set) var selectedSensitivity: TemperatureSensitivity = .normal
+    private(set) var preferredActivities: Set<ActivityType> = [.walking, .goingOutside]
+    private(set) var wakeUpTime: DateComponents
+    private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
+    private(set) var notificationStatus: NotificationAuthorizationStatus = .notDetermined
+    private(set) var errorMessage: String?
 
     private let locationRepository: LocationRepository
     private let notificationRepository: NotificationRepository

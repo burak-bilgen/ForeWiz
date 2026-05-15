@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - Liquid Glass Onboarding
 struct OnboardingView: View {
-    @StateObject var viewModel: OnboardingViewModel
+    @Bindable var viewModel: OnboardingViewModel
     let existingProfile: UserComfortProfile
     let onCompleted: (UserComfortProfile) async throws -> Void
 

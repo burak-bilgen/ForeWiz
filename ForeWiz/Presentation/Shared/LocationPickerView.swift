@@ -52,7 +52,7 @@ struct LocationPickerView: View {
     private var navBar: some View {
         HStack(spacing: 8) {
             Button {
-                Task { await HapticEngine.shared.light() }
+                HapticEngine.shared.light()
                 dismiss()
             } label: {
                 Image(systemName: "xmark.circle.fill")
@@ -298,7 +298,7 @@ struct LocationPickerView: View {
 
     private func selectLocation(_ location: SavedLocation) {
         guard editMode == .inactive else { return }
-        Task { await HapticEngine.shared.light() }
+        HapticEngine.shared.light()
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
             selectedLocationID = location.id
         }
@@ -315,7 +315,7 @@ struct LocationPickerView: View {
             }
         }
         onLocationsChanged(savedLocations)
-        Task { await HapticEngine.shared.medium() }
+        HapticEngine.shared.medium()
     }
 }
 
@@ -338,7 +338,7 @@ private struct LocationCard: View {
                 HStack {
                     Spacer()
                     Button {
-                        Task { await HapticEngine.shared.medium() }
+                        HapticEngine.shared.medium()
                         onDelete()
                     } label: {
                         Image(systemName: "trash.fill")
@@ -670,7 +670,7 @@ private struct ModernAddLocationView: View {
             address: item.address?.fullAddress ?? ""
         )
         onAdd(location)
-        Task { await HapticEngine.shared.success() }
+        HapticEngine.shared.success()
         dismiss()
     }
 }

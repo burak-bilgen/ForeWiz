@@ -1,18 +1,17 @@
-import Combine
 import Foundation
 
 @MainActor
-final class SettingsViewModel: ObservableObject {
-    @Published var profile: UserComfortProfile
-    @Published private(set) var saveMessage: String?
+@Observable
+final class SettingsViewModel {
+    var profile: UserComfortProfile
+    private(set) var saveMessage: String?
 
     private let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     private let onProfileSaved: (UserComfortProfile) -> Void
     private let onResetOnboarding: (() -> Void)?
     private let onDeleteAllData: (() -> Void)?
-    private var cancellables: Set<AnyCancellable> = []
     private var pendingSave: Task<Void, Never>?
-    private let saveSubject = PassthroughSubject<UserComfortProfile, Never>()
+    private var lastSaveTime: Date = .distantPast
 
     init(
         profile: UserComfortProfile,
@@ -26,13 +25,6 @@ final class SettingsViewModel: ObservableObject {
         self.onProfileSaved = onProfileSaved
         self.onResetOnboarding = onResetOnboarding
         self.onDeleteAllData = onDeleteAllData
-
-        saveSubject
-            .debounce(for: .milliseconds(800), scheduler: DispatchQueue.main)
-            .sink { [weak self] profile in
-                self?.performSave(profile: profile)
-            }
-            .store(in: &cancellables)
     }
 
     var isPremium: Bool {
@@ -40,28 +32,31 @@ final class SettingsViewModel: ObservableObject {
     }
 
     func save() {
-        saveSubject.send(profile)
+        pendingSave?.cancel()
+        lastSaveTime = Date()
+        pendingSave = Task {
+            try? await Task.sleep(nanoseconds: 800_000_000)
+            guard !Task.isCancelled else { return }
+            await performSave(profile: profile)
+        }
     }
 
-    private func performSave(profile: UserComfortProfile) {
-        pendingSave?.cancel()
-        pendingSave = Task {
-            do {
-                try await updateUserPreferencesUseCase.execute(profile: profile)
-                onProfileSaved(profile)
-                saveMessage = L10n.text("settings_save_success")
-                await HapticEngine.shared.success()
+    private func performSave(profile: UserComfortProfile) async {
+        do {
+            try await updateUserPreferencesUseCase.execute(profile: profile)
+            onProfileSaved(profile)
+            saveMessage = L10n.text("settings_save_success")
+            HapticEngine.shared.success()
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            if !Task.isCancelled {
+                saveMessage = nil
+            }
+        } catch {
+            if !Task.isCancelled {
+                saveMessage = AppError.persistenceFailed.userMessage
+                HapticEngine.shared.error()
                 try? await Task.sleep(nanoseconds: 2_500_000_000)
-                if !Task.isCancelled {
-                    saveMessage = nil
-                }
-            } catch {
-                if !Task.isCancelled {
-                    saveMessage = AppError.persistenceFailed.userMessage
-                    await HapticEngine.shared.error()
-                    try? await Task.sleep(nanoseconds: 2_500_000_000)
-                    saveMessage = nil
-                }
+                saveMessage = nil
             }
         }
     }

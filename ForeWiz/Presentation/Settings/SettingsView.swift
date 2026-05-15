@@ -4,7 +4,7 @@ import UIKit
 
 // MARK: - Liquid Glass Settings View
 struct SettingsView: View {
-    @StateObject var viewModel: SettingsViewModel
+    @Bindable var viewModel: SettingsViewModel
     @State private var showDeleteAllDataConfirmation = false
     @State private var showShareSheet = false
     @State private var exportJSON = ""
