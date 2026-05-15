@@ -8,34 +8,33 @@ struct ClimateAwareTimelineView: View {
     let weatherUnavailableMessage: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            headerView
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16) {
+            VStack(alignment: .leading, spacing: 16) {
+                headerView
 
-            if let message = weatherUnavailableMessage {
-                WeatherUnavailableBanner(message: message)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(slots) { slot in
-                        TimelineBar(
-                            slot: slot,
-                            isSelected: selectedSlot?.id == slot.id,
-                            onTap: { onSelect(slot) }
-                        )
-                    }
+                if let message = weatherUnavailableMessage {
+                    WeatherUnavailableBanner(message: message)
                 }
-                .padding(.horizontal, 4)
-                .padding(.vertical, 8)
-            }
 
-            if let selected = selectedSlot {
-                SelectedSlotDetail(slot: selected)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(slots) { slot in
+                            TimelineBar(
+                                slot: slot,
+                                isSelected: selectedSlot?.id == slot.id,
+                                onTap: { onSelect(slot) }
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 8)
+                }
+
+                if let selected = selectedSlot {
+                    SelectedSlotDetail(slot: selected)
+                }
             }
         }
-        .padding(16)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     private var headerView: some View {
@@ -43,7 +42,7 @@ struct ClimateAwareTimelineView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(L10n.text("wizpath_departure_times"))
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.white)
 
                 Text(L10n.text("wizpath_optimal_windows"))
                     .font(.system(size: 13))
@@ -53,9 +52,9 @@ struct ClimateAwareTimelineView: View {
             Spacer()
 
             HStack(spacing: 8) {
-                LegendItem(color: .green, label: L10n.text("wizpath_optimal"))
-                LegendItem(color: .orange, label: L10n.text("wizpath_caution_short"))
-                LegendItem(color: .red, label: L10n.text("wizpath_avoid"))
+                LegendItem(color: .success, label: L10n.text("wizpath_optimal"))
+                LegendItem(color: .warning, label: L10n.text("wizpath_caution_short"))
+                LegendItem(color: .danger, label: L10n.text("wizpath_avoid"))
             }
         }
     }
@@ -72,7 +71,7 @@ struct TimelineBar: View {
             VStack(spacing: 6) {
                 Text(slot.timeLabel)
                     .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
-                    .foregroundStyle(isSelected ? .primary : .secondary)
+                    .foregroundStyle(isSelected ? .white : .secondary)
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 8)
@@ -89,14 +88,15 @@ struct TimelineBar: View {
 
                     if isSelected {
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(.primary, lineWidth: 2)
+                            .stroke(.white, lineWidth: 2)
                             .frame(width: 48, height: 72)
+                            .shadow(color: .white.opacity(0.2), radius: 4)
                     }
 
                     if slot.hasWeatherDataError {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 10))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(Color.warning)
                             .offset(y: -20)
                     }
                 }
@@ -108,13 +108,13 @@ struct TimelineBar: View {
 
                 Text(slot.durationLabel)
                     .font(.system(size: 10))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.tertiary)
             }
             .frame(width: 60)
             .padding(.vertical, 4)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.secondary.opacity(0.1) : Color.clear)
+                    .fill(isSelected ? Color.white.opacity(0.06) : Color.clear)
             )
         }
         .buttonStyle(.plain)
@@ -122,9 +122,9 @@ struct TimelineBar: View {
 
     private var barColor: Color {
         if slot.hasWeatherDataError { return .gray }
-        else if slot.temperature >= 40 || slot.score < 40 { return .red }
-        else if slot.temperature >= 36 || slot.score < 60 { return .orange }
-        else { return .green }
+        else if slot.temperature >= 40 || slot.score < 40 { return .danger }
+        else if slot.temperature >= 36 || slot.score < 60 { return .warning }
+        else { return .success }
     }
 
     private var barGradient: LinearGradient {
@@ -135,17 +135,17 @@ struct TimelineBar: View {
             )
         } else if slot.temperature >= 40 || slot.score < 40 {
             return LinearGradient(
-                colors: [.red.opacity(0.7), .red.opacity(0.3)],
+                colors: [.danger.opacity(0.7), .danger.opacity(0.3)],
                 startPoint: .bottom, endPoint: .top
             )
         } else if slot.temperature >= 36 || slot.score < 60 {
             return LinearGradient(
-                colors: [.orange.opacity(0.7), .orange.opacity(0.3)],
+                colors: [.warning.opacity(0.7), .warning.opacity(0.3)],
                 startPoint: .bottom, endPoint: .top
             )
         } else {
             return LinearGradient(
-                colors: [.green.opacity(0.7), .green.opacity(0.3)],
+                colors: [.success.opacity(0.7), .success.opacity(0.3)],
                 startPoint: .bottom, endPoint: .top
             )
         }
@@ -161,8 +161,8 @@ struct TimelineBar: View {
 
     private var temperatureColor: Color {
         if slot.hasWeatherDataError { return .secondary }
-        else if slot.temperature >= 40 { return .red }
-        else if slot.temperature >= 36 { return .orange }
+        else if slot.temperature >= 40 { return .danger }
+        else if slot.temperature >= 36 { return .warning }
         else { return .secondary }
     }
 }
@@ -177,6 +177,7 @@ struct LegendItem: View {
             Circle()
                 .fill(color)
                 .frame(width: 6, height: 6)
+                .shadow(color: color.opacity(0.4), radius: 2)
             Text(label)
                 .font(.system(size: 10))
                 .foregroundStyle(.secondary)
@@ -192,7 +193,7 @@ struct WeatherUnavailableBanner: View {
         HStack(spacing: 10) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 16))
-                .foregroundStyle(.orange)
+                .foregroundStyle(Color.warning)
 
             Text(message)
                 .font(.system(size: 13))
@@ -202,7 +203,7 @@ struct WeatherUnavailableBanner: View {
             Spacer()
         }
         .padding(12)
-        .background(.regularMaterial)
+        .background(Color.white.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
@@ -217,7 +218,7 @@ struct SelectedSlotDetail: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(slot.timeLabel)
                         .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.white)
 
                     Text(slot.displayStatus)
                         .font(.system(size: 15, weight: .medium))
@@ -239,11 +240,12 @@ struct SelectedSlotDetail: View {
 
                     Text("\\(slot.score)")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.white)
                 }
             }
 
             Divider()
+                .overlay(Color.white.opacity(0.06))
 
             HStack(spacing: 20) {
                 DetailItem(icon: "clock.fill", label: L10n.text("wizpath_duration"), value: slot.durationLabel)
@@ -254,22 +256,22 @@ struct SelectedSlotDetail: View {
             }
         }
         .padding(16)
-        .background(.regularMaterial)
+        .background(Color.white.opacity(0.04))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var statusColor: Color {
-        if slot.hasWeatherDataError { return .orange }
-        else if slot.score >= 80 { return .green }
-        else if slot.score >= 60 { return .orange }
-        else { return .red }
+        if slot.hasWeatherDataError { return .warning }
+        else if slot.score >= 80 { return .success }
+        else if slot.score >= 60 { return .warning }
+        else { return .danger }
     }
 
     private var scoreColor: Color {
         if slot.hasWeatherDataError { return .gray }
-        else if slot.score >= 80 { return .green }
-        else if slot.score >= 60 { return .orange }
-        else { return .red }
+        else if slot.score >= 80 { return .success }
+        else if slot.score >= 60 { return .warning }
+        else { return .danger }
     }
 }
 
@@ -287,10 +289,10 @@ struct DetailItem: View {
 
             Text(value)
                 .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white)
 
             Text(label)
-                .font(.system(size: 11))
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .frame(minWidth: 70)

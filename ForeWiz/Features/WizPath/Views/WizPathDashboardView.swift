@@ -7,7 +7,6 @@ struct WizPathDashboardView: View {
     @StateObject private var viewModel = WizPathViewModel()
     @Environment(\.dismiss) private var dismiss
     @State private var showDestinationPicker = false
-    @State private var showTimePicker = false
     @State private var showDepartureOptimizer = false
     @State private var dashboardLoadTrigger = false
 
@@ -15,21 +14,23 @@ struct WizPathDashboardView: View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
-                    // Hero Section
+                    // Hero Header
                     heroHeader
+                        .padding(.horizontal, 20)
+                        .padding(.top, 8)
 
                     // Route Map
                     WizPathMapView(viewModel: viewModel)
                         .frame(height: 320)
-                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                        .shadow(color: .black.opacity(0.15), radius: 20, x: 0, y: 8)
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-
-                    // Trip Planner
-                    plannerCard
+                        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                        .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 10)
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
+
+                    // Planner Card
+                    plannerCard
+                        .padding(.horizontal, 16)
+                        .padding(.top, 14)
 
                     // Journey HUD
                     if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
@@ -39,7 +40,7 @@ struct WizPathDashboardView: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
-                    // Departure Optimizer Button
+                    // Departure Optimizer
                     if viewModel.currentRoute != nil {
                         departureOptimizerButton
                             .padding(.horizontal, 16)
@@ -57,16 +58,17 @@ struct WizPathDashboardView: View {
                     // Attribution
                     if viewModel.currentRoute != nil {
                         Text(L10n.text("wizpath_powered_by_apple_maps"))
-                            .font(.system(size: 11))
+                            .font(.caption2)
                             .foregroundStyle(.tertiary)
                             .padding(.top, 16)
                             .padding(.bottom, 24)
                     }
                 }
             }
-            .background(Color(.systemGroupedBackground).ignoresSafeArea())
+            .background(AppBackground())
             .navigationTitle(L10n.text("wizpath_route_planner"))
             .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -75,7 +77,7 @@ struct WizPathDashboardView: View {
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 24))
-                            .foregroundStyle(.tertiary)
+                            .foregroundStyle(.secondary)
                             .symbolRenderingMode(.hierarchical)
                     }
                     .accessibleButton(label: L10n.text("wizpath_close"))
@@ -110,38 +112,37 @@ struct WizPathDashboardView: View {
 
     // MARK: - Hero Header
     private var heroHeader: some View {
-        VStack(spacing: 4) {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16, cornerRadius: 20) {
             HStack {
-                Image(systemName: "map.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.blue)
-                    .symbolEffect(.bounce, value: dashboardLoadTrigger)
+                GlassIcon(systemName: "map.fill", color: .liquidAccent)
 
-                Text(L10n.text("wizpath_smart_route_planner"))
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.primary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("wizpath_smart_route_planner"))
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Text(L10n.text("wizpath_weather_aware_routing"))
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                }
 
                 Spacer()
 
                 if viewModel.isCalculating {
                     ProgressView()
                         .scaleEffect(0.8)
-                        .tint(.blue)
+                        .tint(.liquidAccent)
                 }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .padding(.bottom, 4)
 
-            Text(L10n.text("wizpath_weather_aware_routing"))
-                .font(.system(size: 13))
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                .padding(.bottom, 12)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.liquidAccent)
+                    .opacity(dashboardLoadTrigger ? 1 : 0)
+                    .scaleEffect(dashboardLoadTrigger ? 1 : 0.5)
+            }
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 0.3)) {
+            withAnimation(.spring(response: 0.4).delay(0.2)) {
                 dashboardLoadTrigger = true
             }
         }
@@ -149,19 +150,16 @@ struct WizPathDashboardView: View {
 
     // MARK: - Planner Card
     private var plannerCard: some View {
-        GlassCard(innerPadding: 16) {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16) {
             VStack(spacing: 14) {
                 // Destination Field
                 destinationField
 
-                // Travel Mode + Departure Time
+                // Travel Mode + Calculate Button
                 HStack(spacing: 10) {
                     travelModePicker
-                    departureTimeButton
+                    calculateButton
                 }
-
-                // Calculate Button
-                calculateButton
             }
         }
     }
@@ -174,21 +172,23 @@ struct WizPathDashboardView: View {
         } label: {
             HStack(spacing: 12) {
                 Circle()
-                    .fill(.blue.opacity(0.12))
+                    .fill(Color.liquidAccent.opacity(0.12))
                     .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: "mappin.circle.fill")
                             .font(.system(size: 20))
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Color.liquidAccent)
                     )
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L10n.text("wizpath_destination"))
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text(viewModel.destinationName.isEmpty ? L10n.text("wizpath_select_destination_placeholder") : viewModel.destinationName)
+                    Text(viewModel.destinationName.isEmpty
+                        ? L10n.text("wizpath_select_destination_placeholder")
+                        : viewModel.destinationName)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(viewModel.destinationName.isEmpty ? .secondary : .primary)
+                        .foregroundStyle(viewModel.destinationName.isEmpty ? Color.secondary : Color.white)
                         .lineLimit(1)
                 }
 
@@ -199,41 +199,14 @@ struct WizPathDashboardView: View {
                     .foregroundStyle(.tertiary)
             }
             .padding(12)
-            .background(Color(.secondarySystemBackground))
+            .background(Color.liquidAccent.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color.liquidAccent.opacity(0.12), lineWidth: 0.5)
+            )
         }
         .buttonStyle(.plain)
-    }
-
-    // MARK: - Recent Destinations Quick Access
-    private var recentDestinationsRow: some View {
-        Group {
-            if !viewModel.recentDestinations.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(viewModel.recentDestinations.prefix(5), id: \.self) { recent in
-                            Button {
-                                viewModel.selectRecentDestination(recent)
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "clock.arrow.circlepath")
-                                        .font(.system(size: 10))
-                                    Text(recent.name)
-                                        .font(.system(size: 12, weight: .medium))
-                                        .lineLimit(1)
-                                }
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color(.tertiarySystemBackground))
-                                .clipShape(Capsule())
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     // MARK: - Travel Mode Picker
@@ -246,43 +219,6 @@ struct WizPathDashboardView: View {
         .pickerStyle(.segmented)
         .onChange(of: viewModel.travelMode) { _, _ in
             viewModel.refreshRoute()
-        }
-    }
-
-    // MARK: - Departure Time
-    private var departureTimeButton: some View {
-        Button {
-            showTimePicker = true
-            HapticEngine.shared.selectionChanged()
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: "clock.fill")
-                    .font(.system(size: 12))
-                Text(formattedTime(viewModel.departureTime))
-                    .font(.system(size: 12, weight: .semibold))
-                    .monospacedDigit()
-            }
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(Color(.tertiarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .popover(isPresented: $showTimePicker) {
-            DatePicker(
-                L10n.text("wizpath_departure_time"),
-                selection: $viewModel.departureTime,
-                displayedComponents: [.hourAndMinute]
-            )
-            .datePickerStyle(.wheel)
-            .labelsHidden()
-            .frame(width: 200, height: 200)
-            .padding()
-            .presentationCompactAdaptation(.popover)
-            .onChange(of: viewModel.departureTime) { _, _ in
-                viewModel.refreshRoute()
-            }
         }
     }
 
@@ -301,14 +237,24 @@ struct WizPathDashboardView: View {
                         .font(.system(size: 18))
                         .symbolEffect(.bounce, value: viewModel.canCalculate)
                 }
-                Text(viewModel.isCalculating ? L10n.text("wizpath_calculating") : L10n.text("wizpath_calculate_route"))
-                    .font(.system(size: 16, weight: .semibold))
+                Text(viewModel.isCalculating
+                    ? L10n.text("wizpath_calculating")
+                    : L10n.text("wizpath_calculate_route"))
+                    .font(.system(size: 14, weight: .semibold))
             }
             .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(viewModel.canCalculate ? Color.blue : Color.gray.opacity(0.5))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                LinearGradient(
+                    colors: viewModel.canCalculate
+                        ? [Color.liquidAccent, Color.liquidAccentSoft]
+                        : [Color.gray.opacity(0.4), Color.gray.opacity(0.3)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .disabled(!viewModel.canCalculate)
         .buttonStyle(.plain)
@@ -320,16 +266,13 @@ struct WizPathDashboardView: View {
             showDepartureOptimizer = true
             HapticEngine.shared.medium()
         } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "clock.badge.checkmark.fill")
-                    .font(.system(size: 22))
-                    .foregroundStyle(.green)
-                    .symbolRenderingMode(.multicolor)
+            HStack(spacing: 14) {
+                GlassIcon(systemName: "clock.badge.checkmark.fill", color: .success)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(L10n.text("wizpath_departure_optimizer"))
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.primary)
+                        .foregroundStyle(.white)
                     Text(L10n.text("wizpath_find_best_departure"))
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
@@ -342,8 +285,7 @@ struct WizPathDashboardView: View {
                     .foregroundStyle(.tertiary)
             }
             .padding(14)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .glassEffect(in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .buttonStyle(.plain)
     }
@@ -365,76 +307,78 @@ struct WizPathDashboardView: View {
 
     // MARK: - Route Detail Panel
     private func routeDetailPanel(_ route: WizPathRoute) -> some View {
-        GlassCard(innerPadding: 16) {
-            VStack(alignment: .leading, spacing: 14) {
-                // Header with risk indicator
+        LiquidGlassCard(accentColor: .routeRiskColor(route.overallRisk), innerPadding: 16) {
+            VStack(alignment: .leading, spacing: 16) {
+                // Header with risk + duration
                 HStack(spacing: 12) {
-                    // Risk badge
                     riskBadge(route.overallRisk)
 
                     Spacer()
 
-                    // Duration
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(L10n.text("wizpath_total_time"))
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                         Text(formattedDuration(route.totalDuration))
-                            .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundStyle(.primary)
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
                             .monospacedDigit()
                     }
                 }
 
                 // Stats Row
                 HStack(spacing: 0) {
-                    statItem(icon: route.travelMode.icon, value: route.travelMode.localizedTitle, label: L10n.text("wizpath_mode"))
+                    statItem(
+                        icon: route.travelMode.icon,
+                        value: route.travelMode.localizedTitle,
+                        label: L10n.text("wizpath_mode")
+                    )
                     Spacer()
-                    statItem(icon: "arrow.triangle.swap", value: formattedDistance(route.totalDistance), label: L10n.text("wizpath_distance"))
+                    statItem(
+                        icon: "arrow.triangle.swap",
+                        value: formattedDistance(route.totalDistance),
+                        label: L10n.text("wizpath_distance")
+                    )
                     Spacer()
                     if let temp = route.segments.first?.weather?.temperature {
-                        statItem(icon: "thermometer.medium", value: "\\(Int(temp))°", label: L10n.text("wizpath_avg_temp"))
+                        statItem(
+                            icon: "thermometer.medium",
+                            value: "\\(Int(temp))°",
+                            label: L10n.text("wizpath_avg_temp")
+                        )
                     }
                 }
 
-                // Weather Along Route
+                // Weather Timeline
                 if !route.weatherChangePoints.isEmpty {
                     Divider()
-                        .padding(.vertical, 2)
+                        .overlay(Color.white.opacity(0.06))
 
                     weatherTimeline(route)
                 }
 
-                // Action buttons
+                // Action Buttons
                 Divider()
-                    .padding(.vertical, 2)
+                    .overlay(Color.white.opacity(0.06))
 
                 HStack(spacing: 10) {
-                    Button {
+                    LiquidGlassButton(
+                        L10n.text("wizpath_new_route"),
+                        icon: "plus.circle",
+                        style: .secondary,
+                        haptic: .light
+                    ) {
                         viewModel.reset()
-                    } label: {
-                        Label(L10n.text("wizpath_new_route"), systemImage: "plus.circle")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(Color(.tertiarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
-                    .buttonStyle(.plain)
 
-                    Button {
+                    LiquidGlassButton(
+                        L10n.text("wizpath_refresh"),
+                        icon: "arrow.clockwise",
+                        style: .primary,
+                        haptic: .light
+                    ) {
                         viewModel.refreshRoute()
-                    } label: {
-                        Label(L10n.text("wizpath_refresh"), systemImage: "arrow.clockwise")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.blue)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(Color.blue.opacity(0.08))
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }
@@ -442,18 +386,24 @@ struct WizPathDashboardView: View {
 
     // MARK: - Risk Badge
     private func riskBadge(_ risk: RouteRisk) -> some View {
-        HStack(spacing: 6) {
-            Circle()
-                .fill(Color(hex: risk.color))
-                .frame(width: 10, height: 10)
-                .glow(color: Color(hex: risk.color), radius: 4)
+        HStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: risk.color))
+                    .frame(width: 12, height: 12)
+
+                Circle()
+                    .fill(Color(hex: risk.color).opacity(0.3))
+                    .frame(width: 20, height: 20)
+                    .blur(radius: 4)
+            }
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(L10n.text("wizpath_route_risk"))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                 Text(risk.localizedTitle)
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 15, weight: .bold))
                     .foregroundStyle(Color(hex: risk.color))
             }
         }
@@ -481,34 +431,30 @@ struct WizPathDashboardView: View {
     private func weatherSegmentCard(_ segment: WizPathSegment) -> some View {
         VStack(spacing: 5) {
             if let weather = segment.weather {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(.tertiarySystemBackground))
-                        .frame(width: 56, height: 72)
+                VStack(spacing: 4) {
+                    Image(systemName: weather.iconName)
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color(hex: weather.severity.colorHex))
+                        .shadow(color: Color(hex: weather.severity.colorHex).opacity(0.4), radius: 4)
 
-                    VStack(spacing: 4) {
-                        Image(systemName: weather.iconName)
-                            .font(.system(size: 18))
-                            .foregroundStyle(Color(hex: weather.severity.colorHex))
-                            .shadow(color: Color(hex: weather.severity.colorHex).opacity(0.3), radius: 3)
+                    Text("\\(Int(weather.temperature))°")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white)
 
-                        Text("\\(Int(weather.temperature))°")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(.primary)
-
-                        Text(segment.etaShortDisplay)
-                            .font(.system(size: 9, weight: .medium))
-                            .foregroundStyle(.secondary)
-                    }
+                    Text(segment.etaShortDisplay)
+                        .font(.system(size: 9, weight: .medium))
+                        .foregroundStyle(.tertiary)
                 }
                 .frame(width: 56, height: 72)
+                .background(Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(Color(hex: weather.severity.colorHex).opacity(0.25), lineWidth: 1)
                 )
             } else {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(.tertiarySystemBackground))
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
                     .frame(width: 56, height: 72)
                     .overlay(ProgressView().scaleEffect(0.6))
             }
@@ -517,52 +463,47 @@ struct WizPathDashboardView: View {
 
     // MARK: - Helpers
 
-    private func formattedTime(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
-        return f.string(from: date)
-    }
-
     private func formattedDuration(_ duration: TimeInterval) -> String {
         let h = Int(duration) / 3600
         let m = (Int(duration) % 3600) / 60
         if h > 0 {
-            return "\(h) \(L10n.text("wizpath_hours")) \(m) \(L10n.text("wizpath_minutes"))"
+            return "\\(h) \(L10n.text("wizpath_hours")) \(m) \(L10n.text("wizpath_minutes"))"
         }
-        return "\(m) \(L10n.text("wizpath_minutes"))"
+        return "\\(m) \(L10n.text("wizpath_minutes"))"
     }
 
     private func formattedDistance(_ dist: CLLocationDistance) -> String {
         let km = dist / 1000
-        return km >= 10 ? "\(Int(km)) km" : String(format: "%.1f km", km)
+        return km >= 10 ? "\\(Int(km)) km" : String(format: "%.1f km", km)
     }
 
     private func statItem(icon: String, value: String, label: String) -> some View {
         VStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.system(size: 18))
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.liquidAccent)
                 .symbolRenderingMode(.hierarchical)
+
             Text(value)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.primary)
+                .foregroundStyle(.white)
+
             Text(label)
-                .font(.system(size: 10))
-                .foregroundStyle(.secondary)
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
         }
         .frame(maxWidth: .infinity)
     }
 }
 
-// MARK: - Glow Effect
-extension View {
-    func glow(color: Color, radius: CGFloat) -> some View {
-        self.background(
-            Circle()
-                .fill(color)
-                .blur(radius: radius)
-                .scaleEffect(1.5)
-        )
+// MARK: - Route Risk Color
+extension Color {
+    static func routeRiskColor(_ risk: RouteRisk) -> Color {
+        switch risk {
+        case .good: return Color.success
+        case .caution: return Color.warning
+        case .severe: return Color.danger
+        }
     }
 }
 
@@ -575,127 +516,188 @@ struct DepartureOptimizerView: View {
     @State private var selectedMinute = 0
 
     var body: some View {
-        VStack(spacing: 20) {
-            // Header
-            VStack(spacing: 8) {
-                Image(systemName: "clock.badge.checkmark")
-                    .font(.system(size: 40))
-                    .foregroundStyle(.green)
-                    .symbolRenderingMode(.multicolor)
+        ZStack {
+            AppBackground()
 
-                Text(L10n.text("wizpath_optimize_departure"))
-                    .font(.system(size: 20, weight: .bold))
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Header
+                    LiquidGlassCard(accentColor: .success, innerPadding: 24) {
+                        VStack(spacing: 12) {
+                            Image(systemName: "clock.badge.checkmark")
+                                .font(.system(size: 40))
+                                .foregroundStyle(Color.success)
+                                .symbolRenderingMode(.multicolor)
 
-                Text(L10n.text("wizpath_optimize_departure_desc"))
-                    .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.top, 24)
+                            Text(L10n.text("wizpath_optimize_departure"))
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(.white)
 
-            // Time Picker
-            HStack(spacing: 16) {
-                // Hour picker
-                VStack {
-                    Text(L10n.text("wizpath_hour"))
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.secondary)
-                    Picker("", selection: $selectedHour) {
-                        ForEach(0..<24) { hour in
-                            Text(String(format: "%02d", hour)).tag(hour)
+                            Text(L10n.text("wizpath_optimize_departure_desc"))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
                     }
-                    .pickerStyle(.wheel)
-                    .frame(width: 80)
-                }
 
-                Text(":")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(.secondary)
-                    .offset(y: -10)
+                    // Time Picker
+                    LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 20) {
+                        VStack(spacing: 16) {
+                            HStack(spacing: 16) {
+                                TimePickerColumn(
+                                    title: L10n.text("wizpath_hour"),
+                                    range: Array(0..<24),
+                                    selection: $selectedHour,
+                                    format: "%02d"
+                                )
 
-                // Minute picker
-                VStack {
-                    Text(L10n.text("wizpath_minute"))
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.secondary)
-                    Picker("", selection: $selectedMinute) {
-                        ForEach(Array(stride(from: 0, to: 60, by: 5)), id: \.self) { minute in
-                            Text(String(format: "%02d", minute)).tag(minute)
+                                Text(":")
+                                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                                    .foregroundStyle(.secondary)
+                                    .offset(y: -10)
+
+                                TimePickerColumn(
+                                    title: L10n.text("wizpath_minute"),
+                                    range: Array(stride(from: 0, to: 60, by: 5)),
+                                    selection: $selectedMinute,
+                                    format: "%02d"
+                                )
+                            }
+
+                            // Quick Select
+                            VStack(spacing: 8) {
+                                Text(L10n.text("wizpath_quick_times"))
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                LazyVGrid(columns: [
+                                    .init(.flexible()), .init(.flexible()),
+                                    .init(.flexible()), .init(.flexible())
+                                ], spacing: 8) {
+                                    ForEach([6, 8, 10, 12, 14, 16, 18, 20], id: \.self) { hour in
+                                        QuickTimeChip(
+                                            hour: hour,
+                                            isSelected: selectedHour == hour && selectedMinute == 0
+                                        ) {
+                                            selectedHour = hour
+                                            selectedMinute = 0
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                    .pickerStyle(.wheel)
-                    .frame(width: 80)
-                }
-            }
 
-            // Quick select buttons
-            VStack(spacing: 8) {
-                Text(L10n.text("wizpath_quick_times"))
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer(minLength: 20)
 
-                LazyVGrid(columns: [.init(.flexible()), .init(.flexible()), .init(.flexible()), .init(.flexible())], spacing: 8) {
-                    ForEach([6, 8, 10, 12, 14, 16, 18, 20], id: \.self) { hour in
-                        Button {
-                            selectedHour = hour
-                            selectedMinute = 0
-                        } label: {
-                            Text(String(format: "%02d:00", hour))
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(selectedHour == hour ? .white : .primary)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
-                                .background(selectedHour == hour ? Color.blue : Color(.tertiarySystemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                    // Apply Button
+                    Button {
+                        let calendar = Calendar.current
+                        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+                        components.hour = selectedHour
+                        components.minute = selectedMinute
+                        if let date = calendar.date(from: components) {
+                            onSelectTime(date)
                         }
-                        .buttonStyle(.plain)
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 18))
+                            Text(L10n.text("wizpath_set_departure_time"))
+                                .font(.system(size: 16, weight: .bold))
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            LinearGradient(
+                                colors: [Color.liquidAccent, Color.liquidAccentSoft],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: .liquidAccent.opacity(0.3), radius: 12, y: 4)
                     }
+                    .buttonStyle(.plain)
+                    .padding(.bottom, 24)
                 }
+                .padding(20)
             }
-
-            Spacer()
-
-            // Apply button
-            Button {
-                let calendar = Calendar.current
-                var components = calendar.dateComponents([.year, .month, .day], from: Date())
-                components.hour = selectedHour
-                components.minute = selectedMinute
-                if let date = calendar.date(from: components) {
-                    onSelectTime(date)
-                }
-            } label: {
-                Text(L10n.text("wizpath_set_departure_time"))
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Color.blue)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            }
-            .buttonStyle(.plain)
-            .padding(.bottom, 24)
         }
-        .padding(.horizontal, 24)
-        .background(Color(.systemGroupedBackground))
         .navigationTitle(L10n.text("wizpath_departure_optimizer"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(L10n.text("wizpath_done")) { dismiss() }
+                    .foregroundStyle(Color.liquidAccent)
             }
         }
+    }
+}
+
+// MARK: - Time Picker Column
+struct TimePickerColumn: View {
+    let title: String
+    let range: [Int]
+    @Binding var selection: Int
+    let format: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+                .tracking(0.8)
+
+            Picker("", selection: $selection) {
+                ForEach(range, id: \.self) { value in
+                    Text(String(format: format, value))
+                        .font(.system(size: 20, design: .rounded))
+                        .tag(value)
+                }
+            }
+            .pickerStyle(.wheel)
+            .frame(width: 80)
+            .colorScheme(.dark)
+        }
+    }
+}
+
+// MARK: - Quick Time Chip
+struct QuickTimeChip: View {
+    let hour: Int
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(String(format: "%02d:00", hour))
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(isSelected ? .white : .white.opacity(0.8))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(isSelected ? Color.liquidAccent : Color.white.opacity(0.06))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(isSelected ? Color.liquidAccent : Color.white.opacity(0.08), lineWidth: isSelected ? 1 : 0.5)
+                )
+        }
+        .buttonStyle(.plain)
     }
 }
 
 // MARK: - WizPath Journey HUD Data
 extension WizPathRoute {
     var journeyHUDData: JourneyHUDData {
-        let hazards = [EnvironmentalHazard]() // Real hazard detection would go here
-        let safeStops = [SmartStop]() // Real POI data would go here
-
+        let hazards = [EnvironmentalHazard]()
+        let safeStops = [SmartStop]()
         return JourneyHUDData(
             totalDuration: totalDuration,
             totalDistance: totalDistance,

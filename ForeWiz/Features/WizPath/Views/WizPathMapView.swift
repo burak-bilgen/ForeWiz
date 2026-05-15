@@ -2,7 +2,7 @@ import SwiftUI
 @preconcurrency import MapKit
 import CoreLocation
 
-// MARK: - WizPath Map View (iOS 17+ MapKit)
+// MARK: - WizPath Map View
 struct WizPathMapView: View {
     @ObservedObject var viewModel: WizPathViewModel
     @State private var position: MapCameraPosition = .automatic
@@ -10,20 +10,15 @@ struct WizPathMapView: View {
 
     var body: some View {
         Map(position: $position, selection: $selectedAnnotation) {
-            // User location
             UserAnnotation()
 
-            // Route overlay
             if let route = viewModel.currentRoute, viewModel.isShowingRoute {
                 let coords = route.routeCoordinates
                 if coords.count > 1 {
-                    // Main route polyline
                     MapPolyline(coordinates: coords)
                         .stroke(routeColor(for: route), lineWidth: 3)
-
                 }
 
-                // Destination marker
                 Annotation(coordinate: route.destination) {
                     DestinationFlag()
                 } label: {
@@ -31,7 +26,6 @@ struct WizPathMapView: View {
                         .font(.system(size: 11, weight: .semibold))
                 }
 
-                // Weather change point markers (max 6)
                 let changePoints = Array(route.weatherChangePoints.prefix(6))
                 ForEach(changePoints) { segment in
                     if let weather = segment.weather {
@@ -44,7 +38,6 @@ struct WizPathMapView: View {
                 }
             }
 
-            // Origin marker when route exists
             if let origin = viewModel.originCoordinate, viewModel.currentRoute != nil {
                 Annotation(coordinate: origin) {
                     OriginMarker()
@@ -54,12 +47,11 @@ struct WizPathMapView: View {
                 }
             }
 
-            // Destination preview when no route yet
             if let dest = viewModel.destinationCoordinate, viewModel.currentRoute == nil {
                 Annotation(coordinate: dest) {
                     Image(systemName: "mappin.circle.fill")
                         .font(.system(size: 28))
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Color.coral)
                         .background(Circle().fill(.white).frame(width: 22, height: 22))
                 } label: {
                     Text(viewModel.destinationName)
@@ -81,8 +73,10 @@ struct WizPathMapView: View {
             }
         }
         .overlay(alignment: .topTrailing) {
-            mapControlsOverlay
-                .padding(10)
+            if viewModel.currentRoute != nil {
+                glassLegendOverlay
+                    .padding(10)
+            }
         }
         .overlay(alignment: .bottomTrailing) {
             if viewModel.currentRoute != nil {
@@ -91,7 +85,6 @@ struct WizPathMapView: View {
             }
         }
         .onAppear {
-            // Center on user location initially
             if let origin = viewModel.originCoordinate, viewModel.currentRoute == nil {
                 position = .region(MKCoordinateRegion(
                     center: origin,
@@ -99,40 +92,41 @@ struct WizPathMapView: View {
                 ))
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
-// MARK: - Map Controls Overlay
-    private var mapControlsOverlay: some View {
-        VStack(spacing: 6) {
-            if viewModel.currentRoute != nil {
-                legendControl
-            }
+    // MARK: - Liquid Glass Legend Overlay
+    private var glassLegendOverlay: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            legendRow(color: .success, label: L10n.text("wizpath_weather_good"))
+            legendRow(color: .warning, label: L10n.text("wizpath_weather_caution"))
+            legendRow(color: .danger, label: L10n.text("wizpath_weather_severe"))
         }
-    }
-
-    private var legendControl: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            legendRow(color: .green, label: L10n.text("wizpath_weather_good"))
-            legendRow(color: .orange, label: L10n.text("wizpath_weather_caution"))
-            legendRow(color: .red, label: L10n.text("wizpath_weather_severe"))
-        }
-        .padding(8)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 0.5)
+                )
+        )
         .font(.system(size: 10, weight: .medium))
     }
 
     private func legendRow(color: Color, label: String) -> some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 5) {
             Circle()
                 .fill(color)
-                .frame(width: 6, height: 6)
+                .frame(width: 7, height: 7)
+                .shadow(color: color.opacity(0.4), radius: 2)
             Text(label)
                 .foregroundStyle(.secondary)
         }
     }
 
+    // MARK: - Toggle Route Button
     private var toggleRouteButton: some View {
         Button {
             withAnimation(.spring(response: 0.3)) {
@@ -144,8 +138,11 @@ struct WizPathMapView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 36, height: 36)
-                .background(.ultraThinMaterial)
-                .clipShape(Circle())
+                .background(
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+                )
         }
         .buttonStyle(.plain)
     }
@@ -153,9 +150,9 @@ struct WizPathMapView: View {
     // MARK: - Helpers
     private func routeColor(for route: WizPathRoute) -> Color {
         switch route.overallRisk {
-        case .good: return .green
-        case .caution: return .orange
-        case .severe: return .red
+        case .good: return .success
+        case .caution: return .warning
+        case .severe: return .danger
         }
     }
 
@@ -193,38 +190,16 @@ struct OriginMarker: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(.blue.opacity(pulse ? 0.3 : 0.15))
+                .fill(Color.liquidAccent.opacity(pulse ? 0.3 : 0.15))
                 .frame(width: pulse ? 40 : 30, height: pulse ? 40 : 30)
                 .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
 
             Image(systemName: "location.circle.fill")
                 .font(.system(size: 24))
                 .foregroundStyle(.white)
-                .background(Circle().fill(.blue).frame(width: 20, height: 20))
+                .background(Circle().fill(Color.liquidAccent).frame(width: 20, height: 20))
         }
         .onAppear { pulse = true }
-    }
-}
-
-// MARK: - Destination Flag
-struct DestinationFlag: View {
-    @State private var bounce = false
-
-    var body: some View {
-        Image(systemName: "mappin.circle.fill")
-            .font(.system(size: 32))
-            .foregroundStyle(.red)
-            .background(
-                Circle()
-                    .fill(.white)
-                    .frame(width: 24, height: 24)
-            )
-            .scaleEffect(bounce ? 1.15 : 1.0)
-            .onAppear {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.5).repeatForever(autoreverses: true)) {
-                    bounce = true
-                }
-            }
     }
 }
 
@@ -232,14 +207,13 @@ struct DestinationFlag: View {
 struct WeatherMarker: View {
     let weather: SegmentWeather
     let eta: String
-
     @State private var isVisible = false
 
     var body: some View {
         VStack(spacing: 2) {
             ZStack {
                 Circle()
-                    .fill(Color(hex: weather.severity.colorHex).opacity(0.2))
+                    .fill(Color(hex: weather.severity.colorHex).opacity(0.25))
                     .frame(width: isVisible ? 36 : 24, height: isVisible ? 36 : 24)
 
                 Image(systemName: weather.iconName)
