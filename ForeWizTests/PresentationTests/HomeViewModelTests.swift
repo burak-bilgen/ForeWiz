@@ -47,7 +47,7 @@ struct HomeViewModelTests {
         try? await Task.sleep(nanoseconds: 150_000_000)
 
         #expect(loadUseCase.executeCount == 1)
-        #expect(loadUseCase.lastForceRefresh == false)
+        #expect(loadUseCase.lastForceRefresh == true)
     }
 
     private func makeViewModel(

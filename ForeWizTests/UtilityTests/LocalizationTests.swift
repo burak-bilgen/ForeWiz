@@ -32,7 +32,7 @@ struct LocalizationTests {
         let normal = L10n.text("sensitivity_normal", lang: "tr")
         let hot = L10n.text("sensitivity_hot", lang: "tr")
 
-        #expect(cold.lowercased().contains("soğu"))
+        #expect(cold.lowercased().contains("üşü"))
         #expect(normal.lowercased().contains("normal"))
         #expect(hot.lowercased().contains("sıca"))
     }

@@ -143,7 +143,7 @@ private struct InsightsScoreCard: View {
             }
         }
         .padding(18)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .glassEffect(in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .onAppear { withAnimation { appeared = true } }
     }
 
@@ -235,7 +235,7 @@ private struct InsightsActivityCard: View {
             }
         }
         .padding(18)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .glassEffect(in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func activityIcon(_ type: ActivityType) -> String {
@@ -330,7 +330,7 @@ private struct InsightsDayQualityCard: View {
             }
         }
         .padding(18)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .glassEffect(in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 
     private func barHeight(_ quality: HourBlock.Quality) -> CGFloat {

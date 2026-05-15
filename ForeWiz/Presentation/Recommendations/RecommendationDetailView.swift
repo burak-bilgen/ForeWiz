@@ -67,7 +67,7 @@ private struct DetailCard<Content: View>: View {
     var body: some View {
         content
             .padding(18)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .glassEffect(in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 
