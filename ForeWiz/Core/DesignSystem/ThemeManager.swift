@@ -1,57 +1,41 @@
 import SwiftUI
 
+/// Manages the visual theme for ForeWiz — always uses Liquid Glass dark aesthetic.
 @available(iOS 17.0, *)
 @Observable
 final class ThemeManager {
     static let shared = ThemeManager()
-    
-    var colorScheme: ColorScheme = .dark
-    var accentColor: Color = .blue
-    var isDarkMode: Bool {
-        colorScheme == .dark
-    }
-    
-    private init() {
-        loadSavedTheme()
-    }
-    
-    func toggleDarkMode() {
-        colorScheme = .dark
-        saveTheme()
-    }
-    
-    func setColorScheme(_: ColorScheme) {
-        colorScheme = .dark
-        saveTheme()
-    }
-    
-    func setAccentColor(_ color: Color) {
-        accentColor = color
-        saveTheme()
-    }
-    
-    private func loadSavedTheme() {
-        colorScheme = .dark
-        
-        if let accentData = UserDefaults.standard.data(forKey: "app_accent_color"),
-           let uiColor = try? NSKeyedUnarchiver.unarchivedObject(ofClass: UIColor.self, from: accentData) {
-            accentColor = Color(uiColor: uiColor)
-        }
-    }
-    
-    private func saveTheme() {
-        UserDefaults.standard.set(isDarkMode ? "dark" : "light", forKey: "app_theme")
-        
-        let uiColor = UIColor(accentColor)
-        if let data = try? NSKeyedArchiver.archivedData(withRootObject: uiColor, requiringSecureCoding: false) {
-            UserDefaults.standard.set(data, forKey: "app_accent_color")
-        }
+
+    /// Always dark — liquid glass aesthetic is designed for dark mode.
+    let colorScheme: ColorScheme = .dark
+
+    var isDarkMode: Bool { true }
+
+    private init() {}
+
+    // Theme is locked to dark mode for the liquid glass experience.
+    func toggleDarkMode() {}
+    func setColorScheme(_: ColorScheme) {}
+
+    // MARK: - Convenience Accessors
+
+    var accentColor: Color { AppTheme.liquidAccent }
+    var accentSoft: Color { AppTheme.liquidAccentSoft }
+    var success: Color { AppTheme.success }
+    var warning: Color { AppTheme.warning }
+    var danger: Color { AppTheme.danger }
+
+    var cardGradient: LinearGradient {
+        AppTheme.ambientGradient(for: .dark)
     }
 }
+
+// MARK: - Theme Modifier
 
 struct ThemeModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
+            .preferredColorScheme(.dark)
     }
 }
 
@@ -61,51 +45,44 @@ extension View {
     }
 }
 
+// MARK: - Legacy Support
+
 struct AdaptiveColor {
-    static let background = Color(.systemBackground)
-    static let secondaryBackground = Color(.secondarySystemBackground)
-    static let tertiaryBackground = Color(.tertiarySystemBackground)
-    static let groupedBackground = Color(.systemGroupedBackground)
-    static let secondaryGroupedBackground = Color(.secondarySystemGroupedBackground)
-    
-    static let label = Color(.label)
-    static let secondaryLabel = Color(.secondaryLabel)
-    static let tertiaryLabel = Color(.tertiaryLabel)
-    static let quaternaryLabel = Color(.quaternaryLabel)
-    
-    static let fill = Color(.systemFill)
-    static let secondaryFill = Color(.secondarySystemFill)
-    static let tertiaryFill = Color(.tertiarySystemFill)
-    
-    static let separator = Color(.separator)
-    static let opaqueSeparator = Color(.opaqueSeparator)
+    static let background = Color(uiColor: .systemBackground)
+    static let secondaryBackground = Color(uiColor: .secondarySystemBackground)
+    static let tertiaryBackground = Color(uiColor: .tertiarySystemBackground)
+    static let groupedBackground = Color(uiColor: .systemGroupedBackground)
+    static let label = Color(uiColor: .label)
+    static let secondaryLabel = Color(uiColor: .secondaryLabel)
+    static let tertiaryLabel = Color(uiColor: .tertiaryLabel)
+    static let fill = Color(uiColor: .systemFill)
+    static let separator = Color(uiColor: .separator)
 }
 
 struct AdaptiveCard<Content: View>: View {
     @ViewBuilder let content: Content
-    
     var body: some View {
-        content
-            .padding()
-            .background(AdaptiveColor.secondaryBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        LiquidGlassCard {
+            content
+        }
     }
 }
 
 struct AdaptiveButtonStyle: ButtonStyle {
     let role: ButtonRole?
-    
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 17, weight: .semibold))
-            .foregroundStyle(role == .destructive ? .red : .primary)
+            .font(.system(size: 17, weight: .semibold, design: .rounded))
+            .foregroundStyle(role == .destructive ? AppTheme.coral : .white)
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
-            .background(AdaptiveColor.fill)
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+            )
             .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .opacity(configuration.isPressed ? 0.8 : 1.0)
+            .animation(.spring(response: 0.28, dampingFraction: 0.72), value: configuration.isPressed)
     }
 }
 
