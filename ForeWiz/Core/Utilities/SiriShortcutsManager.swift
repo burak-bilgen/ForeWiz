@@ -7,8 +7,8 @@ import WidgetKit
 
 @available(iOS 16.0, *)
 struct GetWeatherRecommendationIntent: AppIntent {
-    static var title: LocalizedStringResource = "Get Weather Recommendation"
-    static var description = IntentDescription("Get personalized weather recommendation for your current location")
+    static var title: LocalizedStringResource { "Get Weather Recommendation" }
+    static var description = IntentDescription(stringLiteral: "Get personalized weather recommendation for your current location")
 
     static var openAppWhenRun: Bool = false
 
@@ -25,20 +25,20 @@ struct GetWeatherRecommendationIntent: AppIntent {
             let decisionText: String
             switch recommendation.outdoorDecision {
             case .good:
-                decisionText = "Great weather to go outside!"
+                decisionText = L10n.text("siri_response_great_weather")
             case .moderate:
-                decisionText = "Weather is okay, but be cautious."
+                decisionText = L10n.text("siri_response_okay_weather")
             case .risky:
-                decisionText = "Consider staying inside today."
+                decisionText = L10n.text("siri_response_stay_inside_consider")
             case .avoid:
-                decisionText = "It's best to stay indoors."
+                decisionText = L10n.text("siri_response_stay_indoors")
             }
 
             let outfitItems = recommendation.outfit.items.joined(separator: ", ")
-            let accessories = recommendation.outfit.accessories.isEmpty ? "" : "Don't forget: \(recommendation.outfit.accessories.joined(separator: ", "))"
+            let accessories = recommendation.outfit.accessories.isEmpty ? "" : "\(L10n.text("siri_response_outfit_accessories_prefix")) \(recommendation.outfit.accessories.joined(separator: ", "))"
 
-            let response = "\(decisionText) Outdoor score is \(recommendation.outdoorScore.displayValue) out of 100. " +
-                          "Recommended outfit: \(outfitItems). \(accessories)"
+            let response = "\(decisionText) \(L10n.formatted("siri_response_score_template", recommendation.outdoorScore.displayValue)). " +
+                          "\(L10n.text("siri_response_outfit_prefix")) \(outfitItems). \(accessories)"
 
             return .result(value: response, dialog: IntentDialog(stringLiteral: response))
         } catch {
@@ -50,8 +50,8 @@ struct GetWeatherRecommendationIntent: AppIntent {
 
 @available(iOS 16.0, *)
 struct GetCurrentTemperatureIntent: AppIntent {
-    static var title: LocalizedStringResource = "Get Current Temperature"
-    static var description = IntentDescription("Get the current temperature for your location")
+    static var title: LocalizedStringResource { "Get Current Temperature" }
+    static var description = IntentDescription(stringLiteral: "Get the current temperature for your location")
 
     static var openAppWhenRun: Bool = false
 
@@ -68,7 +68,7 @@ struct GetCurrentTemperatureIntent: AppIntent {
             let temp = Int(current.temperatureCelsius)
             let feelsLike = Int(current.apparentTemperatureCelsius)
 
-            let response = "Current temperature is \(temp) degrees Celsius, feels like \(feelsLike) degrees."
+            let response = L10n.formatted("siri_response_temp_template", String(temp), String(feelsLike))
 
             return .result(value: response, dialog: IntentDialog(stringLiteral: response))
         } catch {
@@ -80,8 +80,8 @@ struct GetCurrentTemperatureIntent: AppIntent {
 
 @available(iOS 16.0, *)
 struct GetOutfitRecommendationIntent: AppIntent {
-    static var title: LocalizedStringResource = "Get Outfit Recommendation"
-    static var description = IntentDescription("Get clothing recommendations based on current weather")
+    static var title: LocalizedStringResource { "Get Outfit Recommendation" }
+    static var description = IntentDescription(stringLiteral: "Get clothing recommendations based on current weather")
 
     static var openAppWhenRun: Bool = false
 
@@ -96,10 +96,10 @@ struct GetOutfitRecommendationIntent: AppIntent {
             let outfit = result.recommendation.outfit
 
             let items = outfit.items.joined(separator: ", ")
-            let accessories = outfit.accessories.isEmpty ? "" : " Accessories: \(outfit.accessories.joined(separator: ", "))."
-            let warning = outfit.warning.map { " Note: \($0)" } ?? ""
+            let accessories = outfit.accessories.isEmpty ? "" : " \(L10n.text("siri_response_accessories_label")) \(outfit.accessories.joined(separator: ", "))."
+            let warning = outfit.warning.map { " \(L10n.text("siri_response_note_label")) \($0)" } ?? ""
 
-            let response = "Today's outfit: \(items).\(accessories)\(warning)"
+            let response = "\(L10n.text("siri_response_outfit_today_prefix")) \(items).\(accessories)\(warning)"
 
             return .result(value: response, dialog: IntentDialog(stringLiteral: response))
         } catch {
@@ -111,8 +111,8 @@ struct GetOutfitRecommendationIntent: AppIntent {
 
 @available(iOS 16.0, *)
 struct GetBestActivityWindowIntent: AppIntent {
-    static var title: LocalizedStringResource = "Get Best Time to Exercise"
-    static var description = IntentDescription("Find the best time window for outdoor activities today")
+    static var title: LocalizedStringResource { "Get Best Activity Window" }
+    static var description = IntentDescription(stringLiteral: "Find the best time window for outdoor activities today")
 
     static var openAppWhenRun: Bool = false
 
@@ -130,8 +130,8 @@ struct GetBestActivityWindowIntent: AppIntent {
             let windows = result.recommendation.bestActivityWindows
 
             guard !windows.isEmpty else {
-                return .result(value: "No optimal activity windows found for today.",
-                              dialog: IntentDialog(stringLiteral: "No optimal activity windows found for today."))
+                return .result(value: L10n.text("siri_response_no_windows"),
+                              dialog: IntentDialog(stringLiteral: L10n.text("siri_response_no_windows")))
             }
 
             let targetActivity: ActivityType
@@ -172,8 +172,8 @@ struct GetBestActivityWindowIntent: AppIntent {
 
 @available(iOS 16.0, *)
 struct CheckWeatherRisksIntent: AppIntent {
-    static var title: LocalizedStringResource = "Check Weather Risks"
-    static var description = IntentDescription("Check for any weather warnings or risks for today")
+    static var title: LocalizedStringResource { "Check Weather Risks" }
+    static var description = IntentDescription(stringLiteral: "Check for any weather warnings or risks for today")
 
     static var openAppWhenRun: Bool = false
 
@@ -188,14 +188,14 @@ struct CheckWeatherRisksIntent: AppIntent {
             let risks = result.recommendation.risks
 
             if risks.isEmpty {
-                let response = "No weather risks detected today. It's safe to go outside!"
+                let response = L10n.text("siri_response_no_risks")
                 return .result(value: response, dialog: IntentDialog(stringLiteral: response))
             }
 
             let riskDescriptions = risks.map { "\($0.severity.description) \($0.type.description)" }
             let joinedRisks = riskDescriptions.joined(separator: ", ")
 
-            let response = "Weather risks today: \(joinedRisks). Please take precautions."
+            let response = L10n.formatted("siri_response_risks_template", joinedRisks)
 
             return .result(value: response, dialog: IntentDialog(stringLiteral: response))
         } catch {
@@ -207,8 +207,8 @@ struct CheckWeatherRisksIntent: AppIntent {
 
 @available(iOS 16.0, *)
 struct RefreshWeatherDataIntent: AppIntent {
-    static var title: LocalizedStringResource = "Refresh Weather Data"
-    static var description = IntentDescription("Fetch the latest weather data for your location")
+    static var title: LocalizedStringResource { "Refresh Weather Data" }
+    static var description = IntentDescription(stringLiteral: "Fetch the latest weather data for your location")
 
     static var openAppWhenRun: Bool = true
 
@@ -221,7 +221,7 @@ struct RefreshWeatherDataIntent: AppIntent {
         do {
             _ = try await container.loadHomeRecommendationUseCase.execute(forceRefresh: true)
 
-            let response = "Weather data refreshed successfully."
+            let response = L10n.text("siri_response_refreshed")
             return .result(value: response, dialog: IntentDialog(stringLiteral: response))
         } catch {
             AppLogger.shortcuts.error("Failed to refresh weather: \(error.localizedDescription)")
@@ -302,10 +302,10 @@ struct ForeWizShortcuts {
 extension RiskLevel {
     var description: String {
         switch self {
-        case .low: return "low"
-        case .medium: return "medium"
-        case .high: return "high"
-        case .extreme: return "extreme"
+        case .low: return L10n.text("risk_level_low")
+        case .medium: return L10n.text("risk_level_medium")
+        case .high: return L10n.text("risk_level_high")
+        case .extreme: return L10n.text("risk_level_extreme")
         }
     }
 }
@@ -313,14 +313,14 @@ extension RiskLevel {
 extension WeatherRiskType {
     var description: String {
         switch self {
-        case .heat: return "heat"
-        case .cold: return "cold"
-        case .rain: return "rain"
-        case .storm: return "storm"
-        case .uv: return "UV"
-        case .wind: return "wind"
-        case .humidity: return "humidity"
-        case .poorComfort: return "poor comfort"
+        case .heat: return L10n.text("risk_type_heat")
+        case .cold: return L10n.text("risk_type_cold")
+        case .rain: return L10n.text("risk_type_rain")
+        case .storm: return L10n.text("risk_type_storm")
+        case .uv: return L10n.text("risk_type_uv")
+        case .wind: return L10n.text("risk_type_wind")
+        case .humidity: return L10n.text("risk_type_humidity")
+        case .poorComfort: return L10n.text("risk_type_poor_comfort")
         }
     }
 }
@@ -377,28 +377,28 @@ struct SiriShortcutsSettingsView: View {
 
     var body: some View {
         List {
-            Section(header: Text("Available Shortcuts")) {
+            Section(header: Text(L10n.text("siri_available_shortcuts"))) {
                 ForEach(shortcuts) { shortcut in
                     SiriShortcutRow(shortcut: shortcut)
                 }
             }
 
-            Section(header: Text("How to Use")) {
-                Text("You can use these shortcuts with Siri by saying phrases like:")
+            Section(header: Text(L10n.text("siri_how_to_use"))) {
+                Text(L10n.text("siri_how_to_use_desc"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("• \"Hey Siri, what's the weather like in ForeWiz?\"")
-                    Text("• \"Hey Siri, what should I wear today?\"")
-                    Text("• \"Hey Siri, when should I exercise?\"")
-                    Text("• \"Hey Siri, check weather risks\"")
+                    Text(L10n.text("siri_example_weather"))
+                    Text(L10n.text("siri_example_outfit"))
+                    Text(L10n.text("siri_example_exercise"))
+                    Text(L10n.text("siri_example_risks"))
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle("Siri Shortcuts")
+        .navigationTitle(L10n.text("siri_shortcuts_title"))
         .onAppear {
             loadShortcuts()
         }
@@ -407,40 +407,40 @@ struct SiriShortcutsSettingsView: View {
     private func loadShortcuts() {
         shortcuts = [
             SiriShortcutInfo(
-                name: "Weather Recommendation",
-                description: "Get personalized weather advice",
+                name: L10n.text("siri_shortcut_weather_rec"),
+                description: L10n.text("siri_intent_weather_rec_desc"),
                 icon: "cloud.sun.fill",
-                phrases: ["What's the weather like", "Should I go outside"]
+                phrases: [L10n.text("siri_example_weather"), L10n.text("decision_good")]
             ),
             SiriShortcutInfo(
-                name: "Current Temperature",
-                description: "Get current temperature and feels-like",
+                name: L10n.text("siri_shortcut_temp"),
+                description: L10n.text("siri_intent_temp_desc"),
                 icon: "thermometer",
-                phrases: ["What's the temperature", "How hot is it"]
+                phrases: [L10n.text("siri_intent_temp_title"), L10n.text("weather_current")]
             ),
             SiriShortcutInfo(
-                name: "Outfit Recommendation",
-                description: "Get clothing advice for today",
+                name: L10n.text("siri_shortcut_outfit"),
+                description: L10n.text("siri_intent_outfit_desc"),
                 icon: "tshirt.fill",
-                phrases: ["What should I wear", "Clothing advice"]
+                phrases: [L10n.text("siri_example_outfit"), L10n.text("what_to_wear_today")]
             ),
             SiriShortcutInfo(
-                name: "Best Exercise Time",
-                description: "Find optimal outdoor activity windows",
+                name: L10n.text("siri_shortcut_exercise"),
+                description: L10n.text("siri_intent_exercise_desc"),
                 icon: "figure.run",
-                phrases: ["When should I exercise", "Best time to run"]
+                phrases: [L10n.text("siri_example_exercise"), L10n.text("notification_best_run")]
             ),
             SiriShortcutInfo(
-                name: "Check Weather Risks",
-                description: "Check for weather warnings",
+                name: L10n.text("siri_shortcut_risks"),
+                description: L10n.text("siri_intent_risks_desc"),
                 icon: "exclamationmark.triangle.fill",
-                phrases: ["Any weather risks", "Weather alerts"]
+                phrases: [L10n.text("siri_example_risks"), L10n.text("alert_warning")]
             ),
             SiriShortcutInfo(
-                name: "Refresh Weather",
-                description: "Fetch latest weather data",
+                name: L10n.text("siri_shortcut_refresh"),
+                description: L10n.text("siri_intent_refresh_desc"),
                 icon: "arrow.clockwise",
-                phrases: ["Refresh weather", "Update weather data"]
+                phrases: [L10n.text("refresh_weather"), L10n.text("siri_intent_refresh_title")]
             )
         ]
     }
@@ -475,7 +475,7 @@ struct SiriShortcutRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
 
-                Text("Try: \"\(shortcut.phrases[0])\"")
+                Text(L10n.formatted("siri_try_phrase", shortcut.phrases[0]))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .italic()
@@ -499,7 +499,7 @@ struct SiriShortcutsButton: View {
                 Image(systemName: "mic.fill")
                     .foregroundStyle(Color.accentColor)
 
-                Text("Siri Shortcuts")
+                Text(L10n.text("siri_button_shortcuts"))
 
                 Spacer()
 

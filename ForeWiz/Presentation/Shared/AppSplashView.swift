@@ -39,7 +39,7 @@ struct AppSplashView: View {
                 .opacity(iconOpacity)
 
                 VStack(spacing: 12) {
-                    Text("ForeWiz")
+                    Text(L10n.text("splash_app_name"))
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
 

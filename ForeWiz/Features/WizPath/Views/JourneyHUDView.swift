@@ -25,11 +25,11 @@ struct JourneyHUDView: View {
 
                     // Stats
                     HStack(spacing: 0) {
-                        StatItem(value: data.durationDisplay, label: "ETA", color: .white)
+                        StatItem(value: data.durationDisplay, label: L10n.text("hud_eta"), color: .white)
                         Divider().frame(height: 20).padding(.horizontal, 8).overlay(Color.white.opacity(0.1))
-                        StatItem(value: "\\(data.hazardCount)", label: "Hazards", color: data.hazardCount > 0 ? Color.warning : .secondary)
+                        StatItem(value: "\(data.hazardCount)", label: L10n.text("hud_hazards"), color: data.hazardCount > 0 ? Color.warning : .secondary)
                         Divider().frame(height: 20).padding(.horizontal, 8).overlay(Color.white.opacity(0.1))
-                        StatItem(value: "\\(data.safetyScore)", label: "Safety", color: safetyTint)
+                        StatItem(value: "\(data.safetyScore)", label: L10n.text("hud_safety"), color: safetyTint)
                     }
                     .padding(.horizontal, 8)
 
@@ -125,7 +125,7 @@ struct HUDDetailPanel: View {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.warning)
-                            Text(hazards.count == 1 ? "1 Active Hazard" : "\\(hazards.count) Active Hazards")
+                            Text(hazards.count == 1 ? L10n.text("hud_active_hazard_singular") : L10n.formatted("hud_active_hazard_plural", hazards.count))
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundStyle(Color.warning)
                         }
@@ -135,7 +135,7 @@ struct HUDDetailPanel: View {
                         }
 
                         if hazards.count > 3 {
-                            Text("+\\(hazards.count - 3) more")
+                            Text(L10n.formatted("hud_more", hazards.count - 3))
                                 .font(.caption)
                                 .foregroundStyle(.tertiary)
                         }
@@ -176,7 +176,7 @@ struct HUDDetailPanel: View {
                         .foregroundStyle(.tertiary)
 
                     if let weather = stop.weatherAtArrival {
-                        Label("\\(Int(weather.temperature))°", systemImage: weather.iconName)
+                        Label("\(Int(weather.temperature))\(L10n.text("unit_degree"))", systemImage: weather.iconName)
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                     }
@@ -201,7 +201,7 @@ struct HUDDetailPanel: View {
     private var safetyScoreBar: some View {
         VStack(spacing: 6) {
             HStack {
-                Label("Journey Safety", systemImage: "shield.checkered")
+                Label(L10n.text("hud_journey_safety"), systemImage: "shield.checkered")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.secondary)
 
@@ -230,11 +230,11 @@ struct HUDDetailPanel: View {
 
     private var safetyRatingText: String {
         switch safetyScore {
-        case 80...100: return "Excellent"
-        case 60..<80: return "Good"
-        case 40..<60: return "Moderate"
-        case 20..<40: return "Poor"
-        default: return "Dangerous"
+        case 80...100: return L10n.text("hud_rating_excellent")
+        case 60..<80: return L10n.text("hud_rating_good")
+        case 40..<60: return L10n.text("hud_rating_moderate")
+        case 20..<40: return L10n.text("hud_rating_poor")
+        default: return L10n.text("hud_rating_dangerous")
         }
     }
 
@@ -267,7 +267,7 @@ struct HazardRow: View {
                 Text(hazard.localizedTitle)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
-                Text("at \\(hazard.etaAtLocation.formattedTime())")
+                Text(L10n.formatted("hud_at_time", hazard.etaAtLocation.formattedTime()))
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
@@ -288,9 +288,7 @@ struct HazardRow: View {
 // MARK: - Date Extension
 extension Date {
     func formattedTime() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: self)
+        SharedFormatters.shortTime.string(from: self)
     }
 }
 

@@ -28,7 +28,7 @@ struct NotificationSettingsSection: View {
                         }
                     }
 
-                    Text("\\(profile.maximumDailyNotifications)")
+                    Text("\(profile.maximumDailyNotifications)")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.white)
                         .monospacedDigit()

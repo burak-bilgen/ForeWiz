@@ -1,12 +1,12 @@
 import SwiftUI
 
-/// Manages the visual theme for ForeWiz — always uses Liquid Glass dark aesthetic.
+/// Manages the visual theme for ForeWiz - always uses Liquid Glass dark aesthetic.
 @available(iOS 17.0, *)
 @Observable
 final class ThemeManager {
     static let shared = ThemeManager()
 
-    /// Always dark — liquid glass aesthetic is designed for dark mode.
+    /// Always dark - liquid glass aesthetic is designed for dark mode.
     let colorScheme: ColorScheme = .dark
 
     var isDarkMode: Bool { true }

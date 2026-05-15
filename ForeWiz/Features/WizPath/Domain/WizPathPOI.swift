@@ -27,9 +27,7 @@ struct SmartStop: Identifiable, Sendable {
     
     /// Formatted ETA string
     var etaDisplay: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: etaArrival)
+        SharedFormatters.shortTime.string(from: etaArrival)
     }
 }
 
@@ -208,9 +206,9 @@ struct JourneyHUDData: Sendable {
         let hours = Int(totalDuration) / 3600
         let minutes = (Int(totalDuration) % 3600) / 60
         if hours > 0 {
-            return String(format: "%dh %02dm", hours, minutes)
+            return String(format: "%d\(L10n.text("unit_hour_short")) %02d\(L10n.text("unit_minute_short"))", hours, minutes)
         } else {
-            return String(format: "%d min", minutes)
+            return String(format: "%d \(L10n.text("unit_minutes"))", minutes)
         }
     }
 }

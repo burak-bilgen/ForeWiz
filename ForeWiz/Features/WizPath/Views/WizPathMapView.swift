@@ -243,9 +243,7 @@ struct WeatherMarker: View {
 // MARK: - WizPathSegment + ETA Short Display
 extension WizPathSegment {
     var etaShortDisplay: String {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
-        return f.string(from: estimatedArrival)
+        SharedFormatters.shortTime.string(from: estimatedArrival)
     }
 }
 

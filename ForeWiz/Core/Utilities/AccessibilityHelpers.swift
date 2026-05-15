@@ -340,8 +340,8 @@ struct AccessibleToggleStyle: ToggleStyle {
                 }
         }
         .accessibilityLabel(accessibilityLabel)
-        .accessibilityValue(configuration.isOn ? "On" : "Off")
-        .accessibilityHint("Double tap to toggle")
+        .accessibilityValue(configuration.isOn ? L10n.text("accessibility_toggle_on") : L10n.text("accessibility_toggle_off"))
+        .accessibilityHint(L10n.text("accessibility_toggle_hint"))
         .accessibilityAddTraits(.isButton)
         .accessibilityAdjustableAction { direction in
             switch direction {
@@ -358,24 +358,24 @@ struct AccessibleToggleStyle: ToggleStyle {
 
 extension Text {
     func accessibleTemperature(value: Double, unit: String) -> some View {
-        self.accessibilityLabel("Temperature \(Int(value)) degrees \(unit)")
+        self.accessibilityLabel(L10n.formatted("accessibility_temperature_template", String(Int(value)), unit))
     }
 
     func accessiblePercentage(value: Double, description: String) -> some View {
-        self.accessibilityLabel("\(description): \(Int(value * 100)) percent")
+        self.accessibilityLabel(L10n.formatted("accessibility_percent_template", String(Int(value * 100))))
     }
 
     func accessibleScore(value: Int, outOf: Int = 100, description: String? = nil) -> some View {
-        let desc = description ?? "Score"
+        let desc = description ?? L10n.text("accessibility_score_label")
         let quality: String
         switch value {
-        case 80...100: quality = "Excellent"
-        case 60..<80: quality = "Good"
-        case 40..<60: quality = "Fair"
-        case 20..<40: quality = "Poor"
-        default: quality = "Very Poor"
+        case 80...100: quality = L10n.text("accessibility_score_excellent")
+        case 60..<80: quality = L10n.text("accessibility_score_good")
+        case 40..<60: quality = L10n.text("accessibility_score_fair")
+        case 20..<40: quality = L10n.text("accessibility_score_poor")
+        default: quality = L10n.text("accessibility_score_very_poor")
         }
-        return self.accessibilityLabel("\(desc): \(value) out of \(outOf), \(quality)")
+        return self.accessibilityLabel(L10n.formatted("accessibility_score_template", desc, String(value), String(outOf), quality))
     }
 
     func accessibleTimeRange(start: Date, end: Date) -> some View {
@@ -385,7 +385,7 @@ extension Text {
     }
 
     func accessibleRisk(severity: String, type: String) -> some View {
-        self.accessibilityLabel("\(severity) risk: \(type)")
+        self.accessibilityLabel(L10n.formatted("accessibility_risk_template", severity, type))
     }
 }
 
@@ -424,7 +424,7 @@ struct AccessibleProgressView: View {
     var body: some View {
         ProgressView(value: progress, total: total)
             .accessibilityLabel(label)
-            .accessibilityValue("\(Int((progress / total) * 100)) percent complete")
+            .accessibilityValue(L10n.formatted("accessibility_progress_template", String(Int((progress / total) * 100))))
     }
 }
 
@@ -506,7 +506,7 @@ struct AccessibleLoadingView: View {
         ProgressView()
             .progressViewStyle(.circular)
             .accessibilityLabel(label)
-            .accessibilityValue("Loading in progress")
+            .accessibilityValue(L10n.text("accessibility_loading"))
     }
 }
 
@@ -520,7 +520,7 @@ struct AccessibleErrorView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 40))
                 .foregroundStyle(.red)
-                .accessibleImage(label: "Error icon")
+                .accessibleImage(label: L10n.text("accessibility_error_icon"))
 
             Text(title)
                 .font(.headline)
@@ -532,14 +532,14 @@ struct AccessibleErrorView: View {
                 .accessible(label: message)
 
             if let retryAction = retryAction {
-                Button("Retry") {
+                Button(L10n.text("home_error_retry")) {
                     retryAction()
                 }
-                .accessibleButton(label: "Retry", hint: "Attempts to load the content again")
+                .accessibleButton(label: L10n.text("home_error_retry"), hint: L10n.text("accessibility_retry_hint"))
             }
         }
         .padding()
-        .accessible(label: "Error message")
+        .accessible(label: L10n.text("accessibility_error_message"))
     }
 }
 
@@ -576,6 +576,6 @@ struct AccessibleEmptyStateView: View {
             }
         }
         .padding()
-        .accessible(label: "Empty state")
+        .accessible(label: L10n.text("accessibility_empty_state"))
     }
 }

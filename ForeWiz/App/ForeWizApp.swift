@@ -1,4 +1,3 @@
-import os
 import SwiftData
 import SwiftUI
 
@@ -34,7 +33,7 @@ struct ForeWizApp: App {
             AppLogger.persistence.error("Persistent ModelContainer failed: \(error.localizedDescription)")
         }
 
-        assertionFailure("Persistent ModelContainer failed — falling back to in-memory")
+        assertionFailure("Persistent ModelContainer failed - falling back to in-memory")
         do {
             let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             return try ModelContainer(for: schema, configurations: [fallbackConfig])

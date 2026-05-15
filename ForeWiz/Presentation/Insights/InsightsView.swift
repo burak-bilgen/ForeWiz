@@ -220,7 +220,7 @@ private struct InsightsActivityCard: View {
                                 .fixedSize(horizontal: false, vertical: true)
                                 .layoutPriority(1)
                             Spacer(minLength: 8)
-                            Text("\(window.score.rawValue)/100")
+                            Text("\(window.score.rawValue)\(L10n.text("insights_score_suffix_100"))")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundStyle(Color(red: 0.4, green: 0.85, blue: 0.6))
                                 .monospacedDigit()
@@ -313,7 +313,7 @@ private struct InsightsDayQualityCard: View {
             HStack(alignment: .top, spacing: 3) {
                 ForEach(hourBlocks) { block in
                     if block.id % 4 == 0 {
-                        Text("\(block.id)h")
+                        Text("\(block.id)\(L10n.text("insights_hour_block_suffix"))")
                             .font(.system(size: 7))
                             .foregroundStyle(Color.white.opacity(0.28))
                             .frame(maxWidth: .infinity)

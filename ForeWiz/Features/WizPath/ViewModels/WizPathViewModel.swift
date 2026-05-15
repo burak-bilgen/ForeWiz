@@ -49,6 +49,8 @@ final class WizPathViewModel: ObservableObject {
     // MARK: - Dependencies
     private let wizPathService: WizPathService
     private let locationService: LocationService
+    private let climateService = WizPathClimateService.shared
+    private let sentinelService = WizPathSentinelService.shared
 
     // MARK: - Published State
     @Published var state: WizPathViewState = .idle
@@ -61,6 +63,12 @@ final class WizPathViewModel: ObservableObject {
     @Published var recentDestinations: [RecentDestination] = []
     @Published var isShowingRoute = true
     @Published var showJourneyHUD = false
+    @Published var climateAnalysis: ClimateAnalysis?
+    @Published var routeStatusForHUD: RouteStatus = .noRoute
+    @Published var sentinelAlerts: [SentinelAlert] = []
+
+    // MARK: - Internal State
+    private var lastCalculatedRoute: WizPathRoute?
 
     // MARK: - Computed
     var canCalculate: Bool {
@@ -80,7 +88,11 @@ final class WizPathViewModel: ObservableObject {
         locationService: LocationService? = nil
     ) {
         self.wizPathService = wizPathService
-        self.locationService = locationService ?? DependencyContainer.shared.locationService
+        self.locationService = locationService ?? DependencyContainer.shared?.locationService ?? {
+            let ls = LocationService()
+            ls.requestPermission()
+            return ls
+        }()
         loadCurrentLocation()
         loadRecentDestinations()
     }
@@ -145,6 +157,33 @@ final class WizPathViewModel: ObservableObject {
                 mode: travelMode,
                 departureTime: departureTime
             )
+
+            // Run climate analysis
+            climateAnalysis = climateService.analyzeRouteClimate(route, travelMode: travelMode)
+
+            // Check for sentinel alerts if we have a previous route
+            if let previousRoute = lastCalculatedRoute {
+                let weatherContext = WeatherContext(
+                    primaryHazard: nil,
+                    temperature: climateAnalysis?.maxTemperature,
+                    conditions: [],
+                    isExtreme: climateAnalysis?.isExtremeHeat ?? false
+                )
+                let decision = sentinelService.evaluateRouteChange(
+                    originalRoute: previousRoute,
+                    updatedRoute: route,
+                    weatherContext: weatherContext
+                )
+                if case .trigger(let alert) = decision {
+                    sentinelAlerts.append(alert)
+                    await sentinelService.dispatchSentinelAlert(alert)
+                }
+            }
+            lastCalculatedRoute = route
+
+            // Update route status for HUD
+            updateRouteStatus(for: route)
+
             state = .routeReady(route)
             showJourneyHUD = true
             HapticEngine.shared.success()
@@ -194,5 +233,38 @@ final class WizPathViewModel: ObservableObject {
 
     func dismissError() {
         state = .idle
+    }
+
+    // MARK: - Route Status for HUD
+
+    private func updateRouteStatus(for route: WizPathRoute) {
+        let status = computeRouteStatus(for: route)
+        routeStatusForHUD = status
+        WizPathHUDStatus.shared.currentStatus = status
+    }
+
+    private func computeRouteStatus(for route: WizPathRoute) -> RouteStatus {
+        let dest = destinationName.isEmpty ? L10n.text("wizpath_destination") : destinationName
+        let eta = formattedDuration(route.totalDuration)
+
+        switch route.overallRisk {
+        case .good:
+            return .optimal(destination: dest, eta: eta)
+        case .caution:
+            let hazard = climateAnalysis?.primaryAlert?.title ?? L10n.text("wizpath_weather_hazard")
+            return .warning(destination: dest, hazard: hazard, eta: eta)
+        case .severe:
+            let hazard = climateAnalysis?.primaryAlert?.title ?? L10n.text("wizpath_severe_hazard")
+            return .critical(destination: dest, hazard: hazard)
+        }
+    }
+
+    private func formattedDuration(_ duration: TimeInterval) -> String {
+        let h = Int(duration) / 3600
+        let m = (Int(duration) % 3600) / 60
+        if h > 0 {
+            return "\(h)h \(m)m"
+        }
+        return "\(m)m"
     }
 }

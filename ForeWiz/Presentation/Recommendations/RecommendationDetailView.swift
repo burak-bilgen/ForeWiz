@@ -295,7 +295,7 @@ private struct DetailAvoidCard: View {
                 VStack(spacing: 4) {
                     ForEach(avoidWindows) { warning in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("\(warning.window.shortDisplayText) · \(warning.risk.title)")
+                            Text("\(warning.window.shortDisplayText)\(L10n.text("unit_separator_dot"))\(warning.risk.title)")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.white)
                                 .fixedSize(horizontal: false, vertical: true)

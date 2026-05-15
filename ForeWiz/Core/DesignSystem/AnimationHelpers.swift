@@ -2,10 +2,9 @@ import Combine
 import SwiftUI
 
 // MARK: - Animated Liquid Orb Background
-/// Fluid, morphing orb background with liquid glass aesthetic.
+/// Static gradient background with liquid glass aesthetic.
 struct LiquidOrbBackground: View {
     var palette: OrbPalette = .default
-    @State private var phase: Double = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     enum OrbPalette {
@@ -72,53 +71,38 @@ struct LiquidOrbBackground: View {
                     endPoint: .bottomTrailing
                 )
 
-                // Primary orb — large, slow
+                // Primary orb - static
                 LiquidOrb(
                     color: palette.colors.primary,
                     opacity: 0.18,
                     size: base * 0.95,
                     blur: base * 0.16,
                     xOffset: 0.20,
-                    yOffset: 0.05,
-                    xSpeed: 0.7,
-                    ySpeed: 0.5,
-                    phase: phase
+                    yOffset: 0.05
                 )
 
-                // Secondary orb — medium
+                // Secondary orb - static
                 LiquidOrb(
                     color: palette.colors.secondary,
                     opacity: 0.12,
                     size: base * 0.62,
                     blur: base * 0.13,
                     xOffset: 0.85,
-                    yOffset: 0.82,
-                    xSpeed: 0.9,
-                    ySpeed: 0.6,
-                    phase: phase
+                    yOffset: 0.82
                 )
 
-                // Tertiary orb — small, fast
+                // Tertiary orb - static
                 LiquidOrb(
                     color: palette.colors.tertiary,
                     opacity: 0.10,
                     size: base * 0.44,
                     blur: base * 0.10,
                     xOffset: 0.58,
-                    yOffset: 0.34,
-                    xSpeed: 1.2,
-                    ySpeed: 0.8,
-                    phase: phase
+                    yOffset: 0.34
                 )
             }
             .frame(width: w, height: h)
             .clipped()
-        }
-        .onAppear {
-            guard !reduceMotion else { return }
-            withAnimation(.linear(duration: 8).repeatForever(autoreverses: false)) {
-                phase = .pi * 2
-            }
         }
     }
 }
@@ -132,9 +116,6 @@ private struct LiquidOrb: View {
     let blur: CGFloat
     let xOffset: CGFloat
     let yOffset: CGFloat
-    let xSpeed: Double
-    let ySpeed: Double
-    let phase: Double
 
     var body: some View {
         GeometryReader { geometry in
@@ -144,8 +125,8 @@ private struct LiquidOrb: View {
                 .frame(width: size, height: size * 0.82)
                 .blur(radius: blur)
                 .position(
-                    x: geometry.size.width * xOffset + CGFloat(sin(phase * xSpeed)) * 18,
-                    y: geometry.size.height * yOffset + CGFloat(cos(phase * ySpeed)) * 14
+                    x: geometry.size.width * xOffset,
+                    y: geometry.size.height * yOffset
                 )
         }
     }
@@ -430,7 +411,7 @@ extension View {
             .ignoresSafeArea()
 
         VStack(spacing: 20) {
-            Text("Liquid Glass Animations")
+            Text(L10n.text("preview_liquid_glass_animations"))
                 .font(.title)
                 .foregroundStyle(.white)
 

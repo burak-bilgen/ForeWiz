@@ -3,7 +3,7 @@ import CoreLocation
 @preconcurrency import MapKit
 
 // MARK: - Travel Mode
-enum TravelMode: String, CaseIterable, Identifiable {
+enum TravelMode: String, CaseIterable, Identifiable, Sendable {
     case car = "car"
     case walking = "walking"
 
@@ -143,9 +143,7 @@ struct WizPathSegment: Identifiable, Equatable, Sendable {
     }
 
     var etaDisplay: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter.string(from: estimatedArrival)
+        SharedFormatters.shortTime.string(from: estimatedArrival)
     }
 }
 

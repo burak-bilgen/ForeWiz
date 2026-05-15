@@ -143,7 +143,7 @@ struct OnboardingView: View {
                             set: { viewModel.setWakeUpHour($0) }
                         )) {
                             ForEach(5...11, id: \.self) { hour in
-                                Text(String(format: "%02d:00", hour)).tag(hour)
+                                Text(L10n.formatted("time_format_full", hour)).tag(hour)
                             }
                         }
                         .pickerStyle(.menu)

@@ -16,7 +16,6 @@ struct LiquidGlassCard<Content: View>: View {
     let cornerRadius: CGFloat
     let content: Content
 
-    @State private var sheenOffset: CGFloat = -0.5
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
 
@@ -44,23 +43,20 @@ struct LiquidGlassCard<Content: View>: View {
                         .fill(.ultraThinMaterial)
                         .environment(\.colorScheme, .dark)
 
-                    // Animated gradient sheen overlay
-                    if !reduceMotion {
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        accentColor.opacity(0.0),
-                                        accentColor.opacity(0.08),
-                                        .white.opacity(0.04),
-                                        accentColor.opacity(0.0)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
+                    // Static gradient sheen overlay
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    accentColor.opacity(0.0),
+                                    accentColor.opacity(0.08),
+                                    .white.opacity(0.04),
+                                    accentColor.opacity(0.0)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
                             )
-                            .rotationEffect(.degrees(sheenOffset * 360))
-                    }
+                        )
 
                     // Subtle inner glow
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -90,18 +86,6 @@ struct LiquidGlassCard<Content: View>: View {
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .onAppear { startSheenAnimation() }
-    }
-
-    private func startSheenAnimation() {
-        guard !reduceMotion else { return }
-        withAnimation(
-            .linear(duration: 6.0)
-            .repeatForever(autoreverses: false)
-            .delay(1.0)
-        ) {
-            sheenOffset = 0.5
-        }
     }
 }
 
@@ -183,18 +167,18 @@ extension View {
                         Image(systemName: "sparkles")
                             .font(.title2)
                             .foregroundStyle(.green)
-                        Text("Liquid Glass")
+                        Text(L10n.text("preview_liquid_glass"))
                             .font(.headline)
                             .foregroundStyle(.white)
                     }
-                    Text("Premium glass morphism with animated sheen, depth layers, and adaptive accents.")
+                    Text(L10n.text("preview_liquid_glass_desc"))
                         .font(.subheadline)
                         .foregroundStyle(.white.opacity(0.7))
                 }
             }
 
             GlassCard {
-                Text("Legacy GlassCard → LiquidGlassCard")
+                Text(L10n.text("preview_legacy_glass"))
                     .foregroundStyle(.white)
             }
         }

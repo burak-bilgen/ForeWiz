@@ -372,11 +372,11 @@ struct ClimateAdjustedRoute: Sendable {
     var formattedAddedTime: String {
         let minutes = Int(addedTime) / 60
         if minutes < 60 {
-            return "+\(minutes) min"
+            return L10n.formatted("climate_added_minutes", minutes)
         } else {
             let hours = minutes / 60
             let mins = minutes % 60
-            return "+\(hours)h \(mins)m"
+            return L10n.formatted("climate_added_hours_minutes", hours, mins)
         }
     }
     

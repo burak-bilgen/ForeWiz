@@ -601,13 +601,13 @@ struct CountdownView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            TimeUnitView(value: hours, unit: "HRS")
+            TimeUnitView(value: hours, unit: L10n.text("countdown_hrs"))
             Text(":")
                 .font(.title.bold())
-            TimeUnitView(value: minutes, unit: "MIN")
+            TimeUnitView(value: minutes, unit: L10n.text("countdown_min"))
             Text(":")
                 .font(.title.bold())
-            TimeUnitView(value: seconds, unit: "SEC")
+            TimeUnitView(value: seconds, unit: L10n.text("countdown_sec"))
         }
         .onAppear {
             updateTime()

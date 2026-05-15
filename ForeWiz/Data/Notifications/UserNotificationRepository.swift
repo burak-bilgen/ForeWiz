@@ -1,6 +1,5 @@
 import Foundation
 import UserNotifications
-import os
 
 final class UserNotificationRepository: NotificationRepository {
     private let center: UNUserNotificationCenter

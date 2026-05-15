@@ -1,6 +1,13 @@
 import SwiftUI
 
-// MARK: - WizPath HUD Card — Liquid Glass Premium
+// MARK: - Shared HUD Status
+final class WizPathHUDStatus: ObservableObject {
+    static let shared = WizPathHUDStatus()
+    @Published var currentStatus: RouteStatus = .noRoute
+    private init() {}
+}
+
+// MARK: - WizPath HUD Card - Liquid Glass Premium
 /// Home screen entry point for WizPath with Liquid Glass aesthetic.
 /// Features animated glass background, pulse glow, and haptic feedback.
 struct WizPathHUDCard: View {
@@ -83,17 +90,17 @@ struct WizPathHUDCard: View {
         switch routeStatus {
         case .optimal(let destination, _): return destination
         case .warning(let destination, _, _): return destination
-        case .critical(let destination, _): return "Alert: \(destination)"
-        case .noRoute: return "Plan Your Journey"
+        case .critical(let destination, _): return L10n.formatted("wizpath_alert_format", destination)
+        case .noRoute: return L10n.text("wizpath_plan_journey")
         }
     }
 
     private var statusSubtitle: String {
         switch routeStatus {
-        case .optimal(_, let eta): return "Clear route · ETA \(eta)"
-        case .warning(_, let hazard, let eta): return "\(hazard) ahead · ETA \(eta)"
-        case .critical(_, let hazard): return "\(hazard) — check route"
-        case .noRoute: return "Tap to set destination"
+        case .optimal(_, let eta): return L10n.formatted("wizpath_clear_route_format", eta)
+        case .warning(_, let hazard, let eta): return L10n.formatted("wizpath_hazard_ahead_format", hazard, eta)
+        case .critical(_, let hazard): return L10n.formatted("wizpath_hazard_check_format", hazard)
+        case .noRoute: return L10n.text("wizpath_tap_destination")
         }
     }
 }

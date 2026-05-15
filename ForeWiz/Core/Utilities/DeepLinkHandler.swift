@@ -25,7 +25,7 @@ enum DeepLink: Equatable {
             guard !sanitized.isEmpty else { return nil }
             return .recommendationDetail(sanitized)
         case "onboarding":
-            // Intentionally accessible — allows deeplink to reset to onboarding flow
+            // Intentionally accessible - allows deeplink to reset to onboarding flow
             return .onboarding
         default:
             return nil

@@ -343,7 +343,7 @@ struct WizPathDashboardView: View {
                     if let temp = route.segments.first?.weather?.temperature {
                         statItem(
                             icon: "thermometer.medium",
-                            value: "\\(Int(temp))°",
+                            value: "\(Int(temp))\(L10n.text("unit_degree"))",
                             label: L10n.text("wizpath_avg_temp")
                         )
                     }
@@ -437,7 +437,7 @@ struct WizPathDashboardView: View {
                         .foregroundStyle(Color(hex: weather.severity.colorHex))
                         .shadow(color: Color(hex: weather.severity.colorHex).opacity(0.4), radius: 4)
 
-                    Text("\\(Int(weather.temperature))°")
+                    Text("\(Int(weather.temperature))\(L10n.text("unit_degree"))")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundStyle(.white)
 
@@ -467,14 +467,14 @@ struct WizPathDashboardView: View {
         let h = Int(duration) / 3600
         let m = (Int(duration) % 3600) / 60
         if h > 0 {
-            return "\\(h) \(L10n.text("wizpath_hours")) \(m) \(L10n.text("wizpath_minutes"))"
+            return "\(h) \(L10n.text("wizpath_hours")) \(m) \(L10n.text("wizpath_minutes"))"
         }
-        return "\\(m) \(L10n.text("wizpath_minutes"))"
+        return "\(m) \(L10n.text("wizpath_minutes"))"
     }
 
     private func formattedDistance(_ dist: CLLocationDistance) -> String {
         let km = dist / 1000
-        return km >= 10 ? "\\(Int(km)) km" : String(format: "%.1f km", km)
+        return km >= 10 ? "\(Int(km)) \(L10n.text("unit_km"))" : String(format: "%.1f \(L10n.text("unit_km"))", km)
     }
 
     private func statItem(icon: String, value: String, label: String) -> some View {
@@ -675,7 +675,7 @@ struct QuickTimeChip: View {
 
     var body: some View {
         Button(action: action) {
-            Text(String(format: "%02d:00", hour))
+            Text(L10n.formatted("time_format_full", hour))
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(isSelected ? .white : .white.opacity(0.8))
                 .frame(maxWidth: .infinity)
@@ -696,7 +696,7 @@ struct QuickTimeChip: View {
 // MARK: - WizPath Journey HUD Data
 extension WizPathRoute {
     var journeyHUDData: JourneyHUDData {
-        let hazards = [EnvironmentalHazard]()
+        let hazards = generateEnvironmentalHazards()
         let safeStops = [SmartStop]()
         return JourneyHUDData(
             totalDuration: totalDuration,
@@ -707,6 +707,64 @@ extension WizPathRoute {
             activeHazards: hazards,
             nextSafeStop: safeStops.first
         )
+    }
+
+    private func generateEnvironmentalHazards() -> [EnvironmentalHazard] {
+        var hazards: [EnvironmentalHazard] = []
+        for (index, segment) in segments.enumerated() {
+            guard let weather = segment.weather else { continue }
+            let hazardType: HazardType?
+            let details: String
+            let recommendation: String
+
+            switch weather.condition {
+            case .thunderstorm:
+                hazardType = .thunderstorm
+                details = L10n.formatted("wizpath_hazard_thunderstorm_detail", Int(weather.windSpeed))
+                recommendation = L10n.text("wizpath_hazard_thunderstorm_rec")
+            case .heavyRain:
+                hazardType = .heavyRain
+                details = L10n.formatted("wizpath_hazard_heavyrain_detail", Int(weather.precipitationChance * 100))
+                recommendation = L10n.text("wizpath_hazard_heavyrain_rec")
+            case .fog:
+                hazardType = .fog
+                details = L10n.formatted("wizpath_hazard_fog_detail", Int(weather.visibility))
+                recommendation = L10n.text("wizpath_hazard_fog_rec")
+            case .snow, .sleet:
+                hazardType = .snow
+                details = L10n.formatted("wizpath_hazard_snow_detail", Int(weather.temperature))
+                recommendation = L10n.text("wizpath_hazard_snow_rec")
+            default:
+                if weather.windSpeed > 50 {
+                    hazardType = .crosswind
+                    details = L10n.formatted("wizpath_hazard_wind_detail", Int(weather.windSpeed))
+                    recommendation = L10n.text("wizpath_hazard_wind_rec")
+                } else if weather.temperature <= 0 && weather.condition == .clear {
+                    hazardType = .ice
+                    details = L10n.formatted("wizpath_hazard_ice_detail", Int(weather.temperature))
+                    recommendation = L10n.text("wizpath_hazard_ice_rec")
+                } else {
+                    hazardType = nil
+                    details = ""
+                    recommendation = ""
+                }
+            }
+
+            if let type = hazardType {
+                let severity: HazardSeverity = weather.severity >= 3 ? .severe : .moderate
+                hazards.append(EnvironmentalHazard(
+                    id: UUID(),
+                    type: type,
+                    coordinate: segment.coordinate,
+                    routeSegmentIndex: index,
+                    severity: severity,
+                    details: details,
+                    recommendation: recommendation,
+                    etaAtLocation: segment.estimatedArrival
+                ))
+            }
+        }
+        return hazards
     }
 }
 

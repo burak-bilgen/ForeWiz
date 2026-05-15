@@ -18,7 +18,10 @@ struct HomeView: View {
     @State private var contentReady = false
     @State private var toolbarAppeared = false
     @State private var showWizPathSheet = false
-    @State private var wizPathRouteStatus: RouteStatus = .noRoute
+
+    private var wizPathRouteStatus: RouteStatus {
+        WizPathHUDStatus.shared.currentStatus
+    }
 
     private var currentSymbol: String {
         if case .loaded(let state) = viewModel.state { return state.currentWeather.symbolName }
@@ -71,6 +74,11 @@ struct HomeView: View {
             }
             .fullScreenCover(isPresented: $showWizPathSheet) {
                 WizPathDashboardView()
+            }
+            .onChange(of: showWizPathSheet) { _, isPresented in
+                if !isPresented {
+                    objectWillChange.send()
+                }
             }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
@@ -328,14 +336,14 @@ private struct HeroCard: View {
                     // Metric Grid
                     HStack(spacing: 0) {
                         MetricCell(icon: "thermometer.medium", value: weather.feelsLikeText
-                            .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""), label: "Feels")
+                            .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""), label: L10n.text("home_metric_feels"))
                         if weather.highTempText != "–" {
-                            MetricCell(icon: "arrow.up", value: weather.highTempText, label: "High")
+                            MetricCell(icon: "arrow.up", value: weather.highTempText, label: L10n.text("home_metric_high"))
                         }
                         if weather.lowTempText != "–" {
-                            MetricCell(icon: "arrow.down", value: weather.lowTempText, label: "Low")
+                            MetricCell(icon: "arrow.down", value: weather.lowTempText, label: L10n.text("home_metric_low"))
                         }
-                        MetricCell(icon: "humidity.fill", value: weather.humidityText, label: "Humidity")
+                        MetricCell(icon: "humidity.fill", value: weather.humidityText, label: L10n.text("home_metric_humidity"))
                     }
                 }
 
@@ -358,7 +366,7 @@ private struct HeroCard: View {
         }
         .onAppear { iconPulse = true }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Weather: \(weather.temperatureText), \(weather.conditionText). \(assistant.headline)")
+        .accessibilityLabel(L10n.formatted("accessibility_hero_weather_template", weather.temperatureText, weather.conditionText, assistant.headline))
     }
 }
 
@@ -514,7 +522,7 @@ private struct WarningBanner: View {
                 .stroke(AppTheme.warning.opacity(0.2), lineWidth: 0.5)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Warning: \(message)")
+        .accessibilityLabel(L10n.formatted("accessibility_warning_banner_template", message))
     }
 }
 
@@ -665,7 +673,7 @@ private struct OutfitCard: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Outfit recommendation: \(outfit.title)")
+        .accessibilityLabel(L10n.formatted("accessibility_outfit_template", outfit.title))
     }
 }
 
@@ -711,7 +719,7 @@ private struct HourlyPill: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text("\(item.hour):00")
+            Text("\(item.hour)\(L10n.text("time_format_hour"))")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
 
@@ -785,10 +793,10 @@ private struct ForecastRow: View {
                 .frame(width: 20)
 
             HStack(spacing: 4) {
-                Text("\(Int(forecast.highTemp))°")
+                Text("\(Int(forecast.highTemp))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                Text("\(Int(forecast.lowTemp))°")
+                Text("\(Int(forecast.lowTemp))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.35))
             }
@@ -800,7 +808,7 @@ private struct ForecastRow: View {
                 HStack(spacing: 3) {
                     Image(systemName: "drop.fill")
                         .font(.system(size: 8))
-                    Text("\(Int(forecast.precipitationChance * 100))%")
+                    Text("\(Int(forecast.precipitationChance * 100))\(L10n.text("unit_percent"))")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                 }
                 .foregroundStyle(AppTheme.sky)
@@ -829,7 +837,7 @@ private struct AttributionView: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text("Powered by \(info.serviceName)")
+            Text(L10n.formatted("home_attribution_powered", info.serviceName))
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.25))
             if let legal = info.legalAttributionText, !legal.isEmpty {
@@ -850,7 +858,7 @@ private struct LastUpdatedBadge: View {
         HStack(spacing: 4) {
             Image(systemName: "clock.arrow.circlepath")
                 .font(.system(size: 10))
-            Text("Updated \(text)")
+            Text(L10n.formatted("home_attribution_updated", text))
                 .font(.system(size: 11, weight: .medium, design: .rounded))
         }
         .foregroundStyle(.white.opacity(0.18))
@@ -937,7 +945,7 @@ struct HomeLoadingView: View {
         VStack(spacing: 20) {
             PulsingDotsLoader(color: .white.opacity(0.5), dotSize: 10)
                 .floating(amplitude: 6)
-            Text("Fetching your weather...")
+            Text(L10n.text("home_loading_text"))
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.35))
         }

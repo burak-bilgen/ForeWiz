@@ -71,7 +71,7 @@ final class MockWeatherRepository: WeatherRepository {
             attribution: WeatherAttributionInfo(
                 serviceName: "Mock Weather",
                 legalPageURLString: nil,
-                legalAttributionText: "Simulator mock data — not real weather"
+                legalAttributionText: "Simulator mock data - not real weather"
             )
         )
     }

@@ -9,15 +9,12 @@ final class WizPathService {
     static let shared = WizPathService()
 
     private let cache = WizPathCache()
-    private let weatherRepository: WeatherRepository
-    private let locationRepository: LocationRepository
+    private let weatherRepository: WeatherRepository?
+    private let locationRepository: LocationRepository?
 
     private init() {
-        guard let dependencyContainer = DependencyContainer.shared else {
-            fatalError("DependencyContainer not initialized before WizPathService.shared")
-        }
-        self.weatherRepository = dependencyContainer.weatherRepository
-        self.locationRepository = dependencyContainer.locationRepository
+        self.weatherRepository = DependencyContainer.shared?.weatherRepository
+        self.locationRepository = DependencyContainer.shared?.locationRepository
     }
 
     init(
@@ -158,6 +155,9 @@ final class WizPathService {
                 )
 
                 do {
+                    guard let weatherRepository else {
+                        throw AppError.weatherUnavailable
+                    }
                     let snapshot = try await weatherRepository.fetchWeather(for: coord)
                     let weather = segmentWeather(from: snapshot, at: segment.estimatedArrival)
                     weatherCache[hour] = weather
@@ -235,10 +235,10 @@ final class WizPathService {
 
     private func visibility(for condition: SegmentWeatherCondition, precipitation: Double) -> Double {
         switch condition {
-        case .fog: return Double.random(in: 0.5...2)
-        case .heavyRain, .thunderstorm: return Double.random(in: 3...6)
-        case .rain, .snow, .sleet: return Double.random(in: 5...10)
-        case .cloudy: return Double.random(in: 8...12)
+        case .fog: return max(0.5, 2.0 - precipitation * 1.5)
+        case .heavyRain, .thunderstorm: return max(3.0, 6.0 - precipitation * 3.0)
+        case .rain, .snow, .sleet: return max(5.0, 10.0 - precipitation * 5.0)
+        case .cloudy: return max(8.0, 12.0 - precipitation * 2.0)
         default: return 15
         }
     }
@@ -304,6 +304,9 @@ final class WizPathService {
     // MARK: - Location Services
 
     func getCurrentLocation() async throws -> LocationCoordinate {
+        guard let locationRepository else {
+            throw AppError.locationUnavailable
+        }
         try await locationRepository.getCurrentLocation()
     }
 }
@@ -331,20 +334,20 @@ final class WizPathCache {
 
     func store(route: WizPathRoute) {
         queue.async {
-            let key = "\\(route.origin.latitude),\\(route.origin.longitude)|\\(route.destination.latitude),\\(route.destination.longitude)|\\(route.travelMode.rawValue)"
+            let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)"
             self.routeCache[key] = route
         }
     }
 
     func route(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> WizPathRoute? {
         queue.sync {
-            let key = "\\(origin.latitude),\\(origin.longitude)|\\(destination.latitude),\\(destination.longitude)|\\(mode.rawValue)"
+            let key = "\(origin.latitude),\(origin.longitude)|\(destination.latitude),\(destination.longitude)|\(mode.rawValue)"
             return self.routeCache[key]
         }
     }
 
     func clear() {
-        queue.async {
+        queue.sync {
             self.routeCache.removeAll()
         }
     }

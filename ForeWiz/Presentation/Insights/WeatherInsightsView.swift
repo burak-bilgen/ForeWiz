@@ -58,7 +58,7 @@ struct WeatherInsightsView: View {
     }
 
     private var timeRangeSelector: some View {
-        Picker("Time Range", selection: $selectedTimeRange) {
+        Picker(L10n.text("insights_time_range"), selection: $selectedTimeRange) {
             ForEach(TimeRange.allCases) { range in
                 Text(range.localizedTitle)
                     .tag(range)
@@ -112,15 +112,15 @@ struct WeatherInsightsView: View {
             Chart {
                 ForEach(chartData, id: \.hour) { point in
                     LineMark(
-                        x: .value("Hour", point.hour),
-                        y: .value("Value", point.value)
+                        x: .value(L10n.text("chart_axis_hour"), point.hour),
+                        y: .value(L10n.text("chart_axis_value"), point.value)
                     )
                     .interpolationMethod(.catmullRom)
                     .foregroundStyle(selectedMetric.color)
 
                     AreaMark(
-                        x: .value("Hour", point.hour),
-                        y: .value("Value", point.value)
+                        x: .value(L10n.text("chart_axis_hour"), point.hour),
+                        y: .value(L10n.text("chart_axis_value"), point.value)
                     )
                     .interpolationMethod(.catmullRom)
                     .foregroundStyle(selectedMetric.color.opacity(0.1))
@@ -128,7 +128,7 @@ struct WeatherInsightsView: View {
 
                 let currentHour = Calendar.current.component(.hour, from: Date())
                 if chartData.contains(where: { $0.hour == currentHour }) {
-                    RuleMark(x: .value("Now", currentHour))
+                    RuleMark(x: .value(L10n.text("chart_now_label"), currentHour))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
                         .foregroundStyle(.gray)
                 }
@@ -139,7 +139,7 @@ struct WeatherInsightsView: View {
                     AxisGridLine()
                     AxisValueLabel {
                         if let hour = value.as(Int.self) {
-                            Text("\(hour):00")
+                            Text(L10n.formatted("time_format_full", hour))
                                 .font(.caption)
                         }
                     }
@@ -395,11 +395,11 @@ enum MetricType: String, CaseIterable, Identifiable {
 
     var unit: String {
         switch self {
-        case .temperature: return "°C"
-        case .humidity: return "%"
-        case .wind: return "km/h"
+        case .temperature: return L10n.text("unit_celsius")
+        case .humidity: return L10n.text("unit_percent")
+        case .wind: return L10n.text("unit_km_per_h")
         case .uvIndex: return ""
-        case .precipitation: return "%"
+        case .precipitation: return L10n.text("unit_percent")
         }
     }
 
@@ -426,11 +426,11 @@ enum MetricType: String, CaseIterable, Identifiable {
     func currentValue(from snapshot: WeatherSnapshot) -> String {
         let current = snapshot.current
         switch self {
-        case .temperature: return "\(Int(current.apparentTemperatureCelsius))°C"
-        case .humidity: return "\(Int((current.humidity ?? 0) * 100))%"
-        case .wind: return "\(Int(current.windSpeedKph ?? 0)) km/h"
+        case .temperature: return "\(Int(current.apparentTemperatureCelsius))\(L10n.text("unit_celsius"))"
+        case .humidity: return "\(Int((current.humidity ?? 0) * 100))\(L10n.text("unit_percent"))"
+        case .wind: return "\(Int(current.windSpeedKph ?? 0)) \(L10n.text("unit_km_per_h"))"
         case .uvIndex: return "\(current.uvIndex ?? 0)"
-        case .precipitation: return "\(Int((current.precipitationChance ?? 0) * 100))%"
+        case .precipitation: return "\(Int((current.precipitationChance ?? 0) * 100))\(L10n.text("unit_percent"))"
         }
     }
 }
@@ -635,10 +635,10 @@ struct ComfortWindowRow: View {
 
     var body: some View {
         HStack {
-            let startText = String(format: "%02d:00", window.startHour)
-            let endText = window.endHour.map { String(format: "%02d:00", $0) } ?? "..."
+            let startText = L10n.formatted("time_format_full", window.startHour)
+            let endText = window.endHour.map { L10n.formatted("time_format_full", $0) } ?? L10n.text("time_fallback_end")
 
-            Text("\(startText) - \(endText)")
+            Text("\(startText)\(L10n.text("time_range_separator"))\(endText)")
                 .font(.subheadline)
                 .monospacedDigit()
                 .lineLimit(1)

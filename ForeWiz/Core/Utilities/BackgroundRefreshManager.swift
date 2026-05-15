@@ -2,7 +2,6 @@ import Foundation
 import BackgroundTasks
 import UIKit
 import OSLog
-import Network
 import UserNotifications
 import WidgetKit
 

@@ -9,7 +9,7 @@ enum AppTheme {
 
     // MARK: - Liquid Glass Core
 
-    /// Primary dynamic accent — shifts with context, always vibrant.
+    /// Primary dynamic accent - shifts with context, always vibrant.
     static let liquidAccent = Color(red: 0.25, green: 0.60, blue: 1.0)
 
     /// Secondary accent for highlights and badges.
@@ -26,45 +26,45 @@ enum AppTheme {
 
     // MARK: - Weather-Inspired Accents
 
-    /// Clear sky — bright, cheerful blue.
+    /// Clear sky - bright, cheerful blue.
     static let sky = Color(red: 0.35, green: 0.68, blue: 1.0)
 
-    /// Deep ocean — for rainy conditions.
+    /// Deep ocean - for rainy conditions.
     static let ocean = Color(red: 0.18, green: 0.40, blue: 0.75)
 
-    /// Teal — for moderate, balanced weather.
+    /// Teal - for moderate, balanced weather.
     static let teal = Color(red: 0.15, green: 0.75, blue: 0.68)
 
-    /// Golden sunshine — warm, bright.
+    /// Golden sunshine - warm, bright.
     static let sunshine = Color(red: 1.0, green: 0.75, blue: 0.25)
 
-    /// Warm ember — for hot conditions.
+    /// Warm ember - for hot conditions.
     static let ember = Color(red: 1.0, green: 0.55, blue: 0.20)
 
-    /// Vibrant coral — for warnings/alerts.
+    /// Vibrant coral - for warnings/alerts.
     static let coral = Color(red: 1.0, green: 0.40, blue: 0.40)
 
-    /// Royal purple — for storms/dramatic weather.
+    /// Royal purple - for storms/dramatic weather.
     static let royalPurple = Color(red: 0.55, green: 0.35, blue: 0.95)
 
-    /// Soft pink — for dawn/dusk transitions.
+    /// Soft pink - for dawn/dusk transitions.
     static let dawnPink = Color(red: 0.95, green: 0.50, blue: 0.70)
 
-    /// Icy blue — for cold/snow conditions.
+    /// Icy blue - for cold/snow conditions.
     static let ice = Color(red: 0.70, green: 0.85, blue: 1.0)
 
-    /// Storm gray — for fog/overcast.
+    /// Storm gray - for fog/overcast.
     static let stormGray = Color(red: 0.45, green: 0.50, blue: 0.60)
 
     // MARK: - Status / Decision Colors
 
-    /// Optimal outdoor conditions — rich emerald.
+    /// Optimal outdoor conditions - rich emerald.
     static let success = Color(red: 0.18, green: 0.70, blue: 0.48)
 
-    /// Moderate conditions — warm amber.
+    /// Moderate conditions - warm amber.
     static let warning = Color(red: 0.95, green: 0.62, blue: 0.18)
 
-    /// Avoid/postpone — vibrant coral.
+    /// Avoid/postpone - vibrant coral.
     static let danger = Color(red: 0.92, green: 0.28, blue: 0.32)
 
     // MARK: - Semantic Tokens

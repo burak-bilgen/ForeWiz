@@ -37,7 +37,7 @@ struct ScoreRingView: View {
                         .font(.system(size: size * 0.30, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.white)
-                    Text("/100")
+                    Text(L10n.text("home_score_out_of_100"))
                         .font(.system(size: size * 0.12, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.white.opacity(0.4))
                 } else {
@@ -45,7 +45,7 @@ struct ScoreRingView: View {
                         .font(.system(size: size * 0.28, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.white)
-                    Text("/10")
+                    Text(L10n.text("home_score_out_of_10"))
                         .font(.system(size: size * 0.13, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.white.opacity(0.4))
                 }
@@ -77,7 +77,7 @@ struct ScoreRingView: View {
 
     private var scoreAccessibilityLabel: String {
         let scoreValue = score.displayValue.formatted(.number.precision(.fractionLength(1)))
-        return L10n.text("widget_outdoor_score") + " \(scoreValue) / 10"
+        return L10n.text("widget_outdoor_score") + " \(scoreValue) \(L10n.text("home_score_out_of_10"))"
     }
 
     private var scoreColor: Color {

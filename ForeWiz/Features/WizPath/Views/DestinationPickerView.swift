@@ -413,7 +413,15 @@ struct DestinationPickerView: View {
 
         Task {
             do {
-                let response = try await search.start()
+                let response = try await withCheckedThrowingContinuation { continuation in
+                    search.start { response, error in
+                        if let response = response {
+                            continuation.resume(returning: response)
+                        } else {
+                            continuation.resume(throwing: error ?? URLError(.unknown))
+                        }
+                    }
+                }
                 if let mapItem = response.mapItems.first {
                     let coordinate = mapItem.placemark.coordinate
                     selectedCoordinate = coordinate
@@ -436,7 +444,7 @@ struct DestinationPickerView: View {
                     }
                 }
             } catch {
-                AppLogger.search.error("Search failed: \\(error.localizedDescription)")
+                AppLogger.search.error("Search failed: \(error.localizedDescription)")
             }
         }
     }
@@ -524,7 +532,7 @@ extension LocationSearchCompleter: MKLocalSearchCompleterDelegate {
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
-        AppLogger.search.error("Search completer failed: \\(error.localizedDescription)")
+        AppLogger.search.error("Search completer failed: \(error.localizedDescription)")
         Task { @MainActor in
             self.results = []
             self.isSearching = false
@@ -565,7 +573,7 @@ extension DestinationLocationManager: CLLocationManagerDelegate {
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        AppLogger.location.error("Destination picker location error: \\(error.localizedDescription)")
+        AppLogger.location.error("Destination picker location error: \(error.localizedDescription)")
     }
 
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
