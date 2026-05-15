@@ -759,6 +759,7 @@ private struct HourlyPill: View {
 
 private struct WeeklyForecastSection: View {
     let dailyForecasts: [DailyForecastItem]
+    @State private var showPaywall = false
 
     var body: some View {
         LiquidGlassCard(accentColor: AppTheme.sky) {
@@ -775,6 +776,53 @@ private struct WeeklyForecastSection: View {
                             .background(.white.opacity(0.04))
                     }
                 }
+
+                // Premium 14-day CTA (locked behind paywall)
+                if !FeatureGate.isUnlocked(.fourteenDayForecast) {
+                    premiumCTASection
+                }
+            }
+        }
+        .sheet(isPresented: $showPaywall) {
+            PremiumPaywallView()
+        }
+    }
+
+    private var premiumCTASection: some View {
+        VStack(spacing: 10) {
+            Divider()
+                .background(.white.opacity(0.06))
+
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(AppTheme.liquidAccent.opacity(0.12))
+                        .frame(width: 32, height: 32)
+                    Image(systemName: "lock.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(AppTheme.liquidAccent)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("home_forecast_premium_cta"))
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(L10n.text("forecast_premium_required"))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.3))
+            }
+            .padding(.vertical, 4)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                HapticEngine.shared.light()
+                showPaywall = true
             }
         }
     }
@@ -1042,7 +1090,8 @@ struct HomeErrorView: View {
             scheduleSmartNotificationsUseCase: DefaultScheduleSmartNotificationsUseCase(
                 notificationRepository: UserNotificationRepository(),
                 notificationPlanningEngine: DefaultNotificationPlanningEngine(),
-                dateProvider: dateProvider
+                dateProvider: dateProvider,
+                severeWeatherAlertService: SevereWeatherAlertService.shared
             ),
             preferencesRepository: preferencesRepo
         ),

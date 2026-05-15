@@ -80,7 +80,8 @@ struct WizPathDashboardView: View {
                             .foregroundStyle(.secondary)
                             .symbolRenderingMode(.hierarchical)
                     }
-                    .accessibleButton(label: L10n.text("wizpath_close"))
+                    .accessibilityLabel(L10n.text("wizpath_close"))
+                    .accessibilityAddTraits(.isButton)
                 }
             }
             .sheet(isPresented: $showDestinationPicker) {

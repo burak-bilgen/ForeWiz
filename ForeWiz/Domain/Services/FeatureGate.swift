@@ -44,12 +44,13 @@ enum Feature: String, CaseIterable, Sendable {
     case severeWeatherAlerts
     case removeAds
     case widgets
+    case fourteenDayForecast
     
     var requiredTier: PremiumTier {
         switch self {
         case .dailyForecast, .hourlyForecast:
             return .free
-        case .insights, .severeWeatherAlerts, .removeAds, .widgets:
+        case .insights, .severeWeatherAlerts, .removeAds, .widgets, .fourteenDayForecast:
             return .premium
         }
     }

@@ -1,0 +1,24 @@
+feat: Complete Phase 1-3 — Premium subscription system and Widget Extension
+
+Phase 1 — Critical Fixes:
+- Extract ContainerProvider from SiriShortcutsManager with proper OSLog import
+- Wire SevereWeatherAlertService into DependencyContainer with FeatureGate gating
+- Complete DeepLinkHandler recommendationDetail case with analytics
+- Remove 500+ lines of dead AccessibilityHelpers code, inline into WizPathDashboardView
+
+Phase 2 — Premium Subscription System (StoreKit 2):
+- PremiumManager: @Observable/@MainActor StoreKit 2 manager with product loading, purchasing, restoring, transaction observation
+- PremiumPaywallView: Liquid Glass paywall with feature grid, pricing cards (auto-selects yearly), restore flow
+- ForeWizApp: Products loaded and subscription checked on launch
+- SettingsView: PremiumStatusView with active badge or upgrade CTA + paywall sheet
+- HomeView: 14-day forecast locked behind premium CTA with paywall sheet
+- FeatureGate: Added .fourteenDayForecast case
+- 6 new premium localization keys
+
+Phase 3 — Widget Extension:
+- ForeWizWidgets target with WidgetBundle, StaticConfiguration, TimelineProvider
+- Small widget: condition icon + temperature + outdoor score ring
+- Medium widget: conditions + score + 3-day forecast with score bars
+- Liquid Glass dark gradient aesthetic matching the app
+- App Group sharing (group.forewiz) between main app and widget
+- Automatic weather data caching to UserDefaults on each live fetch

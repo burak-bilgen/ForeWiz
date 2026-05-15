@@ -2,7 +2,6 @@ import Foundation
 import AppIntents
 import SwiftUI
 import OSLog
-import SwiftData
 import WidgetKit
 
 @available(iOS 16.0, *)
@@ -323,52 +322,6 @@ extension WeatherRiskType {
         case .poorComfort: return L10n.text("risk_type_poor_comfort")
         }
     }
-}
-
-@available(iOS 16.0, *)
-@MainActor
-final class ContainerProvider {
-    static let shared = ContainerProvider()
-
-    private var _container: DependencyContainer?
-
-    var container: DependencyContainer {
-        get async throws {
-            if let container = _container {
-                return container
-            }
-
-            let container: ModelContainer
-            do {
-                let config = ModelConfiguration(isStoredInMemoryOnly: false)
-                container = try ModelContainer(
-                    for: UserPreferencesModel.self,
-                    WeatherSnapshotModel.self,
-                    configurations: config
-                )
-            } catch {
-                AppLogger.shortcuts.error("Persistent shortcut container failed: \(error.localizedDescription)")
-                do {
-                    let fallbackConfig = ModelConfiguration(isStoredInMemoryOnly: true)
-                    container = try ModelContainer(
-                        for: UserPreferencesModel.self,
-                        WeatherSnapshotModel.self,
-                        configurations: fallbackConfig
-                    )
-                } catch {
-                    AppLogger.shortcuts.error("Failed to create shortcut ModelContainer: \(error.localizedDescription)")
-                    throw error
-                }
-            }
-
-            let context = ModelContext(container)
-            let newContainer = DependencyContainer.live(modelContext: context)
-            _container = newContainer
-            return newContainer
-        }
-    }
-
-    private init() {}
 }
 
 @available(iOS 16.0, *)

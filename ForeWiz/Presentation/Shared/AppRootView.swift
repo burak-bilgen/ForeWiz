@@ -50,9 +50,10 @@ struct AppRootView: View {
         case .home:
             break
         case .insights:
+            // Open insights view - can be expanded when insights screen gets navigation
             break
-        case .recommendationDetail:
-            break
+        case .recommendationDetail(let id):
+            AnalyticsManager.shared.track(.recommendationViewed(id))
         }
 
         deepLinkHandler.clear()

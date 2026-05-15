@@ -79,6 +79,16 @@ struct SettingsView: View {
                     }
                     .settingsCardEntrance(appeared: appeared, index: 3)
 
+                    // Premium Status
+                    SettingsCard(
+                        title: L10n.text("settings_premium_title"),
+                        icon: viewModel.isPremium ? "crown.fill" : "crown",
+                        color: AppTheme.liquidAccent
+                    ) {
+                        PremiumStatusView(isPremium: viewModel.isPremium)
+                    }
+                    .settingsCardEntrance(appeared: appeared, index: 4)
+
                     // Notifications
                     SettingsCard(
                         title: L10n.text("settings_section_notifications"),
@@ -87,7 +97,7 @@ struct SettingsView: View {
                     ) {
                         NotificationSettingsSection(profile: $viewModel.profile)
                     }
-                    .settingsCardEntrance(appeared: appeared, index: 4)
+                    .settingsCardEntrance(appeared: appeared, index: 5)
 
                     // Language
                     SettingsCard(
@@ -104,7 +114,7 @@ struct SettingsView: View {
                             label: { $0.localizedTitle }
                         )
                     }
-                    .settingsCardEntrance(appeared: appeared, index: 5)
+                    .settingsCardEntrance(appeared: appeared, index: 6)
 
                     // About
                     SettingsCard(
@@ -115,14 +125,14 @@ struct SettingsView: View {
                         SettingsInfoRow(icon: "doc.text", color: .white.opacity(0.4), text: L10n.text("settings_version") + " " + appVersion)
                         SettingsInfoRow(icon: "map.fill", color: AppTheme.sky, text: L10n.text("settings_data_apple_weather"))
                     }
-                    .settingsCardEntrance(appeared: appeared, index: 6)
+                    .settingsCardEntrance(appeared: appeared, index: 7)
 
                     // Delete Data
                     LiquidGlassButton(L10n.text("settings_delete_all_data_title"), icon: "trash", style: .danger, haptic: .heavy) {
                         showDeleteAllDataConfirmation = true
                     }
                     .frame(maxWidth: .infinity)
-                    .settingsCardEntrance(appeared: appeared, index: 7)
+                    .settingsCardEntrance(appeared: appeared, index: 8)
 
                     // Save banner
                     if let message = viewModel.saveMessage {
@@ -151,7 +161,6 @@ struct SettingsView: View {
                         .foregroundStyle(.white.opacity(0.5))
                 }
                 .contentShape(Rectangle())
-
                 .buttonStyle(.plain)
             }
         }
@@ -205,6 +214,68 @@ struct SettingsView: View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
         return "\(version) (\(build))"
+    }
+}
+
+// MARK: - Premium Status View
+
+struct PremiumStatusView: View {
+    let isPremium: Bool
+    @State private var showPaywall = false
+
+    var body: some View {
+        if isPremium {
+            premiumActiveContent
+        } else {
+            premiumUpgradeContent
+        }
+    }
+
+    private var premiumActiveContent: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "crown.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(AppTheme.liquidAccent)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("settings_premium_active"))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(L10n.text("settings_premium_active_subtitle"))
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.45))
+                }
+                Spacer()
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(AppTheme.success)
+            }
+        }
+        .padding(.vertical, 6)
+    }
+
+    private var premiumUpgradeContent: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("settings_premium_upgrade"))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(L10n.text("settings_premium_upgrade_subtitle"))
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.45))
+                }
+                Spacer()
+            }
+
+            LiquidGlassButton(L10n.text("premium_upgrade"), icon: "crown.fill", style: .primary, haptic: .medium) {
+                showPaywall = true
+            }
+        }
+        .padding(.vertical, 4)
+        .sheet(isPresented: $showPaywall) {
+            PremiumPaywallView()
+        }
     }
 }
 
@@ -351,7 +422,6 @@ private struct SettingsSensitivitySelector: View {
                     )
                 }
                 .contentShape(Rectangle())
-
                 .buttonStyle(.plain)
                 .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
             }
@@ -382,7 +452,6 @@ private struct SettingsActivityRow: View {
             .padding(.vertical, 5)
         }
         .contentShape(Rectangle())
-
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }

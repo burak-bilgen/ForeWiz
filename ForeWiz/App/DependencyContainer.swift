@@ -20,6 +20,9 @@ final class DependencyContainer {
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
     
+    // MARK: - Severe Weather
+    let severeWeatherAlertService: SevereWeatherAlertService
+    
     // MARK: - WizPath
     let wizPathService: WizPathService
     let locationService: LocationService
@@ -46,6 +49,7 @@ final class DependencyContainer {
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
         scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
         homeViewStateFactory: HomeViewStateFactory,
+        severeWeatherAlertService: SevereWeatherAlertService,
         weatherGradientService: WeatherGradientService,
         retryPolicy: NetworkRetryPolicy,
         wizPathService: WizPathService,
@@ -69,6 +73,7 @@ final class DependencyContainer {
         self.homeViewStateFactory = homeViewStateFactory
         self.weatherGradientService = weatherGradientService
         self.retryPolicy = retryPolicy
+        self.severeWeatherAlertService = severeWeatherAlertService
         self.wizPathService = wizPathService
         self.locationService = locationService
         Self.shared = self
@@ -96,6 +101,7 @@ final class DependencyContainer {
         )
         let weatherGradientService = WeatherGradientService.shared
         let retryPolicy = NetworkRetryPolicy.default
+        let severeWeatherAlertService = SevereWeatherAlertService.shared
         
         let locationService = LocationService(timeout: 8.0)
         let wizPathService = WizPathService(
@@ -123,7 +129,8 @@ final class DependencyContainer {
         let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
             notificationRepository: notificationRepository,
             notificationPlanningEngine: notificationEngine,
-            dateProvider: dateProvider
+            dateProvider: dateProvider,
+            severeWeatherAlertService: severeWeatherAlertService
         )
 
         return DependencyContainer(
@@ -143,6 +150,7 @@ final class DependencyContainer {
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
             scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
             homeViewStateFactory: homeViewStateFactory,
+            severeWeatherAlertService: severeWeatherAlertService,
             weatherGradientService: weatherGradientService,
             retryPolicy: retryPolicy,
             wizPathService: wizPathService,
@@ -173,6 +181,7 @@ final class DependencyContainer {
         )
         let weatherGradientService = WeatherGradientService.shared
         let retryPolicy = NetworkRetryPolicy.aggressive // More retries for production
+        let severeWeatherAlertService = SevereWeatherAlertService.shared
         
         let wizPathService = WizPathService(
             weatherRepository: weatherRepository,
@@ -199,7 +208,8 @@ final class DependencyContainer {
         let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
             notificationRepository: notificationRepository,
             notificationPlanningEngine: notificationEngine,
-            dateProvider: dateProvider
+            dateProvider: dateProvider,
+            severeWeatherAlertService: severeWeatherAlertService
         )
 
         return DependencyContainer(
@@ -219,6 +229,7 @@ final class DependencyContainer {
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
             scheduleSmartNotificationsUseCase: scheduleSmartNotificationsUseCase,
             homeViewStateFactory: homeViewStateFactory,
+            severeWeatherAlertService: severeWeatherAlertService,
             weatherGradientService: weatherGradientService,
             retryPolicy: retryPolicy,
             wizPathService: wizPathService,

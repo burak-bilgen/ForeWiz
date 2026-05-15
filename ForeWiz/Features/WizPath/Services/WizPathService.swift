@@ -193,7 +193,7 @@ final class WizPathService {
             calendar.isDate($0.date, inSameDayAs: date)
         }) ?? snapshot.hourly.min(by: { abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date)) }) {
 
-            let condition = mapConditionCode(hourlyPoint.symbolName ?? hourlyPoint.conditionCode ?? "clear")
+            let condition = mapConditionCode(hourlyPoint.conditionCode ?? hourlyPoint.symbolName ?? "clear")
             let severity = condition.severity
             let precip = hourlyPoint.precipitationChance ?? 0
             let wind = hourlyPoint.windSpeedKph ?? 0
@@ -316,7 +316,7 @@ final class WizPathService {
         guard let locationRepository else {
             throw AppError.locationUnavailable
         }
-        try await locationRepository.getCurrentLocation()
+        return try await locationRepository.getCurrentLocation()
     }
 }
 

@@ -231,7 +231,7 @@ struct MockPolyline {
 
 // MARK: - WizPathError Extension for Testing
 extension WizPathError {
-    static let noRouteAvailable = WizPathError.routeUnavailable
-    static let invalidCoordinates = WizPathError.destinationUnreachable
-    static let networkFailure = WizPathError.weatherAPIFailed
+    static var noRouteAvailable: WizPathError { .routeUnavailable }
+    static var invalidCoordinates: WizPathError { .destinationUnreachable }
+    static var networkFailure: WizPathError { .weatherAPIFailed }
 }

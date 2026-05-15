@@ -7,6 +7,7 @@ struct ForeWizApp: App {
     private let modelContainer: ModelContainer
     @State private var coordinator: AppCoordinator?
     @State private var deepLinkHandler = DeepLinkHandler()
+    @State private var premiumManager = PremiumManager.shared
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -67,6 +68,12 @@ struct ForeWizApp: App {
             .onChange(of: scenePhase) { _, phase in
                 handleScenePhaseChange(phase)
             }
+            .onChange(of: premiumManager.purchaseSuccess) { _, success in
+                if success {
+                    // Reload coordinator state when premium purchased
+                    Task { await coordinator?.start() }
+                }
+            }
             .preferredColorScheme(.dark)
             .buttonStyle(.fullTapArea)
         }
@@ -75,6 +82,16 @@ struct ForeWizApp: App {
     @MainActor
     private func initializeCoordinator() {
         let context = modelContainer.mainContext
+
+        // Load products and check premium subscription
+        Task {
+            await premiumManager.loadProducts()
+            let hasPremium = await premiumManager.hasActiveSubscription()
+            if hasPremium {
+                FeatureGate.currentTier = .premium
+            }
+        }
+
         #if targetEnvironment(simulator)
         coordinator = AppCoordinator(
             container: DependencyContainer.simulator(modelContext: context)
@@ -91,6 +108,14 @@ struct ForeWizApp: App {
         case .active:
             AppLifecycleManager.shared.applicationWillEnterForeground()
             AppLifecycleManager.shared.applicationDidBecomeActive()
+
+            // Refresh premium status on become active
+            Task {
+                let hasPremium = await premiumManager.hasActiveSubscription()
+                if hasPremium {
+                    FeatureGate.currentTier = .premium
+                }
+            }
         case .inactive:
             AppLifecycleManager.shared.applicationWillResignActive()
         case .background:
