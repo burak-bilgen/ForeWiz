@@ -119,6 +119,8 @@ struct OnboardingView: View {
                                         .stroke(selected ? AppTheme.ember.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
                                 )
                             }
+                            .contentShape(Rectangle())
+
                             .buttonStyle(.plain)
                             .accessibilityLabel(sensitivity.localizedTitle)
                         }
@@ -189,6 +191,8 @@ struct OnboardingView: View {
                                 )
                                 .scaleEffect(selected ? 1.05 : 1.0)
                             }
+                            .contentShape(Rectangle())
+
                             .buttonStyle(.plain)
                             .accessibilityLabel(activity.localizedTitle)
                         }
@@ -384,6 +388,8 @@ private struct PermissionRow: View {
                     .stroke(isGranted ? color.opacity(0.3) : .white.opacity(0.05), lineWidth: 1)
             )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .disabled(isGranted)
     }

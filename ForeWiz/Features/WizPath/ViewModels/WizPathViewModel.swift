@@ -163,10 +163,23 @@ final class WizPathViewModel: ObservableObject {
 
             // Check for sentinel alerts if we have a previous route
             if let previousRoute = lastCalculatedRoute {
+                let routeConditions = route.segments.compactMap { $0.weather?.condition }
+                let worstCondition = routeConditions.max(by: { $0.severity.rawValue < $1.severity.rawValue })
+                let primaryHazard: WeatherHazardType? = {
+                    switch worstCondition {
+                    case .thunderstorm: return .severeStorm
+                    case .heavyRain: return .flooding
+                    case .snow, .sleet:
+                        let avgTemp = route.segments.compactMap { $0.weather?.temperature }.reduce(0, +) / max(1, route.segments.count)
+                        return avgTemp < 0 ? .blizzard : .heavySnow
+                    default:
+                        return climateAnalysis?.isExtremeHeat == true ? .extremeHeat : nil
+                    }
+                }()
                 let weatherContext = WeatherContext(
-                    primaryHazard: nil,
+                    primaryHazard: primaryHazard,
                     temperature: climateAnalysis?.maxTemperature,
-                    conditions: [],
+                    conditions: routeConditions,
                     isExtreme: climateAnalysis?.isExtremeHeat ?? false
                 )
                 let decision = sentinelService.evaluateRouteChange(

@@ -112,6 +112,8 @@ struct LiquidGlassButton: View {
             .scaleEffect(isPressed ? 0.96 : 1.0)
             .opacity(isEnabled ? 1.0 : 0.4)
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
@@ -254,6 +256,8 @@ struct ToolbarLocationButton: View {
                     .stroke(.white.opacity(0.08), lineWidth: 0.5)
             )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .accessibilityLabel(L10n.text("current_location"))
         .accessibilityHint(L10n.text("tap_to_change_location"))
@@ -282,6 +286,8 @@ struct ToolbarSettingsButton: View {
                         .stroke(.white.opacity(0.06), lineWidth: 0.5)
                 )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .accessibilityLabel(L10n.text("settings_title"))
     }
@@ -317,6 +323,8 @@ struct ToolbarRefreshButton: View {
                 )
                 .rotationEffect(.degrees(isSpinning ? 360 : 0))
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .animation(.linear(duration: 0.8), value: isSpinning)
         .accessibilityLabel(L10n.text("refresh_weather"))
@@ -374,6 +382,8 @@ struct CardActionButton: View {
                     .stroke(color.opacity(0.15), lineWidth: 1)
             )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title): \(detail)")

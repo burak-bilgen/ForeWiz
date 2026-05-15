@@ -84,7 +84,7 @@ final class WizPathService {
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
         request.transportType = mode.mkTransportType
-        request.departureDate = Date()
+        request.departureDate = departureTime
         request.requestsAlternateRoutes = true
 
         let directions = MKDirections(request: request)
@@ -223,8 +223,8 @@ final class WizPathService {
         if lower.contains("thunder") || lower.contains("storm") || lower.contains("bolt") { return .thunderstorm }
         if lower.contains("heavy") && lower.contains("rain") { return .heavyRain }
         if lower.contains("rain") || lower.contains("drizzle") { return .rain }
-        if lower.contains("snow") || lower.contains("sleet") || lower.contains("flurry") { return .snow }
         if lower.contains("sleet") { return .sleet }
+        if lower.contains("snow") || lower.contains("flurry") { return .snow }
         if lower.contains("fog") || lower.contains("haze") || lower.contains("mist") { return .fog }
         if lower.contains("cloudy") || lower.contains("overcast") || lower.contains("mostly.cloud") { return .cloudy }
         if lower.contains("partly.cloudy") || lower.contains("partly.cloud") { return .partlyCloudy }

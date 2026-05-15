@@ -303,6 +303,10 @@ struct ClimateAnalysis: Sendable {
     var isCriticalHeat: Bool {
         maxTemperature >= WizPathClimateService.TemperatureThresholds.criticalHeat
     }
+
+    var primaryAlert: ClimateAlert? {
+        alerts.sorted(by: { $0.severity.rawValue > $1.severity.rawValue }).first
+    }
 }
 
 struct RouteHeatSegment: Sendable {

@@ -55,6 +55,8 @@ struct DestinationPickerView: View {
                             .foregroundStyle(.white.opacity(0.7))
                             .symbolRenderingMode(.hierarchical)
                     }
+                    .contentShape(Rectangle())
+
                     .buttonStyle(.plain)
                 }
             }
@@ -153,6 +155,8 @@ struct DestinationPickerView: View {
                             .font(.system(size: 16))
                             .foregroundStyle(.tertiary)
                     }
+                    .contentShape(Rectangle())
+
                     .buttonStyle(.plain)
                 }
             }
@@ -231,6 +235,8 @@ struct DestinationPickerView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                             }
+                            .contentShape(Rectangle())
+
                             .buttonStyle(.plain)
 
                             if result != searchCompleter.results.last {
@@ -304,6 +310,8 @@ struct DestinationPickerView: View {
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
                             }
+                            .contentShape(Rectangle())
+
                             .buttonStyle(.plain)
 
                             if recent != recentDestinations.prefix(5).last {

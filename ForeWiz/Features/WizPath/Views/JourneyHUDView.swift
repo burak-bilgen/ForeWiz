@@ -49,6 +49,8 @@ struct JourneyHUDView: View {
                             .background(Color.white.opacity(0.06))
                             .clipShape(Circle())
                     }
+                    .contentShape(Rectangle())
+
                     .buttonStyle(.plain)
                     .padding(.trailing, 10)
                 }

@@ -144,6 +144,8 @@ struct WizPathMapView: View {
                         .environment(\.colorScheme, .dark)
                 )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
     }
 

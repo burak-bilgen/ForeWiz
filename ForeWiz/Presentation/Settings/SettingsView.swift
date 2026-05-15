@@ -150,6 +150,8 @@ struct SettingsView: View {
                         .font(.system(size: 22))
                         .foregroundStyle(.white.opacity(0.5))
                 }
+                .contentShape(Rectangle())
+
                 .buttonStyle(.plain)
             }
         }
@@ -348,6 +350,8 @@ private struct SettingsSensitivitySelector: View {
                             .stroke(selected ? AppTheme.ember.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
                     )
                 }
+                .contentShape(Rectangle())
+
                 .buttonStyle(.plain)
                 .animation(.spring(response: 0.25, dampingFraction: 0.75), value: selected)
             }
@@ -377,6 +381,8 @@ private struct SettingsActivityRow: View {
             }
             .padding(.vertical, 5)
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }

@@ -206,6 +206,8 @@ struct WizPathDashboardView: View {
                     .stroke(Color.liquidAccent.opacity(0.12), lineWidth: 0.5)
             )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
     }
 
@@ -257,6 +259,8 @@ struct WizPathDashboardView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .disabled(!viewModel.canCalculate)
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
     }
 
@@ -287,6 +291,8 @@ struct WizPathDashboardView: View {
             .padding(14)
             .glassEffect(in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
     }
 
@@ -620,6 +626,8 @@ struct DepartureOptimizerView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .shadow(color: .liquidAccent.opacity(0.3), radius: 12, y: 4)
                     }
+                    .contentShape(Rectangle())
+
                     .buttonStyle(.plain)
                     .padding(.bottom, 24)
                 }
@@ -689,6 +697,8 @@ struct QuickTimeChip: View {
                         .stroke(isSelected ? Color.liquidAccent : Color.white.opacity(0.08), lineWidth: isSelected ? 1 : 0.5)
                 )
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
     }
 }
@@ -751,7 +761,12 @@ extension WizPathRoute {
             }
 
             if let type = hazardType {
-                let severity: HazardSeverity = weather.severity >= 3 ? .severe : .moderate
+                let severity: HazardSeverity
+                switch weather.severity {
+                case .severe: severity = .critical
+                case .caution: severity = .high
+                default: severity = .moderate
+                }
                 hazards.append(EnvironmentalHazard(
                     id: UUID(),
                     type: type,

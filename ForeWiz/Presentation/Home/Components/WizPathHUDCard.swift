@@ -67,6 +67,8 @@ struct WizPathHUDCard: View {
             )
             .scaleEffect(isPressed ? 0.97 : 1.0)
         }
+        .contentShape(Rectangle())
+
         .buttonStyle(.plain)
         .pressEvents(
             onPress: { withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } },
