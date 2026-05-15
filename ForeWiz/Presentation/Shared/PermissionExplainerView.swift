@@ -6,19 +6,22 @@ struct PermissionExplainerView: View {
     let message: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: systemImage)
-                .font(.title3)
-                .foregroundStyle(.blue)
-                .frame(width: 32, height: 32)
+        LiquidGlassCard {
+            HStack(alignment: .top, spacing: 14) {
+                GlassIcon(systemName: systemImage, color: .liquidAccent)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-                Text(message)
-                    .font(.body)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+
+                    Text(message)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.white.opacity(0.6))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+            .padding(4)
         }
         .accessibilityElement(children: .combine)
     }

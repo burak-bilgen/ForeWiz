@@ -15,34 +15,31 @@ struct NotificationPreferenceToggle: View {
         }
     }
 
-    private let accentColor = Color(red: 1.0, green: 0.45, blue: 0.45)
-
     var body: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(accentColor.opacity(0.16))
-                    .frame(width: 34, height: 34)
-                Image(systemName: categoryIcon)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(accentColor)
+        LiquidGlassCard {
+            HStack(spacing: 14) {
+                GlassIcon(systemName: categoryIcon, color: .liquidAccent)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(preference.category.localizedTitle)
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+
+                    Text(preference.category.localizedDescription)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.white.opacity(0.45))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 8)
+
+                Toggle("", isOn: $preference.isEnabled)
+                    .tint(.liquidAccent)
+                    .labelsHidden()
             }
-            VStack(alignment: .leading, spacing: 3) {
-                Text(preference.category.localizedTitle)
-                    .font(.system(size: 15))
-                    .foregroundStyle(.white)
-                    .lineLimit(2)
-                Text(preference.category.localizedDescription)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.white.opacity(0.38))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .layoutPriority(1)
-            Spacer(minLength: 8)
-            Toggle("", isOn: $preference.isEnabled)
-                .tint(accentColor)
-                .labelsHidden()
+            .padding(.vertical, 8)
         }
-        .padding(.vertical, 8)
     }
 }

@@ -1,49 +1,49 @@
 import Combine
 import SwiftUI
 
+// MARK: - Liquid Glass Splash View
 struct AppSplashView: View {
     @State private var iconScale: CGFloat = 0.6
     @State private var iconOpacity: Double = 0
     @State private var textOpacity: Double = 0
     @State private var glowPulse = false
 
-    private let sky = Color(red: 0.35, green: 0.68, blue: 1.0)
-
     var body: some View {
         ZStack {
-            AnimatedOrbBackground(
-                primary:   Color(red: 0.25, green: 0.50, blue: 1.00),
-                secondary: Color(red: 0.55, green: 0.30, blue: 1.00),
-                tertiary:  Color(red: 0.20, green: 0.75, blue: 0.90)
-            )
-            .ignoresSafeArea()
+            LiquidOrbBackground(palette: .default)
+                .ignoresSafeArea()
 
             VStack(spacing: 32) {
                 ZStack {
                     Circle()
-                        .fill(sky.opacity(glowPulse ? 0.18 : 0.08))
-                        .frame(width: 120, height: 120)
-                        .blur(radius: 24)
+                        .fill(AppTheme.liquidAccent.opacity(glowPulse ? 0.18 : 0.08))
+                        .frame(width: 130, height: 130)
+                        .blur(radius: 28)
                         .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: glowPulse)
 
                     Circle()
-                        .fill(Color.white.opacity(0.06))
-                        .frame(width: 96, height: 96)
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+                        .frame(width: 100, height: 100)
+                        .overlay(
+                            Circle()
+                                .stroke(.white.opacity(0.08), lineWidth: 0.5)
+                        )
 
                     Image(systemName: "cloud.sun.fill")
-                        .font(.system(size: 44))
+                        .font(.system(size: 46, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(sky)
+                        .foregroundStyle(AppTheme.liquidAccent)
                 }
                 .scaleEffect(iconScale)
                 .opacity(iconOpacity)
 
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     Text("ForeWiz")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
 
-                    LoadingDotsView()
+                    PulsingDotsLoader(color: .white.opacity(0.6), dotSize: 7)
                 }
                 .opacity(textOpacity)
             }
@@ -57,25 +57,6 @@ struct AppSplashView: View {
                 textOpacity = 1.0
             }
             glowPulse = true
-        }
-    }
-}
-
-private struct LoadingDotsView: View {
-    @State private var phase: Int = 0
-
-    var body: some View {
-        HStack(spacing: 6) {
-            ForEach(0..<3, id: \.self) { i in
-                Circle()
-                    .fill(Color.white.opacity(phase == i ? 0.90 : 0.25))
-                    .frame(width: 6, height: 6)
-                    .scaleEffect(phase == i ? 1.35 : 1.0)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: phase)
-            }
-        }
-        .onReceive(Timer.publish(every: 0.38, on: .main, in: .common).autoconnect()) { _ in
-            phase = (phase + 1) % 3
         }
     }
 }

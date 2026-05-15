@@ -1,5 +1,6 @@
 import SwiftUI
 
+// MARK: - Liquid Glass Onboarding
 struct OnboardingView: View {
     @StateObject var viewModel: OnboardingViewModel
     let existingProfile: UserComfortProfile
@@ -7,19 +8,14 @@ struct OnboardingView: View {
 
     @State private var isCompleting = false
     @State private var pageAppeared = false
-    private var accentOrange: Color { Color(red: 1.0, green: 0.55, blue: 0.3) }
 
     var body: some View {
         ZStack {
-            AnimatedOrbBackground(
-                primary: Color(red: 0.25, green: 0.48, blue: 0.92),
-                secondary: Color(red: 0.15, green: 0.32, blue: 0.75),
-                tertiary: Color(red: 0.40, green: 0.65, blue: 1.0)
-            )
-            .ignoresSafeArea()
+            LiquidOrbBackground(palette: .clearSky)
+                .ignoresSafeArea()
 
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
+                VStack(spacing: 22) {
                     welcomeSection
                         .padding(.top, 48)
 
@@ -30,39 +26,52 @@ struct OnboardingView: View {
                         .padding(.bottom, 8)
 
                     startButton
-                        .padding(.bottom, 24)
+                        .padding(.bottom, 32)
                 }
                 .padding(.horizontal, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .navigationBarHidden(true)
-        .onAppear { pageAppeared = true }
+        .onAppear { animatePage() }
     }
 
+    private func animatePage() {
+        withAnimation(.easeOut(duration: 0.8)) {
+            pageAppeared = true
+        }
+    }
+
+    // MARK: - Welcome Section
+
     private var welcomeSection: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color.white.opacity(0.08))
+                    .fill(AppTheme.liquidAccent.opacity(0.12))
+                    .frame(width: 80, height: 80)
+                    .blur(radius: 8)
+                Circle()
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
                     .frame(width: 72, height: 72)
                 Image(systemName: "cloud.sun.fill")
-                    .font(.system(size: 34))
+                    .font(.system(size: 34, weight: .semibold))
                     .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(Color(red: 0.4, green: 0.72, blue: 1.0))
+                    .foregroundStyle(AppTheme.liquidAccent)
             }
-            .floating(amplitude: 6, duration: 3.5)
+            .floating(amplitude: 7, duration: 3.5)
             .staggerEntrance(index: 0, appeared: pageAppeared)
 
             Text(L10n.text("onboarding_welcome_title"))
-                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .staggerEntrance(index: 1, appeared: pageAppeared)
 
             Text(L10n.text("onboarding_welcome_subtitle"))
-                .font(.system(size: 14))
-                .foregroundStyle(Color.white.opacity(0.5))
+                .font(.system(size: 15, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.45))
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
                 .padding(.horizontal, 16)
@@ -70,41 +79,63 @@ struct OnboardingView: View {
         }
     }
 
+    // MARK: - Preferences
+
     private var preferencesSection: some View {
         VStack(spacing: 12) {
-            sectionCard {
+            // Temperature Sensitivity
+            LiquidGlassCard(accentColor: AppTheme.ember, innerPadding: 14) {
                 VStack(alignment: .leading, spacing: 14) {
-                    sectionLabel(icon: "thermometer.sun.fill", title: L10n.text("how_do_you_feel"))
+                    sectionLabel(icon: "thermometer.sun.fill", text: L10n.text("how_do_you_feel"))
 
                     HStack(spacing: 8) {
                         ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
                             let selected = viewModel.selectedSensitivity == sensitivity
                             Button {
-                                Task { await HapticEngine.shared.selectionChanged() }
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                HapticEngine.shared.selectionChanged()
+                                withAnimation(AppTheme.springSmooth) {
                                     viewModel.selectSensitivity(sensitivity)
                                 }
                             } label: {
-                                sensitivityButtonLabel(sensitivity: sensitivity, selected: selected, accentOrange: accentOrange)
-                                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(selected ? accentOrange.opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
+                                VStack(spacing: 5) {
+                                    Image(systemName: sensitivityIcon(for: sensitivity))
+                                        .font(.system(size: 18))
+                                        .scaleEffect(selected ? 1.15 : 1.0)
+                                    Text(sensitivity.localizedTitle)
+                                        .font(.system(size: 13, weight: selected ? .bold : .medium, design: .rounded))
+                                        .multilineTextAlignment(.center)
+                                }
+                                .foregroundStyle(selected ? AppTheme.ember : .white.opacity(0.35))
+                                .frame(maxWidth: .infinity, minHeight: 72)
+                                .padding(.vertical, 10)
+                                .background(
+                                    selected
+                                        ? AppTheme.ember.opacity(0.12)
+                                        : .white.opacity(0.04),
+                                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .stroke(selected ? AppTheme.ember.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
+                                )
                             }
+                            .buttonStyle(.plain)
                             .accessibilityLabel(sensitivity.localizedTitle)
-                            .buttonStyle(.fullTapArea)
                         }
                     }
-                    .frame(minHeight: 72)
                 }
             }
             .staggerEntrance(index: 3, appeared: pageAppeared)
 
-            sectionCard {
+            // Wake Time
+            LiquidGlassCard(accentColor: AppTheme.sunshine, innerPadding: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    sectionLabel(icon: "sunrise.fill", title: L10n.text("onboarding_wake_time"))
+                    sectionLabel(icon: "sunrise.fill", text: L10n.text("onboarding_wake_time"))
 
                     HStack {
                         Image(systemName: "sunrise.fill")
-                            .font(.system(size: 16))
-                            .foregroundStyle(accentOrange)
+                            .font(.system(size: 18))
+                            .foregroundStyle(AppTheme.sunshine)
                             .floating(amplitude: 3, duration: 4)
                         Spacer()
                         Picker("", selection: Binding(
@@ -112,9 +143,7 @@ struct OnboardingView: View {
                             set: { viewModel.setWakeUpHour($0) }
                         )) {
                             ForEach(5...11, id: \.self) { hour in
-                                Text(String(format: "%02d:00", hour))
-                                    .tag(hour)
-                                    .foregroundStyle(.white)
+                                Text(String(format: "%02d:00", hour)).tag(hour)
                             }
                         }
                         .pickerStyle(.menu)
@@ -125,23 +154,43 @@ struct OnboardingView: View {
             }
             .staggerEntrance(index: 4, appeared: pageAppeared)
 
-            sectionCard {
+            // Activities
+            LiquidGlassCard(accentColor: AppTheme.success, innerPadding: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    sectionLabel(icon: "figure.run", title: L10n.text("which_activities_do_you"))
+                    sectionLabel(icon: "figure.run", text: L10n.text("which_activities_do_you"))
 
                     FlowLayout(spacing: 8) {
                         ForEach(ActivityType.allCases, id: \.self) { activity in
                             let selected = viewModel.preferredActivities.contains(activity)
                             Button {
-                                Task { await HapticEngine.shared.selectionChanged() }
-                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                HapticEngine.shared.selectionChanged()
+                                withAnimation(AppTheme.springSnappy) {
                                     viewModel.toggleActivity(activity)
                                 }
                             } label: {
-                                activityButtonLabel(activity: activity, selected: selected)
+                                HStack(spacing: 5) {
+                                    Image(systemName: activityIcon(for: activity))
+                                        .font(.system(size: 13, weight: .semibold))
+                                    Text(activity.localizedTitle)
+                                        .font(.system(size: 13, weight: selected ? .bold : .medium, design: .rounded))
+                                }
+                                .foregroundStyle(selected ? AppTheme.success : .white.opacity(0.45))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(
+                                    selected
+                                        ? AppTheme.success.opacity(0.12)
+                                        : .white.opacity(0.04),
+                                    in: Capsule()
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(selected ? AppTheme.success.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
+                                )
+                                .scaleEffect(selected ? 1.05 : 1.0)
                             }
+                            .buttonStyle(.plain)
                             .accessibilityLabel(activity.localizedTitle)
-                            .buttonStyle(.fullTapArea)
                         }
                     }
                 }
@@ -150,15 +199,17 @@ struct OnboardingView: View {
         }
     }
 
+    // MARK: - Permissions
+
     @ViewBuilder
     private var permissionsSection: some View {
-        sectionCard {
+        LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 14) {
             VStack(spacing: 10) {
-                sectionLabel(icon: "lock.shield.fill", title: L10n.text("permissions"))
+                sectionLabel(icon: "lock.shield.fill", text: L10n.text("permissions"))
 
                 PermissionRow(
                     icon: "location.fill",
-                    color: Color(red: 0.4, green: 0.72, blue: 1.0),
+                    color: AppTheme.liquidAccent,
                     title: L10n.text("location"),
                     subtitle: L10n.text("required_for_local_weather"),
                     isGranted: viewModel.locationStatus == .authorized,
@@ -169,7 +220,7 @@ struct OnboardingView: View {
 
                 PermissionRow(
                     icon: "bell.badge.fill",
-                    color: accentOrange,
+                    color: AppTheme.sunshine,
                     title: L10n.text("notifications"),
                     subtitle: L10n.text("for_timely_reminders"),
                     isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
@@ -183,16 +234,18 @@ struct OnboardingView: View {
 
         if let error = viewModel.errorMessage {
             Text(error)
-                .font(.system(size: 14))
-                .foregroundStyle(Color(red: 1.0, green: 0.45, blue: 0.45))
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(AppTheme.coral)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 8)
         }
     }
 
+    // MARK: - Start Button
+
     private var startButton: some View {
         Button {
-            Task { await HapticEngine.shared.medium() }
+            HapticEngine.shared.medium()
             guard !isCompleting else { return }
             isCompleting = true
             Task {
@@ -206,13 +259,13 @@ struct OnboardingView: View {
         } label: {
             ZStack {
                 if isCompleting {
-                    PulsingDotsLoader(color: .white)
+                    PulsingDotsLoader(color: .white, dotSize: 8)
                 } else {
                     HStack(spacing: 8) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 14))
+                            .font(.system(size: 15, weight: .semibold))
                         Text(L10n.text("onboarding_activate"))
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
                     }
                     .foregroundStyle(.white)
                 }
@@ -220,39 +273,35 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(
-                LinearGradient(
-                    colors: [Color(red: 0.2, green: 0.5, blue: 1.0), Color(red: 0.15, green: 0.4, blue: 0.9)],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
             )
-            .pulseGlow(color: Color(red: 0.2, green: 0.5, blue: 1.0), radius: 12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(AppTheme.liquidAccent.opacity(0.35), lineWidth: 1)
+            )
+            .pulseGlow(color: AppTheme.liquidAccent, radius: 14)
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
         .disabled(isCompleting)
         .staggerEntrance(index: 7, appeared: pageAppeared)
     }
 
-    private func sectionCard(@ViewBuilder content: () -> some View) -> some View {
-        content()
-            .padding(16)
-            .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(Color.white.opacity(0.08), lineWidth: 1))
-    }
+    // MARK: - Helpers
 
-    private func sectionLabel(icon: String, title: String) -> some View {
+    private func sectionLabel(icon: String, text: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.5))
-            Text(title)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.white.opacity(0.5))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.45))
+            Text(text)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.45))
         }
     }
 
-    static func icon(for sensitivity: TemperatureSensitivity) -> String {
+    private func sensitivityIcon(for sensitivity: TemperatureSensitivity) -> String {
         switch sensitivity {
         case .getsColdEasily: return "snowflake"
         case .normal: return "thermometer.medium"
@@ -260,45 +309,13 @@ struct OnboardingView: View {
         }
     }
 
-    static func icon(for activity: ActivityType) -> String {
+    private func activityIcon(for activity: ActivityType) -> String {
         switch activity {
         case .running: return "figure.run"
         case .walking: return "figure.walk"
         case .cycling: return "bicycle"
         case .goingOutside: return "sun.max.fill"
         }
-    }
-    
-    // MARK: - Helper Functions
-    
-    private func sensitivityButtonLabel(sensitivity: TemperatureSensitivity, selected: Bool, accentOrange: Color) -> some View {
-        VStack(spacing: 5) {
-            Image(systemName: OnboardingView.icon(for: sensitivity))
-                .font(.system(size: 18))
-                .scaleEffect(selected ? 1.15 : 1.0)
-            Text(sensitivity.localizedTitle)
-                .font(.system(size: 14, weight: selected ? .semibold : .regular))
-                .multilineTextAlignment(.center)
-        }
-        .foregroundStyle(selected ? accentOrange : Color.white.opacity(0.4))
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.vertical, 12)
-        .background(selected ? accentOrange.opacity(0.12) : Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-    }
-    
-    private func activityButtonLabel(activity: ActivityType, selected: Bool) -> some View {
-        HStack(spacing: 5) {
-            Image(systemName: OnboardingView.icon(for: activity))
-                .font(.system(size: 14, weight: .semibold))
-            Text(activity.localizedTitle)
-                .font(.system(size: 14, weight: selected ? .semibold : .regular))
-        }
-        .foregroundStyle(selected ? Color(red: 0.3, green: 0.85, blue: 0.58) : Color.white.opacity(0.5))
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.12) : Color.white.opacity(0.05), in: Capsule())
-        .overlay(Capsule().stroke(selected ? Color(red: 0.3, green: 0.85, blue: 0.58).opacity(0.35) : Color.white.opacity(0.06), lineWidth: 1))
-        .scaleEffect(selected ? 1.05 : 1.0)
     }
 }
 
@@ -319,7 +336,7 @@ private struct PermissionRow: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(color.opacity(0.12))
-                        .frame(width: 36, height: 36)
+                        .frame(width: 38, height: 38)
                     Image(systemName: icon)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(color)
@@ -328,20 +345,20 @@ private struct PermissionRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(title)
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white)
                         if isRequired {
                             Text(L10n.text("required"))
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.15))
-                                .padding(.horizontal, 5)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundStyle(AppTheme.ember)
+                                .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(red: 1.0, green: 0.55, blue: 0.15).opacity(0.12), in: Capsule())
+                                .background(AppTheme.ember.opacity(0.12), in: Capsule())
                         }
                     }
                     Text(subtitle)
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.white.opacity(0.45))
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
                 }
 
                 Spacer()
@@ -349,10 +366,10 @@ private struct PermissionRow: View {
                 if isGranted {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 18))
-                        .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.58))
+                        .foregroundStyle(AppTheme.success)
                 } else {
                     Text(L10n.text("allow"))
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(color)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
@@ -361,13 +378,26 @@ private struct PermissionRow: View {
                 }
             }
             .padding(12)
-            .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(isGranted ? color.opacity(0.3) : Color.white.opacity(0.05), lineWidth: 1)
+                    .stroke(isGranted ? color.opacity(0.3) : .white.opacity(0.05), lineWidth: 1)
             )
         }
-        .buttonStyle(.fullTapArea)
+        .buttonStyle(.plain)
         .disabled(isGranted)
     }
+}
+
+// MARK: - Preview
+
+#Preview {
+    OnboardingView(
+        viewModel: OnboardingViewModel(
+            locationRepository: MockLocationRepository(),
+            notificationRepository: UserNotificationRepository()
+        ),
+        existingProfile: .default,
+        onCompleted: { _ in }
+    )
 }
