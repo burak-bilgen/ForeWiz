@@ -246,23 +246,30 @@ final class WizPathService {
     /// Fallback weather estimation when API fails
     private func estimatedWeather(for coordinate: CLLocationCoordinate2D, at date: Date) -> SegmentWeather {
         let hour = Calendar.current.component(.hour, from: date)
+        let minute = Calendar.current.component(.minute, from: date)
+        // Use minute-based deterministic variation instead of random
+        let variation = Double(minute % 6) - 2.5
+
         let baseTemp: Double
         switch hour {
-        case 5..<9:  baseTemp = 14 + Double.random(in: -2...3)
-        case 9..<13: baseTemp = 20 + Double.random(in: -2...5)
-        case 13..<17: baseTemp = 25 + Double.random(in: -3...5)
-        case 17..<21: baseTemp = 19 + Double.random(in: -2...3)
-        default:      baseTemp = 12 + Double.random(in: -2...3)
+        case 5..<9:  baseTemp = 14 + variation
+        case 9..<13: baseTemp = 20 + variation * 1.5
+        case 13..<17: baseTemp = 25 + variation * 2
+        case 17..<21: baseTemp = 19 + variation
+        default:      baseTemp = 12 + variation
         }
 
         let isNight = hour < 6 || hour >= 21
         let condition: SegmentWeatherCondition = isNight ? .clear : .partlyCloudy
 
+        // Deterministic wind speed based on hour
+        let windSpeed: Double = 5 + Double((hour * 7 + 3) % 14)
+
         return SegmentWeather(
             condition: condition,
             temperature: baseTemp,
             precipitationChance: isNight ? 0.05 : 0.15,
-            windSpeed: Double.random(in: 5...18),
+            windSpeed: windSpeed,
             visibility: isNight ? 12 : 10,
             severity: condition.severity
         )
