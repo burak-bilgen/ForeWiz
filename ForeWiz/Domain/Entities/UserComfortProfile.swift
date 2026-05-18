@@ -18,7 +18,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         maximumDailyNotifications: Int = 2,
         appearance: AppAppearance = .system,
         accentPalette: AppAccentPalette = .sky,
-        language: AppLanguage = .system,
+        language: AppLanguage = .english,
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
         selectedLocationID: String = "current-location"
     ) {

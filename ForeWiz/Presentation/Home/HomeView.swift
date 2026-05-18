@@ -1036,11 +1036,9 @@ private struct LanguagePermissionsSection: View {
     @State private var showLanguagePicker = false
 
     private var currentLanguageTitle: String {
-        let code = L10n.currentLanguageCode
-        switch code {
+        switch L10n.currentLanguageCode {
         case "tr": return L10n.text("language_turkish")
-        case "en": return L10n.text("language_english")
-        default: return L10n.text("language_system")
+        default: return L10n.text("language_english")
         }
     }
 

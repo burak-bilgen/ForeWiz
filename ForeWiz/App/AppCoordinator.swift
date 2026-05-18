@@ -28,16 +28,14 @@ final class AppCoordinator {
             let loadedProfile = try await container.preferencesRepository.loadProfile()
             profile = loadedProfile
             let code = L10n.currentLanguageCode
-            let effectiveLanguage: AppLanguage
-            switch code {
-            case "tr": effectiveLanguage = .turkish
-            case "en": effectiveLanguage = .english
-            default: effectiveLanguage = profile.language
+            if code == "tr" {
+                L10n.configure(language: .turkish)
+            } else {
+                L10n.configure(language: .english)
             }
-            L10n.configure(language: effectiveLanguage)
             rootFlow = try await container.preferencesRepository.isOnboardingCompleted() ? .main : .onboarding
         } catch {
-            L10n.configure(language: profile.language)
+            L10n.configure(language: .english)
             rootFlow = .onboarding
         }
     }

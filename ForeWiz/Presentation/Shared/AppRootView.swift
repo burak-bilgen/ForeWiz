@@ -114,14 +114,7 @@ private struct HomeRootView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
             let code = L10n.currentLanguageCode
-            let rawValue: String
-            switch code {
-            case "tr": rawValue = "turkish"
-            case "en": rawValue = "english"
-            default: rawValue = "system"
-            }
-            let newLang = AppLanguage(rawValue: rawValue) ?? .system
-            coordinator.profile.language = newLang
+            coordinator.profile.language = code == "tr" ? .turkish : .english
             Task {
                 do {
                     try await coordinator.container.updateUserPreferencesUseCase.execute(profile: coordinator.profile)

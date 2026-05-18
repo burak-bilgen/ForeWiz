@@ -58,7 +58,7 @@ final class UserPreferencesModel {
 
     func toProfile() -> UserComfortProfile {
         let defaultProfile = UserComfortProfile.default
-        let language = preferredLanguageRaw.flatMap(AppLanguage.init(rawValue:)) ?? .system
+        let language = preferredLanguageRaw.flatMap(AppLanguage.init(rawValue:)) ?? .english
         let appearance = preferredAppearanceRaw.flatMap(AppAppearance.init(rawValue:)) ?? .system
         let accentPalette = accentPaletteRaw.flatMap(AppAccentPalette.init(rawValue:)) ?? .sky
         let notifications = decoded(

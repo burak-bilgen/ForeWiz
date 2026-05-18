@@ -6381,23 +6381,6 @@
         }
       }
     },
-    "language_system": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "System"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sistem"
-          }
-        }
-      }
-    },
     "language_turkish": {
       "extractionState": "manual",
       "localizations": {

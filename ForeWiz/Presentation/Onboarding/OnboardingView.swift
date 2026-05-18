@@ -82,7 +82,41 @@ struct OnboardingView: View {
     // MARK: - Preferences
 
     private var preferencesSection: some View {
-        EmptyView()
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
+            VStack(alignment: .leading, spacing: 14) {
+                sectionLabel(icon: "globe", text: L10n.text("settings_language"))
+
+                HStack(spacing: 8) {
+                    ForEach(AppLanguage.allCases, id: \.self) { lang in
+                        let selected = viewModel.selectedLanguage == lang
+                        Button {
+                            HapticEngine.shared.selectionChanged()
+                            withAnimation(AppTheme.springSmooth) {
+                                viewModel.selectLanguage(lang)
+                            }
+                        } label: {
+                            Text(lang.localizedTitle)
+                                .font(.system(size: 14, weight: selected ? .bold : .medium, design: .rounded))
+                                .foregroundStyle(selected ? Color.liquidAccent : .white.opacity(0.45))
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                                .background(
+                                    selected
+                                        ? Color.liquidAccent.opacity(0.12)
+                                        : .white.opacity(0.04),
+                                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        .stroke(selected ? Color.liquidAccent.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
+                                )
+                        }
+                        .contentShape(Rectangle())
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .staggerEntrance(index: 3, appeared: pageAppeared)
     }
 
     // MARK: - Permissions
@@ -116,7 +150,7 @@ struct OnboardingView: View {
                 }
             }
         }
-        .staggerEntrance(index: 3, appeared: pageAppeared)
+        .staggerEntrance(index: 4, appeared: pageAppeared)
 
         if let error = viewModel.errorMessage {
             Text(error)
