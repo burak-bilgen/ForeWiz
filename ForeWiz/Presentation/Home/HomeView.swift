@@ -196,9 +196,6 @@ private struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
-                DailyPlanCard(plan: state.plan)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.24)
-
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
 

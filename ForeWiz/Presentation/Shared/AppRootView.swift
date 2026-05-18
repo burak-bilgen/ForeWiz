@@ -113,9 +113,23 @@ private struct HomeRootView: View {
             Task { await homeViewModel.refreshWhenAppBecomesActive() }
         }
         .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
-            let updated = UserComfortProfile.default
-            coordinator.profile.language = AppLanguage(rawValue: L10n.currentLanguageCode) ?? .system
-            Task { await homeViewModel.reloadForLanguageChange() }
+            let code = L10n.currentLanguageCode
+            let rawValue: String
+            switch code {
+            case "tr": rawValue = "turkish"
+            case "en": rawValue = "english"
+            default: rawValue = "system"
+            }
+            let newLang = AppLanguage(rawValue: rawValue) ?? .system
+            coordinator.profile.language = newLang
+            Task {
+                do {
+                    try await coordinator.container.updateUserPreferencesUseCase.execute(profile: coordinator.profile)
+                } catch {
+                    AppLogger.persistence.error("Failed to save language: \(error.localizedDescription)")
+                }
+                await homeViewModel.reloadForLanguageChange()
+            }
         }
     }
 
