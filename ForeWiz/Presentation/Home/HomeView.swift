@@ -199,9 +199,6 @@ private struct HomeLoadedContent: View {
                 DailyPlanCard(plan: state.plan)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.24)
 
-                OutfitCard(outfit: state.recommendation.outfit)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.32)
-
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
 
@@ -217,9 +214,6 @@ private struct HomeLoadedContent: View {
                     LastUpdatedBadge(text: state.lastUpdatedText)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.60)
                 }
-
-                LanguagePermissionsSection()
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.64)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -300,20 +294,8 @@ private struct HeroCard: View {
 
                     Spacer()
 
-                    // Score Ring + Icon
-                    VStack(spacing: 4) {
-                        ZStack {
-                            ScoreRingView(score: WeatherScore(rawValue: score), size: 56, lineWidth: 4)
-                                .frame(width: 56, height: 56)
-                            Image(systemName: assistant.symbolName)
-                                .font(.system(size: 22, weight: .semibold))
-                                .foregroundStyle(decisionColor)
-                                .symbolEffect(.bounce, options: .speed(0.5), value: iconPulse)
-                        }
-                        Text("\(score)")
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.6))
-                    }
+                    ScoreRingView(score: WeatherScore(rawValue: score), size: 56, lineWidth: 4)
+                        .frame(width: 56, height: 56)
                 }
 
                 // Action Pills
@@ -360,20 +342,6 @@ private struct HeroCard: View {
                     }
                 }
 
-                // Sunrise/Sunset
-                if weather.sunriseText != nil || weather.sunsetText != nil {
-                    HStack(spacing: 12) {
-                        if let sunrise = weather.sunriseText {
-                            SunTimeRow(icon: "sunrise.fill", color: .orange, time: sunrise)
-                        }
-                        if weather.sunriseText != nil, weather.sunsetText != nil {
-                            Spacer()
-                        }
-                        if let sunset = weather.sunsetText {
-                            SunTimeRow(icon: "sunset.fill", color: .red.opacity(0.8), time: sunset)
-                        }
-                    }
-                }
             }
         }
         .onAppear { iconPulse = true }
@@ -909,60 +877,46 @@ private struct TemperatureTrendChart: View {
     let hourlyScores: [HourlyScoreItem]
 
     var body: some View {
-        GeometryReader { geometry in
-            let values = hourlyScores.prefix(12)
-            guard values.count > 1 else { return AnyView(EmptyView()) }
+        let slots = hourlyScores.prefix(12)
+        let temps = slots.map { extractTemp($0.temperatureText) }
+        let minTemp = floor(temps.min() ?? 0)
+        let maxTemp = ceil(temps.max() ?? 1)
+        let tempRange = max(maxTemp - minTemp, 3)
 
-            let temps = values.map { extractTemp($0.temperatureText) }
-            let minTemp = temps.min() ?? 0
-            let maxTemp = temps.max() ?? 1
-            let range = max(maxTemp - minTemp, 1)
-            let spacing = geometry.size.width / CGFloat(values.count - 1)
+        HStack(alignment: .bottom, spacing: 4) {
+            ForEach(Array(slots.enumerated()), id: \.element.id) { index, item in
+                let temp = temps[safe: index] ?? 0
+                let ratio = (temp - minTemp) / tempRange
+                let barHeight = max(ratio * 80, 4)
 
-            let points: [CGPoint] = temps.enumerated().map { (i, t) in
-                let x = CGFloat(i) * spacing
-                let y = geometry.size.height - ((t - minTemp) / range) * (geometry.size.height - 20) - 10
-                return CGPoint(x: x, y: y)
-            }
+                VStack(spacing: 3) {
+                    Text(item.temperatureText)
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
 
-            return AnyView(
-                ZStack {
-                    // Gradient fill
-                    Path { path in
-                        path.move(to: CGPoint(x: points[0].x, y: geometry.size.height))
-                        for p in points {
-                            path.addLine(to: p)
-                        }
-                        path.addLine(to: CGPoint(x: points.last!.x, y: geometry.size.height))
-                        path.closeSubpath()
-                    }
-                    .fill(
-                        LinearGradient(
-                            colors: [AppTheme.sky.opacity(0.2), AppTheme.sky.opacity(0.02)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
+                        .fill(barColor(for: temp))
+                        .frame(width: 12, height: barHeight)
 
-                    // Line
-                    Path { path in
-                        path.move(to: points[0])
-                        for i in 1..<points.count {
-                            let mid = CGPoint(
-                                x: (points[i-1].x + points[i].x) / 2,
-                                y: (points[i-1].y + points[i].y) / 2
-                            )
-                            path.addQuadCurve(to: mid, control: points[i-1])
-                            let mid2 = CGPoint(
-                                x: (points[i].x + points[min(i+1, points.count-1)].x) / 2,
-                                y: (points[i].y + points[min(i+1, points.count-1)].y) / 2
-                            )
-                            path.addQuadCurve(to: points[i], control: mid2)
-                        }
-                    }
-                    .stroke(AppTheme.sky, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                    Text(String(format: "%02d", item.hour))
+                        .font(.system(size: 8, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                        .lineLimit(1)
                 }
-            )
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func barColor(for temp: CGFloat) -> Color {
+        switch temp {
+        case 30...: return AppTheme.danger
+        case 20..<30: return AppTheme.warning
+        case 10..<20: return AppTheme.success
+        default: return AppTheme.sky
         }
     }
 
@@ -1082,7 +1036,16 @@ struct HomeErrorView: View {
 // MARK: - Language & Permissions Section
 
 private struct LanguagePermissionsSection: View {
-    @State private var showLanguageSheet = false
+    @State private var showLanguagePicker = false
+
+    private var currentLanguageTitle: String {
+        let code = L10n.currentLanguageCode
+        switch code {
+        case "tr": return L10n.text("language_turkish")
+        case "en": return L10n.text("language_english")
+        default: return L10n.text("language_system")
+        }
+    }
 
     var body: some View {
         LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
@@ -1096,7 +1059,7 @@ private struct LanguagePermissionsSection: View {
 
                 Button {
                     HapticEngine.shared.selectionChanged()
-                    showLanguageSheet = true
+                    showLanguagePicker = true
                 } label: {
                     HStack(spacing: 12) {
                         SettingsIcon(systemName: "globe", color: .liquidAccent)
@@ -1104,6 +1067,9 @@ private struct LanguagePermissionsSection: View {
                             Text(L10n.text("settings_language"))
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
+                            Text(currentLanguageTitle)
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.45))
                         }
                         Spacer()
                         Image(systemName: "chevron.right")
@@ -1142,66 +1108,26 @@ private struct LanguagePermissionsSection: View {
                 .buttonStyle(.plain)
             }
         }
-        .sheet(isPresented: $showLanguageSheet) {
-            LanguageSelectionSheet()
+        .confirmationDialog(L10n.text("settings_language"), isPresented: $showLanguagePicker) {
+            ForEach(AppLanguage.allCases, id: \.self) { lang in
+                Button(lang.localizedTitle) {
+                    L10n.configure(language: lang)
+                    NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
+                }
+            }
+            Button(L10n.text("wizpath_cancel"), role: .cancel) {}
         }
     }
 }
-
-// MARK: - Language Selection Sheet
-
-private struct LanguageSelectionSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    private let languages: [AppLanguage] = AppLanguage.allCases
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                LiquidOrbBackground(palette: .clearSky)
-                    .ignoresSafeArea()
-
-                List {
-                    ForEach(languages, id: \.self) { lang in
-                        Button {
-                            L10n.configure(language: lang)
-                            NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
-                            dismiss()
-                        } label: {
-                            HStack {
-                                Text(lang.localizedTitle)
-                                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                                    .foregroundStyle(.white)
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .listRowBackground(Color.white.opacity(0.04))
-                    }
-                }
-                .scrollContentBackground(.hidden)
-            }
-            .navigationTitle(L10n.text("settings_language"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(L10n.text("wizpath_done")) { dismiss() }
-                        .foregroundStyle(Color.liquidAccent)
-                }
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-}
-
 // MARK: - Toolbar Language Button
 
 private struct ToolbarLanguageButton: View {
-    @State private var showLanguageSheet = false
+    @State private var showLanguagePicker = false
 
     var body: some View {
         Button {
             HapticEngine.shared.light()
-            showLanguageSheet = true
+            showLanguagePicker = true
         } label: {
             Image(systemName: "globe")
                 .font(.system(size: 17, weight: .semibold))
@@ -1209,12 +1135,17 @@ private struct ToolbarLanguageButton: View {
                 .frame(width: 44, height: 44)
         }
         .accessibilityLabel(L10n.text("settings_language"))
-        .sheet(isPresented: $showLanguageSheet) {
-            LanguageSelectionSheet()
+        .confirmationDialog(L10n.text("settings_language"), isPresented: $showLanguagePicker) {
+            ForEach(AppLanguage.allCases, id: \.self) { lang in
+                Button(lang.localizedTitle) {
+                    L10n.configure(language: lang)
+                    NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
+                }
+            }
+            Button(L10n.text("wizpath_cancel"), role: .cancel) {}
         }
     }
 }
-
 // MARK: - Settings Icon
 private struct SettingsIcon: View {
     let systemName: String
