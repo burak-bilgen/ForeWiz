@@ -10,14 +10,10 @@ struct RecommendationCandidate: Identifiable, Equatable, Sendable {
 
     var headline: String {
         switch type {
-        case .outdoorWindow:
+        case .goingOutSuggestion:
             return metadata["headline"] ?? L10n.text("decision_good_message")
-        case .activityWindow(let activity):
-            return String(format: L10n.text("reason_best_time"), activity.localizedTitle, metadata["timeWindow"] ?? "")
         case .outfitRecommendation:
             return metadata["headline"] ?? L10n.text("outfit_title_balanced")
-        case .avoidWindow:
-            return metadata["headline"] ?? L10n.text("decision_avoid_message")
         case .riskAlert:
             return metadata["headline"] ?? L10n.text("home_risk_label")
         }
@@ -29,18 +25,14 @@ struct RecommendationCandidate: Identifiable, Equatable, Sendable {
 }
 
 enum CandidateType: Equatable, Hashable, Sendable {
-    case outdoorWindow
-    case activityWindow(ActivityType)
+    case goingOutSuggestion
     case outfitRecommendation
-    case avoidWindow
     case riskAlert
 
     func hash(into hasher: inout Hasher) {
         switch self {
-        case .outdoorWindow: hasher.combine("outdoor")
-        case .activityWindow(let a): hasher.combine("activity_\(a.rawValue)")
+        case .goingOutSuggestion: hasher.combine("going_out")
         case .outfitRecommendation: hasher.combine("outfit")
-        case .avoidWindow: hasher.combine("avoid")
         case .riskAlert: hasher.combine("risk")
         }
     }

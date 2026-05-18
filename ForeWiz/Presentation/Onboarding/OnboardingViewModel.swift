@@ -3,8 +3,6 @@ import Foundation
 @MainActor
 @Observable
 final class OnboardingViewModel {
-    private(set) var preferredActivities: Set<ActivityType> = [.walking, .goingOutside]
-    private(set) var wakeUpTime: DateComponents
     private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
     private(set) var notificationStatus: NotificationAuthorizationStatus = .notDetermined
     private(set) var errorMessage: String?
@@ -19,28 +17,10 @@ final class OnboardingViewModel {
     ) {
         self.locationRepository = locationRepository
         self.notificationRepository = notificationRepository
-        preferredActivities = profile.preferredActivities
-        wakeUpTime = profile.wakeUpTime ?? Self.defaultWakeTime()
     }
 
     var canContinue: Bool {
         locationStatus == .authorized
-    }
-
-    func toggleActivity(_ activity: ActivityType) {
-        if preferredActivities.contains(activity) {
-            preferredActivities.remove(activity)
-        } else {
-            preferredActivities.insert(activity)
-        }
-
-        if preferredActivities.isEmpty {
-            preferredActivities.insert(.goingOutside)
-        }
-    }
-
-    func setWakeUpHour(_ hour: Int) {
-        wakeUpTime = DateComponents(hour: hour, minute: 0)
     }
 
     func requestLocationPermission() {
@@ -74,13 +54,6 @@ final class OnboardingViewModel {
     }
 
     func makeProfile(inheriting existingProfile: UserComfortProfile = .default) -> UserComfortProfile {
-        var profile = existingProfile
-        profile.preferredActivities = preferredActivities.isEmpty ? [.goingOutside] : preferredActivities
-        profile.wakeUpTime = wakeUpTime
-        return profile
-    }
-
-    private static func defaultWakeTime() -> DateComponents {
-        DateComponents(hour: 7, minute: 0)
+        existingProfile
     }
 }

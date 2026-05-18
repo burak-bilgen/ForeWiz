@@ -111,8 +111,8 @@ struct DecisionEngineIntegrationTests {
             severeWeatherRisk: .medium
         )
 
-        let goodScore = activityEngine.score(hour: goodHour, activity: .running, profile: profile, calendar: calendar)
-        let badScore = activityEngine.score(hour: badHour, activity: .running, profile: profile, calendar: calendar)
+        let goodScore = activityEngine.score(hour: goodHour, activity: .goingOutside, profile: profile, calendar: calendar)
+        let badScore = activityEngine.score(hour: badHour, activity: .goingOutside, profile: profile, calendar: calendar)
 
         #expect(goodScore.rawValue > badScore.rawValue)
     }

@@ -133,12 +133,7 @@ struct GetBestActivityWindowIntent: AppIntent {
                               dialog: IntentDialog(stringLiteral: L10n.text("siri_response_no_windows")))
             }
 
-            let targetActivity: ActivityType
-            if let activity = activity {
-                targetActivity = ActivityType.allCases.first { $0.rawValue.lowercased() == activity.lowercased() } ?? .walking
-            } else {
-                targetActivity = .walking
-            }
+            let targetActivity: ActivityType = .goingOutside
 
             if let window = windows.first(where: { $0.activityType == targetActivity }) {
                 let formatter = DateFormatter()

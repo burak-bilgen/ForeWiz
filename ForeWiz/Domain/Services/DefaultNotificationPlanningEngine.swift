@@ -36,7 +36,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         }
 
         if enabledCategories.contains(.bestRunWindow),
-           let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .running }),
+           let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .goingOutside }),
            let plan = makeActivityPlan(activityRecommendation: runningWindow, now: now, calendar: calendar),
            isWorthNotifying(plan: plan, calendar: calendar) {
             candidates.append(plan)

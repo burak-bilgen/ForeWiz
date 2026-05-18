@@ -125,26 +125,16 @@ struct ContextualRecommendationRanker: RecommendationRanker {
         var adjustedScore = candidate.score
 
         switch candidate.type {
-        case .activityWindow(let activity):
-            if context.timeOfDay == .morning || context.timeOfDay == .midday {
-                adjustedScore *= 1.15
-            }
-            if context.dayOfWeek == .weekend && activity == .goingOutside {
-                adjustedScore *= 1.1
-            }
-
-        case .outdoorWindow:
+        case .goingOutSuggestion:
             if context.timeOfDay == .afternoon || context.timeOfDay == .evening {
                 adjustedScore *= 1.1
+            }
+            if context.dayOfWeek == .weekend {
+                adjustedScore *= 1.15
             }
 
         case .riskAlert:
             adjustedScore *= 1.3
-
-        case .avoidWindow:
-            if candidate.score > 30 {
-                adjustedScore *= 1.2
-            }
 
         case .outfitRecommendation:
             if context.timeOfDay == .earlyMorning || context.timeOfDay == .morning {

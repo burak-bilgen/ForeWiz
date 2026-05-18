@@ -17,30 +17,24 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         let apparentTemperature = hour.apparentTemperatureCelsius
         let month = calendar.component(.month, from: hour.date)
 
-        score -= temperaturePenalty(for: apparentTemperature, activity: activity)
-        score -= precipitationPenalty(hour: hour, activity: activity)
-        score -= windPenalty(hour.windSpeedKph, activity: activity)
-        score -= humidityPenalty(hour.humidity, apparentTemperature: apparentTemperature, activity: activity)
-        score -= uvPenalty(hour.uvIndex, hourOfDay: hourOfDay, activity: activity)
+        score -= goingOutTemperaturePenalty(apparentTemperature)
+        score -= precipitationPenalty(hour)
+        score -= windPenalty(hour.windSpeedKph)
+        score -= humidityPenalty(hour.humidity, apparentTemperature: apparentTemperature)
+        score -= uvPenalty(hour.uvIndex, hourOfDay: hourOfDay)
 
         if isHotSummerMidday(month: month, hour: hourOfDay, apparentTemperature: apparentTemperature) {
-            score -= activity == .walking ? 14 : 22
+            score -= 14
         }
 
         if hour.isDaylight == false {
-            if activity == .goingOutside {
-                score -= 15
-            } else {
-                score -= 8
-            }
+            score -= 15
         }
 
-        if activity == .goingOutside {
-            if hourOfDay >= 22 || hourOfDay < 5 {
-                score -= 20
-            } else if hourOfDay >= 20 || hourOfDay < 6 {
-                score -= 10
-            }
+        if hourOfDay >= 22 || hourOfDay < 5 {
+            score -= 20
+        } else if hourOfDay >= 20 || hourOfDay < 6 {
+            score -= 10
         }
 
         if let severeWeatherRisk = hour.severeWeatherRisk {
@@ -138,9 +132,9 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
     // MARK: - Active hours guard
 
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
-        let startHour = profile.wakeUpTime?.hour ?? 7
         let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 22
 
+        let startHour = 7
         if endHour > startHour {
             return hourOfDay >= startHour && hourOfDay < endHour
         } else {
@@ -165,29 +159,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
     // MARK: - Helpers
 
-    private func temperaturePenalty(for temperature: Double, activity: ActivityType) -> Int {
-        switch activity {
-        case .running:
-            runningTemperaturePenalty(temperature)
-        case .walking, .goingOutside:
-            walkingTemperaturePenalty(temperature)
-        case .cycling:
-            cyclingTemperaturePenalty(temperature)
-        }
-    }
-
-    private func runningTemperaturePenalty(_ temperature: Double) -> Int {
-        switch temperature {
-        case 8...22: 0
-        case 4..<8, 22.01...26: 10
-        case 26.01...30: 28
-        case 30.01...34: 46
-        case 34.01...: 68
-        default: 24
-        }
-    }
-
-    private func walkingTemperaturePenalty(_ temperature: Double) -> Int {
+    private func goingOutTemperaturePenalty(_ temperature: Double) -> Int {
         switch temperature {
         case 12...28: 0
         case 6..<12, 28.01...31: 10
@@ -197,20 +169,9 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
-    private func cyclingTemperaturePenalty(_ temperature: Double) -> Int {
-        switch temperature {
-        case 10...24: 0
-        case 5..<10, 24.01...28: 12
-        case 28.01...32: 30
-        case 32.01...: 54
-        default: 24
-        }
-    }
-
-    private func precipitationPenalty(hour: HourlyWeatherPoint, activity: ActivityType) -> Int {
+    private func precipitationPenalty(_ hour: HourlyWeatherPoint) -> Int {
         let chance = hour.precipitationChance ?? 0
         let amount = hour.precipitationAmountMm ?? 0
-        let activityMultiplier: Double = activity == .walking ? 0.75 : 1
 
         var penalty = 0.0
         if chance >= 0.7 || amount >= 2 {
@@ -221,45 +182,41 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             penalty += 8
         }
 
-        return Int((penalty * activityMultiplier).rounded())
+        return Int(penalty.rounded())
     }
 
-    private func windPenalty(_ windSpeedKph: Double?, activity: ActivityType) -> Int {
+    private func windPenalty(_ windSpeedKph: Double?) -> Int {
         let windSpeed = windSpeedKph ?? 0
-        let cyclingMultiplier = activity == .cycling ? 1.55 : 1
 
         switch windSpeed {
         case 0..<20: return 0
-        case 20..<30: return Int((8 * cyclingMultiplier).rounded())
-        case 30..<45: return Int((22 * cyclingMultiplier).rounded())
-        default: return Int((42 * cyclingMultiplier).rounded())
+        case 20..<30: return 8
+        case 30..<45: return 22
+        default: return 42
         }
     }
 
     private func humidityPenalty(
         _ humidity: Double?,
-        apparentTemperature: Double,
-        activity: ActivityType
+        apparentTemperature: Double
     ) -> Int {
         guard apparentTemperature >= 25 else { return 0 }
         let humidityValue = humidity ?? 0
-        let multiplier = activity == .running ? 1.3 : 1
 
         switch humidityValue {
-        case 0.80...: return Int((16 * multiplier).rounded())
-        case 0.65..<0.80: return Int((8 * multiplier).rounded())
+        case 0.80...: return 16
+        case 0.65..<0.80: return 8
         default: return 0
         }
     }
 
-    private func uvPenalty(_ uvIndex: Int?, hourOfDay: Int, activity: ActivityType) -> Int {
+    private func uvPenalty(_ uvIndex: Int?, hourOfDay: Int) -> Int {
         guard (11...16).contains(hourOfDay) else { return 0 }
         let uv = uvIndex ?? 0
-        let multiplier = activity == .running ? 1.15 : 1
 
         switch uv {
-        case 8...: return Int((24 * multiplier).rounded())
-        case 6...7: return Int((14 * multiplier).rounded())
+        case 8...: return 24
+        case 6...7: return 14
         default: return 0
         }
     }

@@ -28,10 +28,8 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
 
         candidates.append(outdoorCandidate(hourly: hourly, profile: profile, now: now, calendar: calendar))
 
-        for activity in profile.preferredActivities.sorted(by: { $0.rawValue < $1.rawValue }) {
-            if let candidate = activityCandidate(for: activity, hourly: hourly, profile: profile, now: now, calendar: calendar) {
-                candidates.append(candidate)
-            }
+        if let goingOut = goingOutCandidate(hourly: hourly, profile: profile, now: now, calendar: calendar) {
+            candidates.append(goingOut)
         }
 
         candidates.append(avoidCandidate(from: snapshot, hourly: hourly, now: now, calendar: calendar))
@@ -55,10 +53,18 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         let averageScore = scores.isEmpty ? 50 : Double(scores.map(\.rawValue).reduce(0, +)) / Double(scores.count)
 
         var signals: [RecommendationSignal] = []
+        if let currentTemp = hourly.first?.apparentTemperatureCelsius {
+            signals.append(RecommendationSignal(
+                kind: .temperature,
+                value: "\(Int(currentTemp))°C",
+                weight: 0.3,
+                metadata: ["range": temperatureRangeLabel(currentTemp)]
+            ))
+        }
 
         return RecommendationCandidate(
             id: UUID(),
-            type: .outdoorWindow,
+            type: .goingOutSuggestion,
             score: averageScore,
             signals: signals,
             metadata: ["headline": outdoorHeadline(for: averageScore)],
@@ -66,15 +72,14 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         )
     }
 
-    private func activityCandidate(
-        for activity: ActivityType,
+    private func goingOutCandidate(
         hourly: [HourlyWeatherPoint],
         profile: UserComfortProfile,
         now: Date,
         calendar: Calendar
     ) -> RecommendationCandidate? {
         guard let recommendation = activityWindowScoringEngine.bestWindow(
-            for: activity,
+            for: .goingOutside,
             hourly: hourly,
             profile: profile,
             now: now,
@@ -86,22 +91,22 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
 
         let signals: [RecommendationSignal] = [
             RecommendationSignal(
-                kind: .activityMatch,
-                value: activity.localizedTitle,
-                weight: 0.4,
-                metadata: [:]
-            ),
-            RecommendationSignal(
                 kind: .schedule,
                 value: timeWindow,
                 weight: 0.2,
+                metadata: [:]
+            ),
+            RecommendationSignal(
+                kind: .activityMatch,
+                value: L10n.text("activity_outside"),
+                weight: 0.4,
                 metadata: [:]
             )
         ]
 
         return RecommendationCandidate(
             id: UUID(),
-            type: .activityWindow(activity),
+            type: .goingOutSuggestion,
             score: score,
             signals: signals,
             metadata: ["timeWindow": timeWindow, "headline": recommendation.reason],
@@ -122,7 +127,7 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         if severeHours.isEmpty {
             return RecommendationCandidate(
                 id: UUID(),
-                type: .avoidWindow,
+                type: .goingOutSuggestion,
                 score: 0,
                 signals: [],
                 metadata: ["headline": L10n.text("decision_no_avoid")],
@@ -142,7 +147,7 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
 
         return RecommendationCandidate(
             id: UUID(),
-            type: .avoidWindow,
+            type: .goingOutSuggestion,
             score: Double(severeHours.count) * 15,
             signals: signals,
             metadata: [
@@ -159,7 +164,7 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         if let precip = current.precipitationChance, precip > 0.5 {
             risks.append(RecommendationCandidate(
                 id: UUID(),
-                type: .riskAlert,
+                type: .goingOutSuggestion,
                 score: Double(precip) * 100,
                 signals: [
                     RecommendationSignal(kind: .precipitation, value: "\(Int(precip * 100))%", weight: 0.5, metadata: [:])
@@ -172,7 +177,7 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         if let wind = current.windSpeedKph, wind > 30 {
             risks.append(RecommendationCandidate(
                 id: UUID(),
-                type: .riskAlert,
+                type: .goingOutSuggestion,
                 score: Double(wind) * 1.5,
                 signals: [
                     RecommendationSignal(kind: .wind, value: "\(Int(wind)) km/h", weight: 0.4, metadata: [:])
@@ -185,7 +190,7 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         if let uv = current.uvIndex, uv >= 6 {
             risks.append(RecommendationCandidate(
                 id: UUID(),
-                type: .riskAlert,
+                type: .goingOutSuggestion,
                 score: Double(uv) * 12,
                 signals: [
                     RecommendationSignal(kind: .uvIndex, value: "UV \(uv)", weight: 0.3, metadata: [:])

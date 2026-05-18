@@ -105,7 +105,7 @@ private struct StoredCandidate: Codable {
     func toCandidate() -> RecommendationCandidate {
         RecommendationCandidate(
             id: UUID(),
-            type: CandidateType(rawValue: typeRaw),
+            type: CandidateType(rawValue: typeRaw) ?? .goingOutSuggestion,
             score: score,
             signals: [],
             metadata: metadata,
@@ -117,37 +117,26 @@ private struct StoredCandidate: Codable {
 extension CandidateType: Codable {
     var rawValue: String {
         switch self {
-        case .outdoorWindow: return "outdoor"
-        case .activityWindow(let a): return "activity_\(a.rawValue)"
+        case .goingOutSuggestion: return "going_out"
         case .outfitRecommendation: return "outfit"
-        case .avoidWindow: return "avoid"
         case .riskAlert: return "risk"
         }
     }
 
     init(rawValue: String) {
-        if rawValue == "outdoor" { self = .outdoorWindow }
-        else if rawValue == "outfit" { self = .outfitRecommendation }
-        else if rawValue == "avoid" { self = .avoidWindow }
-        else if rawValue == "risk" { self = .riskAlert }
-        else if rawValue.hasPrefix("activity_") {
-            let activityRaw = String(rawValue.dropFirst("activity_".count))
-            if let activity = ActivityType(rawValue: activityRaw) {
-                self = .activityWindow(activity)
-            } else {
-                self = .outdoorWindow
-            }
-        } else {
-            self = .outdoorWindow
+        switch rawValue {
+        case "outfit": self = .outfitRecommendation
+        case "risk": self = .riskAlert
+        default: self = .goingOutSuggestion
         }
     }
 
-    public func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(rawValue)
     }
 
-    public init(from decoder: Decoder) throws {
+    public init(from decoder: any Decoder) throws {
         let container = try decoder.singleValueContainer()
         let raw = try container.decode(String.self)
         self.init(rawValue: raw)

@@ -11,7 +11,7 @@ struct RecommendationExplainerTests {
     func testTemperatureExplanation() {
         let candidate = RecommendationCandidate(
             id: UUID(),
-            type: .outdoorWindow,
+            type: .goingOutSuggestion,
             score: 80,
             signals: [
                 RecommendationSignal(kind: .temperature, value: "22°C", weight: 0.3, metadata: ["range": "good"])
@@ -45,12 +45,12 @@ struct RecommendationExplainerTests {
     func testMultipleSignals() {
         let candidate = RecommendationCandidate(
             id: UUID(),
-            type: .activityWindow(.running),
+            type: .goingOutSuggestion,
             score: 85,
             signals: [
                 RecommendationSignal(kind: .temperature, value: "18°C", weight: 0.3, metadata: ["range": "optimal"]),
                 RecommendationSignal(kind: .schedule, value: "14:00-16:00", weight: 0.2, metadata: [:]),
-                RecommendationSignal(kind: .activityMatch, value: "Running", weight: 0.4, metadata: [:])
+                RecommendationSignal(kind: .activityMatch, value: "Going out", weight: 0.4, metadata: [:])
             ],
             metadata: [:],
             generatedAt: Date()
@@ -63,7 +63,7 @@ struct RecommendationExplainerTests {
     func testEmptySignals() {
         let candidate = RecommendationCandidate(
             id: UUID(),
-            type: .outdoorWindow,
+            type: .goingOutSuggestion,
             score: 50,
             signals: [],
             metadata: [:],
@@ -78,7 +78,7 @@ struct RecommendationExplainerTests {
     func testMaxThreePoints() {
         let candidate = RecommendationCandidate(
             id: UUID(),
-            type: .outdoorWindow,
+            type: .goingOutSuggestion,
             score: 80,
             signals: (0..<10).map { i in
                 RecommendationSignal(kind: .temperature, value: "\(i)°C", weight: 0.3, metadata: ["range": "good"])
@@ -88,21 +88,5 @@ struct RecommendationExplainerTests {
         )
         let points = explainer.explain(candidate)
         #expect(points.count <= 3)
-    }
-
-    @Test("Activity match produces positive tone")
-    func testActivityMatchPositive() {
-        let candidate = RecommendationCandidate(
-            id: UUID(),
-            type: .activityWindow(.walking),
-            score: 80,
-            signals: [
-                RecommendationSignal(kind: .activityMatch, value: "Walking", weight: 0.4, metadata: [:])
-            ],
-            metadata: [:],
-            generatedAt: Date()
-        )
-        let points = explainer.explain(candidate)
-        #expect(points.contains { $0.tone == .positive })
     }
 }

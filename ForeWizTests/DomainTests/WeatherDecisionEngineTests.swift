@@ -33,9 +33,9 @@ struct WeatherDecisionEngineTests {
         #expect(heatWindow.map { calendar.component(.hour, from: $0.window.start) } == 12)
         #expect(heatWindow.map { calendar.component(.hour, from: $0.window.end) } == 16)
 
-        let runningWindow = recommendation.bestActivityWindows.first { $0.activityType == .running }
-        let runningStartHour = runningWindow.map { calendar.component(.hour, from: $0.bestWindow.start) }
-        #expect(runningStartHour.map { $0 < 12 || $0 >= 16 } == true)
+        let goingOutWindow = recommendation.bestActivityWindows.first { $0.activityType == .goingOutside }
+        let goingOutStartHour = goingOutWindow.map { calendar.component(.hour, from: $0.bestWindow.start) }
+        #expect(goingOutStartHour.map { $0 < 12 || $0 >= 16 } == true)
     }
 
     // Pre-existing crash with this fixture setup. Skipping.

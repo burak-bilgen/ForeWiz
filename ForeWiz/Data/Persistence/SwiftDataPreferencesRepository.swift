@@ -29,7 +29,6 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             model.update(from: profile)
         } else {
             let model = UserPreferencesModel(
-                preferredActivities: Array(profile.preferredActivities),
                 quietHours: profile.quietHours,
                 onboardingCompleted: true,
                 preferredLanguage: profile.language,
@@ -56,7 +55,6 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             model.onboardingCompleted = completed
         } else {
             let model = UserPreferencesModel(
-                preferredActivities: [.goingOutside, .walking],
                 quietHours: nil,
                 onboardingCompleted: completed
             )

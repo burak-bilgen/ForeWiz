@@ -1,24 +1,35 @@
 import Testing
+import Foundation
 @testable import ForeWiz
 
+@Suite("Activity Window Scoring Tests")
 struct ActivityWindowScoringEngineTests {
-    private let engine = DefaultActivityWindowScoringEngine()
 
-    @Test func windyDayPenalizesCyclingMoreThanWalking() {
+    @Test("Wind reduces going-out score")
+    func testWindPenalty() {
         let calendar = WeatherTestFixtures.calendar
-        let now = WeatherTestFixtures.date(month: 3, day: 12, hour: 10)
-        let snapshot = WeatherTestFixtures.snapshot(
+        let engine = DefaultActivityWindowScoringEngine()
+        let now = WeatherTestFixtures.date(month: 6, day: 15, hour: 14)
+
+        let calmHour = WeatherTestFixtures.snapshot(
             now: now,
-            temperature: { _ in 18 },
-            apparentTemperature: { _ in 18 },
+            temperature: { _ in 22 },
+            apparentTemperature: { _ in 22 },
+            windSpeed: { _ in 5 }
+        ).hourly[4]
+
+        let windyHour = WeatherTestFixtures.snapshot(
+            now: now,
+            temperature: { _ in 22 },
+            apparentTemperature: { _ in 22 },
             windSpeed: { _ in 38 }
-        )
-        let hour = snapshot.hourly[4]
+        ).hourly[4]
+
         let profile = WeatherTestFixtures.profile()
 
-        let walkingScore = engine.score(hour: hour, activity: .walking, profile: profile, calendar: calendar)
-        let cyclingScore = engine.score(hour: hour, activity: .cycling, profile: profile, calendar: calendar)
+        let calmScore = engine.score(hour: calmHour, activity: .goingOutside, profile: profile, calendar: calendar)
+        let windyScore = engine.score(hour: windyHour, activity: .goingOutside, profile: profile, calendar: calendar)
 
-        #expect(cyclingScore.rawValue < walkingScore.rawValue)
+        #expect(windyScore.rawValue < calmScore.rawValue)
     }
 }

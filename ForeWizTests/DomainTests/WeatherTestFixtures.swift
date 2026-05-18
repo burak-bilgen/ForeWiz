@@ -23,14 +23,12 @@ enum WeatherTestFixtures {
     }
 
     static func profile(
-        activities: Set<ActivityType> = [.running, .walking, .cycling, .goingOutside],
         quietHours: TimeWindow? = nil,
         maximumDailyNotifications: Int = 2
     ) -> UserComfortProfile {
         L10n.configure(language: .turkish)
 
         return UserComfortProfile(
-            preferredActivities: activities,
             quietHours: quietHours,
             notificationPreferences: NotificationCategory.allCases.map {
                 let preferredTime = $0 == .morningBriefing ? DateComponents(hour: 8, minute: 0) : nil

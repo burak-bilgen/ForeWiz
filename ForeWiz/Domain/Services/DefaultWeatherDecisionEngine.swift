@@ -36,7 +36,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         let outdoorScore = makeOutdoorScore(from: todayHours, profile: profile, risks: risks, calendar: calendar)
         let outdoorDecision = OutdoorDecision(score: outdoorScore)
 
-        // Consistency: if decision says avoid, or no good window found, do not suggest a best time
         let bestOutdoorWindow: TimeWindow? = {
             guard outdoorDecision != .avoid else { return nil }
             guard risks.contains(where: { $0.severity == .extreme }) == false else { return nil }
@@ -51,7 +50,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             return recommendation.bestWindow
         }()
 
-        let activityWindows = makeActivityWindows(
+        let goingOutRecommendation = activityWindowScoringEngine.bestWindow(
+            for: .goingOutside,
             hourly: todayHours,
             profile: profile,
             now: now,
@@ -73,7 +73,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             outdoorDecision: outdoorDecision,
             outdoorScore: outdoorScore,
             bestOutdoorWindow: bestOutdoorWindow,
-            bestActivityWindows: activityWindows,
+            bestActivityWindows: goingOutRecommendation.map { [$0] } ?? [],
             avoidWindows: avoidWindows,
             outfit: outfit,
             risks: risks,
@@ -239,7 +239,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
     }
 
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
-        let startHour = profile.wakeUpTime?.hour ?? 7
+        let startHour = 7
         let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 22
 
         if endHour > startHour {
@@ -247,32 +247,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         } else {
             return hourOfDay >= startHour || hourOfDay < endHour
         }
-    }
-
-    private func makeActivityWindows(
-        hourly: [HourlyWeatherPoint],
-        profile: UserComfortProfile,
-        now: Date,
-        calendar: Calendar,
-        avoidWindows: [AvoidWindowRecommendation]
-    ) -> [ActivityRecommendation] {
-        let preferredActivities = profile.preferredActivities.isEmpty
-            ? Set([ActivityType.walking])
-            : profile.preferredActivities
-
-        return preferredActivities
-            .filter { $0 != .goingOutside }
-            .sorted { $0.rawValue < $1.rawValue }
-            .compactMap {
-                activityWindowScoringEngine.bestWindow(
-                    for: $0,
-                    hourly: hourly,
-                    profile: profile,
-                    now: now,
-                    calendar: calendar,
-                    avoidWindows: avoidWindows
-                )
-            }
     }
 
     private func summaryText(

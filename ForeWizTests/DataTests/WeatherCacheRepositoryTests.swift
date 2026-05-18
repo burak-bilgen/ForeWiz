@@ -205,7 +205,6 @@ struct PreferencesRepositoryTests {
 
         let profile = try await repository.loadProfile()
 
-        #expect(profile.preferredActivities.contains(.goingOutside))
         #expect(profile.language == .system)
     }
 
@@ -218,12 +217,10 @@ struct PreferencesRepositoryTests {
         let repository = SwiftDataPreferencesRepository(modelContext: context)
 
         var profile = UserComfortProfile.default
-        profile.preferredActivities = [.running, .walking]
         profile.language = .english
         profile.appearance = .light
         profile.accentPalette = .ember
         profile.maximumDailyNotifications = 3
-        profile.wakeUpTime = DateComponents(hour: 6, minute: 30)
         profile.usualWorkoutTime = DateComponents(hour: 18, minute: 15)
         let istanbul = SavedLocation(
             id: "istanbul",
@@ -249,13 +246,10 @@ struct PreferencesRepositoryTests {
 
         let loaded = try await repository.loadProfile()
 
-        #expect(loaded.preferredActivities.contains(.running))
         #expect(loaded.language == .english)
         #expect(loaded.appearance == .light)
         #expect(loaded.accentPalette == .ember)
         #expect(loaded.maximumDailyNotifications == 3)
-        #expect(loaded.wakeUpTime?.hour == 6)
-        #expect(loaded.wakeUpTime?.minute == 30)
         #expect(loaded.usualWorkoutTime?.hour == 18)
         #expect(loaded.savedLocations.contains(istanbul))
         #expect(loaded.selectedLocationID == istanbul.id)
@@ -295,6 +289,6 @@ struct PreferencesRepositoryTests {
 
         let loaded = try await repository.loadProfile()
 
-        #expect(loaded.preferredActivities == profile2.preferredActivities)
+        #expect(loaded.language == profile2.language)
     }
 }

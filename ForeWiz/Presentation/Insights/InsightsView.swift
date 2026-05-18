@@ -239,12 +239,7 @@ private struct InsightsActivityCard: View {
     }
 
     private func activityIcon(_ type: ActivityType) -> String {
-        switch type {
-        case .running: "figure.run"
-        case .walking: "figure.walk"
-        case .cycling: "bicycle"
-        case .goingOutside: "sun.max.fill"
-        }
+        "sun.max.fill"
     }
 }
 

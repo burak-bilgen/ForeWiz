@@ -1,8 +1,6 @@
 import Foundation
 
 struct UserComfortProfile: Codable, Equatable, Sendable {
-    var preferredActivities: Set<ActivityType>
-    var wakeUpTime: DateComponents?
     var usualWorkoutTime: DateComponents?
     var quietHours: TimeWindow?
     var notificationPreferences: [NotificationPreference]
@@ -13,23 +11,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var savedLocations: [SavedLocation]
     var selectedLocationID: String
 
-    private enum CodingKeys: String, CodingKey {
-        case preferredActivities
-        case wakeUpTime
-        case usualWorkoutTime
-        case quietHours
-        case notificationPreferences
-        case maximumDailyNotifications
-        case appearance
-        case accentPalette
-        case language
-        case savedLocations
-        case selectedLocationID
-    }
-
     init(
-        preferredActivities: Set<ActivityType>,
-        wakeUpTime: DateComponents? = nil,
         usualWorkoutTime: DateComponents? = nil,
         quietHours: TimeWindow? = nil,
         notificationPreferences: [NotificationPreference],
@@ -40,8 +22,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
         selectedLocationID: String = "current-location"
     ) {
-        self.preferredActivities = preferredActivities
-        self.wakeUpTime = wakeUpTime
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
         self.notificationPreferences = notificationPreferences
@@ -55,7 +35,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
 
     static var `default`: UserComfortProfile {
         UserComfortProfile(
-            preferredActivities: [.running, .walking, .goingOutside],
             notificationPreferences: NotificationCategory.allCases.map {
                 NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
             }

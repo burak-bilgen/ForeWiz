@@ -101,9 +101,6 @@ struct DateTimeHelpersTests {
     @Test func activityTypeLocalizedTitle() {
         L10n.configure(language: .turkish)
 
-        #expect(ActivityType.running.localizedTitle == "Koşu")
-        #expect(ActivityType.walking.localizedTitle == "Yürüyüş")
-        #expect(ActivityType.cycling.localizedTitle == "Bisiklet")
         #expect(ActivityType.goingOutside.localizedTitle.isEmpty == false)
     }
 }

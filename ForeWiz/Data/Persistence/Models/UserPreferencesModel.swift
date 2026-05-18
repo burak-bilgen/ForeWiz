@@ -4,7 +4,6 @@ import SwiftData
 @Model
 final class UserPreferencesModel {
     @Attribute(.unique) var id: UUID
-    var preferredActivitiesRaw: [String]
     var quietHoursStartHour: Int
     var quietHoursStartMinute: Int
     var quietHoursEndHour: Int
@@ -14,8 +13,6 @@ final class UserPreferencesModel {
     var preferredLanguageRaw: String?
     var preferredAppearanceRaw: String?
     var preferredUnitSystemRaw: String?
-    var wakeUpHour: Int?
-    var wakeUpMinute: Int?
     var workoutHour: Int?
     var workoutMinute: Int?
     var notificationPreferencesData: Data?
@@ -28,14 +25,12 @@ final class UserPreferencesModel {
 
     init(
         id: UUID = UUID(),
-        preferredActivities: [ActivityType],
         quietHours: TimeWindow? = nil,
         onboardingCompleted: Bool = false,
         preferredLanguage: AppLanguage? = nil,
         preferredAppearance: AppAppearance? = nil
     ) {
         self.id = id
-        self.preferredActivitiesRaw = preferredActivities.map { $0.rawValue }
         
         if let quietHours {
             let calendar = Calendar.current
@@ -62,7 +57,6 @@ final class UserPreferencesModel {
     }
 
     func toProfile() -> UserComfortProfile {
-        let activities = preferredActivitiesRaw.compactMap { ActivityType(rawValue: $0) }
         let defaultProfile = UserComfortProfile.default
         let language = preferredLanguageRaw.flatMap(AppLanguage.init(rawValue:)) ?? .system
         let appearance = preferredAppearanceRaw.flatMap(AppAppearance.init(rawValue:)) ?? .system
@@ -100,8 +94,6 @@ final class UserPreferencesModel {
         }
         
         return UserComfortProfile(
-            preferredActivities: Set(activities),
-            wakeUpTime: dateComponents(hour: wakeUpHour, minute: wakeUpMinute),
             usualWorkoutTime: dateComponents(hour: workoutHour, minute: workoutMinute),
             quietHours: quietHours,
             notificationPreferences: normalizedNotificationPreferences(notifications),
@@ -115,9 +107,6 @@ final class UserPreferencesModel {
     }
 
     func update(from profile: UserComfortProfile) {
-        self.preferredActivitiesRaw = profile.preferredActivities.map { $0.rawValue }
-        self.wakeUpHour = profile.wakeUpTime?.hour
-        self.wakeUpMinute = profile.wakeUpTime?.minute
         self.workoutHour = profile.usualWorkoutTime?.hour
         self.workoutMinute = profile.usualWorkoutTime?.minute
         

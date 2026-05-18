@@ -33,9 +33,9 @@ struct ContextualRecommendationRankerTests {
 
     @Test("Returns top candidates sorted by score")
     func testTopCandidatesSorted() {
-        let c1 = makeCandidate(type: .outdoorWindow, score: 90)
+        let c1 = makeCandidate(type: .goingOutSuggestion, score: 90)
         let c2 = makeCandidate(type: .riskAlert, score: 50)
-        let c3 = makeCandidate(type: .outdoorWindow, score: 80)
+        let c3 = makeCandidate(type: .goingOutSuggestion, score: 80)
 
         let context = RecommendationContext(
             timeOfDay: .morning,
@@ -51,7 +51,7 @@ struct ContextualRecommendationRankerTests {
 
     @Test("Respects maxResults limit")
     func testMaxResults() {
-        let candidates = (0..<10).map { makeCandidate(type: .outdoorWindow, score: Double($0 * 10)) }
+        let candidates = (0..<10).map { makeCandidate(type: .goingOutSuggestion, score: Double($0 * 10)) }
         let context = RecommendationContext(
             timeOfDay: .morning,
             dayOfWeek: .weekday,
@@ -63,35 +63,9 @@ struct ContextualRecommendationRankerTests {
         #expect(result.count <= 5)
     }
 
-    @Test("Morning context boosts activity scores")
-    func testMorningBoost() {
-        let morning = makeCandidate(type: .activityWindow(.walking), score: 70)
-        let afternoon = makeCandidate(type: .activityWindow(.walking), score: 70)
-
-        let morningContext = RecommendationContext(
-            timeOfDay: .morning,
-            dayOfWeek: .weekday,
-            recentFeedback: [],
-            lastShownTypes: [],
-            isOffline: false
-        )
-        let afternoonContext = RecommendationContext(
-            timeOfDay: .afternoon,
-            dayOfWeek: .weekday,
-            recentFeedback: [],
-            lastShownTypes: [],
-            isOffline: false
-        )
-
-        let morningResult = ranker.rank([morning], context: morningContext).first!
-        let afternoonResult = ranker.rank([afternoon], context: afternoonContext).first!
-
-        #expect(morningResult.score > afternoonResult.score)
-    }
-
     @Test("Offline context reduces scores")
     func testOfflinePenalty() {
-        let c = makeCandidate(type: .outdoorWindow, score: 100)
+        let c = makeCandidate(type: .goingOutSuggestion, score: 100)
         let online = RecommendationContext(
             timeOfDay: .morning,
             dayOfWeek: .weekday,
@@ -112,32 +86,9 @@ struct ContextualRecommendationRankerTests {
         #expect(offlineResult.score < onlineResult.score)
     }
 
-    @Test("Diversity prevents same type from dominating")
-    func testDiversity() {
-        let candidates = [
-            makeCandidate(type: .outdoorWindow, score: 100),
-            makeCandidate(type: .outdoorWindow, score: 95),
-            makeCandidate(type: .outdoorWindow, score: 90),
-            makeCandidate(type: .riskAlert, score: 40),
-            makeCandidate(type: .avoidWindow, score: 50)
-        ]
-        let context = RecommendationContext(
-            timeOfDay: .morning,
-            dayOfWeek: .weekday,
-            recentFeedback: [],
-            lastShownTypes: [],
-            isOffline: false
-        )
-        let result = ranker.rank(candidates, context: context)
-        let outdoorCount = result.filter { $0.type == .outdoorWindow }.count
-        #expect(outdoorCount <= 2) // diversity limits to < 60% of results
-        #expect(result.contains { $0.type == .riskAlert })
-        #expect(result.contains { $0.type == .avoidWindow })
-    }
-
     @Test("Cooldown reduces score for recently shown types")
     func testCooldown() {
-        let c = makeCandidate(type: .outdoorWindow, score: 80)
+        let c = makeCandidate(type: .goingOutSuggestion, score: 80)
         let noCooldown = RecommendationContext(
             timeOfDay: .morning,
             dayOfWeek: .weekday,
@@ -149,7 +100,7 @@ struct ContextualRecommendationRankerTests {
             timeOfDay: .morning,
             dayOfWeek: .weekday,
             recentFeedback: [],
-            lastShownTypes: [.outdoorWindow],
+            lastShownTypes: [.goingOutSuggestion],
             isOffline: false
         )
         let fresh = ranker.rank([c], context: noCooldown).first!
@@ -161,9 +112,8 @@ struct ContextualRecommendationRankerTests {
     @Test("Not relevant feedback suppresses candidate")
     func testFeedbackSuppression() {
         let id = UUID()
-        let c = makeCandidate(type: .outdoorWindow, score: 80)
         let candidate = RecommendationCandidate(
-            id: id, type: .outdoorWindow, score: 80, signals: [], metadata: [:], generatedAt: Date()
+            id: id, type: .goingOutSuggestion, score: 80, signals: [], metadata: [:], generatedAt: Date()
         )
         let context = RecommendationContext(
             timeOfDay: .morning,
@@ -176,9 +126,9 @@ struct ContextualRecommendationRankerTests {
         #expect(result.isEmpty || result.first?.score == 0)
     }
 
-    @Test("Weekend boosts outdoor activity scores")
+    @Test("Weekend boosts going out scores")
     func testWeekendBoost() {
-        let outdoor = makeCandidate(type: .activityWindow(.goingOutside), score: 70)
+        let outdoor = makeCandidate(type: .goingOutSuggestion, score: 70)
         let weekday = RecommendationContext(
             timeOfDay: .morning,
             dayOfWeek: .weekday,
@@ -202,7 +152,7 @@ struct ContextualRecommendationRankerTests {
     @Test("Risk alerts get priority boost")
     func testRiskBoost() {
         let risk = makeCandidate(type: .riskAlert, score: 50)
-        let outdoor = makeCandidate(type: .outdoorWindow, score: 60)
+        let outdoor = makeCandidate(type: .goingOutSuggestion, score: 60)
         let context = RecommendationContext(
             timeOfDay: .morning,
             dayOfWeek: .weekday,

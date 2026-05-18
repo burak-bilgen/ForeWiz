@@ -82,79 +82,7 @@ struct OnboardingView: View {
     // MARK: - Preferences
 
     private var preferencesSection: some View {
-        VStack(spacing: 12) {
-            // Wake Time
-            LiquidGlassCard(accentColor: AppTheme.sunshine, innerPadding: 14) {
-                VStack(alignment: .leading, spacing: 10) {
-                    sectionLabel(icon: "sunrise.fill", text: L10n.text("onboarding_wake_time"))
-
-                    HStack {
-                        Image(systemName: "sunrise.fill")
-                            .font(.system(size: 18))
-                            .foregroundStyle(AppTheme.sunshine)
-                            .floating(amplitude: 3, duration: 4)
-                        Spacer()
-                        Picker("", selection: Binding(
-                            get: { viewModel.wakeUpTime.hour ?? 7 },
-                            set: { viewModel.setWakeUpHour($0) }
-                        )) {
-                            ForEach(5...11, id: \.self) { hour in
-                                Text(L10n.formatted("time_format_full", hour)).tag(hour)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .tint(.white)
-                    }
-                    .padding(.vertical, 2)
-                }
-            }
-            .staggerEntrance(index: 3, appeared: pageAppeared)
-
-            // Activities
-            LiquidGlassCard(accentColor: AppTheme.success, innerPadding: 14) {
-                VStack(alignment: .leading, spacing: 10) {
-                    sectionLabel(icon: "figure.run", text: L10n.text("which_activities_do_you"))
-
-                    FlowLayout(spacing: 8) {
-                        ForEach(ActivityType.allCases, id: \.self) { activity in
-                            let selected = viewModel.preferredActivities.contains(activity)
-                            Button {
-                                HapticEngine.shared.selectionChanged()
-                                withAnimation(AppTheme.springSnappy) {
-                                    viewModel.toggleActivity(activity)
-                                }
-                            } label: {
-                                HStack(spacing: 5) {
-                                    Image(systemName: activityIcon(for: activity))
-                                        .font(.system(size: 13, weight: .semibold))
-                                    Text(activity.localizedTitle)
-                                        .font(.system(size: 13, weight: selected ? .bold : .medium, design: .rounded))
-                                }
-                                .foregroundStyle(selected ? AppTheme.success : .white.opacity(0.45))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(
-                                    selected
-                                        ? AppTheme.success.opacity(0.12)
-                                        : .white.opacity(0.04),
-                                    in: Capsule()
-                                )
-                                .overlay(
-                                    Capsule()
-                                        .stroke(selected ? AppTheme.success.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
-                                )
-                                .scaleEffect(selected ? 1.05 : 1.0)
-                            }
-                            .contentShape(Rectangle())
-
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(activity.localizedTitle)
-                        }
-                    }
-                }
-            }
-            .staggerEntrance(index: 4, appeared: pageAppeared)
-        }
+        EmptyView()
     }
 
     // MARK: - Permissions
@@ -188,7 +116,7 @@ struct OnboardingView: View {
                 }
             }
         }
-        .staggerEntrance(index: 5, appeared: pageAppeared)
+        .staggerEntrance(index: 3, appeared: pageAppeared)
 
         if let error = viewModel.errorMessage {
             Text(error)
@@ -260,12 +188,7 @@ struct OnboardingView: View {
     }
 
     private func activityIcon(for activity: ActivityType) -> String {
-        switch activity {
-        case .running: return "figure.run"
-        case .walking: return "figure.walk"
-        case .cycling: return "bicycle"
-        case .goingOutside: return "sun.max.fill"
-        }
+        "sun.max.fill"
     }
 }
 
