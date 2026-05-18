@@ -10,7 +10,6 @@ struct HomeView: View {
     @Binding var selectedLocationID: String
 
     let onRecommendationLoaded: (DailyRecommendation) -> Void
-    let onOpenSettings: () -> Void
     let onLocationsChanged: ([SavedLocation], String) -> Void
 
     @State private var showLocationPicker = false
@@ -96,7 +95,7 @@ struct HomeView: View {
         }
 
         ToolbarItem(placement: .topBarTrailing) {
-            ToolbarSettingsButton(action: onOpenSettings)
+            ToolbarLanguageButton()
                 .opacity(toolbarAppeared ? 1 : 0)
                 .offset(y: toolbarAppeared ? 0 : -4)
                 .animation(.easeOut(duration: 0.4).delay(0.15), value: toolbarAppeared)
@@ -218,6 +217,9 @@ private struct HomeLoadedContent: View {
                     LastUpdatedBadge(text: state.lastUpdatedText)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.60)
                 }
+
+                LanguagePermissionsSection()
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.64)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
@@ -775,7 +777,6 @@ private struct HourlyPill: View {
 
 private struct WeeklyForecastSection: View {
     let dailyForecasts: [DailyForecastItem]
-    @State private var showPaywall = false
 
     var body: some View {
         LiquidGlassCard(accentColor: AppTheme.sky) {
@@ -793,55 +794,11 @@ private struct WeeklyForecastSection: View {
                     }
                 }
 
-                // Premium 14-day CTA (locked behind paywall)
-                if !FeatureGate.isUnlocked(.fourteenDayForecast) {
-                    premiumCTASection
-                }
-            }
-        }
-        .sheet(isPresented: $showPaywall) {
-            PremiumPaywallView()
-        }
-    }
-
-    private var premiumCTASection: some View {
-        VStack(spacing: 10) {
-            Divider()
-                .background(.white.opacity(0.06))
-
-            HStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(AppTheme.liquidAccent.opacity(0.12))
-                        .frame(width: 32, height: 32)
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(AppTheme.liquidAccent)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(L10n.text("home_forecast_premium_cta"))
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text(L10n.text("forecast_premium_required"))
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.4))
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.3))
-            }
-            .padding(.vertical, 4)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                HapticEngine.shared.light()
-                showPaywall = true
             }
         }
     }
+
+
 }
 
 private struct ForecastRow: View {
@@ -1114,7 +1071,158 @@ struct HomeErrorView: View {
         savedLocations: .constant([]),
         selectedLocationID: .constant("current"),
         onRecommendationLoaded: { _ in },
-        onOpenSettings: {},
         onLocationsChanged: { _, _ in }
     )
+}
+
+// MARK: - Language & Permissions Section
+
+private struct LanguagePermissionsSection: View {
+    @State private var showLanguageSheet = false
+
+    var body: some View {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
+            VStack(spacing: 12) {
+                Text(L10n.text("settings_title"))
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.45))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textCase(.uppercase)
+                    .tracking(0.8)
+
+                Button {
+                    HapticEngine.shared.selectionChanged()
+                    showLanguageSheet = true
+                } label: {
+                    HStack(spacing: 12) {
+                        SettingsIcon(systemName: "globe", color: .liquidAccent)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L10n.text("settings_language"))
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+
+                Divider()
+                    .overlay(Color.white.opacity(0.06))
+
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    HStack(spacing: 12) {
+                        SettingsIcon(systemName: "lock.shield.fill", color: .success)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L10n.text("permissions"))
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text(L10n.text("permission_settings"))
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.45))
+                        }
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+            }
+        }
+        .sheet(isPresented: $showLanguageSheet) {
+            LanguageSelectionSheet()
+        }
+    }
+}
+
+// MARK: - Language Selection Sheet
+
+private struct LanguageSelectionSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    private let languages: [AppLanguage] = AppLanguage.allCases
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                LiquidOrbBackground(palette: .clearSky)
+                    .ignoresSafeArea()
+
+                List {
+                    ForEach(languages, id: \.self) { lang in
+                        Button {
+                            L10n.configure(language: lang)
+                            dismiss()
+                        } label: {
+                            HStack {
+                                Text(lang.localizedTitle)
+                                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                                    .foregroundStyle(.white)
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .listRowBackground(Color.white.opacity(0.04))
+                    }
+                }
+                .scrollContentBackground(.hidden)
+            }
+            .navigationTitle(L10n.text("settings_language"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(L10n.text("wizpath_done")) { dismiss() }
+                        .foregroundStyle(Color.liquidAccent)
+                }
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+}
+
+// MARK: - Toolbar Language Button
+
+private struct ToolbarLanguageButton: View {
+    @State private var showLanguageSheet = false
+
+    var body: some View {
+        Button {
+            HapticEngine.shared.light()
+            showLanguageSheet = true
+        } label: {
+            Image(systemName: "globe")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.65))
+                .frame(width: 44, height: 44)
+        }
+        .accessibilityLabel(L10n.text("settings_language"))
+        .sheet(isPresented: $showLanguageSheet) {
+            LanguageSelectionSheet()
+        }
+    }
+}
+
+// MARK: - Settings Icon
+private struct SettingsIcon: View {
+    let systemName: String
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(color.opacity(0.14))
+                .frame(width: 34, height: 34)
+            Image(systemName: systemName)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(color)
+        }
+    }
 }

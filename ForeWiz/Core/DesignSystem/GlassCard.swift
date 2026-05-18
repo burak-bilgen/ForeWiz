@@ -185,3 +185,20 @@ extension View {
         .padding()
     }
 }
+
+// MARK: - Glass Icon (minimal rounded-square icon)
+struct GlassIcon: View {
+    let systemName: String
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(color.opacity(0.12))
+                .frame(width: 36, height: 36)
+            Image(systemName: systemName)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(color)
+        }
+    }
+}

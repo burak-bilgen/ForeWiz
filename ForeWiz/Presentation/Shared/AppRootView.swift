@@ -64,7 +64,6 @@ private struct HomeRootView: View {
     @Bindable var coordinator: AppCoordinator
     @Environment(\.scenePhase) private var scenePhase
     @State private var homeViewModel: HomeViewModel
-    @State private var showSettings = false
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
@@ -89,7 +88,6 @@ private struct HomeRootView: View {
             onRecommendationLoaded: { recommendation in
                 coordinator.updateRecommendation(recommendation)
             },
-            onOpenSettings: { showSettings = true },
             onLocationsChanged: { locations, selectedID in
                 Task {
                     var profile = coordinator.profile
@@ -104,25 +102,6 @@ private struct HomeRootView: View {
                 }
             }
         )
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                SettingsView(
-                    viewModel: SettingsViewModel(
-                        profile: coordinator.profile,
-                        updateUserPreferencesUseCase: coordinator.container.updateUserPreferencesUseCase,
-                        onProfileSaved: coordinator.applyProfile,
-                        onResetOnboarding: coordinator.resetToOnboarding,
-                        onDeleteAllData: coordinator.deleteAllData
-                    )
-                )
-            }
-        }
-        .onChange(of: coordinator.showSettings) { _, shouldShow in
-            if shouldShow { showSettings = true }
-        }
-        .onChange(of: showSettings) { _, isPresented in
-            if !isPresented { coordinator.dismissSettings() }
-        }
         .onChange(of: coordinator.profile.language) { _, _ in
             Task { await homeViewModel.reloadForLanguageChange() }
         }

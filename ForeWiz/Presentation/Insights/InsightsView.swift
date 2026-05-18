@@ -20,7 +20,7 @@ struct InsightsView: View {
             .refreshable { }
             .safeAreaPadding(.bottom, 12)
         }
-        .navigationTitle(L10n.text("premium_feature_analytics"))
+        .navigationTitle(L10n.text("insights_title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -49,7 +49,7 @@ private struct InsightsHeader: View {
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color(red: 0.4, green: 0.7, blue: 1.0))
-                Text(L10n.text("premium_feature_analytics"))
+                Text(L10n.text("insights_title"))
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(2)
@@ -387,7 +387,7 @@ private struct InsightsLockedView: View {
                 .scaleEffect(appeared ? 1 : 0.5)
 
                 VStack(spacing: 10) {
-                    Text(L10n.text("premium_feature_analytics"))
+                    Text(L10n.text("insights_title"))
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .multilineTextAlignment(.center)
