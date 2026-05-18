@@ -723,8 +723,10 @@ private struct HourlyForecastSection: View {
                     HStack(spacing: 6) {
                         ForEach(hourlyScores) { item in
                             HourlyPill(item: item)
+                                .fixedSize()
                         }
                     }
+                    .padding(.horizontal, 2)
                 }
             }
         }
@@ -965,8 +967,10 @@ private struct TemperatureTrendChart: View {
     }
 
     private func extractTemp(_ text: String) -> CGFloat {
-        let digits = text.filter { $0.isNumber || $0 == "." || $0 == "-" }
-        return CGFloat(Double(digits) ?? 0)
+        let clean = text.replacingOccurrences(of: L10n.text("unit_degree"), with: "")
+            .replacingOccurrences(of: "°", with: "")
+            .trimmingCharacters(in: .whitespaces)
+        return CGFloat(Double(clean) ?? 0)
     }
 }
 
@@ -1160,6 +1164,7 @@ private struct LanguageSelectionSheet: View {
                     ForEach(languages, id: \.self) { lang in
                         Button {
                             L10n.configure(language: lang)
+                            NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
                             dismiss()
                         } label: {
                             HStack {

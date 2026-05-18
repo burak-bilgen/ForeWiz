@@ -80,3 +80,8 @@ final class AppCoordinator {
         }
     }
 }
+
+
+extension Notification.Name {
+    static let appLanguageDidChange = Notification.Name("com.forewiz.languageDidChange")
+}

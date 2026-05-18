@@ -246,15 +246,6 @@ struct ToolbarLocationButton: View {
             .frame(minHeight: 44)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .environment(\.colorScheme, .dark)
-            )
-            .overlay(
-                Capsule()
-                    .stroke(.white.opacity(0.08), lineWidth: 0.5)
-            )
         }
         .contentShape(Rectangle())
 

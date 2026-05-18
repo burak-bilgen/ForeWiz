@@ -112,6 +112,11 @@ private struct HomeRootView: View {
 
             Task { await homeViewModel.refreshWhenAppBecomesActive() }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
+            let updated = UserComfortProfile.default
+            coordinator.profile.language = AppLanguage(rawValue: L10n.currentLanguageCode) ?? .system
+            Task { await homeViewModel.reloadForLanguageChange() }
+        }
     }
 
     private var savedLocationsBinding: Binding<[SavedLocation]> {
