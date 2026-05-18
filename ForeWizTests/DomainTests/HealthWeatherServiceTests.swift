@@ -53,6 +53,8 @@ struct HealthWeatherServiceTests {
             apparentTemperatureCelsius: temp,
             humidity: humidity,
             windSpeedKph: wind,
+            precipitationChance: 0.05,
+            precipitationAmountMm: 0,
             uvIndex: uv,
             conditionCode: "clear",
             symbolName: "sun.max.fill",
@@ -74,18 +76,26 @@ struct HealthWeatherServiceTests {
         decision: OutdoorDecision = .good
     ) -> DailyRecommendation {
         DailyRecommendation(
-            date: Date(),
-            outdoorScore: WeatherScore(rawValue: score),
+            generatedAt: Date(),
             outdoorDecision: decision,
+            outdoorScore: WeatherScore(rawValue: score),
             bestOutdoorWindow: nil,
+            bestActivityWindows: [],
             avoidWindows: [],
             outfit: OutfitRecommendation(title: "title", items: [], accessories: [], warning: nil, detailedAdvice: nil),
-            risks: nil
+            risks: [],
+            summaryText: "Test",
+            explanation: "\(score)/100",
+            isTomorrowsRecommendation: false
         )
     }
 
     private func makeProfile() -> UserComfortProfile {
-        UserComfortProfile()
+        UserComfortProfile(
+            notificationPreferences: NotificationCategory.allCases.map {
+                NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
+            }
+        )
     }
 
     // MARK: - Migraine Tests
@@ -164,7 +174,7 @@ struct HealthWeatherServiceTests {
     // MARK: - Respiratory Tests
 
     @Test func respiratoryRiskyInColdWindy() {
-        let snapshot = makeSnapshot(temp: 3, wind: 30, humidity: 0.3, hourly: makeHourlyPoints(temps: [3, 3, 2, 2, 1, 1]))
+        let snapshot = makeSnapshot(temp: 3, humidity: 0.3, wind: 30, hourly: makeHourlyPoints(temps: [3, 3, 2, 2, 1, 1]))
         let analysis = service.analyzeHealth(snapshot: snapshot, recommendation: makeRecommendation(), profile: makeProfile(), calendar: calendar)
         #expect(analysis.respiratoryIndex >= 4)
     }

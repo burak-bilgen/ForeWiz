@@ -1,8 +1,8 @@
 import SwiftUI
 
 // MARK: - AI Briefing Section
-/// Apple Weather'de OLMAYAN özellikler: hava durumu hikayesi, sağlık analizi, karşılaştırmalı anomali.
-/// ForeWiz, yapay zekayla hava durumunu yorumlayıp kullanıcıya anlamlı içgörüler sunar.
+/// AI-powered daily weather briefing with narrative storytelling, health insights, and comparative analysis.
+/// Combines weather data into meaningful, human-readable insights.
 struct AIBriefingSection: View {
     let briefing: DailyWeatherBriefing
 

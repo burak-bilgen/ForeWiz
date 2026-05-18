@@ -1,8 +1,7 @@
 import Foundation
 
 /// Health-Weather correlation intelligence.
-/// Apple Weather has ZERO health integration — this is a massive differentiator.
-/// Analyzes how weather conditions affect: migraines, sleep, joints, respiratory, and stamina.
+/// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, and stamina.
 struct HealthWeatherService {
 
     /// Generates a complete health analysis from weather data.

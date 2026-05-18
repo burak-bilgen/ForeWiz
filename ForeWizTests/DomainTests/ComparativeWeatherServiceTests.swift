@@ -67,6 +67,8 @@ struct ComparativeWeatherServiceTests {
             apparentTemperatureCelsius: 25,
             humidity: 0.5,
             windSpeedKph: 10,
+            precipitationChance: 0.05,
+            precipitationAmountMm: 0,
             uvIndex: 4,
             conditionCode: "clear",
             symbolName: "sun.max.fill",
@@ -85,13 +87,17 @@ struct ComparativeWeatherServiceTests {
 
     private func makeRecommendation() -> DailyRecommendation {
         DailyRecommendation(
-            date: Date(),
-            outdoorScore: WeatherScore(rawValue: 80),
+            generatedAt: Date(),
             outdoorDecision: .good,
+            outdoorScore: WeatherScore(rawValue: 80),
             bestOutdoorWindow: nil,
+            bestActivityWindows: [],
             avoidWindows: [],
             outfit: OutfitRecommendation(title: "title", items: [], accessories: [], warning: nil, detailedAdvice: nil),
-            risks: nil
+            risks: [],
+            summaryText: "Good",
+            explanation: "80/100",
+            isTomorrowsRecommendation: false
         )
     }
 

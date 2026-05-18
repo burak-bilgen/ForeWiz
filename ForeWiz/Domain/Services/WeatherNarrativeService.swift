@@ -1,8 +1,7 @@
 import Foundation
 
-/// Apple Weather gives you numbers. ForeWiz gives you a STORY.
-/// This service analyzes raw weather data and generates a human-like narrative,
-/// personality, mood, and pro-tip — making weather feel alive and personal.
+/// Generates a human-like weather narrative with personality, mood, and actionable tips.
+/// Analyzes raw weather data to create a conversational story about today's conditions.
 struct WeatherNarrativeService {
 
     func generateNarrative(

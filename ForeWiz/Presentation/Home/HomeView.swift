@@ -207,7 +207,7 @@ private struct HomeLoadedContent: View {
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.48)
 
-                // AI Briefing — Apple Weather'de OLMAYAN özellikler
+                // AI-powered daily briefing section
                 if let briefing = state.briefing {
                     AIBriefingSection(briefing: briefing)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.52)
@@ -1231,15 +1231,6 @@ private struct HeatTip: View {
 // MARK: - Language & Permissions Section
 
 private struct LanguagePermissionsSection: View {
-    @State private var showLanguagePicker = false
-
-    private var currentLanguageTitle: String {
-        switch L10n.currentLanguageCode {
-        case "tr": return L10n.text("language_turkish")
-        default: return L10n.text("language_english")
-        }
-    }
-
     var body: some View {
         LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
             VStack(spacing: 12) {
@@ -1250,9 +1241,20 @@ private struct LanguagePermissionsSection: View {
                     .textCase(.uppercase)
                     .tracking(0.8)
 
-                Button {
-                    HapticEngine.shared.selectionChanged()
-                    showLanguagePicker = true
+                Menu {
+                    ForEach(AppLanguage.allCases, id: \.self) { lang in
+                        Button {
+                            L10n.configure(language: lang)
+                            NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
+                        } label: {
+                            HStack {
+                                Text(lang.localizedTitle)
+                                if L10n.currentLanguageCode == lang.localeIdentifier {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
                 } label: {
                     HStack(spacing: 12) {
                         SettingsIcon(systemName: "globe", color: .liquidAccent)
@@ -1301,26 +1303,33 @@ private struct LanguagePermissionsSection: View {
                 .buttonStyle(.plain)
             }
         }
-        .confirmationDialog(L10n.text("settings_language"), isPresented: $showLanguagePicker) {
-            ForEach(AppLanguage.allCases, id: \.self) { lang in
-                Button(lang.localizedTitle) {
-                    L10n.configure(language: lang)
-                    NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
-                }
-            }
-            Button(L10n.text("wizpath_cancel"), role: .cancel) {}
+    }
+
+    private var currentLanguageTitle: String {
+        switch L10n.currentLanguageCode {
+        case "tr": return L10n.text("language_turkish")
+        default: return L10n.text("language_english")
         }
     }
 }
 // MARK: - Toolbar Language Button
 
 private struct ToolbarLanguageButton: View {
-    @State private var showLanguagePicker = false
-
     var body: some View {
-        Button {
-            HapticEngine.shared.light()
-            showLanguagePicker = true
+        Menu {
+            ForEach(AppLanguage.allCases, id: \.self) { lang in
+                Button {
+                    L10n.configure(language: lang)
+                    NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
+                } label: {
+                    HStack {
+                        Text(lang.localizedTitle)
+                        if L10n.currentLanguageCode == lang.localeIdentifier {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
         } label: {
             Image(systemName: "globe")
                 .font(.system(size: 17, weight: .semibold))
@@ -1330,15 +1339,6 @@ private struct ToolbarLanguageButton: View {
                 .overlay(Circle().stroke(.white.opacity(0.12), lineWidth: 0.5))
         }
         .accessibilityLabel(L10n.text("settings_language"))
-        .confirmationDialog(L10n.text("settings_language"), isPresented: $showLanguagePicker) {
-            ForEach(AppLanguage.allCases, id: \.self) { lang in
-                Button(lang.localizedTitle) {
-                    L10n.configure(language: lang)
-                    NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
-                }
-            }
-            Button(L10n.text("wizpath_cancel"), role: .cancel) {}
-        }
     }
 }
 // MARK: - Settings Icon

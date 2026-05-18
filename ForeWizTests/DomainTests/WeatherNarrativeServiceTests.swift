@@ -27,6 +27,8 @@ struct WeatherNarrativeServiceTests {
             apparentTemperatureCelsius: temp,
             humidity: humidity,
             windSpeedKph: wind,
+            precipitationChance: 0.05,
+            precipitationAmountMm: 0,
             uvIndex: uv,
             conditionCode: condition,
             symbolName: isDaylight ? "sun.max.fill" : "moon.stars.fill",

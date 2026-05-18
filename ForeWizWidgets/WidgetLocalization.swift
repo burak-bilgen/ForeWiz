@@ -30,7 +30,7 @@ enum WidgetL10n {
     private static let translations: [String: [String: String]] = [
         "widget_outdoor_label": [
             "en": "Outdoor",
-            "tr": "Açık Hava"
+            "tr": "Dış Mekan"
         ],
         "widget_score_label": [
             "en": "Score",
@@ -66,7 +66,7 @@ enum WidgetL10n {
         ],
         "widget_config_desc": [
             "en": "Your daily outdoor score and forecast at a glance.",
-            "tr": "Günlük açık hava puanın ve tahmini bir bakışta."
+            "tr": "Günlük hava puanın ve tahminin bir bakışta."
         ],
         "widget_updated": [
             "en": "Updated",
@@ -98,7 +98,7 @@ enum WidgetL10n {
         ],
         "widget_waiting_msg": [
             "en": "Open ForeWiz to load your weather data.",
-            "tr": "Hava durumunu yüklemek için ForeWiz'i aç."
+            "tr": "Hava durumunu yüklemek için uygulamayı aç."
         ],
         "widget_config_error": [
             "en": "Setup needed",
@@ -106,7 +106,7 @@ enum WidgetL10n {
         ],
         "widget_config_error_msg": [
             "en": "Reinstall the app to fix widget configuration.",
-            "tr": "Widget yapılandırması için uygulamayı yeniden yükle."
+            "tr": "Widget'ı yapılandırmak için uygulamayı yeniden yükle."
         ],
         "widget_corrupted_title": [
             "en": "Update needed",
@@ -114,7 +114,7 @@ enum WidgetL10n {
         ],
         "widget_corrupted_msg": [
             "en": "Open ForeWiz to refresh widget data.",
-            "tr": "Widget'ı yenilemek için ForeWiz'i aç."
+            "tr": "Widget'ı yenilemek için uygulamayı aç."
         ],
         "widget_stale_title": [
             "en": "Open app to refresh",
@@ -122,7 +122,7 @@ enum WidgetL10n {
         ],
         "widget_stale_msg": [
             "en": "Data may be out of date. Open ForeWiz for the latest forecast.",
-            "tr": "Veri güncel olmayabilir. Güncel hava durumu için ForeWiz'i aç."
+            "tr": "Veri güncel olmayabilir. Güncel hava durumu için uygulamayı aç."
         ],
         "widget_tap_to_open": [
             "en": "Tap to open",

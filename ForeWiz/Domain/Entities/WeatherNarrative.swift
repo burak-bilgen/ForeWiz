@@ -1,7 +1,7 @@
 import Foundation
 
 /// AI-generated narrative that tells a human-friendly "story" about today's weather.
-/// Apple Weather just shows numbers — this makes weather FEEL like something.
+/// Transforms raw weather data into a relatable, conversational experience.
 struct WeatherNarrative: Codable, Equatable, Sendable {
     /// One-line headline like "A sizzling summer day with a cool afternoon breeze"
     let headline: String
@@ -39,7 +39,7 @@ struct WeatherNarrative: Codable, Equatable, Sendable {
 }
 
 /// AI health-weather correlation analysis.
-/// Apple Weather has NO health integration — this is a huge differentiator.
+/// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, and stamina.
 struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
     /// Migraine risk index (0=none, 10=extreme)
     let migraineRisk: Int
@@ -73,8 +73,7 @@ struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
     let healthSummary: String
 }
 
-/// Comparative analysis — how today compares to normal/historical patterns.
-/// Apple Weather has NO historical context — just raw forecasts.
+/// Comparative analysis — how today's weather compares to seasonal norms, yesterday, and weekly patterns.
 struct ComparativeWeatherAnalysis: Codable, Equatable, Sendable {
     /// Temperature anomaly (how many degrees different from typical)
     let temperatureAnomalyCelsius: Double?
@@ -107,8 +106,7 @@ struct ComparativeWeatherAnalysis: Codable, Equatable, Sendable {
     }
 }
 
-/// A comprehensive daily briefing that combines all AI analyses.
-/// This is the "killer feature" — one screen that tells you everything Apple Weather can't.
+/// A comprehensive daily briefing that combines narrative, health, and comparative analyses into a single view.
 struct DailyWeatherBriefing: Codable, Equatable, Sendable {
     let narrative: WeatherNarrative
     let health: HealthWeatherAnalysis

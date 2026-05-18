@@ -109,6 +109,7 @@
         }
       }
     },
+    "#%lld": {},
     "%@ - %@": {
       "comment": "A label displaying a time range with a color-coded level description. The first argument is the string “%02d:00”. The second argument is the end time, or \"...\" if the window is open 24/7. The third argument is the color-coded level description.",
       "extractionState": "stale",
@@ -678,6 +679,193 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uyarı: %@"
+          }
+        }
+      }
+    },
+    "action_avoid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avoid"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaçın"
+          }
+        }
+      }
+    },
+    "action_avoid_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ - %@"
+          }
+        }
+      }
+    },
+    "action_best_time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best Time"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En İyi Zaman"
+          }
+        }
+      }
+    },
+    "action_best_time_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan outdoor activities around %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dış mekan aktivitelerini %@ civarında planla"
+          }
+        }
+      }
+    },
+    "action_card_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No specific actions needed today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugün özel bir işlem gerekmiyor."
+          }
+        }
+      }
+    },
+    "action_card_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smart Actions"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akıllı İşlemler"
+          }
+        }
+      }
+    },
+    "action_migraine": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Migraine Alert"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Migren Uyarısı"
+          }
+        }
+      }
+    },
+    "action_outfit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What to Wear"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne Giymeli"
+          }
+        }
+      }
+    },
+    "action_pro_tip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro Tip"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profesyonel İpucu"
+          }
+        }
+      }
+    },
+    "action_sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep Better Tonight"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Gece Daha İyi Uyu"
+          }
+        }
+      }
+    },
+    "action_stamina": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Your Energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enerjini Koru"
           }
         }
       }
@@ -1729,6 +1917,91 @@
         }
       }
     },
+    "briefing_section_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Weather Briefing"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava Durumu Özeti"
+          }
+        }
+      }
+    },
+    "briefing_takeaway_anomaly": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today is %@ compared to normal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugün normale göre %@"
+          }
+        }
+      }
+    },
+    "briefing_takeaway_critical": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical: %@ - take precautions today"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kritik: %@ — bugün önlem al"
+          }
+        }
+      }
+    },
+    "briefing_takeaway_health": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today the weather may affect how you feel"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugünkü hava sağlığını etkileyebilir"
+          }
+        }
+      }
+    },
+    "briefing_takeaway_window": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best time to go out is %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dışarı çıkmak için en iyi zaman %@"
+          }
+        }
+      }
+    },
     "bring_an_umbrella_or_move": {
       "extractionState": "manual",
       "localizations": {
@@ -1775,7 +2048,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "chart axis hour"
+            "value": "Saat"
           }
         }
       }
@@ -1792,7 +2065,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "chart axis value"
+            "value": "Değer"
           }
         }
       }
@@ -1809,7 +2082,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "chart now label"
+            "value": "Şimdi"
           }
         }
       }
@@ -2277,6 +2550,533 @@
         }
       }
     },
+    "comparative_anomaly_cold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cooler than usual"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normalden Serin"
+          }
+        }
+      }
+    },
+    "comparative_anomaly_cold_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Below seasonal averages."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevsim ortalamasının altında."
+          }
+        }
+      }
+    },
+    "comparative_anomaly_extreme_cold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extremely Cold"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aşırı Soğuk"
+          }
+        }
+      }
+    },
+    "comparative_anomaly_extreme_cold_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Well below seasonal norms."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevsim normallerinin çok altında."
+          }
+        }
+      }
+    },
+    "comparative_anomaly_extreme_hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extremely Hot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aşırı Sıcak"
+          }
+        }
+      }
+    },
+    "comparative_anomaly_extreme_hot_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Well above seasonal norms."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevsim normallerinin çok üstünde."
+          }
+        }
+      }
+    },
+    "comparative_anomaly_hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warmer than usual"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normalden Sıcak"
+          }
+        }
+      }
+    },
+    "comparative_anomaly_hot_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Above seasonal averages."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevsim ortalamasının üstünde."
+          }
+        }
+      }
+    },
+    "comparative_anomaly_normal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seasonal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mevsim Normalinde"
+          }
+        }
+      }
+    },
+    "comparative_anomaly_normal_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right where it should be for this time of year."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Olması gerektiği gibi."
+          }
+        }
+      }
+    },
+    "comparative_card_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compared to Normal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normale Göre"
+          }
+        }
+      }
+    },
+    "comparative_dod_cooler": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d cooler than yesterday"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dünden %d daha serin"
+          }
+        }
+      }
+    },
+    "comparative_dod_no_data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No recent data for comparison."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karşılaştırma için yeterli veri yok."
+          }
+        }
+      }
+    },
+    "comparative_dod_same": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Same as yesterday"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dünle aynı"
+          }
+        }
+      }
+    },
+    "comparative_dod_warmer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d warmer than yesterday"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dünden %d daha sıcak"
+          }
+        }
+      }
+    },
+    "comparative_metric_dod": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vs Yesterday"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düne Göre"
+          }
+        }
+      }
+    },
+    "comparative_metric_pattern": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Week Pattern"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafta Deseni"
+          }
+        }
+      }
+    },
+    "comparative_no_data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No data"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veri yok"
+          }
+        }
+      }
+    },
+    "comparative_no_data_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough data to compare."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karşılaştırma için yeterli veri yok."
+          }
+        }
+      }
+    },
+    "comparative_pattern_coldsnap": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cold snap - prolonged cold weather."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soğuk hava dalgası — uzun süreli soğuk."
+          }
+        }
+      }
+    },
+    "comparative_pattern_cooling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cooling trend - dropping through the week."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soğuma trendi — hafta boyunca düşüyor."
+          }
+        }
+      }
+    },
+    "comparative_pattern_heatwave": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heatwave - multiple days of extreme heat."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıcak hava dalgası — günlerce aşırı sıcak."
+          }
+        }
+      }
+    },
+    "comparative_pattern_limited": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not enough data for a weekly pattern."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haftalık desen için yeterli veri yok."
+          }
+        }
+      }
+    },
+    "comparative_pattern_mixed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixed bag - different conditions each day."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karmaşık — her gün farklı koşullar."
+          }
+        }
+      }
+    },
+    "comparative_pattern_stable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stable weather - consistent conditions."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İstikrarlı hava — tutarlı koşullar."
+          }
+        }
+      }
+    },
+    "comparative_pattern_stormy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stormy spell - unsettled weather ahead."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fırtına — dengesiz hava bekleniyor."
+          }
+        }
+      }
+    },
+    "comparative_pattern_warming": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warming trend - rising through the week."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isınma trendi — hafta boyunca yükseliyor."
+          }
+        }
+      }
+    },
+    "comparative_precip_dry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dry conditions expected."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuru koşullar bekleniyor."
+          }
+        }
+      }
+    },
+    "comparative_precip_heavy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heavy precipitation expected."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yoğun yağış bekleniyor."
+          }
+        }
+      }
+    },
+    "comparative_precip_light": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light precipitation possible."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafif yağış mümkün."
+          }
+        }
+      }
+    },
+    "comparative_precip_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate rain chances."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta düzeyde yağmur ihtimali."
+          }
+        }
+      }
+    },
     "continue_button": {
       "extractionState": "manual",
       "localizations": {
@@ -2306,7 +3106,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "countdown hrs"
+            "value": "Saat"
           }
         }
       }
@@ -2323,7 +3123,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "countdown min"
+            "value": "Dakika"
           }
         }
       }
@@ -2340,7 +3140,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "countdown sec"
+            "value": "Saniye"
           }
         }
       }
@@ -3730,6 +4530,23 @@
         }
       }
     },
+    "health_card_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health and Weather"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık ve Hava"
+          }
+        }
+      }
+    },
     "health_conditions": {
       "extractionState": "manual",
       "localizations": {
@@ -3743,6 +4560,822 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sağlık Koşulları"
+          }
+        }
+      }
+    },
+    "health_joint_extreme": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Severe"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şiddetli"
+          }
+        }
+      }
+    },
+    "health_joint_extreme_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Severe joint discomfort - rest and keep joints warm."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şiddetli eklem rahatsızlığı — dinlen ve eklemlerini sıcak tut."
+          }
+        }
+      }
+    },
+    "health_joint_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek"
+          }
+        }
+      }
+    },
+    "health_joint_high_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High joint discomfort - keep warm and avoid sudden movements."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek eklem rahatsızlığı — sıcak kal ve ani hareketlerden kaçın."
+          }
+        }
+      }
+    },
+    "health_joint_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük"
+          }
+        }
+      }
+    },
+    "health_joint_low_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low joint discomfort - great day to stay active."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük eklem rahatsızlığı — harika"
+          }
+        }
+      }
+    },
+    "health_joint_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "health_joint_moderate_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate joint discomfort - gentle stretching may help."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta eklem rahatsizligi - hafif esneme yardimci olabilir."
+          }
+        }
+      }
+    },
+    "health_metric_migraine": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Migraine"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Migren"
+          }
+        }
+      }
+    },
+    "health_metric_respiratory": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Respiratory"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solunum"
+          }
+        }
+      }
+    },
+    "health_metric_sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku"
+          }
+        }
+      }
+    },
+    "health_metric_stamina": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stamina"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dayaniklilik"
+          }
+        }
+      }
+    },
+    "health_migraine_extreme": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extreme"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asiri"
+          }
+        }
+      }
+    },
+    "health_migraine_extreme_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extreme migraine risk - minimize stress and rest if possible."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asiri migren riski - stresi azaltin ve mumkunse dinlenin."
+          }
+        }
+      }
+    },
+    "health_migraine_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High risk"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yuksek risk"
+          }
+        }
+      }
+    },
+    "health_migraine_high_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High migraine risk - avoid bright screens and take breaks."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yuksek migren riski - parlak ekranlardan kacinin, mola verin."
+          }
+        }
+      }
+    },
+    "health_migraine_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low risk"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dusuk risk"
+          }
+        }
+      }
+    },
+    "health_migraine_low_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low migraine trigger risk - enjoy your day normally."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dusuk migren riski - gununuzu normal gecirebilirsiniz."
+          }
+        }
+      }
+    },
+    "health_migraine_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "health_migraine_moderate_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate migraine risk - keep lights dim and stay hydrated."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta migren riski - isiklari los tutun ve su icin."
+          }
+        }
+      }
+    },
+    "health_respiratory_extreme": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risky"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riskli"
+          }
+        }
+      }
+    },
+    "health_respiratory_extreme_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risky respiratory conditions today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riskli solunum kosullari bugun."
+          }
+        }
+      }
+    },
+    "health_respiratory_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caution"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dikkat"
+          }
+        }
+      }
+    },
+    "health_respiratory_high_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caution if you have asthma or sensitivity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Astim veya hassasiyetiniz varsa dikkatli olun."
+          }
+        }
+      }
+    },
+    "health_respiratory_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iyi"
+          }
+        }
+      }
+    },
+    "health_respiratory_low_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good breathing conditions - enjoy the fresh air."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iyi nefes kosullari - temiz havanin tadini cikarin."
+          }
+        }
+      }
+    },
+    "health_respiratory_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fair"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "health_respiratory_moderate_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fair respiratory comfort."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta solunum konforu."
+          }
+        }
+      }
+    },
+    "health_sleep_excellent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Excellent"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mukemmel"
+          }
+        }
+      }
+    },
+    "health_sleep_excellent_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfect sleeping weather - open a window and enjoy fresh air."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mukemmel uyku havasi - pencere acin ve temiz havanin tadini cikarin."
+          }
+        }
+      }
+    },
+    "health_sleep_fair": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fair"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "health_sleep_fair_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fair sleep quality - a fan might help."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta uyku kalitesi - vantilator yardimci olabilir."
+          }
+        }
+      }
+    },
+    "health_sleep_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iyi"
+          }
+        }
+      }
+    },
+    "health_sleep_good_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good sleeping conditions."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iyi uyku kosullari."
+          }
+        }
+      }
+    },
+    "health_sleep_poor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poor"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kotu"
+          }
+        }
+      }
+    },
+    "health_sleep_poor_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poor sleeping weather - keep your bedroom cool."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kotu uyku havasi - yatak odanizi serin tutun."
+          }
+        }
+      }
+    },
+    "health_stamina_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iyi enerji"
+          }
+        }
+      }
+    },
+    "health_stamina_good_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good energy levels for outdoor activities."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dis mekan aktiviteleri icin iyi enerji."
+          }
+        }
+      }
+    },
+    "health_stamina_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yuksek enerji"
+          }
+        }
+      }
+    },
+    "health_stamina_high_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High outdoor energy - great for exercise."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yuksek dis mekan enerjisi - egzersiz icin harika."
+          }
+        }
+      }
+    },
+    "health_stamina_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low energy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dusuk enerji"
+          }
+        }
+      }
+    },
+    "health_stamina_low_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low outdoor energy - keep activities light."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dusuk dis mekan enerjisi - aktiviteleri hafif tutun."
+          }
+        }
+      }
+    },
+    "health_stamina_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "health_stamina_moderate_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate energy - take breaks and pace yourself."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta enerji - mola verin ve kendinize uygun tempo bulun."
+          }
+        }
+      }
+    },
+    "health_summary_fair": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some weather factors may affect how you feel today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bazi hava faktorleri bugun nasil hissettiginizi etkileyebilir."
+          }
+        }
+      }
+    },
+    "health_summary_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today the weather is generally good for your health."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugunku hava genel olarak sagliginiz icin iyi."
+          }
+        }
+      }
+    },
+    "health_summary_great": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today the weather is great for your health."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugunku hava sagliginiz icin harika."
+          }
+        }
+      }
+    },
+    "health_summary_poor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today the weather is challenging for health."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugunku hava saglik icin zorlu."
           }
         }
       }
@@ -7149,6 +8782,618 @@
         }
       }
     },
+    "narrative_headline_adventurous": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wild weather ahead - for those who dare to step out"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vahsi hava kapida - disari cikmaya cesareti olanlara"
+          }
+        }
+      }
+    },
+    "narrative_headline_cozy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cold outside - perfect excuse for a warm drink indoors"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disarisi soguk - iceride sicak bir icecek icin mukemmel bahane"
+          }
+        }
+      }
+    },
+    "narrative_headline_dramatic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dramatic skies ahead - today is making a statement"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onumuzde dramatik gokyuzu - bugun bir aciklama yapiyor"
+          }
+        }
+      }
+    },
+    "narrative_headline_energetic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bright and energetic - a day made for being outside"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parlak ve enerjik - disarida olmak icin yaratilmis bir gun"
+          }
+        }
+      }
+    },
+    "narrative_headline_lazy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hot and hazy - today moves at its own slow pace"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sicak ve puslu - bugun kendi yavas temposunda ilerliyor"
+          }
+        }
+      }
+    },
+    "narrative_headline_melancholic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A quiet gray day - perfect for staying cozy indoors"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessiz gri bir gun - iceride keyif yapmak icin mukemmel"
+          }
+        }
+      }
+    },
+    "narrative_headline_mysterious": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fog and mystery - the world feels soft today"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sis ve gizem - dunya bugun yumusak ve ruya gibi"
+          }
+        }
+      }
+    },
+    "narrative_headline_refreshing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crisp and fresh - like nature hit the reset button"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taze ve ferah - doga reset butonuna basmis gibi"
+          }
+        }
+      }
+    },
+    "narrative_headline_serene": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calm and peaceful - a gentle day ahead"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sakin ve huzurlu - yumusak bir gun seni bekliyor"
+          }
+        }
+      }
+    },
+    "narrative_headline_serene_perfect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfectly balanced - nature at its finest today"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mukemmel dengede - doga bugun en guzel halinde"
+          }
+        }
+      }
+    },
+    "narrative_headline_stubborn": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mixed signals from the sky - expect a bit of everything"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gokyuzunden karisik sinyaller - her seyden biraz bekle"
+          }
+        }
+      }
+    },
+    "narrative_mood_great": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Great"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Harika"
+          }
+        }
+      }
+    },
+    "narrative_mood_meh": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meh"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eh iste"
+          }
+        }
+      }
+    },
+    "narrative_mood_okay": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okay"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idare eder"
+          }
+        }
+      }
+    },
+    "narrative_mood_perfect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfect"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mustesem"
+          }
+        }
+      }
+    },
+    "narrative_mood_rough": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rough"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zor"
+          }
+        }
+      }
+    },
+    "narrative_story_adventurous": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The elements are flexing today with strong winds and dramatic clouds."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elementler bugun kaslarini esnetiyor - guclu ruzgarlar, dramatik bulutlar."
+          }
+        }
+      }
+    },
+    "narrative_story_cozy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The cold has arrived wrapping the world in a frosty embrace."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soguk geldi, dunyayi buzlu bir kucaklamaya aldi."
+          }
+        }
+      }
+    },
+    "narrative_story_dramatic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The sky is putting on a show today. Dark clouds roll in and the wind picks up."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gokyuzu bugun bir sov yapiyor. Karanlik bulutlar geliyor, ruzgar hizlaniyor."
+          }
+        }
+      }
+    },
+    "narrative_story_energetic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The sun is out and the air is buzzing with energy today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gunes acti ve hava enerjiyle ugulduyor bugun."
+          }
+        }
+      }
+    },
+    "narrative_story_lazy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The heat hangs thick in the air slowing everything down."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sicaklik havada agir agir asili kaliyor, her seyi yavaslatiyor."
+          }
+        }
+      }
+    },
+    "narrative_story_melancholic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The sky is painted in soft grays today. Rain taps gently on the windows."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gokyuzu bugun yumusak grilere boyanmis. Yagmur camlara nazikce vuruyor."
+          }
+        }
+      }
+    },
+    "narrative_story_mysterious": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fog wraps the world in a soft silent blanket today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sis dunyayi yumusak sessiz bir battaniyeye sariyor bugun."
+          }
+        }
+      }
+    },
+    "narrative_story_refreshing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The air feels clean and invigorating like someone opened all the windows."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava temiz ve canlandirici, sanki biri tum pencereleri acmis gibi."
+          }
+        }
+      }
+    },
+    "narrative_story_serene": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A calm blanket of mild air settles over everything today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ilik bir hava ortusu bugun her seyin uzerine yayiliyor."
+          }
+        }
+      }
+    },
+    "narrative_story_serene_perfect": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything aligns today - the temperature, the breeze, the light."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her sey bugun uyum icinde - sicaklik, ruzgar, isik."
+          }
+        }
+      }
+    },
+    "narrative_story_stubborn": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The weather cannot seem to make up its mind today."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava bir turlu karar veremiyor bugun."
+          }
+        }
+      }
+    },
+    "narrative_tip_best_window": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The sweet spot today is %@ - that is your window."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugunun tatli noktasi %@."
+          }
+        }
+      }
+    },
+    "narrative_tip_cold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It is chilly out - layer up and do not forget a scarf."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava soguk - katmanli giyinin ve atkiyi unutmayin."
+          }
+        }
+      }
+    },
+    "narrative_tip_enjoy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No major weather concerns today - go out and enjoy."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugun onemli bir hava sorunu yok - disari cikin ve keyfini cikarin."
+          }
+        }
+      }
+    },
+    "narrative_tip_heat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It is hot out there. Take it slow and drink water."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disarisi sicak. Yavaslayin ve su icin."
+          }
+        }
+      }
+    },
+    "narrative_tip_heat_uv": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scorching heat and high UV - stay in the shade between noon and 3."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kavurucu sicak ve yuksek UV - oglen 12 ile 3 arasinda golgede kalin."
+          }
+        }
+      }
+    },
+    "narrative_tip_rain_window": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There is a dry window around %@ - plan accordingly."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ civarinda kuru bir aralik var - ona gore plan yapin."
+          }
+        }
+      }
+    },
+    "narrative_tip_storm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stay indoors if you can - storms are brewing outside."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mumkunse iceride kalin - firtina geliyor."
+          }
+        }
+      }
+    },
+    "narrative_tip_uv": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UV index is high today - sunscreen is non-negotiable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UV endeksi bugun yuksek - gunes kremi sart."
+          }
+        }
+      }
+    },
+    "narrative_tip_wind": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Windy out there. Hold onto your hat."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disarisi ruzgarli. Sapkanizi tutun."
+          }
+        }
+      }
+    },
     "No optimal activity windows found for today.": {
       "comment": "Response when no optimal activity windows are found for today.",
       "extractionState": "manual",
@@ -9101,6 +11346,278 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@"
+          }
+        }
+      }
+    },
+    "outfit_advice_cold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's cold! A warm coat, sweater, and closed shoes are a must. Layer up — you can always take off if needed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava soğuk! Kalın bir mont, kazak ve kapalı ayakkabı şart. Kat kat giyin — gerektiğinde çıkarırsın."
+          }
+        }
+      }
+    },
+    "outfit_advice_cool": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's a bit cool out. A sweater or hoodie with closed shoes will keep you cozy. A light scarf wouldn't hurt."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dışarısı biraz serin. Bir kazak veya hoodie ile kapalı ayakkabı rahat ettirir. Hafif bir atkı da fena olmaz."
+          }
+        }
+      }
+    },
+    "outfit_advice_evening_layer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It'll cool down significantly in the evening — take a light jacket or sweater if you plan to be out late."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akşama doğru hava belirgin şekilde soğuyacak — geç saatlere kadar dışarıda kalacaksan yanına bir hırka veya ceket al."
+          }
+        }
+      }
+    },
+    "outfit_advice_extreme_hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's scorching out there! A light t-shirt and shorts will keep you cool. Don't forget water and sun protection."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dışarısı kavurucu! Hafif bir tişört ve şort serin kalmanı sağlar. Su ve güneş korumasını unutma."
+          }
+        }
+      }
+    },
+    "outfit_advice_extreme_humid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extreme heat with high humidity — a light, breathable shirt and shorts are your best bet. Stay in the shade if you can."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aşırı sıcak ve yüksek nem — hafif, nefes alabilen bir tişört ve şort en iyi tercihin. Mümkünse gölgede kal."
+          }
+        }
+      }
+    },
+    "outfit_advice_freezing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freezing out there! A winter coat, thermal layers, gloves, and a hat are essential. Keep your outings short."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dışarısı dondurucu! Kışlık mont, termal katmanlar, eldiven ve bere şart. Dışarıda fazla kalma."
+          }
+        }
+      }
+    },
+    "outfit_advice_hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's a warm one! A t-shirt and light pants are perfect. If you're heading out for a while, bring some water."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava sıcak! Tişört ve hafif bir pantolon ideal. Uzun süre dışarıda kalacaksan yanına su al."
+          }
+        }
+      }
+    },
+    "outfit_advice_hot_humid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hot and humid — go for lightweight, breathable fabrics. A cotton t-shirt and shorts will keep you comfortable."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıcak ve nemli — hafif, nefes alabilen kumaşlar tercih et. Pamuklu bir tişört ve şort rahat ettirir."
+          }
+        }
+      }
+    },
+    "outfit_advice_humid_fabric": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's humid out — go for loose, cotton or linen fabrics. They'll help you stay cool and avoid that sticky feeling."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nemli bir hava — bol, pamuklu veya keten kumaşlar tercih et. Serin kalmana ve o yapış yapış hissi önlemene yardımcı olur."
+          }
+        }
+      }
+    },
+    "outfit_advice_layer_swing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Big temperature swing today — start with layers in the morning so you can peel them off by midday."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugün büyük bir sıcaklık farkı var — sabah katmanlı giyin ki öğlene doğru üstünü çıkarabilesin."
+          }
+        }
+      }
+    },
+    "outfit_advice_mild": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mild and comfortable — a t-shirt with a light jacket or cardigan works great. You'll be glad you have the extra layer later."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ilık ve rahat — tişörtün üzerine hafif bir ceket veya hırka ideal. Fazladan katmanın olduğu için sonra memnun kalacaksın."
+          }
+        }
+      }
+    },
+    "outfit_advice_rain": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rain is in the forecast — grab a rain jacket or umbrella. Waterproof shoes will save your day."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yağmur var — yanına bir yağmurluk veya şemsiye al. Su geçirmez ayakkabılar günü kurtarır."
+          }
+        }
+      }
+    },
+    "outfit_advice_sun_protection": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The sun is strong today — wear a hat, sunglasses, and don't skip the sunscreen. Your skin will thank you."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugün güneş çok güçlü — şapka, güneş gözlüğü tak ve güneş kremini ihmal etme. Cildin sana teşekkür edecek."
+          }
+        }
+      }
+    },
+    "outfit_advice_warm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pleasantly warm! A t-shirt and casual pants are all you need. Perfect weather for a stroll."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyifli bir sıcaklık! Tişört ve rahat bir pantolon yeterli. Yürüyüş için harika bir hava."
+          }
+        }
+      }
+    },
+    "outfit_advice_warm_humid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warm and a bit muggy — a breathable top and light pants will do the trick. You might feel sticky by midday."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ilık ve biraz bunaltıcı — nefes alabilen bir üst ve hafif pantolon iş görür. Öğlene doğru yapış yapış olabilirsin."
+          }
+        }
+      }
+    },
+    "outfit_advice_wind": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Windy out there! A windbreaker or a tightly woven jacket will help. Watch out for gusts if you're cycling."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rüzgârlı bir gün! Rüzgârlık veya sık dokulu bir ceket işe yarar. Bisiklet kullanıyorsan ani rüzgârlara dikkat."
           }
         }
       }
@@ -13047,7 +15564,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tüm verileriniz, tercihleriniz ve önbellege alinmis hava durumu bilgileri kalici olarak silinecektir."
+            "value": "Tüm verilerin, tercihlerinin ve ön belleğe alınmış hava durumu bilgilerinin kalıcı olarak silinmesini sağlar. Karşılama ekranına yönlendirileceksin."
           }
         }
       }
@@ -13438,7 +15955,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uygulamanin nasil calisacagini ozellestir."
+            "value": "Uygulamanın nasıl çalışacağını özelleştir."
           }
         }
       }
@@ -14171,7 +16688,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava durumunu yenile"
+            "value": "Hava Durumunu Yenile"
           }
         }
       }
@@ -14205,7 +16722,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcaklığı ve hissettiren sıcaklığı söyler"
+            "value": "Sıcaklığı ve hissedilen sıcaklığı söyler"
           }
         }
       }
@@ -14222,7 +16739,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcaklık sorgula"
+            "value": "Sıcaklık Sorgula"
           }
         }
       }
@@ -14698,7 +17215,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "splash app name"
+            "value": "ForeWiz"
           }
         }
       }
@@ -14885,7 +17402,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "tap to change location"
+            "value": "Konumu değiştirmek için dokun"
           }
         }
       }
@@ -15025,7 +17542,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sonsuz"
+            "value": "Süresiz"
           }
         }
       }
@@ -15316,7 +17833,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kisileslestir"
+            "value": "Kişiselleştir"
           }
         }
       }
@@ -16429,7 +18946,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dış mekan skoru"
+            "value": "Dış mekan puanı"
           }
         }
       }
@@ -18378,2523 +20895,133 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alerji profiline aktif. Polen seviyeleri yakindan takip ediliyor."
+            "value": "Alerji profilin aktif. Polen seviyeleri yakından takip ediliyor."
           }
         }
       }
     },
-    "outfit_advice_extreme_humid": {
+    "premium_store_error": {
+      "comment": "Error message when the App Store cannot be reached.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Extreme heat with high humidity — a light, breathable shirt and shorts are your best bet. Stay in the shade if you can."
+            "value": "Could not reach the App Store"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı sıcak ve yüksek nem — hafif, nefes alabilen bir tişört ve şort en iyi tercihin. Mümkünse gölgede kal."
+            "value": "App Store'a bağlanılamadı"
           }
         }
       }
     },
-    "outfit_advice_extreme_hot": {
+    "premium_restored": {
+      "comment": "Message shown when a user's premium purchase has been successfully restored.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It's scorching out there! A light t-shirt and shorts will keep you cool. Don't forget water and sun protection."
+            "value": "Premium restored"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarısı kavurucu! Hafif bir tişört ve şort serin kalmanı sağlar. Su ve güneş korumasını unutma."
+            "value": "Premium geri alındı"
           }
         }
       }
     },
-    "outfit_advice_hot_humid": {
+    "premium_not_found": {
+      "comment": "Message shown when no active premium subscription is found during restore.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hot and humid — go for lightweight, breathable fabrics. A cotton t-shirt and shorts will keep you comfortable."
+            "value": "No active premium subscription found"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcak ve nemli — hafif, nefes alabilen kumaşlar tercih et. Pamuklu bir tişört ve şort rahat ettirir."
+            "value": "Premium ürünü bulunamadı"
           }
         }
       }
     },
-    "outfit_advice_hot": {
+    "premium_save_percent": {
+      "comment": "Savings hint showing the percentage saved by choosing yearly over monthly. %d is the percentage.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It's a warm one! A t-shirt and light pants are perfect. If you're heading out for a while, bring some water."
+            "value": "Save %d%%"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava sıcak! Tişört ve hafif bir pantolon ideal. Uzun süre dışarıda kalacaksan yanına su al."
+            "value": "%d%% tasarruf"
           }
         }
       }
     },
-    "outfit_advice_warm_humid": {
+    "premium_per_month": {
+      "comment": "Short label for monthly subscription period.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Warm and a bit muggy — a breathable top and light pants will do the trick. You might feel sticky by midday."
+            "value": "/mo"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilık ve biraz bunaltıcı — nefes alabilen bir üst ve hafif pantolon iş görür. Öğlene doğru yapış yapış olabilirsin."
+            "value": "/ay"
           }
         }
       }
     },
-    "outfit_advice_warm": {
+    "premium_per_year": {
+      "comment": "Short label for yearly subscription period.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pleasantly warm! A t-shirt and casual pants are all you need. Perfect weather for a stroll."
+            "value": "/yr"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Keyifli bir sıcaklık! Tişört ve rahat bir pantolon yeterli. Yürüyüş için harika bir hava."
+            "value": "/yıl"
           }
         }
       }
     },
-    "outfit_advice_mild": {
+    "premium_per_week": {
+      "comment": "Short label for weekly subscription period.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mild and comfortable — a t-shirt with a light jacket or cardigan works great. You'll be glad you have the extra layer later."
+            "value": "/wk"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilık ve rahat — tişörtün üzerine hafif bir ceket veya hırka ideal. Fazladan katmanın olduğu için sonra memnun kalacaksın."
-          }
-        }
-      }
-    },
-    "outfit_advice_cool": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It's a bit cool out. A sweater or hoodie with closed shoes will keep you cozy. A light scarf wouldn't hurt."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dışarısı biraz serin. Bir kazak veya hoodie ile kapalı ayakkabı rahat ettirir. Hafif bir atkı da fena olmaz."
-          }
-        }
-      }
-    },
-    "outfit_advice_cold": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It's cold! A warm coat, sweater, and closed shoes are a must. Layer up — you can always take off if needed."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava soğuk! Kalın bir mont, kazak ve kapalı ayakkabı şart. Kat kat giyin — gerektiğinde çıkarırsın."
-          }
-        }
-      }
-    },
-    "outfit_advice_freezing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Freezing out there! A winter coat, thermal layers, gloves, and a hat are essential. Keep your outings short."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dışarısı dondurucu! Kışlık mont, termal katmanlar, eldiven ve bere şart. Dışarıda fazla kalma."
-          }
-        }
-      }
-    },
-    "outfit_advice_layer_swing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Big temperature swing today — start with layers in the morning so you can peel them off by midday."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugün büyük bir sıcaklık farkı var — sabah katmanlı giyin ki öğlene doğru üstünü çıkarabilesin."
-          }
-        }
-      }
-    },
-    "outfit_advice_evening_layer": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It'll cool down significantly in the evening — take a light jacket or sweater if you plan to be out late."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akşama doğru hava belirgin şekilde soğuyacak — geç saatlere kadar dışarıda kalacaksan yanına bir hırka veya ceket al."
-          }
-        }
-      }
-    },
-    "outfit_advice_rain": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rain is in the forecast — grab a rain jacket or umbrella. Waterproof shoes will save your day."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yağmur var — yanına bir yağmurluk veya şemsiye al. Su geçirmez ayakkabılar günü kurtarır."
-          }
-        }
-      }
-    },
-    "outfit_advice_wind": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Windy out there! A windbreaker or a tightly woven jacket will help. Watch out for gusts if you're cycling."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rüzgârlı bir gün! Rüzgârlık veya sık dokulu bir ceket işe yarar. Bisiklet kullanıyorsan ani rüzgârlara dikkat."
-          }
-        }
-      }
-    },
-    "outfit_advice_sun_protection": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The sun is strong today — wear a hat, sunglasses, and don't skip the sunscreen. Your skin will thank you."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugün güneş çok güçlü — şapka, güneş gözlüğü tak ve güneş kremini ihmal etme. Cildin sana teşekkür edecek."
-          }
-        }
-      }
-    },
-    "outfit_advice_humid_fabric": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It's humid out — go for loose, cotton or linen fabrics. They'll help you stay cool and avoid that sticky feeling."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nemli bir hava — bol, pamuklu veya keten kumaşlar tercih et. Serin kalmana ve o yapış yapış hissi önlemene yardımcı olur."
-          }
-        }
-      }
-    },
-    "briefing_section_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI Weather Briefing"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yapay Zeka Hava Briefingi"
-          }
-        }
-      }
-    },
-    "briefing_takeaway_critical": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Critical: %@ - take precautions today"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kritik: %@ - bugun onlem al"
-          }
-        }
-      }
-    },
-    "briefing_takeaway_health": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today the weather may affect how you feel"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugunku hava sagliginizi etkileyebilir"
-          }
-        }
-      }
-    },
-    "briefing_takeaway_anomaly": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today is %@ compared to normal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugun normale gore %@"
-          }
-        }
-      }
-    },
-    "briefing_takeaway_window": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best time to go out is %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disari cikmak icin en iyi zaman %@"
-          }
-        }
-      }
-    },
-    "narrative_mood_perfect": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perfect"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mustesem"
-          }
-        }
-      }
-    },
-    "narrative_mood_great": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Great"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Harika"
-          }
-        }
-      }
-    },
-    "narrative_mood_okay": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Okay"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Idare eder"
-          }
-        }
-      }
-    },
-    "narrative_mood_meh": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Meh"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eh iste"
-          }
-        }
-      }
-    },
-    "narrative_mood_rough": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rough"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zor"
-          }
-        }
-      }
-    },
-    "narrative_headline_energetic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bright and energetic - a day made for being outside"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Parlak ve enerjik - disarida olmak icin yaratilmis bir gun"
-          }
-        }
-      }
-    },
-    "narrative_headline_melancholic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A quiet gray day - perfect for staying cozy indoors"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sessiz gri bir gun - iceride keyif yapmak icin mukemmel"
-          }
-        }
-      }
-    },
-    "narrative_headline_serene_perfect": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perfectly balanced - nature at its finest today"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mukemmel dengede - doga bugun en guzel halinde"
-          }
-        }
-      }
-    },
-    "narrative_headline_serene": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calm and peaceful - a gentle day ahead"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sakin ve huzurlu - yumusak bir gun seni bekliyor"
-          }
-        }
-      }
-    },
-    "narrative_headline_dramatic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dramatic skies ahead - today is making a statement"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Onumuzde dramatik gokyuzu - bugun bir aciklama yapiyor"
-          }
-        }
-      }
-    },
-    "narrative_headline_cozy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cold outside - perfect excuse for a warm drink indoors"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disarisi soguk - iceride sicak bir icecek icin mukemmel bahane"
-          }
-        }
-      }
-    },
-    "narrative_headline_refreshing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Crisp and fresh - like nature hit the reset button"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Taze ve ferah - doga reset butonuna basmis gibi"
-          }
-        }
-      }
-    },
-    "narrative_headline_stubborn": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mixed signals from the sky - expect a bit of everything"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gokyuzunden karisik sinyaller - her seyden biraz bekle"
-          }
-        }
-      }
-    },
-    "narrative_headline_lazy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hot and hazy - today moves at its own slow pace"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sicak ve puslu - bugun kendi yavas temposunda ilerliyor"
-          }
-        }
-      }
-    },
-    "narrative_headline_adventurous": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wild weather ahead - for those who dare to step out"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vahsi hava kapida - disari cikmaya cesareti olanlara"
-          }
-        }
-      }
-    },
-    "narrative_headline_mysterious": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fog and mystery - the world feels soft today"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sis ve gizem - dunya bugun yumusak ve ruya gibi"
-          }
-        }
-      }
-    },
-    "health_card_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health and Weather"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Saglik ve Hava"
-          }
-        }
-      }
-    },
-    "health_metric_migraine": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Migraine"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Migren"
-          }
-        }
-      }
-    },
-    "health_metric_sleep": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sleep"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyku"
-          }
-        }
-      }
-    },
-    "health_metric_stamina": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stamina"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dayaniklilik"
-          }
-        }
-      }
-    },
-    "health_metric_respiratory": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Respiratory"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solunum"
-          }
-        }
-      }
-    },
-    "health_migraine_low": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low risk"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dusuk risk"
-          }
-        }
-      }
-    },
-    "health_migraine_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "health_migraine_high": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High risk"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yuksek risk"
-          }
-        }
-      }
-    },
-    "health_migraine_extreme": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Extreme"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asiri"
-          }
-        }
-      }
-    },
-    "health_migraine_low_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low migraine trigger risk - enjoy your day normally."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dusuk migren riski - gununuzu normal gecirebilirsiniz."
-          }
-        }
-      }
-    },
-    "health_migraine_moderate_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate migraine risk - keep lights dim and stay hydrated."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta migren riski - isiklari los tutun ve su icin."
-          }
-        }
-      }
-    },
-    "health_migraine_high_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High migraine risk - avoid bright screens and take breaks."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yuksek migren riski - parlak ekranlardan kacinin, mola verin."
-          }
-        }
-      }
-    },
-    "health_migraine_extreme_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Extreme migraine risk - minimize stress and rest if possible."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asiri migren riski - stresi azaltin ve mumkunse dinlenin."
-          }
-        }
-      }
-    },
-    "health_sleep_excellent": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Excellent"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mukemmel"
-          }
-        }
-      }
-    },
-    "health_sleep_good": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iyi"
-          }
-        }
-      }
-    },
-    "health_sleep_fair": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fair"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "health_sleep_poor": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Poor"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kotu"
-          }
-        }
-      }
-    },
-    "health_sleep_excellent_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perfect sleeping weather - open a window and enjoy fresh air."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mukemmel uyku havasi - pencere acin ve temiz havanin tadini cikarin."
-          }
-        }
-      }
-    },
-    "health_sleep_good_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good sleeping conditions."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iyi uyku kosullari."
-          }
-        }
-      }
-    },
-    "health_sleep_fair_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fair sleep quality - a fan might help."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta uyku kalitesi - vantilator yardimci olabilir."
-          }
-        }
-      }
-    },
-    "health_sleep_poor_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Poor sleeping weather - keep your bedroom cool."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kotu uyku havasi - yatak odanizi serin tutun."
-          }
-        }
-      }
-    },
-    "health_joint_low": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dusuk"
-          }
-        }
-      }
-    },
-    "health_joint_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "health_joint_high": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yuksek"
-          }
-        }
-      }
-    },
-    "health_joint_extreme": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Severe"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siddetli"
-          }
-        }
-      }
-    },
-    "health_joint_low_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low joint discomfort - great day to stay active."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dusuk eklem rahatsizligi - aktif kalmak icin harika."
-          }
-        }
-      }
-    },
-    "health_joint_moderate_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate joint discomfort - gentle stretching may help."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta eklem rahatsizligi - hafif esneme yardimci olabilir."
-          }
-        }
-      }
-    },
-    "health_joint_high_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High joint discomfort - keep warm and avoid sudden movements."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yuksek eklem rahatsizligi - sicak kalin ve ani hareketlerden kacinin."
-          }
-        }
-      }
-    },
-    "health_joint_extreme_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Severe joint discomfort - rest and keep joints warm."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siddetli eklem rahatsizligi - dinlenin ve eklemlerinizi sicak tutun."
-          }
-        }
-      }
-    },
-    "health_respiratory_low": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iyi"
-          }
-        }
-      }
-    },
-    "health_respiratory_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fair"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "health_respiratory_high": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caution"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dikkat"
-          }
-        }
-      }
-    },
-    "health_respiratory_extreme": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Risky"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Riskli"
-          }
-        }
-      }
-    },
-    "health_respiratory_low_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good breathing conditions - enjoy the fresh air."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iyi nefes kosullari - temiz havanin tadini cikarin."
-          }
-        }
-      }
-    },
-    "health_respiratory_moderate_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fair respiratory comfort."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta solunum konforu."
-          }
-        }
-      }
-    },
-    "health_respiratory_high_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caution if you have asthma or sensitivity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Astim veya hassasiyetiniz varsa dikkatli olun."
-          }
-        }
-      }
-    },
-    "health_respiratory_extreme_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Risky respiratory conditions today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Riskli solunum kosullari bugun."
-          }
-        }
-      }
-    },
-    "health_stamina_high": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High energy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yuksek enerji"
-          }
-        }
-      }
-    },
-    "health_stamina_good": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good energy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Iyi enerji"
-          }
-        }
-      }
-    },
-    "health_stamina_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "health_stamina_low": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low energy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dusuk enerji"
-          }
-        }
-      }
-    },
-    "health_stamina_high_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High outdoor energy - great for exercise."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yuksek dis mekan enerjisi - egzersiz icin harika."
-          }
-        }
-      }
-    },
-    "health_stamina_good_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good energy levels for outdoor activities."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dis mekan aktiviteleri icin iyi enerji."
-          }
-        }
-      }
-    },
-    "health_stamina_moderate_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate energy - take breaks and pace yourself."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta enerji - mola verin ve kendinize uygun tempo bulun."
-          }
-        }
-      }
-    },
-    "health_stamina_low_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low outdoor energy - keep activities light."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dusuk dis mekan enerjisi - aktiviteleri hafif tutun."
-          }
-        }
-      }
-    },
-    "health_summary_great": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today the weather is great for your health."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugunku hava sagliginiz icin harika."
-          }
-        }
-      }
-    },
-    "health_summary_good": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today the weather is generally good for your health."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugunku hava genel olarak sagliginiz icin iyi."
-          }
-        }
-      }
-    },
-    "health_summary_fair": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Some weather factors may affect how you feel today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bazi hava faktorleri bugun nasil hissettiginizi etkileyebilir."
-          }
-        }
-      }
-    },
-    "health_summary_poor": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today the weather is challenging for health."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugunku hava saglik icin zorlu."
-          }
-        }
-      }
-    },
-    "comparative_card_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compared to Normal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normale Gore"
-          }
-        }
-      }
-    },
-    "comparative_metric_dod": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "vs Yesterday"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dune Gore"
-          }
-        }
-      }
-    },
-    "comparative_metric_pattern": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Week Pattern"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hafta Deseni"
-          }
-        }
-      }
-    },
-    "comparative_no_data": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No data"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Veri yok"
-          }
-        }
-      }
-    },
-    "comparative_no_data_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not enough data to compare."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Karsilastirma icin yeterli veri yok."
-          }
-        }
-      }
-    },
-    "comparative_anomaly_extreme_hot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Extremely Hot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asiri Sicak"
-          }
-        }
-      }
-    },
-    "comparative_anomaly_extreme_hot_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Well above seasonal norms."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevsim normallerinin cok ustunde."
-          }
-        }
-      }
-    },
-    "comparative_anomaly_hot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Warmer than usual"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normalden Sicak"
-          }
-        }
-      }
-    },
-    "comparative_anomaly_hot_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Above seasonal averages."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevsim ortalamasinin ustunde."
-          }
-        }
-      }
-    },
-    "comparative_anomaly_normal": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seasonal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevsim Normalinde"
-          }
-        }
-      }
-    },
-    "comparative_anomaly_normal_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Right where it should be for this time of year."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Olmasi gerektigi gibi."
-          }
-        }
-      }
-    },
-    "comparative_anomaly_cold": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cooler than usual"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normalden Serin"
-          }
-        }
-      }
-    },
-    "comparative_anomaly_cold_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Below seasonal averages."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevsim ortalamasinin altinda."
-          }
-        }
-      }
-    },
-    "comparative_anomaly_extreme_cold": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Extremely Cold"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Asiri Soguk"
-          }
-        }
-      }
-    },
-    "comparative_anomaly_extreme_cold_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Well below seasonal norms."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevsim normallerinin cok altinda."
-          }
-        }
-      }
-    },
-    "comparative_precip_heavy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heavy precipitation expected."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yogun yagis bekleniyor."
-          }
-        }
-      }
-    },
-    "comparative_precip_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate rain chances."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta duzeyde yagmur ihtimali."
-          }
-        }
-      }
-    },
-    "comparative_precip_light": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Light precipitation possible."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hafif yagis mumkun."
-          }
-        }
-      }
-    },
-    "comparative_precip_dry": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dry conditions expected."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kuru kosullar bekleniyor."
-          }
-        }
-      }
-    },
-    "comparative_dod_no_data": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No recent data for comparison."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Karsilastirma icin yeterli veri yok."
-          }
-        }
-      }
-    },
-    "comparative_dod_warmer": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d warmer than yesterday"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dunden %d daha sicak"
-          }
-        }
-      }
-    },
-    "comparative_dod_cooler": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d cooler than yesterday"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dunden %d daha serin"
-          }
-        }
-      }
-    },
-    "comparative_dod_same": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Same as yesterday"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dunle ayni"
-          }
-        }
-      }
-    },
-    "comparative_pattern_limited": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not enough data for a weekly pattern."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Haftalik desen icin yeterli veri yok."
-          }
-        }
-      }
-    },
-    "comparative_pattern_heatwave": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heatwave - multiple days of extreme heat."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sicak hava dalgasi - gunlerce asiri sicak."
-          }
-        }
-      }
-    },
-    "comparative_pattern_coldsnap": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cold snap - prolonged cold weather."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Soguk hava dalgasi - uzun sureli soguk."
-          }
-        }
-      }
-    },
-    "comparative_pattern_warming": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Warming trend - rising through the week."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Isinma trendi - hafta boyunca yukseliyor."
-          }
-        }
-      }
-    },
-    "comparative_pattern_cooling": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cooling trend - dropping through the week."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Soguma trendi - hafta boyunca dusuyor."
-          }
-        }
-      }
-    },
-    "comparative_pattern_stormy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stormy spell - unsettled weather ahead."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Firtina - dengesiz hava bekleniyor."
-          }
-        }
-      }
-    },
-    "comparative_pattern_mixed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mixed bag - different conditions each day."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Karmasik - her gun farkli kosullar."
-          }
-        }
-      }
-    },
-    "comparative_pattern_stable": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stable weather - consistent conditions."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Istikrarli hava - tutarli kosullar."
-          }
-        }
-      }
-    },
-    "action_card_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart Actions"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akilli Aksiyonlar"
-          }
-        }
-      }
-    },
-    "action_card_empty": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No specific actions needed today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugun ozel bir aksiyon gerekmiyor."
-          }
-        }
-      }
-    },
-    "action_best_time": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best Time"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En Iyi Zaman"
-          }
-        }
-      }
-    },
-    "action_best_time_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Plan outdoor activities around %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dis mekan aktivitelerini %@ civarinda planlayin"
-          }
-        }
-      }
-    },
-    "action_avoid": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avoid"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kacinin"
-          }
-        }
-      }
-    },
-    "action_avoid_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ - %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ - %@"
-          }
-        }
-      }
-    },
-    "action_migraine": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Migraine Alert"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Migren Uyarisi"
-          }
-        }
-      }
-    },
-    "action_stamina": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save Your Energy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enerjinizi Koruyun"
-          }
-        }
-      }
-    },
-    "action_sleep": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sleep Better Tonight"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu Gece Daha Iyi Uyuyun"
-          }
-        }
-      }
-    },
-    "action_outfit": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "What to Wear"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ne Giymeli"
-          }
-        }
-      }
-    },
-    "action_pro_tip": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pro Tip"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profesyonel Ipucu"
-          }
-        }
-      }
-    },
-    "narrative_story_energetic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The sun is out and the air is buzzing with energy today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gunes acti ve hava enerjiyle ugulduyor bugun."
-          }
-        }
-      }
-    },
-    "narrative_story_melancholic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The sky is painted in soft grays today. Rain taps gently on the windows."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gokyuzu bugun yumusak grilere boyanmis. Yagmur camlara nazikce vuruyor."
-          }
-        }
-      }
-    },
-    "narrative_story_serene_perfect": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Everything aligns today - the temperature, the breeze, the light."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Her sey bugun uyum icinde - sicaklik, ruzgar, isik."
-          }
-        }
-      }
-    },
-    "narrative_story_serene": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A calm blanket of mild air settles over everything today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ilik bir hava ortusu bugun her seyin uzerine yayiliyor."
-          }
-        }
-      }
-    },
-    "narrative_story_dramatic": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The sky is putting on a show today. Dark clouds roll in and the wind picks up."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gokyuzu bugun bir sov yapiyor. Karanlik bulutlar geliyor, ruzgar hizlaniyor."
-          }
-        }
-      }
-    },
-    "narrative_story_cozy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The cold has arrived wrapping the world in a frosty embrace."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Soguk geldi, dunyayi buzlu bir kucaklamaya aldi."
-          }
-        }
-      }
-    },
-    "narrative_story_refreshing": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The air feels clean and invigorating like someone opened all the windows."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava temiz ve canlandirici, sanki biri tum pencereleri acmis gibi."
-          }
-        }
-      }
-    },
-    "narrative_story_stubborn": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The weather cannot seem to make up its mind today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava bir turlu karar veremiyor bugun."
-          }
-        }
-      }
-    },
-    "narrative_story_lazy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The heat hangs thick in the air slowing everything down."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sicaklik havada agir agir asili kaliyor, her seyi yavaslatiyor."
-          }
-        }
-      }
-    },
-    "narrative_story_adventurous": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The elements are flexing today with strong winds and dramatic clouds."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elementler bugun kaslarini esnetiyor - guclu ruzgarlar, dramatik bulutlar."
-          }
-        }
-      }
-    },
-    "narrative_story_mysterious": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fog wraps the world in a soft silent blanket today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sis dunyayi yumusak sessiz bir battaniyeye sariyor bugun."
-          }
-        }
-      }
-    },
-    "narrative_tip_storm": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stay indoors if you can - storms are brewing outside."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mumkunse iceride kalin - firtina geliyor."
-          }
-        }
-      }
-    },
-    "narrative_tip_heat_uv": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scorching heat and high UV - stay in the shade between noon and 3."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kavurucu sicak ve yuksek UV - oglen 12 ile 3 arasinda golgede kalin."
-          }
-        }
-      }
-    },
-    "narrative_tip_heat": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It is hot out there. Take it slow and drink water."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disarisi sicak. Yavaslayin ve su icin."
-          }
-        }
-      }
-    },
-    "narrative_tip_rain_window": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "There is a dry window around %@ - plan accordingly."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ civarinda kuru bir aralik var - ona gore plan yapin."
-          }
-        }
-      }
-    },
-    "narrative_tip_cold": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It is chilly out - layer up and do not forget a scarf."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava soguk - katmanli giyinin ve atkiyi unutmayin."
-          }
-        }
-      }
-    },
-    "narrative_tip_uv": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UV index is high today - sunscreen is non-negotiable."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UV endeksi bugun yuksek - gunes kremi sart."
-          }
-        }
-      }
-    },
-    "narrative_tip_wind": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Windy out there. Hold onto your hat."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disarisi ruzgarli. Sapkanizi tutun."
-          }
-        }
-      }
-    },
-    "narrative_tip_best_window": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The sweet spot today is %@ - that is your window."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugunun tatli noktasi %@."
-          }
-        }
-      }
-    },
-    "narrative_tip_enjoy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No major weather concerns today - go out and enjoy."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugun onemli bir hava sorunu yok - disari cikin ve keyfini cikarin."
+            "value": "/hafta"
           }
         }
       }

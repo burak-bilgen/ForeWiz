@@ -2,7 +2,7 @@ import Foundation
 
 /// The master service that orchestrates all AI-powered weather analysis.
 /// Combines narrative storytelling, health intelligence, and comparative analysis
-/// into a single comprehensive daily briefing — something Apple Weather can't do.
+/// into a single comprehensive daily briefing.
 struct WeatherBriefingService {
     private let narrativeService = WeatherNarrativeService()
     private let healthService = HealthWeatherService()

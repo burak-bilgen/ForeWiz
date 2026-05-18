@@ -20,6 +20,8 @@ struct WeatherBriefingServiceTests {
             apparentTemperatureCelsius: temp,
             humidity: 0.5,
             windSpeedKph: 10,
+            precipitationChance: 0.05,
+            precipitationAmountMm: 0,
             uvIndex: 4,
             conditionCode: "clear",
             symbolName: "sun.max.fill",
@@ -59,20 +61,27 @@ struct WeatherBriefingServiceTests {
         bestWindow: TimeWindow? = nil,
         avoidWindows: [AvoidWindowRecommendation] = []
     ) -> DailyRecommendation {
-        let riskList = risks.isEmpty ? nil : risks
         return DailyRecommendation(
-            date: Date(),
-            outdoorScore: WeatherScore(rawValue: score),
+            generatedAt: Date(),
             outdoorDecision: decision,
+            outdoorScore: WeatherScore(rawValue: score),
             bestOutdoorWindow: bestWindow,
+            bestActivityWindows: [],
             avoidWindows: avoidWindows,
             outfit: OutfitRecommendation(title: "Light t-shirt", items: ["T-shirt", "Shorts"], accessories: [], warning: nil, detailedAdvice: nil),
-            risks: riskList
+            risks: risks,
+            summaryText: "Test",
+            explanation: "\(score)/100",
+            isTomorrowsRecommendation: false
         )
     }
 
     private func makeProfile() -> UserComfortProfile {
-        UserComfortProfile()
+        UserComfortProfile(
+            notificationPreferences: NotificationCategory.allCases.map {
+                NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)
+            }
+        )
     }
 
     // MARK: - Briefing Generation Tests
@@ -139,7 +148,7 @@ struct WeatherBriefingServiceTests {
     @Test func keyTakeawayForCriticalRisk() {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 15, decision: .avoid, risks: [
-            WeatherRisk(type: .storm, severity: .extreme, title: "Severe Storm", description: "Dangerous storm expected")
+            WeatherRisk(type: .storm, severity: .extreme, title: "Severe Storm", message: "Dangerous storm expected")
         ])
         let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
@@ -171,28 +180,39 @@ struct WeatherBriefingServiceTests {
     @Test func healthActionItemsAddedForHighMigraineRisk() {
         // Create conditions that trigger high migraine risk
         let now = Date()
-        let hourly = (0..<12).map { i in
-            HourlyWeatherPoint(
-                date: now.addingTimeInterval(Double(i) * 3600),
-                temperatureCelsius: 22 + Double(i % 3) * 5,  // 10-12 degree swing
-                apparentTemperatureCelsius: 22 + Double(i % 3) * 5,
-                humidity: 0.85,
-                windSpeedKph: 10,
-                precipitationChance: 0.5,
-                precipitationAmountMm: 0,
-                uvIndex: 7,
-                conditionCode: i < 6 ? "clear" : "rain",
-                symbolName: i < 6 ? "sun.max.fill" : "cloud.rain.fill",
-                isDaylight: true,
-                severeWeatherRisk: i >= 4 && i <= 6 ? .high : nil
-            )
-        }
+        let hourlyData: [HourlyWeatherPoint] = {
+            var result = [HourlyWeatherPoint]()
+            for i in 0..<12 {
+                let date = now.addingTimeInterval(Double(i) * 3600)
+                let temp = 22 + Double(i % 3) * 5
+                let risk: RiskLevel? = (i >= 4 && i <= 6) ? .high : nil
+                result.append(
+                    HourlyWeatherPoint(
+                        date: date,
+                        temperatureCelsius: temp,
+                        apparentTemperatureCelsius: temp,
+                        humidity: 0.85,
+                        windSpeedKph: 10,
+                        precipitationChance: 0.5,
+                        precipitationAmountMm: 0,
+                        uvIndex: 7,
+                        conditionCode: i < 6 ? "clear" : "rain",
+                        symbolName: i < 6 ? "sun.max.fill" : "cloud.rain.fill",
+                        isDaylight: true,
+                        severeWeatherRisk: risk
+                    )
+                )
+            }
+            return result
+        }()
         let current = CurrentWeatherPoint(
             date: now,
             temperatureCelsius: 22,
             apparentTemperatureCelsius: 22,
             humidity: 0.85,
             windSpeedKph: 10,
+            precipitationChance: 0.5,
+            precipitationAmountMm: 0,
             uvIndex: 7,
             conditionCode: "clear",
             symbolName: "sun.max.fill",
@@ -202,7 +222,7 @@ struct WeatherBriefingServiceTests {
         let snapshot = WeatherSnapshot(
             location: LocationCoordinate(latitude: 36.9, longitude: 30.7),
             current: current,
-            hourly: hourly,
+            hourly: hourlyData,
             daily: [],
             fetchedAt: now,
             attribution: nil

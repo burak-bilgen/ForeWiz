@@ -1,7 +1,6 @@
 import Foundation
 
-/// Comparative weather intelligence — Apple Weather has NO historical context.
-/// ForeWiz tells you how today compares to normal, to yesterday, and what patterns to expect.
+/// Comparative weather intelligence — tells you how today compares to seasonal norms, yesterday, and weekly patterns.
 struct ComparativeWeatherService {
 
     func analyze(
