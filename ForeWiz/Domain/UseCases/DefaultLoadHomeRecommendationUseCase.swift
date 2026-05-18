@@ -6,6 +6,10 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
     private let weatherCacheRepository: WeatherCacheRepository
     private let preferencesRepository: PreferencesRepository
     private let weatherDecisionEngine: WeatherDecisionEngine
+    private let candidateProvider: RecommendationCandidateProvider
+    private let ranker: RecommendationRanker
+    private let explainer: RecommendationExplainer
+    private let store: RecommendationStore
     private let dateProvider: DateProvider
     private let cachePolicy: WeatherCachePolicy
     private let liveFetchAttempts = 3
@@ -16,6 +20,10 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         weatherCacheRepository: WeatherCacheRepository,
         preferencesRepository: PreferencesRepository,
         weatherDecisionEngine: WeatherDecisionEngine,
+        candidateProvider: RecommendationCandidateProvider = DefaultRecommendationCandidateProvider(),
+        ranker: RecommendationRanker = ContextualRecommendationRanker(),
+        explainer: RecommendationExplainer = DefaultRecommendationExplainer(),
+        store: RecommendationStore = DefaultRecommendationStore(),
         dateProvider: DateProvider,
         cachePolicy: WeatherCachePolicy = WeatherCachePolicy()
     ) {
@@ -24,6 +32,10 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         self.weatherCacheRepository = weatherCacheRepository
         self.preferencesRepository = preferencesRepository
         self.weatherDecisionEngine = weatherDecisionEngine
+        self.candidateProvider = candidateProvider
+        self.ranker = ranker
+        self.explainer = explainer
+        self.store = store
         self.dateProvider = dateProvider
         self.cachePolicy = cachePolicy
     }
@@ -56,7 +68,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             let snapshot = try await fetchLiveWeather(for: location)
             try await weatherCacheRepository.save(snapshot)
             let result = makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false, usedLocation: location)
-            // Cache weather data for the widget extension
             cacheWidgetData(
                 snapshot: snapshot,
                 outdoorScore: result.recommendation.outdoorScore.rawValue,
@@ -124,6 +135,24 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             calendar: .current
         )
 
+        let context = RecommendationContext(
+            timeOfDay: RecommendationContext.TimeOfDay(date: now),
+            dayOfWeek: RecommendationContext.DayOfWeek(date: now),
+            recentFeedback: store.recentFeedback(),
+            lastShownTypes: store.lastShownTypes(),
+            isOffline: isCached
+        )
+
+        let candidates = candidateProvider.candidates(
+            from: snapshot,
+            profile: profile,
+            now: now,
+            calendar: .current
+        )
+
+        let rankedCandidates = ranker.rank(candidates, context: context)
+        store.saveCandidates(rankedCandidates)
+
         return HomeRecommendationResult(
             recommendation: recommendation,
             currentWeather: snapshot.current,
@@ -136,7 +165,8 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             usedLocation: usedLocation,
             warningMessage: warningMessage,
             weatherFetchedAt: snapshot.fetchedAt,
-            attribution: snapshot.attribution
+            attribution: snapshot.attribution,
+            rankedCandidates: rankedCandidates
         )
     }
 
@@ -144,10 +174,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         ErrorHandler.normalized(error)
     }
 
-    // MARK: - Widget Data Caching
-
-    /// Mirrors WeatherWidgetData from the widget target — uses the same property names
-    /// so JSONEncoder output decodes cleanly on the widget side.
     private struct WidgetCacheData: Codable {
         let locationName: String
         let currentTemperature: Double

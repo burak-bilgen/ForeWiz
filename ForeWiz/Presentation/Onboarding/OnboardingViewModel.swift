@@ -3,7 +3,6 @@ import Foundation
 @MainActor
 @Observable
 final class OnboardingViewModel {
-    private(set) var selectedSensitivity: TemperatureSensitivity = .normal
     private(set) var preferredActivities: Set<ActivityType> = [.walking, .goingOutside]
     private(set) var wakeUpTime: DateComponents
     private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
@@ -20,17 +19,12 @@ final class OnboardingViewModel {
     ) {
         self.locationRepository = locationRepository
         self.notificationRepository = notificationRepository
-        selectedSensitivity = profile.temperatureSensitivity
         preferredActivities = profile.preferredActivities
         wakeUpTime = profile.wakeUpTime ?? Self.defaultWakeTime()
     }
 
     var canContinue: Bool {
         locationStatus == .authorized
-    }
-
-    func selectSensitivity(_ sensitivity: TemperatureSensitivity) {
-        selectedSensitivity = sensitivity
     }
 
     func toggleActivity(_ activity: ActivityType) {
@@ -81,7 +75,6 @@ final class OnboardingViewModel {
 
     func makeProfile(inheriting existingProfile: UserComfortProfile = .default) -> UserComfortProfile {
         var profile = existingProfile
-        profile.temperatureSensitivity = selectedSensitivity
         profile.preferredActivities = preferredActivities.isEmpty ? [.goingOutside] : preferredActivities
         profile.wakeUpTime = wakeUpTime
         return profile

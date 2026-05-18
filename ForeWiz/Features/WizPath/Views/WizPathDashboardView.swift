@@ -19,6 +19,13 @@ struct WizPathDashboardView: View {
                         .padding(.horizontal, 20)
                         .padding(.top, 8)
 
+                    // Offline Banner
+                    if viewModel.state.isOffline {
+                        offlineBanner
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                    }
+
                     // Route Map
                     WizPathMapView(viewModel: viewModel)
                         .frame(height: 320)
@@ -27,10 +34,27 @@ struct WizPathDashboardView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
 
+                    // Empty State (no destination selected)
+                    if viewModel.currentRoute == nil && viewModel.destinationCoordinate == nil {
+                        emptyStateView
+                            .padding(.horizontal, 16)
+                            .padding(.top, 14)
+                    }
+
                     // Planner Card
                     plannerCard
                         .padding(.horizontal, 16)
-                        .padding(.top, 14)
+                        .padding(.top, viewModel.currentRoute == nil && viewModel.destinationCoordinate == nil ? 0 : 14)
+
+                    // Best Departure Time Suggestion
+                    if viewModel.currentRoute != nil,
+                       let bestTime = viewModel.bestDepartureTime,
+                       let reason = viewModel.departureTimeReason {
+                        bestDepartureCard(bestTime: bestTime, reason: reason)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 12)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
 
                     // Journey HUD
                     if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
@@ -106,6 +130,17 @@ struct WizPathDashboardView: View {
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }
+            .alert(L10n.text("wizpath_offline_title"), isPresented: .init(
+                get: { viewModel.state.isOffline },
+                set: { if !$0 { viewModel.dismissError() } }
+            )) {
+                Button(L10n.text("wizpath_offline_retry")) {
+                    Task { await viewModel.calculateRoute() }
+                }
+                Button(L10n.text("wizpath_ok"), role: .cancel) { viewModel.dismissError() }
+            } message: {
+                Text(L10n.text("wizpath_offline_message"))
+            }
             .animation(.spring(response: 0.5, dampingFraction: 0.8), value: viewModel.state)
             .animation(.spring(response: 0.4, dampingFraction: 0.85), value: viewModel.showJourneyHUD)
         }
@@ -145,6 +180,101 @@ struct WizPathDashboardView: View {
         .onAppear {
             withAnimation(.spring(response: 0.4).delay(0.2)) {
                 dashboardLoadTrigger = true
+            }
+        }
+    }
+
+    // MARK: - Offline Banner
+    private var offlineBanner: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "wifi.slash")
+                .font(.system(size: 18))
+                .foregroundStyle(Color.warning)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(L10n.text("wizpath_offline_title"))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                Text(L10n.text("wizpath_offline_message"))
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button(L10n.text("wizpath_offline_retry")) {
+                Task { await viewModel.calculateRoute() }
+            }
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundStyle(Color.liquidAccent)
+        }
+        .padding(14)
+        .background(Color.warning.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.warning.opacity(0.2), lineWidth: 1)
+        )
+    }
+
+    // MARK: - Empty State View
+    private var emptyStateView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "map.badge.plus")
+                .font(.system(size: 48))
+                .foregroundStyle(Color.liquidAccent.opacity(0.4))
+                .symbolRenderingMode(.hierarchical)
+
+            VStack(spacing: 6) {
+                Text(L10n.text("wizpath_select_destination_title"))
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(.white)
+                Text(L10n.text("wizpath_select_destination_subtitle"))
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.vertical, 32)
+        .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Best Departure Card
+    private func bestDepartureCard(bestTime: Date, reason: String) -> some View {
+        LiquidGlassCard(accentColor: .success, innerPadding: 14) {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle()
+                        .fill(Color.success.opacity(0.15))
+                        .frame(width: 36, height: 36)
+                    Image(systemName: "clock.badge.checkmark.fill")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.success)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("wizpath_best_time_to_leave"))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                    Text(bestTime.formatted(date: .omitted, time: .shortened))
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Color.success)
+                    Text(reason)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.tertiary)
+                }
+
+                Spacer()
+
+                Button(L10n.text("wizpath_set_departure_time")) {
+                    viewModel.updateDepartureTime(bestTime)
+                }
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.success)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.success.opacity(0.12))
+                .clipShape(Capsule())
             }
         }
     }

@@ -268,9 +268,9 @@ final class WizPathSentinelService {
         let minutes = (Int(duration) % 3600) / 60
         
         if hours > 0 {
-            return String(format: "%dh %02dm", hours, minutes)
+            return L10n.formatted("format_duration_hours_minutes", hours, minutes)
         } else {
-            return String(format: "%d min", minutes)
+            return L10n.formatted("format_duration_minutes_only", minutes)
         }
     }
 }

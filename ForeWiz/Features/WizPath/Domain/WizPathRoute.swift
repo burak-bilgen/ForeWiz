@@ -194,6 +194,15 @@ enum SegmentWeatherCondition: String, Sendable, CaseIterable {
 enum SegmentWeatherSeverity: String, Sendable {
     case good, fair, caution, severe
 
+    var severityOrder: Int {
+        switch self {
+        case .good: return 0
+        case .fair: return 1
+        case .caution: return 2
+        case .severe: return 3
+        }
+    }
+
     var colorHex: String {
         switch self {
         case .good: return "#34C759"

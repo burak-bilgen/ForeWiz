@@ -23,7 +23,6 @@ enum WeatherTestFixtures {
     }
 
     static func profile(
-        sensitivity: TemperatureSensitivity = .normal,
         activities: Set<ActivityType> = [.running, .walking, .cycling, .goingOutside],
         quietHours: TimeWindow? = nil,
         maximumDailyNotifications: Int = 2
@@ -31,7 +30,6 @@ enum WeatherTestFixtures {
         L10n.configure(language: .turkish)
 
         return UserComfortProfile(
-            temperatureSensitivity: sensitivity,
             preferredActivities: activities,
             quietHours: quietHours,
             notificationPreferences: NotificationCategory.allCases.map {

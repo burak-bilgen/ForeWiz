@@ -4,7 +4,6 @@ import SwiftData
 @Model
 final class UserPreferencesModel {
     @Attribute(.unique) var id: UUID
-    var temperatureSensitivityRaw: String
     var preferredActivitiesRaw: [String]
     var quietHoursStartHour: Int
     var quietHoursStartMinute: Int
@@ -29,7 +28,6 @@ final class UserPreferencesModel {
 
     init(
         id: UUID = UUID(),
-        temperatureSensitivity: TemperatureSensitivity,
         preferredActivities: [ActivityType],
         quietHours: TimeWindow? = nil,
         onboardingCompleted: Bool = false,
@@ -37,7 +35,6 @@ final class UserPreferencesModel {
         preferredAppearance: AppAppearance? = nil
     ) {
         self.id = id
-        self.temperatureSensitivityRaw = temperatureSensitivity.rawValue
         self.preferredActivitiesRaw = preferredActivities.map { $0.rawValue }
         
         if let quietHours {
@@ -65,7 +62,6 @@ final class UserPreferencesModel {
     }
 
     func toProfile() -> UserComfortProfile {
-        let sensitivity = TemperatureSensitivity(rawValue: temperatureSensitivityRaw) ?? .normal
         let activities = preferredActivitiesRaw.compactMap { ActivityType(rawValue: $0) }
         let defaultProfile = UserComfortProfile.default
         let language = preferredLanguageRaw.flatMap(AppLanguage.init(rawValue:)) ?? .system
@@ -104,7 +100,6 @@ final class UserPreferencesModel {
         }
         
         return UserComfortProfile(
-            temperatureSensitivity: sensitivity,
             preferredActivities: Set(activities),
             wakeUpTime: dateComponents(hour: wakeUpHour, minute: wakeUpMinute),
             usualWorkoutTime: dateComponents(hour: workoutHour, minute: workoutMinute),
@@ -120,7 +115,6 @@ final class UserPreferencesModel {
     }
 
     func update(from profile: UserComfortProfile) {
-        self.temperatureSensitivityRaw = profile.temperatureSensitivity.rawValue
         self.preferredActivitiesRaw = profile.preferredActivities.map { $0.rawValue }
         self.wakeUpHour = profile.wakeUpTime?.hour
         self.wakeUpMinute = profile.wakeUpTime?.minute

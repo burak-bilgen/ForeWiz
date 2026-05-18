@@ -61,7 +61,7 @@
 		67305E872F9E05220034CAA8 /* ForeWizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForeWizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E912F9E05220034CAA8 /* ForeWizUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForeWizUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67A870F62FAF23C3005B23F5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = text; path = ForeWizWidgets; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; path = ForeWizWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7D5A8169BBE9FF4971056B1 /* WidgetProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetProvider.swift; path = ForeWizWidgets/WidgetProvider.swift; sourceTree = "<group>"; };
 		FA4934CEF03C1F8AFB1D8CD0 /* WeatherWidgetData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WeatherWidgetData.swift; path = ForeWizWidgets/WeatherWidgetData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -149,7 +149,7 @@
 				67305E752F9E05210034CAA8 /* ForeWiz.app */,
 				67305E872F9E05220034CAA8 /* ForeWizTests.xctest */,
 				67305E912F9E05220034CAA8 /* ForeWizUITests.xctest */,
-				9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets */,
+				9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,7 +200,7 @@
 			);
 			name = ForeWizWidgets;
 			productName = ForeWizWidgets;
-			productReference = 9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets */;
+			productReference = 9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		67305E742F9E05210034CAA8 /* ForeWiz */ = {

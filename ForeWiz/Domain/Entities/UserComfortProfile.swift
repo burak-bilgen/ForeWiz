@@ -1,7 +1,6 @@
 import Foundation
 
 struct UserComfortProfile: Codable, Equatable, Sendable {
-    var temperatureSensitivity: TemperatureSensitivity
     var preferredActivities: Set<ActivityType>
     var wakeUpTime: DateComponents?
     var usualWorkoutTime: DateComponents?
@@ -15,7 +14,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var selectedLocationID: String
 
     private enum CodingKeys: String, CodingKey {
-        case temperatureSensitivity
         case preferredActivities
         case wakeUpTime
         case usualWorkoutTime
@@ -30,7 +28,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     }
 
     init(
-        temperatureSensitivity: TemperatureSensitivity,
         preferredActivities: Set<ActivityType>,
         wakeUpTime: DateComponents? = nil,
         usualWorkoutTime: DateComponents? = nil,
@@ -43,7 +40,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
         selectedLocationID: String = "current-location"
     ) {
-        self.temperatureSensitivity = temperatureSensitivity
         self.preferredActivities = preferredActivities
         self.wakeUpTime = wakeUpTime
         self.usualWorkoutTime = usualWorkoutTime
@@ -59,7 +55,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
 
     static var `default`: UserComfortProfile {
         UserComfortProfile(
-            temperatureSensitivity: .normal,
             preferredActivities: [.running, .walking, .goingOutside],
             notificationPreferences: NotificationCategory.allCases.map {
                 NotificationPreference(category: $0, isEnabled: true, preferredTime: nil)

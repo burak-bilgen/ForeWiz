@@ -83,52 +83,6 @@ struct OnboardingView: View {
 
     private var preferencesSection: some View {
         VStack(spacing: 12) {
-            // Temperature Sensitivity
-            LiquidGlassCard(accentColor: AppTheme.ember, innerPadding: 14) {
-                VStack(alignment: .leading, spacing: 14) {
-                    sectionLabel(icon: "thermometer.sun.fill", text: L10n.text("how_do_you_feel"))
-
-                    HStack(spacing: 8) {
-                        ForEach(TemperatureSensitivity.allCases, id: \.self) { sensitivity in
-                            let selected = viewModel.selectedSensitivity == sensitivity
-                            Button {
-                                HapticEngine.shared.selectionChanged()
-                                withAnimation(AppTheme.springSmooth) {
-                                    viewModel.selectSensitivity(sensitivity)
-                                }
-                            } label: {
-                                VStack(spacing: 5) {
-                                    Image(systemName: sensitivityIcon(for: sensitivity))
-                                        .font(.system(size: 18))
-                                        .scaleEffect(selected ? 1.15 : 1.0)
-                                    Text(sensitivity.localizedTitle)
-                                        .font(.system(size: 13, weight: selected ? .bold : .medium, design: .rounded))
-                                        .multilineTextAlignment(.center)
-                                }
-                                .foregroundStyle(selected ? AppTheme.ember : .white.opacity(0.35))
-                                .frame(maxWidth: .infinity, minHeight: 72)
-                                .padding(.vertical, 10)
-                                .background(
-                                    selected
-                                        ? AppTheme.ember.opacity(0.12)
-                                        : .white.opacity(0.04),
-                                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .stroke(selected ? AppTheme.ember.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
-                                )
-                            }
-                            .contentShape(Rectangle())
-
-                            .buttonStyle(.plain)
-                            .accessibilityLabel(sensitivity.localizedTitle)
-                        }
-                    }
-                }
-            }
-            .staggerEntrance(index: 3, appeared: pageAppeared)
-
             // Wake Time
             LiquidGlassCard(accentColor: AppTheme.sunshine, innerPadding: 14) {
                 VStack(alignment: .leading, spacing: 10) {
@@ -154,7 +108,7 @@ struct OnboardingView: View {
                     .padding(.vertical, 2)
                 }
             }
-            .staggerEntrance(index: 4, appeared: pageAppeared)
+            .staggerEntrance(index: 3, appeared: pageAppeared)
 
             // Activities
             LiquidGlassCard(accentColor: AppTheme.success, innerPadding: 14) {
@@ -199,7 +153,7 @@ struct OnboardingView: View {
                     }
                 }
             }
-            .staggerEntrance(index: 5, appeared: pageAppeared)
+            .staggerEntrance(index: 4, appeared: pageAppeared)
         }
     }
 
@@ -234,7 +188,7 @@ struct OnboardingView: View {
                 }
             }
         }
-        .staggerEntrance(index: 6, appeared: pageAppeared)
+        .staggerEntrance(index: 5, appeared: pageAppeared)
 
         if let error = viewModel.errorMessage {
             Text(error)
@@ -289,7 +243,7 @@ struct OnboardingView: View {
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
         .disabled(isCompleting)
-        .staggerEntrance(index: 7, appeared: pageAppeared)
+        .staggerEntrance(index: 6, appeared: pageAppeared)
     }
 
     // MARK: - Helpers
@@ -302,14 +256,6 @@ struct OnboardingView: View {
             Text(text)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.45))
-        }
-    }
-
-    private func sensitivityIcon(for sensitivity: TemperatureSensitivity) -> String {
-        switch sensitivity {
-        case .getsColdEasily: return "snowflake"
-        case .normal: return "thermometer.medium"
-        case .getsHotEasily: return "sun.max.fill"
         }
     }
 

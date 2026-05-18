@@ -2,10 +2,7 @@ import Foundation
 
 struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
     func recommendOutfit(input: OutfitRecommendationInput) -> OutfitRecommendation {
-        let apparentTemperature = adjustedTemperature(
-            input.current.apparentTemperatureCelsius,
-            sensitivity: input.profile.temperatureSensitivity
-        )
+        let apparentTemperature = input.current.apparentTemperatureCelsius
         let rainRisk = input.risks.contains { $0.type == .rain && $0.severity >= .medium }
         let windRisk = input.risks.contains { $0.type == .wind && $0.severity >= .medium }
         let heatRisk = input.risks.contains { $0.type == .heat && $0.severity >= .medium }
@@ -38,7 +35,7 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
             warnings.append(L10n.text("outfit_warning_evening"))
         }
 
-        let outfitTitle = title(for: items, apparentTemperature: apparentTemperature, sensitivity: input.profile.temperatureSensitivity)
+        let outfitTitle = title(for: items, apparentTemperature: apparentTemperature)
 
         return OutfitRecommendation(
             title: outfitTitle,
@@ -46,14 +43,6 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
             accessories: Array(Set(accessories)).sorted(),
             warning: warnings.first
         )
-    }
-
-    private func adjustedTemperature(_ temperature: Double, sensitivity: TemperatureSensitivity) -> Double {
-        switch sensitivity {
-        case .getsColdEasily: temperature - 3
-        case .normal: temperature
-        case .getsHotEasily: temperature + 2
-        }
     }
 
     private func baseItems(for apparentTemperature: Double) -> [String] {
@@ -71,14 +60,12 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         }
     }
 
-    private func title(for items: [String], apparentTemperature: Double, sensitivity: TemperatureSensitivity) -> String {
+    private func title(for items: [String], apparentTemperature: Double) -> String {
         if apparentTemperature >= 30 {
             return L10n.text("outfit_title_hot")
         }
         if (17..<24).contains(apparentTemperature) {
-            return sensitivity == .getsColdEasily
-                ? L10n.text("outfit_title_mild_cold")
-                : L10n.text("outfit_title_mild")
+            return L10n.text("outfit_title_mild")
         }
         if apparentTemperature < 8 {
             return L10n.text("outfit_title_cold")

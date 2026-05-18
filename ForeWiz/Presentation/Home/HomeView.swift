@@ -242,6 +242,26 @@ private struct HeroCard: View {
     private var decisionColor: Color { AppTheme.color(for: recommendation.outdoorDecision) }
     private var score: Int { recommendation.outdoorScore.rawValue }
 
+    private var actionPillPrimary: some View {
+        ActionPill(
+            icon: "clock.fill",
+            title: assistant.primaryActionTitle,
+            detail: assistant.primaryActionDetail,
+            color: accentColor
+        )
+    }
+
+    private var actionPillSecondary: some View {
+        ActionPill(
+            icon: isUsingCachedWeather ? "arrow.clockwise.icloud.fill" : "checkmark.icloud.fill",
+            title: L10n.text("home_assistant_data_title"),
+            detail: isUsingCachedWeather
+                ? L10n.text("home_assistant_data_cached")
+                : L10n.text("home_assistant_data_live"),
+            color: isUsingCachedWeather ? AppTheme.warning : AppTheme.success
+        )
+    }
+
     var body: some View {
         LiquidGlassCard(accentColor: accentColor) {
             VStack(alignment: .leading, spacing: 14) {
@@ -255,6 +275,7 @@ private struct HeroCard: View {
                                 .frame(width: 6, height: 6)
                             Text(L10n.text("home_assistant_badge"))
                                 .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .minimumScaleFactor(0.8)
                                 .foregroundStyle(accentColor)
                                 .lineLimit(1)
                         }
@@ -294,22 +315,15 @@ private struct HeroCard: View {
                 }
 
                 // Action Pills
-                HStack(spacing: 10) {
-                    ActionPill(
-                        icon: "clock.fill",
-                        title: assistant.primaryActionTitle,
-                        detail: assistant.primaryActionDetail,
-                        color: accentColor
-                    )
-
-                    ActionPill(
-                        icon: isUsingCachedWeather ? "arrow.clockwise.icloud.fill" : "checkmark.icloud.fill",
-                        title: L10n.text("home_assistant_data_title"),
-                        detail: isUsingCachedWeather
-                            ? L10n.text("home_assistant_data_cached")
-                            : L10n.text("home_assistant_data_live"),
-                        color: isUsingCachedWeather ? AppTheme.warning : AppTheme.success
-                    )
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 10) {
+                        actionPillPrimary
+                        actionPillSecondary
+                    }
+                    VStack(spacing: 8) {
+                        actionPillPrimary
+                        actionPillSecondary
+                    }
                 }
 
                 // Weather Metrics
@@ -422,7 +436,7 @@ private struct HeroCard: View {
                     .foregroundStyle(.white.opacity(0.3))
                     .lineLimit(1)
             }
-            .frame(minWidth: 48)
+            .frame(minWidth: 54)
         }
     }
 
@@ -605,7 +619,7 @@ private struct PlanItemRow: View {
                 .foregroundStyle(.white.opacity(0.55))
                 .multilineTextAlignment(.trailing)
                 .lineLimit(2)
-                .frame(maxWidth: 120, alignment: .trailing)
+                .layoutPriority(0)
         }
         .padding(.vertical, 8)
     }
@@ -647,15 +661,17 @@ private struct OutfitCard: View {
                     .lineLimit(2)
 
                 if !outfit.items.isEmpty {
-                    HStack(spacing: 6) {
-                        ForEach(outfit.items.prefix(4), id: \.self) { item in
-                            Text(item)
-                                .font(.system(size: 11, weight: .medium, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.7))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 5)
-                                .background(.white.opacity(0.08), in: Capsule())
-                                .lineLimit(1)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 6) {
+                            ForEach(outfit.items.prefix(4), id: \.self) { item in
+                                Text(item)
+                                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                                    .foregroundStyle(.white.opacity(0.7))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(.white.opacity(0.08), in: Capsule())
+                                    .lineLimit(1)
+                            }
                         }
                     }
                 }
@@ -726,7 +742,7 @@ private struct HourlyPill: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text("\(item.hour)\(L10n.text("time_format_hour"))")
+            Text("\(String(format: "%02d", item.hour))\(L10n.text("time_format_hour"))")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
@@ -844,7 +860,7 @@ private struct ForecastRow: View {
             Text(forecast.dayName)
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .foregroundStyle(forecast.isToday ? .white : .white.opacity(0.6))
-                .frame(width: 56, alignment: .leading)
+                .frame(minWidth: 72, maxWidth: 88, alignment: .leading)
                 .lineLimit(1)
 
             Image(systemName: forecast.conditionSymbol)

@@ -29,7 +29,6 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             model.update(from: profile)
         } else {
             let model = UserPreferencesModel(
-                temperatureSensitivity: profile.temperatureSensitivity,
                 preferredActivities: Array(profile.preferredActivities),
                 quietHours: profile.quietHours,
                 onboardingCompleted: true,
@@ -57,7 +56,6 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             model.onboardingCompleted = completed
         } else {
             let model = UserPreferencesModel(
-                temperatureSensitivity: .normal,
                 preferredActivities: [.goingOutside, .walking],
                 quietHours: nil,
                 onboardingCompleted: completed

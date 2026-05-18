@@ -14,10 +14,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
 
         var score = 100
-        let apparentTemperature = adjustedTemperature(
-            hour.apparentTemperatureCelsius,
-            sensitivity: profile.temperatureSensitivity
-        )
+        let apparentTemperature = hour.apparentTemperatureCelsius
         let month = calendar.component(.month, from: hour.date)
 
         score -= temperaturePenalty(for: apparentTemperature, activity: activity)
@@ -167,17 +164,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
     }
 
     // MARK: - Helpers
-
-    private func adjustedTemperature(_ temperature: Double, sensitivity: TemperatureSensitivity) -> Double {
-        switch sensitivity {
-        case .getsColdEasily:
-            temperature - 2
-        case .normal:
-            temperature
-        case .getsHotEasily:
-            temperature + 2
-        }
-    }
 
     private func temperaturePenalty(for temperature: Double, activity: ActivityType) -> Int {
         switch activity {

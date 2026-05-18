@@ -13,6 +13,15 @@ struct HomeRecommendationResult: Equatable {
     let warningMessage: String?
     let weatherFetchedAt: Date
     let attribution: WeatherAttributionInfo?
+    let rankedCandidates: [RecommendationCandidate]
+
+    static func == (lhs: HomeRecommendationResult, rhs: HomeRecommendationResult) -> Bool {
+        lhs.recommendation == rhs.recommendation &&
+        lhs.isUsingCachedWeather == rhs.isUsingCachedWeather &&
+        lhs.usedLocation == rhs.usedLocation &&
+        lhs.warningMessage == rhs.warningMessage &&
+        lhs.weatherFetchedAt == rhs.weatherFetchedAt
+    }
 }
 
 protocol LoadHomeRecommendationUseCase {

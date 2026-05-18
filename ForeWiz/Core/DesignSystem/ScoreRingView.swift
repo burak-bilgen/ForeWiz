@@ -46,7 +46,7 @@ struct ScoreRingView: View {
                         .monospacedDigit()
                         .foregroundStyle(.white)
                     Text(L10n.text("home_score_out_of_10"))
-                        .font(.system(size: size * 0.13, weight: .medium, design: .rounded))
+                        .font(.system(size: size * 0.11, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.white.opacity(0.4))
                 }
             }

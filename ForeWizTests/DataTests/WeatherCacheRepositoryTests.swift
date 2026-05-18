@@ -205,7 +205,6 @@ struct PreferencesRepositoryTests {
 
         let profile = try await repository.loadProfile()
 
-        #expect(profile.temperatureSensitivity == .normal)
         #expect(profile.preferredActivities.contains(.goingOutside))
         #expect(profile.language == .system)
     }
@@ -219,7 +218,6 @@ struct PreferencesRepositoryTests {
         let repository = SwiftDataPreferencesRepository(modelContext: context)
 
         var profile = UserComfortProfile.default
-        profile.temperatureSensitivity = .getsHotEasily
         profile.preferredActivities = [.running, .walking]
         profile.language = .english
         profile.appearance = .light
@@ -251,7 +249,6 @@ struct PreferencesRepositoryTests {
 
         let loaded = try await repository.loadProfile()
 
-        #expect(loaded.temperatureSensitivity == .getsHotEasily)
         #expect(loaded.preferredActivities.contains(.running))
         #expect(loaded.language == .english)
         #expect(loaded.appearance == .light)
@@ -293,12 +290,11 @@ struct PreferencesRepositoryTests {
         let profile1 = UserComfortProfile.default
         try await repository.saveProfile(profile1)
 
-        var profile2 = profile1
-        profile2.temperatureSensitivity = .getsColdEasily
+        let profile2 = profile1
         try await repository.saveProfile(profile2)
 
         let loaded = try await repository.loadProfile()
 
-        #expect(loaded.temperatureSensitivity == .getsColdEasily)
+        #expect(loaded.preferredActivities == profile2.preferredActivities)
     }
 }

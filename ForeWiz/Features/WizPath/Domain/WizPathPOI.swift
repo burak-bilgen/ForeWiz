@@ -206,9 +206,9 @@ struct JourneyHUDData: Sendable {
         let hours = Int(totalDuration) / 3600
         let minutes = (Int(totalDuration) % 3600) / 60
         if hours > 0 {
-            return String(format: "%d\(L10n.text("unit_hour_short")) %02d\(L10n.text("unit_minute_short"))", hours, minutes)
+            return L10n.formatted("format_duration_hours_minutes", hours, minutes)
         } else {
-            return String(format: "%d \(L10n.text("unit_minutes"))", minutes)
+            return L10n.formatted("format_duration_minutes_only", minutes)
         }
     }
 }
