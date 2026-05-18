@@ -11,7 +11,7 @@ struct DataConsistencyTests {
             bestOutdoorWindow: nil,
             bestActivityWindows: [],
             avoidWindows: [],
-            outfit: OutfitRecommendation(title: "Test", items: [], accessories: [], warning: nil),
+            outfit: OutfitRecommendation(title: "Test", items: [], accessories: [], warning: nil, detailedAdvice: nil),
             risks: [],
             summaryText: "Test",
             explanation: "Test",

@@ -18,7 +18,6 @@ final class AppCoordinator {
     init(container: DependencyContainer, rootFlow: RootFlow = .onboarding) {
         self.container = container  
         self.rootFlow = rootFlow
-        L10n.configure(language: profile.language)
     }
 
     func start() async {
@@ -27,14 +26,10 @@ final class AppCoordinator {
         do {
             let loadedProfile = try await container.preferencesRepository.loadProfile()
             profile = loadedProfile
-            let code = L10n.currentLanguageCode
-            if code == "tr" {
-                L10n.configure(language: .turkish)
-            } else {
-                L10n.configure(language: .english)
-            }
+            L10n.configure(language: loadedProfile.language)
             rootFlow = try await container.preferencesRepository.isOnboardingCompleted() ? .main : .onboarding
         } catch {
+            profile = .default
             L10n.configure(language: .english)
             rootFlow = .onboarding
         }

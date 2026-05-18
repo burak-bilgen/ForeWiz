@@ -321,10 +321,12 @@ final class WizPathService {
 }
 
 // MARK: - Recent Destination Model
-struct RecentDestination: Codable, Hashable {
+struct RecentDestination: Codable, Hashable, Identifiable {
     let name: String
     let latitude: Double
     let longitude: Double
+
+    var id: String { name }
 
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)

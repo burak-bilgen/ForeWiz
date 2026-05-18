@@ -6,14 +6,12 @@ import Foundation
 struct RecommendationStoreTests {
 
     private func makeStore() -> DefaultRecommendationStore {
-        let defaults = UserDefaults(suiteName: "test_recommendation_\(UUID().uuidString)")!
-        defaults.removePersistentDomain(forName: defaults.suiteName!)
-        return DefaultRecommendationStore(userDefaults: defaults)
+        DefaultRecommendationStore(userDefaults: .standard)
     }
 
     @Test("Store returns empty when no data saved")
     func testEmptyStore() {
-        let store = makeStore()
+        let store = DefaultRecommendationStore(userDefaults: createEphemeralDefaults())
         #expect(store.loadLastCandidates().isEmpty)
         #expect(store.recentFeedback().isEmpty)
         #expect(store.lastShownTypes().isEmpty)
@@ -21,10 +19,10 @@ struct RecommendationStoreTests {
 
     @Test("Candidates are saved and loaded")
     func testSaveAndLoadCandidates() {
-        let store = makeStore()
+        let store = DefaultRecommendationStore(userDefaults: createEphemeralDefaults())
         let candidates = [
             RecommendationCandidate(
-                id: UUID(), type: .outdoorWindow, score: 85,
+                id: UUID(), type: .goingOutSuggestion, score: 85,
                 signals: [], metadata: ["headline": "Great day"], generatedAt: Date()
             ),
             RecommendationCandidate(
@@ -32,7 +30,7 @@ struct RecommendationStoreTests {
                 signals: [], metadata: ["headline": "Rain alert"], generatedAt: Date()
             )
         ]
-        store.saveCandidate(candidates)
+        store.saveCandidates(candidates)
 
         let loaded = store.loadLastCandidates()
         #expect(!loaded.isEmpty)
@@ -41,27 +39,27 @@ struct RecommendationStoreTests {
 
     @Test("Last shown types tracked correctly")
     func testLastShownTypes() {
-        let store = makeStore()
+        let store = DefaultRecommendationStore(userDefaults: createEphemeralDefaults())
         let candidates = [
             RecommendationCandidate(
-                id: UUID(), type: .outdoorWindow, score: 80,
+                id: UUID(), type: .goingOutSuggestion, score: 80,
                 signals: [], metadata: [:], generatedAt: Date()
             ),
             RecommendationCandidate(
-                id: UUID(), type: .avoidWindow, score: 40,
+                id: UUID(), type: .riskAlert, score: 40,
                 signals: [], metadata: [:], generatedAt: Date()
             )
         ]
-        store.saveCandidate(candidates)
+        store.saveCandidates(candidates)
 
         let types = store.lastShownTypes()
-        #expect(types.contains(.outdoorWindow))
-        #expect(types.contains(.avoidWindow))
+        #expect(types.contains(.goingOutSuggestion))
+        #expect(types.contains(.riskAlert))
     }
 
     @Test("Feedback can be recorded and retrieved")
     func testFeedbackRecording() {
-        let store = makeStore()
+        let store = DefaultRecommendationStore(userDefaults: createEphemeralDefaults())
         let id = UUID()
         let feedback = RecommendationFeedback.notRelevant(candidateId: id, timestamp: Date())
 
@@ -78,10 +76,10 @@ struct RecommendationStoreTests {
 
     @Test("Clear removes all data")
     func testStoreClear() {
-        let store = makeStore()
-        store.saveCandidate([
+        let store = DefaultRecommendationStore(userDefaults: createEphemeralDefaults())
+        store.saveCandidates([
             RecommendationCandidate(
-                id: UUID(), type: .outdoorWindow, score: 80,
+                id: UUID(), type: .goingOutSuggestion, score: 80,
                 signals: [], metadata: [:], generatedAt: Date()
             )
         ])
@@ -95,10 +93,18 @@ struct RecommendationStoreTests {
 
     @Test("Multiple feedback records are stored")
     func testMultipleFeedback() {
-        let store = makeStore()
+        let store = DefaultRecommendationStore(userDefaults: createEphemeralDefaults())
         for _ in 0..<5 {
             store.recordFeedback(.saved(candidateId: UUID(), timestamp: Date()))
         }
         #expect(store.recentFeedback().count == 5)
+    }
+
+    /// Creates UserDefaults with a unique suite name that gets auto-removed.
+    private func createEphemeralDefaults() -> UserDefaults {
+        let uniqueName = "test_recommendation_\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: uniqueName)!
+        defaults.removePersistentDomain(forName: uniqueName)
+        return defaults
     }
 }

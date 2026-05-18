@@ -12,20 +12,23 @@ struct WizPathMapView: View {
         Map(position: $position, selection: $selectedAnnotation) {
             UserAnnotation()
 
+            // Route polyline
             if let route = viewModel.currentRoute, viewModel.isShowingRoute {
                 let coords = route.routeCoordinates
                 if coords.count > 1 {
                     MapPolyline(coordinates: coords)
-                        .stroke(routeColor(for: route), lineWidth: 3)
+                        .stroke(routeColor(for: route), lineWidth: 2.5)
                 }
 
+                // Destination annotation
                 Annotation(coordinate: route.destination) {
                     DestinationFlag()
                 } label: {
                     Text(L10n.text("wizpath_destination"))
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                 }
 
+                // Weather change points
                 let changePoints = Array(route.weatherChangePoints.prefix(6))
                 ForEach(changePoints) { segment in
                     if let weather = segment.weather {
@@ -38,24 +41,23 @@ struct WizPathMapView: View {
                 }
             }
 
+            // Origin annotation
             if let origin = viewModel.originCoordinate, viewModel.currentRoute != nil {
                 Annotation(coordinate: origin) {
                     OriginMarker()
                 } label: {
                     Text(L10n.text("wizpath_start"))
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                 }
             }
 
+            // Destination pin (no route yet)
             if let dest = viewModel.destinationCoordinate, viewModel.currentRoute == nil {
                 Annotation(coordinate: dest) {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundStyle(Color.coral)
-                        .background(Circle().fill(.white).frame(width: 22, height: 22))
+                    DestinationFlag()
                 } label: {
                     Text(viewModel.destinationName)
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                 }
             }
         }
@@ -74,14 +76,14 @@ struct WizPathMapView: View {
         }
         .overlay(alignment: .topTrailing) {
             if viewModel.currentRoute != nil {
-                glassLegendOverlay
-                    .padding(10)
+                legendOverlay
+                    .padding(8)
             }
         }
         .overlay(alignment: .bottomTrailing) {
             if viewModel.currentRoute != nil {
                 toggleRouteButton
-                    .padding(10)
+                    .padding(8)
             }
         }
         .onAppear {
@@ -95,38 +97,36 @@ struct WizPathMapView: View {
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
-    // MARK: - Liquid Glass Legend Overlay
-    private var glassLegendOverlay: some View {
-        VStack(alignment: .leading, spacing: 4) {
+    // MARK: - Legend Overlay
+
+    private var legendOverlay: some View {
+        VStack(alignment: .leading, spacing: 3) {
             legendRow(color: .success, label: L10n.text("wizpath_weather_good"))
             legendRow(color: .warning, label: L10n.text("wizpath_weather_caution"))
             legendRow(color: .danger, label: L10n.text("wizpath_weather_severe"))
         }
-        .padding(10)
+        .padding(8)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(.ultraThinMaterial)
                 .environment(\.colorScheme, .dark)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 0.5)
-                )
         )
-        .font(.system(size: 10, weight: .medium))
+        .font(.system(size: 9, weight: .medium))
     }
 
     private func legendRow(color: Color, label: String) -> some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 4) {
             Circle()
                 .fill(color)
-                .frame(width: 7, height: 7)
-                .shadow(color: color.opacity(0.4), radius: 2)
+                .frame(width: 6, height: 6)
+                .shadow(color: color.opacity(0.3), radius: 1)
             Text(label)
                 .foregroundStyle(.secondary)
         }
     }
 
     // MARK: - Toggle Route Button
+
     private var toggleRouteButton: some View {
         Button {
             withAnimation(.spring(response: 0.3)) {
@@ -135,9 +135,9 @@ struct WizPathMapView: View {
             HapticEngine.shared.light()
         } label: {
             Image(systemName: viewModel.isShowingRoute ? "eye.fill" : "eye.slash.fill")
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
-                .frame(width: 36, height: 36)
+                .frame(width: 32, height: 32)
                 .background(
                     Circle()
                         .fill(.ultraThinMaterial)
@@ -145,11 +145,11 @@ struct WizPathMapView: View {
                 )
         }
         .contentShape(Rectangle())
-
         .buttonStyle(.plain)
     }
 
     // MARK: - Helpers
+
     private func routeColor(for route: WizPathRoute) -> Color {
         switch route.overallRisk {
         case .good: return .success
@@ -186,6 +186,7 @@ struct WizPathMapView: View {
 }
 
 // MARK: - Origin Marker
+
 struct OriginMarker: View {
     @State private var pulse = false
 
@@ -193,63 +194,58 @@ struct OriginMarker: View {
         ZStack {
             Circle()
                 .fill(Color.liquidAccent.opacity(pulse ? 0.3 : 0.15))
-                .frame(width: pulse ? 40 : 30, height: pulse ? 40 : 30)
+                .frame(width: pulse ? 36 : 26, height: pulse ? 36 : 26)
                 .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
 
             Image(systemName: "location.circle.fill")
-                .font(.system(size: 24))
+                .font(.system(size: 22))
                 .foregroundStyle(.white)
-                .background(Circle().fill(Color.liquidAccent).frame(width: 20, height: 20))
+                .background(Circle().fill(Color.liquidAccent).frame(width: 18, height: 18))
         }
         .onAppear { pulse = true }
     }
 }
 
 // MARK: - Weather Marker
+
 struct WeatherMarker: View {
     let weather: SegmentWeather
     let eta: String
     @State private var isVisible = false
 
     var body: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 1) {
             ZStack {
                 Circle()
-                    .fill(Color(hex: weather.severity.colorHex).opacity(0.25))
-                    .frame(width: isVisible ? 36 : 24, height: isVisible ? 36 : 24)
+                    .fill(Color(hex: weather.severity.colorHex).opacity(0.2))
+                    .frame(width: isVisible ? 30 : 20, height: isVisible ? 30 : 20)
 
                 Image(systemName: weather.iconName)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(Color(hex: weather.severity.colorHex))
-                    .shadow(color: Color(hex: weather.severity.colorHex).opacity(0.5), radius: 3)
+                    .shadow(color: Color(hex: weather.severity.colorHex).opacity(0.4), radius: 2)
             }
 
             Text(eta)
-                .font(.system(size: 8, weight: .bold))
+                .font(.system(size: 7, weight: .bold))
                 .foregroundStyle(.white)
-                .padding(.horizontal, 4)
+                .padding(.horizontal, 3)
                 .padding(.vertical, 1)
-                .background(.black.opacity(0.6))
+                .background(.black.opacity(0.5))
                 .clipShape(Capsule())
         }
         .scaleEffect(isVisible ? 1 : 0.5)
         .opacity(isVisible ? 1 : 0)
         .onAppear {
-            withAnimation(.spring(response: 0.4).delay(0.2)) {
+            withAnimation(.spring(response: 0.3).delay(0.15)) {
                 isVisible = true
             }
         }
     }
 }
 
-// MARK: - WizPathSegment + ETA Short Display
-extension WizPathSegment {
-    var etaShortDisplay: String {
-        SharedFormatters.shortTime.string(from: estimatedArrival)
-    }
-}
-
 // MARK: - Preview
+
 #Preview {
     WizPathMapView(viewModel: WizPathViewModel())
         .frame(height: 300)

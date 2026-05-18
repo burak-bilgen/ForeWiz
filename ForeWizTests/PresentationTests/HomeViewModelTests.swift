@@ -181,7 +181,8 @@ private extension HomeRecommendationResult {
             usedLocation: LocationCoordinate(latitude: 41.0, longitude: 29.0),
             warningMessage: nil,
             weatherFetchedAt: now,
-            attribution: nil
+            attribution: nil,
+            rankedCandidates: []
         )
     }
 }

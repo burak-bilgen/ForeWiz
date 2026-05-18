@@ -54,6 +54,7 @@ final class HomeViewModel {
     func reloadForLanguageChange() async {
         didLoad = false
         await load(forceRefresh: true, retryCachedResult: true)
+        didLoad = true
     }
 
     func refresh() async {
@@ -112,6 +113,12 @@ final class HomeViewModel {
                 .execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
             let profile = try await preferencesRepository.loadProfile()
 
+            // Generate AI-powered daily briefing
+            let briefing: DailyWeatherBriefing? = generateBriefingIfAvailable(
+                result: result,
+                profile: profile
+            )
+
             state = .loaded(
                 HomeViewState(
                     recommendation: result.recommendation,
@@ -131,6 +138,9 @@ final class HomeViewModel {
                     lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
                     isUsingCachedWeather: result.isUsingCachedWeather,
                     warningMessage: result.warningMessage,
+                    heatSafetyBanner: makeHeatSafetyBanner(from: result.recommendation, dailyPoints: result.dailyPoints),
+                    heatStreakCount: heatStreakCount(from: result.dailyPoints),
+                    briefing: briefing,
                     attribution: result.attribution
                 )
             )
@@ -166,8 +176,13 @@ final class HomeViewModel {
     private func scheduleLiveRetry() {
         liveRetryTask?.cancel()
         liveRetryTask = Task { [weak self] in
-            for delaySeconds in [6, 18, 45] {
-                try? await Task.sleep(nanoseconds: UInt64(delaySeconds) * 1_000_000_000)
+            // Base delays with added jitter (±25%) to avoid thundering herd
+            // when multiple users' apps retry simultaneously
+            let baseDelays = [6, 18, 45]
+            for base in baseDelays {
+                let jitter = Double.random(in: -0.25...0.25)
+                let delay = Double(base) * (1.0 + jitter)
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                 guard Task.isCancelled == false else { return }
                 guard await self?.retryLiveWeatherOnce() == true else {
                     return
@@ -705,13 +720,36 @@ final class HomeViewModel {
         }
     }
 
+    /// Küresel ısınma odaklı haftalık skor — yüksek sıcaklıklar çok daha ağır cezalandırılır.
+    /// 32°C+ günler outdoor skoru ciddi düşürür.
     private func weeklyScore(high: Double, low: Double, precipitationChance: Double?) -> Int {
         var score = 100.0
-        score -= abs(high - 24) * 1.8
-        score -= abs(15 - low) * 1.8
+
+        // Ideal gün: 22-26°C high, 14-18°C low
+        let highTarget = 24.0
+        let lowTarget = 16.0
+
+        // High temp penalty — aşırı sıcak günler çok ağır cezalandırılır
+        let highDeviation = abs(high - highTarget)
+        if high > 32 {
+            score -= highDeviation * 3.5  // 32°C+ → çok ağır
+        } else if high > 28 {
+            score -= highDeviation * 2.5  // 28°C+ → ağır
+        } else {
+            score -= highDeviation * 1.8  // normal
+        }
+
+        // Low temp penalty — tropikal geceler (>20°C low) skoru düşürür
+        if low > 20 {
+            score -= (low - 20) * 3.0
+        } else {
+            score -= abs(lowTarget - low) * 1.5
+        }
+
         if let precip = precipitationChance {
             score -= precip * 0.55
         }
+
         return Int(max(0, min(100, score)))
     }
 
@@ -753,6 +791,89 @@ final class HomeViewModel {
         case .imperial:
             (celsius * 9 / 5) + 32
         }
+    }
+
+    // MARK: - Heat Safety
+
+    /// Heat Safety Banner — yüksek sıcaklıkta uyarı banner'ı göster
+    private func makeHeatSafetyBanner(
+        from recommendation: DailyRecommendation,
+        dailyPoints: [DailyWeatherPoint]
+    ) -> HeatSafetyBanner? {
+        // En yüksek heat risk severity'yi bul
+        let heatRisk = recommendation.risks.first(where: { $0.type == .heat })
+        guard let heatRisk, heatRisk.severity >= .medium else {
+            return nil
+        }
+
+        let currentTemp = dailyPoints.first?.highTemperatureCelsius ?? 0
+
+        let adviceKey: String
+        switch heatRisk.severity {
+        case .extreme:
+            adviceKey = "heat_banner_critical_advice"
+        case .high:
+            adviceKey = "heat_banner_high_advice"
+        default:
+            adviceKey = "heat_banner_warning_advice"
+        }
+
+        return HeatSafetyBanner(
+            severity: heatRisk.severity,
+            currentTemp: currentTemp,
+            adviceKey: adviceKey
+        )
+    }
+
+    /// Heat Streak — ardışık aşırı sıcak gün sayısını hesapla
+    private func heatStreakCount(from dailyPoints: [DailyWeatherPoint]) -> Int {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: dateProvider.now)
+
+        // Günleri sırala ve bugünden geriye doğru sıcak gün say
+        let sortedDays = dailyPoints
+            .map { (date: calendar.startOfDay(for: $0.date), high: $0.highTemperatureCelsius) }
+            .sorted { $0.date > $1.date }  // en yakın gün ilk
+
+        var streak = 0
+        var expectedDate = today
+
+        for day in sortedDays {
+            guard day.date == expectedDate else { break }
+            guard day.high >= 32 else { break }  // 32°C+ threshold
+            streak += 1
+            expectedDate = calendar.date(byAdding: .day, value: -1, to: expectedDate) ?? expectedDate
+        }
+
+        return streak
+    }
+
+    // MARK: - AI Briefing Generation
+
+    /// Generates an AI-powered daily briefing from the recommendation result.
+    /// Constructs a minimal WeatherSnapshot and uses WeatherBriefingService to create the briefing.
+    private func generateBriefingIfAvailable(
+        result: HomeRecommendationResult,
+        profile: UserComfortProfile
+    ) -> DailyWeatherBriefing? {
+        let snapshot = WeatherSnapshot(
+            location: LocationCoordinate(latitude: 0, longitude: 0),
+            current: result.currentWeather,
+            minute: result.minutePoints,
+            hourly: result.hourlyPoints,
+            daily: result.dailyPoints,
+            alerts: result.alerts,
+            availability: result.availability,
+            fetchedAt: result.weatherFetchedAt,
+            attribution: result.attribution
+        )
+
+        let briefingService = WeatherBriefingService()
+        return briefingService.generateBriefing(
+            snapshot: snapshot,
+            recommendation: result.recommendation,
+            profile: profile
+        )
     }
 
     private func message(for error: any Error) -> String {

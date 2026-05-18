@@ -1,8 +1,8 @@
 import SwiftUI
 import WidgetKit
 
-/// ForeWiz widget bundle — offers a medium (default) and small widget variant
-/// that displays current weather conditions and outdoor activity scores.
+/// ForeWiz widget bundle — offers system small/medium and Lock Screen accessory widgets
+/// that display current weather conditions and outdoor activity scores.
 @main
 struct ForeWizWidgets: WidgetBundle {
     var body: some Widget {
@@ -20,8 +20,14 @@ struct ForeWizWidget: Widget {
         ) { entry in
             ForeWizWidgetEntryView(entry: entry)
         }
-        .configurationDisplayName("Weather Forecast")
-        .description("Your daily outdoor score and forecast at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .configurationDisplayName(WidgetL10n.text("widget_config_name"))
+        .description(WidgetL10n.text("widget_config_desc"))
+        .supportedFamilies([
+            .systemSmall,
+            .systemMedium,
+            .accessoryInline,
+            .accessoryCircular,
+            .accessoryRectangular
+        ])
     }
 }

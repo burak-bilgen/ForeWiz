@@ -35,13 +35,21 @@ struct ForeWizApp: App {
             AppLogger.persistence.error("Persistent ModelContainer failed: \(error.localizedDescription)")
         }
 
-        assertionFailure("Persistent ModelContainer failed - falling back to in-memory")
+        AppLogger.persistence.error("Persistent ModelContainer failed - falling back to in-memory")
         do {
             let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             return try ModelContainer(for: schema, configurations: [fallbackConfig])
         } catch {
             AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription)")
-            fatalError("Unable to create ForeWiz SwiftData ModelContainer")
+            // Last resort: minimal in-memory container with empty schema
+            let minimalSchema = Schema([UserPreferencesModel.self])
+            if let minimalConfig = try? ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true),
+               let minimal = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
+                return minimal
+            }
+            AppLogger.persistence.critical("Unable to create ANY SwiftData ModelContainer - app cannot function")
+            // Graceful crash - app cannot function without persistence
+            fatalError("ForeWiz requires a working data store to operate")
         }
     }
 

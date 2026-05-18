@@ -1,278 +1,515 @@
 import SwiftUI
 import WidgetKit
 
-/// Medium widget: current conditions + outdoor score + 3-day forecast mini-list.
+// MARK: - Shared Helpers
+
+private func formattedTemp(_ temp: Double) -> String {
+    "\(Int(round(temp)))°"
+}
+
+private func scoreColor(_ score: Int) -> Color {
+    switch score {
+    case 80...100: Color(red: 0.18, green: 0.70, blue: 0.48)
+    case 60..<80: Color(red: 0.25, green: 0.60, blue: 1.0)
+    case 40..<60: Color(red: 0.95, green: 0.62, blue: 0.18)
+    default: Color(red: 0.92, green: 0.28, blue: 0.32)
+    }
+}
+
+private func weatherGradient(for symbol: String) -> LinearGradient {
+    switch symbol {
+    case _ where symbol.contains("sun") || symbol.contains("clear"):
+        LinearGradient(colors: [
+            Color(red: 0.15, green: 0.35, blue: 0.70),
+            Color(red: 0.06, green: 0.08, blue: 0.14)
+        ], startPoint: .top, endPoint: .bottom)
+    case _ where symbol.contains("moon"):
+        LinearGradient(colors: [
+            Color(red: 0.08, green: 0.06, blue: 0.20),
+            Color(red: 0.06, green: 0.08, blue: 0.14)
+        ], startPoint: .top, endPoint: .bottom)
+    case _ where symbol.contains("rain") || symbol.contains("drizzle"):
+        LinearGradient(colors: [
+            Color(red: 0.10, green: 0.15, blue: 0.30),
+            Color(red: 0.06, green: 0.08, blue: 0.14)
+        ], startPoint: .top, endPoint: .bottom)
+    case _ where symbol.contains("snow") || symbol.contains("sleet"):
+        LinearGradient(colors: [
+            Color(red: 0.20, green: 0.25, blue: 0.35),
+            Color(red: 0.06, green: 0.08, blue: 0.14)
+        ], startPoint: .top, endPoint: .bottom)
+    case _ where symbol.contains("bolt") || symbol.contains("thunder"):
+        LinearGradient(colors: [
+            Color(red: 0.20, green: 0.08, blue: 0.25),
+            Color(red: 0.06, green: 0.08, blue: 0.14)
+        ], startPoint: .top, endPoint: .bottom)
+    default:
+        LinearGradient(colors: [
+            Color(red: 0.10, green: 0.12, blue: 0.20),
+            Color(red: 0.06, green: 0.08, blue: 0.14)
+        ], startPoint: .top, endPoint: .bottom)
+    }
+}
+
+private func timeAgoText(from date: Date) -> String {
+    let interval = -date.timeIntervalSinceNow
+    if interval < 60 { return WidgetL10n.text("widget_just_now") }
+    let minutes = Int(interval / 60)
+    if minutes < 60 { return String(format: WidgetL10n.text("widget_min_ago"), minutes) }
+    return ""
+}
+
+private let defaultGradient = LinearGradient(
+    colors: [
+        Color(red: 0.10, green: 0.12, blue: 0.20),
+        Color(red: 0.06, green: 0.08, blue: 0.14)
+    ],
+    startPoint: .top, endPoint: .bottom
+)
+
+// MARK: - Score Ring
+
+private struct ScoreRing: View {
+    let score: Int
+    var size: CGFloat = 32
+    var lineWidth: CGFloat = 3
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(scoreColor(score).opacity(0.2), lineWidth: lineWidth)
+            Circle()
+                .trim(from: 0, to: CGFloat(score) / 100.0)
+                .stroke(scoreColor(score), style: .init(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            Text("\(score)")
+                .font(.system(size: size * 0.38, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+// MARK: - Placeholder Views (shared by medium & small)
+
+private struct EmptyPlaceholderView: View {
+    let icon: String
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 30))
+                .foregroundStyle(.white.opacity(0.3))
+
+            Text(title)
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.5))
+
+            Text(message)
+                .font(.system(size: 10, weight: .regular, design: .rounded))
+                .foregroundStyle(.white.opacity(0.3))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 12)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct StaleBadge: View {
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "arrow.clockwise")
+                .font(.system(size: 8, weight: .bold))
+            Text(WidgetL10n.text("widget_stale_title"))
+                .font(.system(size: 8, weight: .semibold, design: .rounded))
+        }
+        .foregroundStyle(.white.opacity(0.5))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 3)
+        .background(.ultraThinMaterial.opacity(0.5))
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Medium Widget
+
 struct ForeWizWidgetMediumView: View {
     let entry: ForeWizWidgetEntry
 
     var body: some View {
         if let data = entry.widgetData {
-            HStack(spacing: 12) {
-                // Left: current conditions + score
-                currentConditionsView(data: data)
+            HStack(spacing: 0) {
+                // Left: Current conditions
+                currentPanel(data: data)
 
                 Divider()
-                    .background(Color.white.opacity(0.3))
+                    .frame(width: 1)
+                    .overlay(.white.opacity(0.12))
 
-                // Right: mini daily forecast list
-                forecastListView(data: data)
+                // Right: Forecast
+                forecastPanel(data: data)
             }
-            .padding(16)
             .containerBackground(for: .widget) {
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.06, green: 0.08, blue: 0.14),
-                        Color(red: 0.10, green: 0.12, blue: 0.20)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                weatherGradient(for: data.currentConditionSymbol)
+            }
+            .widgetURL(URL(string: "forewiz://home"))
+            .overlay(alignment: .topTrailing) {
+                if entry.emptyState == .staleData {
+                    StaleBadge()
+                        .padding(8)
+                }
             }
         } else {
-            placeholderView
+            emptyMediumView(for: entry.emptyState)
+                .containerBackground(for: .widget) {
+                    defaultGradient
+                }
+                .widgetURL(URL(string: "forewiz://home"))
         }
     }
 
-    // MARK: - Current Conditions
+    @ViewBuilder
+    private func emptyMediumView(for state: WidgetEmptyState?) -> some View {
+        switch state {
+        case .awaitingFirstData, .none:
+            EmptyPlaceholderView(
+                icon: "cloud.sun.fill",
+                title: WidgetL10n.text("widget_waiting_title"),
+                message: WidgetL10n.text("widget_waiting_msg")
+            )
 
-    private func currentConditionsView(data: WeatherWidgetData) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Location name
+        case .configurationError:
+            EmptyPlaceholderView(
+                icon: "gearshape.fill",
+                title: WidgetL10n.text("widget_config_error"),
+                message: WidgetL10n.text("widget_config_error_msg")
+            )
+
+        case .corruptedData:
+            EmptyPlaceholderView(
+                icon: "arrow.triangle.2.circlepath",
+                title: WidgetL10n.text("widget_corrupted_title"),
+                message: WidgetL10n.text("widget_corrupted_msg")
+            )
+
+        case .staleData:
+            // Shouldn't reach here since stale state has data
+            EmptyPlaceholderView(
+                icon: "clock.fill",
+                title: WidgetL10n.text("widget_stale_title"),
+                message: WidgetL10n.text("widget_stale_msg")
+            )
+        }
+    }
+
+    // MARK: Current Conditions Panel
+
+    private func currentPanel(data: WeatherWidgetData) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Location
             Text(data.locationName)
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(.white.opacity(0.6))
                 .lineLimit(1)
 
             Spacer(minLength: 0)
 
-            // Condition icon + temp
+            // Icon + Temp
             HStack(spacing: 6) {
                 Image(systemName: data.currentConditionSymbol)
-                    .font(.system(size: 28))
+                    .font(.system(size: 32))
                     .foregroundStyle(.white)
+                    .symbolRenderingMode(.multicolor)
 
                 Text(formattedTemp(data.currentTemperature))
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .font(.system(size: 38, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .minimumScaleFactor(0.7)
             }
 
             // Condition description
             Text(data.currentConditionDescription)
                 .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.6))
+                .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
 
             Spacer(minLength: 0)
 
-            // Outdoor score ring
-            scoreRingView(score: data.outdoorScore)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
+            // Bottom row: Score + Last updated
+            HStack(spacing: 8) {
+                ScoreRing(score: data.outdoorScore, size: 30, lineWidth: 3)
 
-    // MARK: - Score Ring
-
-    private func scoreRingView(score: Int) -> some View {
-        HStack(spacing: 6) {
-            ZStack {
-                Circle()
-                    .stroke(scoreColor(score).opacity(0.2), lineWidth: 3)
-                Circle()
-                    .trim(from: 0, to: CGFloat(score) / 100.0)
-                    .stroke(scoreColor(score), style: .init(lineWidth: 3, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                Text("\(score)")
-                    .font(.system(size: 12, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 34, height: 34)
-
-            Text("Outdoor")
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.6))
-        }
-    }
-
-    // MARK: - Forecast List
-
-    private func forecastListView(data: WeatherWidgetData) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Forecast")
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.5))
-                .textCase(.uppercase)
-
-            ForEach(Array(data.dailyForecasts.prefix(3))) { day in
-                HStack(spacing: 8) {
-                    Text(day.isToday ? "Now" : day.dayName.prefix(3))
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
-                        .frame(width: 32, alignment: .leading)
-
-                    Image(systemName: day.conditionSymbol)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.white.opacity(0.7))
-                        .frame(width: 16)
-
-                    Text(formattedTemp(day.lowTemp))
-                        .font(.system(size: 11, weight: .regular, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.5))
-
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(.white.opacity(0.1))
-                                .frame(height: 4)
-                            Capsule()
-                                .fill(scoreColor(day.outdoorScore))
-                                .frame(width: geo.size.width * CGFloat(day.outdoorScore) / 100.0, height: 4)
-                        }
-                    }
-                    .frame(height: 4)
-
-                    Text(formattedTemp(day.highTemp))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(WidgetL10n.text("widget_outdoor_label"))
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                    Text(WidgetL10n.text("widget_score_label"))
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.8))
-                        .frame(width: 32, alignment: .trailing)
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+
+                Spacer(minLength: 0)
+
+                // Last updated
+                let ago = timeAgoText(from: data.lastUpdated)
+                if !ago.isEmpty {
+                    HStack(spacing: 3) {
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: 7))
+                        Text(ago)
+                    }
+                    .font(.system(size: 8, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.3))
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 
-    // MARK: - Placeholder
+    // MARK: Forecast Panel
 
-    private var placeholderView: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "cloud.sun.fill")
-                .font(.system(size: 32))
-                .foregroundStyle(.white.opacity(0.3))
-            Text("ForeWiz")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+    private func forecastPanel(data: WeatherWidgetData) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(WidgetL10n.text("widget_forecast_title"))
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.4))
-            Text("Open the app to load weather data.")
-                .font(.system(size: 11, weight: .regular, design: .rounded))
-                .foregroundStyle(.white.opacity(0.3))
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.06, green: 0.08, blue: 0.14),
-                    Color(red: 0.10, green: 0.12, blue: 0.20)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        }
-    }
+                .textCase(.uppercase)
+                .padding(.bottom, 8)
 
-    // MARK: - Helpers
+            ForEach(Array(data.dailyForecasts.prefix(4).enumerated()), id: \.element.id) { index, day in
+                HStack(spacing: 6) {
+                    // Day name
+                    Text(day.isToday ? WidgetL10n.text("widget_today") : String(day.dayName.prefix(3)))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .frame(width: 30, alignment: .leading)
 
-    private func formattedTemp(_ temp: Double) -> String {
-        "\(Int(round(temp)))°"
-    }
+                    // Condition icon
+                    Image(systemName: day.conditionSymbol)
+                        .font(.system(size: 10))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .frame(width: 14)
 
-    private func scoreColor(_ score: Int) -> Color {
-        switch score {
-        case 80...100: .green
-        case 60..<80: Color(red: 0.35, green: 0.68, blue: 1.0)
-        case 40..<60: Color(red: 0.95, green: 0.62, blue: 0.18)
-        default: Color(red: 0.92, green: 0.28, blue: 0.32)
+                    // Score bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(.white.opacity(0.08))
+                                .frame(height: 3)
+                            Capsule()
+                                .fill(scoreColor(day.outdoorScore))
+                                .frame(width: max(geo.size.width * CGFloat(day.outdoorScore) / 100.0, 2), height: 3)
+                        }
+                    }
+                    .frame(height: 3)
+
+                    // Low temp
+                    Text(formattedTemp(day.lowTemp))
+                        .font(.system(size: 10, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                        .frame(width: 26, alignment: .trailing)
+
+                    // High temp
+                    Text(formattedTemp(day.highTemp))
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.8))
+                        .frame(width: 26, alignment: .trailing)
+                }
+
+                if index < min(data.dailyForecasts.count, 4) - 1 {
+                    Divider()
+                        .overlay(.white.opacity(0.06))
+                        .padding(.vertical, 3)
+                }
+            }
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
-/// Small widget: current condition + outdoor score.
+// MARK: - Small Widget
+
 struct ForeWizWidgetSmallView: View {
     let entry: ForeWizWidgetEntry
 
     var body: some View {
         if let data = entry.widgetData {
-            VStack(spacing: 8) {
-                Image(systemName: data.currentConditionSymbol)
-                    .font(.system(size: 28))
-                    .foregroundStyle(.white)
-
-                Text(formattedTemp(data.currentTemperature))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text(data.currentConditionDescription)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
+            VStack(spacing: 0) {
+                // Location
+                Text(data.locationName)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.55))
                     .lineLimit(1)
 
-                scoreRingCompact(score: data.outdoorScore)
+                Spacer(minLength: 0)
+
+                // Icon
+                Image(systemName: data.currentConditionSymbol)
+                    .font(.system(size: 32))
+                    .foregroundStyle(.white)
+                    .symbolRenderingMode(.multicolor)
+
+                // Temperature
+                Text(formattedTemp(data.currentTemperature))
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                // Condition
+                Text(data.currentConditionDescription)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .lineLimit(1)
+
+                Spacer(minLength: 0)
+
+                // Score ring + label
+                HStack(spacing: 4) {
+                    ScoreRing(score: data.outdoorScore, size: 26, lineWidth: 2.5)
+                    Text(WidgetL10n.text("widget_score_label"))
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.45))
+                }
             }
-            .padding()
+            .padding(14)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .containerBackground(for: .widget) {
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.06, green: 0.08, blue: 0.14),
-                        Color(red: 0.10, green: 0.12, blue: 0.20)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                weatherGradient(for: data.currentConditionSymbol)
+            }
+            .widgetURL(URL(string: "forewiz://home"))
+            .overlay(alignment: .topTrailing) {
+                if entry.emptyState == .staleData {
+                    StaleBadge()
+                        .padding(6)
+                }
             }
         } else {
-            placeholderSmall
+            emptySmallView(for: entry.emptyState)
+                .containerBackground(for: .widget) {
+                    defaultGradient
+                }
+                .widgetURL(URL(string: "forewiz://home"))
         }
     }
 
-    private func scoreRingCompact(score: Int) -> some View {
-        HStack(spacing: 4) {
-            ZStack {
-                Circle()
-                    .stroke(scoreColor(score).opacity(0.2), lineWidth: 2.5)
-                Circle()
-                    .trim(from: 0, to: CGFloat(score) / 100.0)
-                    .stroke(scoreColor(score), style: .init(lineWidth: 2.5, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                Text("\(score)")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 28, height: 28)
-        }
-    }
+    @ViewBuilder
+    private func emptySmallView(for state: WidgetEmptyState?) -> some View {
+        switch state {
+        case .awaitingFirstData, .none:
+            EmptyPlaceholderView(
+                icon: "cloud.sun.fill",
+                title: WidgetL10n.text("widget_waiting_title"),
+                message: WidgetL10n.text("widget_waiting_msg")
+            )
 
-    private var placeholderSmall: some View {
-        VStack(spacing: 6) {
-            Image(systemName: "cloud.sun.fill")
-                .font(.system(size: 24))
-                .foregroundStyle(.white.opacity(0.3))
-            Text("ForeWiz")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.4))
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .containerBackground(for: .widget) {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.06, green: 0.08, blue: 0.14),
-                    Color(red: 0.10, green: 0.12, blue: 0.20)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
+        case .configurationError:
+            EmptyPlaceholderView(
+                icon: "gearshape.fill",
+                title: WidgetL10n.text("widget_config_error"),
+                message: WidgetL10n.text("widget_config_error_msg")
+            )
+
+        case .corruptedData:
+            EmptyPlaceholderView(
+                icon: "arrow.triangle.2.circlepath",
+                title: WidgetL10n.text("widget_corrupted_title"),
+                message: WidgetL10n.text("widget_corrupted_msg")
+            )
+
+        case .staleData:
+            EmptyPlaceholderView(
+                icon: "clock.fill",
+                title: WidgetL10n.text("widget_stale_title"),
+                message: WidgetL10n.text("widget_stale_msg")
             )
         }
     }
+}
 
-    private func formattedTemp(_ temp: Double) -> String {
-        "\(Int(round(temp)))°"
+// MARK: - Lock Screen Accessory Views
+
+struct ForeWizWidgetInlineView: View {
+    let entry: ForeWizWidgetEntry
+
+    var body: some View {
+        if let data = entry.widgetData {
+            HStack(spacing: 4) {
+                Image(systemName: data.currentConditionSymbol)
+                Text(formattedTemp(data.currentTemperature))
+                    .fontWeight(.bold)
+                Text("·")
+                    .foregroundStyle(.secondary)
+                Text(data.currentConditionDescription)
+            }
+            .widgetURL(URL(string: "forewiz://home"))
+        } else {
+            Text("--°")
+        }
     }
+}
 
-    private func scoreColor(_ score: Int) -> Color {
-        switch score {
-        case 80...100: .green
-        case 60..<80: Color(red: 0.35, green: 0.68, blue: 1.0)
-        case 40..<60: Color(red: 0.95, green: 0.62, blue: 0.18)
-        default: Color(red: 0.92, green: 0.28, blue: 0.32)
+struct ForeWizWidgetCircularView: View {
+    let entry: ForeWizWidgetEntry
+
+    var body: some View {
+        if let data = entry.widgetData {
+            ZStack {
+                AccessoryWidgetBackground()
+                ScoreRing(score: data.outdoorScore, size: 48, lineWidth: 4)
+            }
+            .widgetURL(URL(string: "forewiz://home"))
+        } else {
+            ZStack {
+                AccessoryWidgetBackground()
+                Text("--")
+                    .font(.headline)
+            }
+        }
+    }
+}
+
+struct ForeWizWidgetRectangularView: View {
+    let entry: ForeWizWidgetEntry
+
+    var body: some View {
+        if let data = entry.widgetData {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Image(systemName: data.currentConditionSymbol)
+                        .font(.system(size: 14))
+                    Text(data.locationName)
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .lineLimit(1)
+                    Spacer()
+                    Text(formattedTemp(data.currentTemperature))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                }
+
+                HStack(spacing: 6) {
+                    Text(data.currentConditionDescription)
+                        .font(.system(size: 11, weight: .regular, design: .rounded))
+                        .foregroundStyle(.secondary)
+
+                    Spacer()
+
+                    ScoreRing(score: data.outdoorScore, size: 22, lineWidth: 2.5)
+                    Text(WidgetL10n.text("widget_outdoor_label"))
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .widgetURL(URL(string: "forewiz://home"))
+        } else {
+            VStack(alignment: .leading) {
+                Text(WidgetL10n.text("widget_name"))
+                    .font(.headline)
+                Text(WidgetL10n.text("widget_waiting_msg"))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }
@@ -288,7 +525,15 @@ struct ForeWizWidgetEntryView: View {
         switch family {
         case .systemSmall:
             ForeWizWidgetSmallView(entry: entry)
-        default:
+        case .systemMedium, .systemLarge:
+            ForeWizWidgetMediumView(entry: entry)
+        case .accessoryInline:
+            ForeWizWidgetInlineView(entry: entry)
+        case .accessoryCircular:
+            ForeWizWidgetCircularView(entry: entry)
+        case .accessoryRectangular:
+            ForeWizWidgetRectangularView(entry: entry)
+        @unknown default:
             ForeWizWidgetMediumView(entry: entry)
         }
     }

@@ -23,21 +23,35 @@ struct DestinationPickerView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                // Background Map
+                // Full-screen Map
                 mapLayer
-                    .ignoresSafeArea(edges: [.bottom])
+                    .ignoresSafeArea()
 
-                // Overlay content
+                // Search overlay
                 VStack(spacing: 0) {
-                    searchSection
+                    searchBar
+                        .padding(.horizontal, 16)
                         .padding(.top, 8)
 
-                    Spacer()
-
-                    if showConfirmationCard, let coordinate = selectedCoordinate {
-                        confirmationCard(coordinate: coordinate)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    if !searchText.isEmpty {
+                        searchResultsDropdown
+                            .padding(.horizontal, 16)
+                            .padding(.top, 6)
+                    } else if !showConfirmationCard {
+                        recentOrEmptyView
+                            .padding(.horizontal, 16)
+                            .padding(.top, 6)
                     }
+
+                    Spacer()
+                }
+
+                // Compact confirmation card
+                if showConfirmationCard, let coordinate = selectedCoordinate {
+                    confirmationCard(coordinate: coordinate)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 40)
                 }
             }
             .background(Color.black)
@@ -51,22 +65,19 @@ struct DestinationPickerView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
+                            .font(.system(size: 22))
                             .foregroundStyle(.white.opacity(0.7))
                             .symbolRenderingMode(.hierarchical)
                     }
                     .contentShape(Rectangle())
-
                     .buttonStyle(.plain)
                 }
             }
-            .animation(.spring(response: 0.35, dampingFraction: 0.85), value: showConfirmationCard)
-            .animation(.spring(response: 0.35, dampingFraction: 0.85), value: searchCompleter.results.isEmpty)
-            .animation(.spring(response: 0.35, dampingFraction: 0.85), value: searchCompleter.isSearching)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showConfirmationCard)
+            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: searchCompleter.results.isEmpty)
             .onChange(of: locationManager.userLocation) { _, location in
                 guard let location else { return }
                 searchCompleter.setRegion(center: location.coordinate)
-
                 if isFirstAppearance {
                     withAnimation(.easeOut(duration: 0.6)) {
                         position = .region(MKCoordinateRegion(
@@ -84,6 +95,7 @@ struct DestinationPickerView: View {
     }
 
     // MARK: - Map Layer
+
     private var mapLayer: some View {
         Map(position: $position, selection: $searchCompleter.selectedResult) {
             UserAnnotation()
@@ -104,39 +116,21 @@ struct DestinationPickerView: View {
         }
     }
 
-    // MARK: - Search Section
-    private var searchSection: some View {
-        VStack(spacing: 6) {
-            // Search Bar
-            searchBar
-                .padding(.horizontal, 16)
+    // MARK: - Search Bar
 
-            if !searchText.isEmpty {
-                searchResultsView
-            } else if showConfirmationCard {
-                EmptyView()
-            } else {
-                recentDestinationsView
-            }
-        }
-    }
-
-    // MARK: - Liquid Glass Search Bar
     private var searchBar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(.secondary)
 
                 TextField(L10n.text("wizpath_search_destination"), text: $searchText)
-                    .font(.system(size: 16))
+                    .font(.system(size: 15))
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .submitLabel(.search)
-                    .onSubmit {
-                        searchCompleter.search(query: searchText)
-                    }
+                    .onSubmit { searchCompleter.search(query: searchText) }
 
                 if searchCompleter.isSearching && !searchText.isEmpty {
                     ProgressView()
@@ -152,22 +146,21 @@ struct DestinationPickerView: View {
                         showConfirmationCard = false
                     } label: {
                         Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 16))
+                            .font(.system(size: 15))
                             .foregroundStyle(.tertiary)
                     }
                     .contentShape(Rectangle())
-
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
             .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(.regularMaterial)
                     .environment(\.colorScheme, .dark)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .stroke(Color.white.opacity(0.08), lineWidth: 0.5)
                     )
             )
@@ -178,23 +171,23 @@ struct DestinationPickerView: View {
         }
     }
 
-    // MARK: - Search Results (Liquid Glass)
-    private var searchResultsView: some View {
+    // MARK: - Search Results
+
+    private var searchResultsDropdown: some View {
         Group {
             if searchCompleter.results.isEmpty && !searchCompleter.isSearching && searchText.count >= 2 {
-                VStack(spacing: 8) {
+                VStack(spacing: 6) {
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: 28))
+                        .font(.system(size: 22))
                         .foregroundStyle(.secondary.opacity(0.5))
                     Text(L10n.text("wizpath_no_results"))
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
+                .padding(.vertical, 20)
                 .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .padding(.horizontal, 16)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             } else if !searchCompleter.results.isEmpty {
                 ScrollView {
                     LazyVStack(spacing: 0) {
@@ -203,24 +196,24 @@ struct DestinationPickerView: View {
                                 selectSearchResult(result)
                                 HapticEngine.shared.selectionChanged()
                             } label: {
-                                HStack(spacing: 14) {
+                                HStack(spacing: 12) {
                                     ZStack {
-                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                        RoundedRectangle(cornerRadius: 8, style: .continuous)
                                             .fill(Color.liquidAccent.opacity(0.1))
-                                            .frame(width: 36, height: 36)
+                                            .frame(width: 32, height: 32)
                                         Image(systemName: iconForResult(result))
-                                            .font(.system(size: 14))
+                                            .font(.system(size: 13))
                                             .foregroundStyle(Color.liquidAccent)
                                     }
 
-                                    VStack(alignment: .leading, spacing: 2) {
+                                    VStack(alignment: .leading, spacing: 1) {
                                         Text(result.title)
-                                            .font(.system(size: 15, weight: .semibold))
+                                            .font(.system(size: 14, weight: .semibold))
                                             .foregroundStyle(.white)
                                             .lineLimit(1)
                                         if !result.subtitle.isEmpty {
                                             Text(result.subtitle)
-                                                .font(.system(size: 13))
+                                                .font(.system(size: 12))
                                                 .foregroundStyle(.secondary)
                                                 .lineLimit(1)
                                         }
@@ -229,192 +222,175 @@ struct DestinationPickerView: View {
                                     Spacer()
 
                                     Image(systemName: "chevron.right")
-                                        .font(.system(size: 12, weight: .semibold))
+                                        .font(.system(size: 11, weight: .semibold))
                                         .foregroundStyle(.tertiary)
                                 }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
                             }
                             .contentShape(Rectangle())
-
                             .buttonStyle(.plain)
 
                             if result != searchCompleter.results.last {
                                 Divider()
                                     .overlay(Color.white.opacity(0.06))
-                                    .padding(.leading, 66)
+                                    .padding(.leading, 58)
                             }
                         }
                     }
                 }
                 .scrollContentBackground(.hidden)
                 .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .shadow(color: .black.opacity(0.12), radius: 16, y: 6)
-                .padding(.horizontal, 16)
-                .frame(maxHeight: 320)
+                .frame(maxHeight: 280)
             }
         }
     }
 
-    // MARK: - Recent Destinations (Liquid Glass)
-    private var recentDestinationsView: some View {
+    // MARK: - Recent / Empty
+
+    private var recentOrEmptyView: some View {
         Group {
             if !recentDestinations.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "clock.arrow.circlepath")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(L10n.text("wizpath_recent_destinations"))
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 4)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(L10n.text("wizpath_recent_destinations"))
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 4)
 
-                    VStack(spacing: 0) {
-                        ForEach(Array(recentDestinations.prefix(5).enumerated()), id: \.offset) { _, recent in
-                            Button {
-                                onSelectRecent(recent)
-                                HapticEngine.shared.medium()
-                                dismiss()
-                            } label: {
-                                HStack(spacing: 14) {
-                                    ZStack {
-                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                            .fill(Color.white.opacity(0.06))
-                                            .frame(width: 36, height: 36)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(Array(recentDestinations.prefix(5).enumerated()), id: \.offset) { _, recent in
+                                Button {
+                                    onSelectRecent(recent)
+                                    HapticEngine.shared.medium()
+                                    dismiss()
+                                } label: {
+                                    HStack(spacing: 6) {
                                         Image(systemName: "clock.arrow.circlepath")
-                                            .font(.system(size: 14))
-                                            .foregroundStyle(.secondary)
-                                    }
-
-                                    VStack(alignment: .leading, spacing: 2) {
+                                            .font(.system(size: 10))
                                         Text(recent.name)
-                                            .font(.system(size: 15, weight: .semibold))
-                                            .foregroundStyle(.white)
-                                            .lineLimit(1)
-                                        Text(String(format: "%.2f, %.2f", recent.latitude, recent.longitude))
-                                            .font(.caption)
-                                            .foregroundStyle(.tertiary)
+                                            .font(.system(size: 12, weight: .medium))
                                             .lineLimit(1)
                                     }
-
-                                    Spacer()
-
-                                    Image(systemName: "arrow.up.right")
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundStyle(.tertiary)
+                                    .foregroundStyle(.white.opacity(0.8))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 7)
+                                    .background(.white.opacity(0.06), in: Capsule())
+                                    .overlay(
+                                        Capsule().stroke(.white.opacity(0.08), lineWidth: 0.5)
+                                    )
                                 }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 10)
-                            }
-                            .contentShape(Rectangle())
-
-                            .buttonStyle(.plain)
-
-                            if recent != recentDestinations.prefix(5).last {
-                                Divider()
-                                    .overlay(Color.white.opacity(0.06))
-                                    .padding(.leading, 66)
+                                .contentShape(Rectangle())
+                                .buttonStyle(.plain)
                             }
                         }
                     }
-                    .background(.regularMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: .black.opacity(0.1), radius: 12, y: 4)
-                    .padding(.horizontal, 16)
                 }
             } else {
-                // Empty state
-                VStack(spacing: 16) {
+                // Hint for new users
+                HStack(spacing: 8) {
                     Image(systemName: "map.fill")
-                        .font(.system(size: 36))
-                        .foregroundStyle(Color.liquidAccent.opacity(0.3))
-
-                    VStack(spacing: 4) {
-                        Text(L10n.text("wizpath_search_hint_title"))
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white)
-                        Text(L10n.text("wizpath_search_hint_subtitle"))
-                            .font(.system(size: 13))
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.liquidAccent.opacity(0.4))
+                    Text(L10n.text("wizpath_search_hint_subtitle"))
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
                 }
-                .padding(.vertical, 40)
-                .padding(.horizontal, 32)
-                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 14)
                 .background(.regularMaterial)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .shadow(color: .black.opacity(0.08), radius: 12, y: 4)
-                .padding(.horizontal, 16)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
         }
     }
 
-    // MARK: - Confirmation Card (Liquid Glass)
+    // MARK: - Compact Confirmation Card
+
     private func confirmationCard(coordinate: CLLocationCoordinate2D) -> some View {
-        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 20) {
-            VStack(spacing: 16) {
-                // Location Info
-                HStack(spacing: 14) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.liquidAccent.opacity(0.12))
-                            .frame(width: 44, height: 44)
-                        Image(systemName: "mappin.and.ellipse")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color.liquidAccent)
-                    }
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(L10n.text("wizpath_selected_location"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(selectedName)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .lineLimit(2)
-                    }
-
-                    Spacer()
-                }
-
-                // Action Buttons
-                HStack(spacing: 12) {
-                    LiquidGlassButton(
-                        L10n.text("wizpath_cancel"),
-                        icon: "xmark",
-                        style: .secondary,
-                        haptic: .light
-                    ) {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedCoordinate = nil
-                            selectedName = ""
-                            showConfirmationCard = false
-                        }
-                    }
-
-                    LiquidGlassButton(
-                        L10n.text("wizpath_confirm_destination"),
-                        icon: "checkmark",
-                        style: .primary,
-                        haptic: .medium
-                    ) {
-                        onSelect(coordinate, selectedName)
-                        dismiss()
-                    }
-                }
+        HStack(spacing: 12) {
+            // Pin icon
+            ZStack {
+                Circle()
+                    .fill(Color.liquidAccent.opacity(0.12))
+                    .frame(width: 36, height: 36)
+                Image(systemName: "mappin.and.ellipse")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.liquidAccent)
             }
+
+            // Name
+            VStack(alignment: .leading, spacing: 1) {
+                Text(L10n.text("wizpath_selected_location"))
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+                Text(selectedName)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 8)
+
+            // Confirm button
+            Button {
+                onSelect(coordinate, selectedName)
+                HapticEngine.shared.medium()
+                dismiss()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14))
+                    Text(L10n.text("wizpath_confirm_destination"))
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background(
+                    LinearGradient(
+                        colors: [Color.liquidAccent, Color.liquidAccentSoft],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .clipShape(Capsule())
+                .shadow(color: .liquidAccent.opacity(0.3), radius: 8, y: 3)
+            }
+            .contentShape(Rectangle())
+            .buttonStyle(.plain)
+
+            // Cancel button
+            Button {
+                withAnimation(.spring(response: 0.3)) {
+                    selectedCoordinate = nil
+                    selectedName = ""
+                    showConfirmationCard = false
+                }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+            .buttonStyle(.plain)
         }
-        .shadow(color: .black.opacity(0.2), radius: 24, y: -8)
-        .padding(.horizontal, 16)
-        .padding(.bottom, 34)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(Color.white.opacity(0.08), lineWidth: 0.5)
+                )
+        )
+        .shadow(color: .black.opacity(0.25), radius: 20, y: -6)
     }
 
     // MARK: - Actions
+
     private func selectSearchResult(_ result: MKLocalSearchCompletion) {
         let searchRequest = MKLocalSearch.Request(completion: result)
         let search = MKLocalSearch(request: searchRequest)
@@ -440,7 +416,7 @@ struct DestinationPickerView: View {
                     searchText = ""
                     searchCompleter.clearResults()
 
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                         showConfirmationCard = true
                     }
 
@@ -478,6 +454,7 @@ struct DestinationPickerView: View {
 }
 
 // MARK: - Location Search Completer
+
 final class LocationSearchCompleter: NSObject, ObservableObject {
     @Published var results: [MKLocalSearchCompletion] = []
     @Published var selectedResult: MKMapItem?
@@ -549,6 +526,7 @@ extension LocationSearchCompleter: MKLocalSearchCompleterDelegate {
 }
 
 // MARK: - Location Manager
+
 @MainActor
 final class DestinationLocationManager: NSObject, ObservableObject {
     @Published var userLocation: CLLocation?
@@ -595,19 +573,20 @@ extension DestinationLocationManager: CLLocationManagerDelegate {
 }
 
 // MARK: - Destination Flag
+
 struct DestinationFlag: View {
     @State private var bounce = false
 
     var body: some View {
         Image(systemName: "mappin.circle.fill")
-            .font(.system(size: 32))
+            .font(.system(size: 30))
             .foregroundStyle(Color.coral)
             .background(
                 Circle()
                     .fill(.white)
-                    .frame(width: 24, height: 24)
+                    .frame(width: 22, height: 22)
             )
-            .scaleEffect(bounce ? 1.15 : 1.0)
+            .scaleEffect(bounce ? 1.1 : 1.0)
             .onAppear {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.5).repeatForever(autoreverses: true)) {
                     bounce = true
@@ -617,6 +596,7 @@ struct DestinationFlag: View {
 }
 
 // MARK: - Preview
+
 #Preview {
     DestinationPickerView(
         recentDestinations: [

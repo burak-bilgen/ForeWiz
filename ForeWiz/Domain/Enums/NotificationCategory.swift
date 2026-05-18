@@ -8,6 +8,10 @@ enum NotificationCategory: String, CaseIterable, Codable, Hashable, Sendable {
     case rainWarning
     case windWarning
     case uvWarning
+    case stormWarning
+    case coldWarning
+    case humidityWarning
+    case poorComfortWarning
 
     var localizedTitle: String {
         switch self {
@@ -18,6 +22,10 @@ enum NotificationCategory: String, CaseIterable, Codable, Hashable, Sendable {
         case .rainWarning: L10n.text("notification_rain")
         case .windWarning: L10n.text("notification_wind")
         case .uvWarning: L10n.text("notification_uv")
+        case .stormWarning: L10n.text("notification_storm_warning")
+        case .coldWarning: L10n.text("notification_cold_warning")
+        case .humidityWarning: L10n.text("notification_humidity_warning")
+        case .poorComfortWarning: L10n.text("notification_poor_comfort_warning")
         }
     }
 
@@ -30,6 +38,10 @@ enum NotificationCategory: String, CaseIterable, Codable, Hashable, Sendable {
         case .rainWarning: L10n.text("notification_rain_desc")
         case .windWarning: L10n.text("notification_wind_desc")
         case .uvWarning: L10n.text("notification_uv_desc")
+        case .stormWarning: L10n.text("notification_storm_warning_desc")
+        case .coldWarning: L10n.text("notification_cold_warning_desc")
+        case .humidityWarning: L10n.text("notification_humidity_warning_desc")
+        case .poorComfortWarning: L10n.text("notification_poor_comfort_warning_desc")
         }
     }
 }

@@ -55,10 +55,6 @@ private struct InsightsHeader: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.80)
             }
-            Text(L10n.text("premium_feature_analytics_desc"))
-                .font(.system(size: 14))
-                .foregroundStyle(Color.white.opacity(0.45))
-                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
@@ -352,87 +348,6 @@ private struct InsightsDayQualityCard: View {
                 .foregroundStyle(Color.white.opacity(0.4))
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-}
-
-// MARK: - Locked view
-
-private struct InsightsLockedView: View {
-    let onUpgrade: () -> Void
-    @State private var appeared = false
-    private let blue = Color(red: 0.40, green: 0.70, blue: 1.0)
-    private let gold = Color(red: 1.0, green: 0.82, blue: 0.3)
-
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 28) {
-                ZStack {
-                    Circle()
-                        .fill(blue.opacity(0.14))
-                        .frame(width: 130, height: 130)
-                        .blur(radius: 14)
-                    Circle()
-                        .fill(blue.opacity(0.08))
-                        .frame(width: 100, height: 100)
-                    Image(systemName: "chart.bar.fill")
-                        .font(.system(size: 46))
-                        .foregroundStyle(blue)
-                        .symbolRenderingMode(.hierarchical)
-                        .shadow(color: blue.opacity(0.5), radius: 16, x: 0, y: 6)
-                }
-                .floating(amplitude: 7, duration: 3.2)
-                .pulseGlow(color: blue, radius: 20)
-                .opacity(appeared ? 1 : 0)
-                .scaleEffect(appeared ? 1 : 0.5)
-
-                VStack(spacing: 10) {
-                    Text(L10n.text("insights_title"))
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.80)
-                    Text(L10n.text("premium_feature_analytics_desc"))
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color.white.opacity(0.50))
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .opacity(appeared ? 1 : 0)
-                .offset(y: appeared ? 0 : 18)
-
-                Button(action: onUpgrade) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "crown.fill")
-                            .font(.system(size: 14))
-                        Text(L10n.text("premium_upgrade"))
-                            .font(.system(size: 16, weight: .bold))
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.80)
-                    }
-                    .foregroundStyle(Color(red: 0.06, green: 0.06, blue: 0.14))
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .background(
-                        Capsule()
-                            .fill(LinearGradient(colors: [gold, Color(red: 1.0, green: 0.65, blue: 0.2)], startPoint: .leading, endPoint: .trailing))
-                    )
-                    .shadow(color: gold.opacity(0.45), radius: 14, x: 0, y: 6)
-                    .shimmerEffect()
-                }
-                .buttonStyle(PressScaleButtonStyle(scale: 0.96))
-                .opacity(appeared ? 1 : 0)
-                .offset(y: appeared ? 0 : 12)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 48)
-        }
-        .scrollIndicators(.hidden)
-        .safeAreaPadding(.bottom, 12)
-        .onAppear {
-            withAnimation(.spring(response: 0.65, dampingFraction: 0.72).delay(0.1)) { appeared = true }
         }
     }
 }

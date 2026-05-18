@@ -133,12 +133,22 @@ struct DefaultWeatherRiskClassifier {
             return stormRisk
         }
 
-        if hour.apparentTemperatureCelsius >= 32 && (12..<16).contains(hourOfDay) {
+        if hour.apparentTemperatureCelsius >= 35 && (11..<17).contains(hourOfDay) {
             return WeatherRisk(
                 type: .heat,
-                severity: hour.apparentTemperatureCelsius >= 35 ? .high : .medium,
+                severity: hour.apparentTemperatureCelsius >= 38 ? .high : .medium,
                 title: L10n.text("risk_feels_like_rising"),
                 message: L10n.text("risk_feels_like_high")
+            )
+        }
+
+        // 🌙 Night heat avoidance — serinlemek için gece saatleri
+        if !(6..<22).contains(hourOfDay) && hour.apparentTemperatureCelsius >= 24 {
+            return WeatherRisk(
+                type: .heat,
+                severity: .medium,
+                title: L10n.text("risk_night_heat"),
+                message: L10n.text("risk_night_heat_message")
             )
         }
 
@@ -202,22 +212,57 @@ struct DefaultWeatherRiskClassifier {
 
     private func heatRisk(for hour: HourlyWeatherPoint, calendar: Calendar) -> WeatherRisk? {
         let hourOfDay = calendar.component(.hour, from: hour.date)
+        let apparentTemp = hour.apparentTemperatureCelsius
 
-        if hour.apparentTemperatureCelsius >= 35 {
+        // 🌙 Night Heat (Tropikal Gece) — >20°C at night disrupts sleep & recovery
+        if !(6..<20).contains(hourOfDay) && apparentTemp > 20 {
+            let severity: RiskLevel = apparentTemp >= 25 ? .high : .medium
             return WeatherRisk(
                 type: .heat,
-                severity: hour.apparentTemperatureCelsius >= 39 ? .extreme : .high,
+                severity: severity,
+                title: L10n.text("risk_night_heat"),
+                message: L10n.text("risk_night_heat_message")
+            )
+        }
+
+        // ☀️ Daytime Heat — kademeli threshold (küresel ısınma odaklı)
+        // Kritik: 40°C+ → extreme
+        // Ekstrem: 36°C+ → high
+        // Yüksek: 32°C+ → medium (gün ortası)
+        // Uyarı: 28°C+ → low (erken uyarı)
+        if apparentTemp >= 40 {
+            return WeatherRisk(
+                type: .heat,
+                severity: .extreme,
+                title: L10n.text("risk_critical_heat"),
+                message: L10n.text("risk_critical_heat_message")
+            )
+        }
+
+        if apparentTemp >= 36 {
+            return WeatherRisk(
+                type: .heat,
+                severity: .high,
                 title: L10n.text("risk_hot_exhausting"),
                 message: L10n.text("risk_feels_high_message")
             )
         }
 
-        if hour.apparentTemperatureCelsius >= 32 && (12..<16).contains(hourOfDay) {
+        if apparentTemp >= 32 && (11..<17).contains(hourOfDay) {
             return WeatherRisk(
                 type: .heat,
                 severity: .medium,
                 title: L10n.text("risk_midday_heating"),
                 message: L10n.text("risk_midday_message")
+            )
+        }
+
+        if apparentTemp >= 28 && (11..<16).contains(hourOfDay) {
+            return WeatherRisk(
+                type: .heat,
+                severity: .low,
+                title: L10n.text("risk_early_heat_warning"),
+                message: L10n.text("risk_early_heat_message")
             )
         }
 

@@ -24,7 +24,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         score -= uvPenalty(hour.uvIndex, hourOfDay: hourOfDay)
 
         if isHotSummerMidday(month: month, hour: hourOfDay, apparentTemperature: apparentTemperature) {
-            score -= 14
+            score -= 20
         }
 
         if hour.isDaylight == false {
@@ -159,12 +159,23 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
     // MARK: - Helpers
 
+    /// Küresel ısınma odaklı ısı cezası — yüksek sıcaklıklar artık çok daha ağır cezalandırılıyor.
+    ///   < 12°C:  soğuk (22)
+    ///   12-26°C: ideal (0)
+    ///   26-29°C: sıcaklık başlangıcı (15)
+    ///   29-32°C: rahatsız (35)
+    ///   32-35°C: tehlikeli (50)
+    ///   35-38°C: çok tehlikeli (65)
+    ///   > 38°C:  ekstrem (85)
     private func goingOutTemperaturePenalty(_ temperature: Double) -> Int {
         switch temperature {
-        case 12...28: 0
-        case 6..<12, 28.01...31: 10
-        case 31.01...35: 28
-        case 35.01...: 48
+        case 12...26: 0
+        case 26.01...29: 15
+        case 29.01...32: 35
+        case 32.01...35: 50
+        case 35.01...38: 65
+        case 38.01...: 85
+        case 6..<12: 10
         default: 22
         }
     }
@@ -196,18 +207,34 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
+    /// Nem cezası — ısı + nem kombinasyonu (Heat Index / Humidex) çok daha agresif.
+    /// Yüksek sıcaklıkta nem, hissedilen sıcaklığı dramatik artırır.
     private func humidityPenalty(
         _ humidity: Double?,
         apparentTemperature: Double
     ) -> Int {
-        guard apparentTemperature >= 25 else { return 0 }
         let humidityValue = humidity ?? 0
+        guard apparentTemperature >= 22 else { return 0 }
 
+        // Heat index yaklaşımı: sıcaklık arttıkça nem cezası katlanır
+        let basePenalty: Int
         switch humidityValue {
-        case 0.80...: return 16
-        case 0.65..<0.80: return 8
-        default: return 0
+        case 0.80...: basePenalty = 20
+        case 0.65..<0.80: basePenalty = 12
+        case 0.50..<0.65: basePenalty = 6
+        default: basePenalty = 0
         }
+
+        // Sıcaklık yükseldikçe nem cezası çarpanı artar
+        let multiplier: Double
+        switch apparentTemperature {
+        case 35...: multiplier = 2.0
+        case 30..<35: multiplier = 1.5
+        case 25..<30: multiplier = 1.0
+        default: multiplier = 1.0
+        }
+
+        return Int(Double(basePenalty) * multiplier)
     }
 
     private func uvPenalty(_ uvIndex: Int?, hourOfDay: Int) -> Int {
@@ -221,8 +248,10 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
+    /// Sıcak mevsim genişletildi: Mayıs-Ekim (5-10) arası, 26°C+ başlangıç
+    /// Küresel ısınmayla sıcak mevsim uzadı ve erken başlıyor.
     private func isHotSummerMidday(month: Int, hour: Int, apparentTemperature: Double) -> Bool {
-        (6...9).contains(month) && (12...16).contains(hour) && apparentTemperature >= 28
+        (5...10).contains(month) && (11...17).contains(hour) && apparentTemperature >= 26
     }
 
     private func reason(for activity: ActivityType, score: WeatherScore, window: TimeWindow) -> String {

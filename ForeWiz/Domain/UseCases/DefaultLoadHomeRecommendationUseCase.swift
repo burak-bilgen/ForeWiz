@@ -95,7 +95,14 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             return nil
         }
 
-        switch cachePolicy.freshness(for: cached.fetchedAt, now: now) {
+        // Compute hourly temperature range for smart cache decisions
+        let tempRange: Double? = {
+            let temps = cached.hourly.map(\.temperatureCelsius)
+            guard let min = temps.min(), let max = temps.max() else { return nil }
+            return max - min
+        }()
+
+        switch cachePolicy.freshness(for: cached.fetchedAt, now: now, hourlyTempRange: tempRange) {
         case .fresh, .staleUsable:
             return cached
         case .expired:
@@ -174,6 +181,77 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         ErrorHandler.normalized(error)
     }
 
+    private func conditionDescription(for conditionCode: String?) -> String {
+        let condition = conditionCode?.lowercased() ?? ""
+        if condition.contains("thunder") || condition.contains("storm") {
+            return L10n.text("weather_storm")
+        } else if condition.contains("rain") || condition.contains("drizzle") {
+            return L10n.text("weather_rain")
+        } else if condition.contains("snow") || condition.contains("sleet") {
+            return L10n.text("weather_snow")
+        } else if condition.contains("cloud") {
+            return L10n.text("weather_cloudy")
+        } else if condition.contains("fog") || condition.contains("haze") {
+            return L10n.text("weather_foggy")
+        } else if condition.contains("clear") || condition.contains("sun") {
+            return L10n.text("weather_clear")
+        }
+        return "—"
+    }
+
+    private func dailyScore(for day: DailyWeatherPoint) -> Int {
+        var s = 100.0
+        s -= abs(day.highTemperatureCelsius - 24) * 1.8
+        s -= abs(15 - day.lowTemperatureCelsius) * 1.8
+        if let precip = day.precipitationChance {
+            s -= precip * 0.55
+        }
+        return Int(max(0, min(100, s)))
+    }
+
+    private func cacheWidgetData(snapshot: WeatherSnapshot, outdoorScore: Int, locationName: String) {
+        let calendar = Calendar.current
+        let locale = L10n.locale
+        let dayFormatter: DateFormatter = {
+            let f = DateFormatter()
+            f.locale = locale
+            f.dateFormat = "EEE"
+            return f
+        }()
+
+        let description = conditionDescription(for: snapshot.current.conditionCode)
+
+        let widgetData = WidgetCacheData(
+            locationName: locationName,
+            currentTemperature: snapshot.current.temperatureCelsius,
+            currentConditionSymbol: snapshot.current.symbolName ?? "cloud.sun.fill",
+            currentConditionDescription: description,
+            outdoorScore: outdoorScore,
+            dailyForecasts: snapshot.daily.map { day in
+                let dayName = dayFormatter.string(from: day.date)
+                return WidgetCacheDailyForecast(
+                    date: day.date,
+                    dayName: dayName,
+                    highTemp: day.highTemperatureCelsius,
+                    lowTemp: day.lowTemperatureCelsius,
+                    conditionSymbol: day.symbolName ?? "cloud.sun.fill",
+                    outdoorScore: dailyScore(for: day),
+                    isToday: calendar.isDateInToday(day.date),
+                    precipitationChance: day.precipitationChance ?? 0
+                )
+            },
+            lastUpdated: snapshot.fetchedAt,
+            attributionName: snapshot.attribution?.serviceName ?? "Weather",
+            languageCode: L10n.currentLanguageCode
+        )
+
+        guard let defaults = UserDefaults(suiteName: "group.forewiz"),
+              let encoded = try? JSONEncoder().encode(widgetData) else { return }
+        defaults.set(encoded, forKey: "com.forewiz.widget.weatherData")
+    }
+
+    // MARK: - Widget Cache Models
+
     private struct WidgetCacheData: Codable {
         let locationName: String
         let currentTemperature: Double
@@ -183,6 +261,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         let dailyForecasts: [WidgetCacheDailyForecast]
         let lastUpdated: Date
         let attributionName: String
+        let languageCode: String
     }
 
     private struct WidgetCacheDailyForecast: Codable {
@@ -194,58 +273,5 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         let outdoorScore: Int
         let isToday: Bool
         let precipitationChance: Double
-    }
-
-    private func cacheWidgetData(snapshot: WeatherSnapshot, outdoorScore: Int, locationName: String) {
-        let calendar = Calendar.current
-        let weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-
-        let condition = snapshot.current.conditionCode?.lowercased() ?? ""
-        let description: String
-        if condition.contains("thunder") || condition.contains("storm") { description = "Thunderstorm" }
-        else if condition.contains("rain") || condition.contains("drizzle") { description = "Rain" }
-        else if condition.contains("snow") || condition.contains("sleet") { description = "Snow" }
-        else if condition.contains("cloud") { description = "Cloudy" }
-        else if condition.contains("fog") || condition.contains("haze") { description = "Fog" }
-        else if condition.contains("clear") || condition.contains("sun") { description = "Clear" }
-        else { description = "—" }
-
-        func score(for day: DailyWeatherPoint) -> Int {
-            var s = 100.0
-            s -= abs(day.highTemperatureCelsius - 24) * 1.8
-            s -= abs(15 - day.lowTemperatureCelsius) * 1.8
-            if let precip = day.precipitationChance {
-                s -= precip * 0.55
-            }
-            return Int(max(0, min(100, s)))
-        }
-
-        let widgetData = WidgetCacheData(
-            locationName: locationName,
-            currentTemperature: snapshot.current.temperatureCelsius,
-            currentConditionSymbol: snapshot.current.symbolName ?? "cloud.sun.fill",
-            currentConditionDescription: description,
-            outdoorScore: outdoorScore,
-            dailyForecasts: snapshot.daily.map { day in
-                let idx = calendar.component(.weekday, from: day.date) - 1
-                let dayName = weekdays.indices.contains(idx) ? weekdays[idx] : "?"
-                return WidgetCacheDailyForecast(
-                    date: day.date,
-                    dayName: dayName,
-                    highTemp: day.highTemperatureCelsius,
-                    lowTemp: day.lowTemperatureCelsius,
-                    conditionSymbol: day.symbolName ?? "cloud.sun.fill",
-                    outdoorScore: score(for: day),
-                    isToday: calendar.isDateInToday(day.date),
-                    precipitationChance: day.precipitationChance ?? 0
-                )
-            },
-            lastUpdated: snapshot.fetchedAt,
-            attributionName: snapshot.attribution?.serviceName ?? "Weather"
-        )
-
-        guard let defaults = UserDefaults(suiteName: "group.forewiz"),
-              let encoded = try? JSONEncoder().encode(widgetData) else { return }
-        defaults.set(encoded, forKey: "com.forewiz.widget.weatherData")
     }
 }

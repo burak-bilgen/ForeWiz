@@ -236,6 +236,28 @@ private struct DetailOutfitCard: View {
                     .font(.system(size: 14))
                     .foregroundStyle(Color.white.opacity(0.55))
                     .fixedSize(horizontal: false, vertical: true)
+
+                // Human-like conversational advice
+                if let advice = outfit.detailedAdvice {
+                    HStack(spacing: 10) {
+                        Image(systemName: "quote.bubble.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.5))
+                        Text(advice)
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.white.opacity(0.8))
+                            .lineSpacing(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(Color(red: 0.8, green: 0.65, blue: 1.0).opacity(0.1), lineWidth: 0.5)
+                    )
+                }
+
                 if !outfit.items.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         ForEach(outfit.items, id: \.self) { item in

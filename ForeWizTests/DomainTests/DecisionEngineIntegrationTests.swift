@@ -25,7 +25,7 @@ struct DecisionEngineIntegrationTests {
 
         let recommendation = decisionEngine.makeDailyRecommendation(
             snapshot: snapshot,
-            profile: WeatherTestFixtures.profile(sensitivity: .normal),
+            profile: WeatherTestFixtures.profile(),
             now: now,
             calendar: calendar
         )
@@ -76,7 +76,7 @@ struct DecisionEngineIntegrationTests {
         let input = OutfitRecommendationInput(
             current: current,
             hourly: [],
-            profile: WeatherTestFixtures.profile(sensitivity: .normal),
+            profile: WeatherTestFixtures.profile(),
             risks: [rainRisk],
             avoidWindows: [],
             calendar: WeatherTestFixtures.calendar
@@ -89,7 +89,7 @@ struct DecisionEngineIntegrationTests {
     }
 
     @Test func activityScoringPenalizesBadConditions() {
-        let profile = WeatherTestFixtures.profile(sensitivity: .normal)
+        let profile = WeatherTestFixtures.profile()
         let calendar = WeatherTestFixtures.calendar
         let goodHour = makeHour(
             temperatureCelsius: 22,

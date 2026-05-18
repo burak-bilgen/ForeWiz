@@ -88,11 +88,11 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
         let category: NotificationCategory
         switch alert.event {
         case .tornado, .severeThunderstorm, .flashFlood:
-            category = .windWarning
+            category = .stormWarning
         case .extremeHeat:
             category = .avoidHeatWindow
         case .extremeCold, .blizzard:
-            category = .windWarning
+            category = .coldWarning
         case .highWind:
             category = .windWarning
         case .hail:

@@ -32,7 +32,8 @@ extension DailyRecommendation {
                 title: L10n.text("outfit_light_and_comfortable"),
                 items: [L10n.text("activity_running")],
                 accessories: [],
-                warning: nil
+                warning: nil,
+                detailedAdvice: nil
             ),
             risks: [],
             summaryText: L10n.text("decision_good"),

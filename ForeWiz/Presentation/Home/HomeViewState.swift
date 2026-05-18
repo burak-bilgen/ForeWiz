@@ -10,6 +10,9 @@ struct HomeViewState: Equatable {
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
     let warningMessage: String?
+    let heatSafetyBanner: HeatSafetyBanner?
+    let heatStreakCount: Int
+    let briefing: DailyWeatherBriefing?
     let attribution: WeatherAttributionInfo?
 }
 
@@ -64,6 +67,35 @@ struct HourlyScoreItem: Equatable, Identifiable {
     let symbolName: String
     let temperatureText: String
     let precipitationChance: Double
+}
+
+// MARK: - Heat Safety Banner
+
+struct HeatSafetyBanner: Equatable, Identifiable {
+    let id: String = "heat-safety"
+    let severity: RiskLevel
+    let currentTemp: Double
+    let adviceKey: String
+
+    var iconName: String {
+        switch severity {
+        case .extreme: "thermometer.sun.triangle.fill"
+        case .high: "thermometer.sun.fill"
+        default: "sun.max.trianglebadge.exclamationmark.fill"
+        }
+    }
+
+    var titleKey: String {
+        switch severity {
+        case .extreme: "heat_banner_critical_title"
+        case .high: "heat_banner_high_title"
+        default: "heat_banner_warning_title"
+        }
+    }
+
+    var messageKey: String {
+        adviceKey
+    }
 }
 
 struct HomeCurrentWeatherViewState: Equatable {

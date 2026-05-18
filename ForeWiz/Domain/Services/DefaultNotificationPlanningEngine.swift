@@ -383,8 +383,11 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         case .heat: return .avoidHeatWindow
         case .uv: return .uvWarning
         case .rain: return .rainWarning
-        case .wind, .storm: return .windWarning
-        case .humidity, .cold, .poorComfort: return nil
+        case .wind: return .windWarning
+        case .storm: return .stormWarning
+        case .cold: return .coldWarning
+        case .humidity: return .humidityWarning
+        case .poorComfort: return .poorComfortWarning
         }
     }
 

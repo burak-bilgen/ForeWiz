@@ -21,6 +21,7 @@ final class HomeViewStateFactory {
     func makeViewState(
         from result: HomeRecommendationResult,
         profile: UserComfortProfile,
+        briefing: DailyWeatherBriefing? = nil,
         unitSystem: UnitSystem = .current
     ) -> HomeViewState {
         HomeViewState(
@@ -33,6 +34,9 @@ final class HomeViewStateFactory {
             lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
             isUsingCachedWeather: result.isUsingCachedWeather,
             warningMessage: result.warningMessage,
+            heatSafetyBanner: makeHeatSafetyBanner(from: result.recommendation, dailyPoints: result.dailyPoints),
+            heatStreakCount: heatStreakCount(from: result.dailyPoints),
+            briefing: briefing,
             attribution: result.attribution
         )
     }
@@ -529,14 +533,83 @@ private extension HomeViewStateFactory {
             }
     }
     
+    /// Küresel ısınma odaklı haftalık skor — yüksek sıcaklıklar çok daha ağır cezalandırılır.
     func weeklyScore(high: Double, low: Double, precipitationChance: Double?) -> Int {
         var score = 100.0
-        score -= abs(high - 24) * 1.8
-        score -= abs(15 - low) * 1.8
+
+        let highTarget = 24.0
+        let lowTarget = 16.0
+
+        // High temp penalty — aşırı sıcak günler çok ağır cezalandırılır
+        let highDeviation = abs(high - highTarget)
+        if high > 32 {
+            score -= highDeviation * 3.5
+        } else if high > 28 {
+            score -= highDeviation * 2.5
+        } else {
+            score -= highDeviation * 1.8
+        }
+
+        // Low temp penalty — tropikal geceler (>20°C low) skoru düşürür
+        if low > 20 {
+            score -= (low - 20) * 3.0
+        } else {
+            score -= abs(lowTarget - low) * 1.5
+        }
+
         if let precip = precipitationChance {
             score -= precip * 0.55
         }
+
         return Int(max(0, min(100, score)))
+    }
+}
+
+// MARK: - Heat Safety
+
+private extension HomeViewStateFactory {
+    /// Heat Safety Banner — yüksek sıcaklıkta uyarı banner'ı
+    func makeHeatSafetyBanner(
+        from recommendation: DailyRecommendation,
+        dailyPoints: [DailyWeatherPoint]
+    ) -> HeatSafetyBanner? {
+        let heatRisk = recommendation.risks.first(where: { $0.type == .heat })
+        guard let heatRisk, heatRisk.severity >= .medium else {
+            return nil
+        }
+
+        let currentTemp = dailyPoints.first?.highTemperatureCelsius ?? 0
+
+        let adviceKey: String
+        switch heatRisk.severity {
+        case .extreme: adviceKey = "heat_banner_critical_advice"
+        case .high: adviceKey = "heat_banner_high_advice"
+        default: adviceKey = "heat_banner_warning_advice"
+        }
+
+        return HeatSafetyBanner(severity: heatRisk.severity, currentTemp: currentTemp, adviceKey: adviceKey)
+    }
+
+    /// Heat Streak — ardışık aşırı sıcak gün sayısı
+    func heatStreakCount(from dailyPoints: [DailyWeatherPoint]) -> Int {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: dateProvider.now)
+
+        let sortedDays = dailyPoints
+            .map { (date: calendar.startOfDay(for: $0.date), high: $0.highTemperatureCelsius) }
+            .sorted { $0.date > $1.date }
+
+        var streak = 0
+        var expectedDate = today
+
+        for day in sortedDays {
+            guard day.date == expectedDate else { break }
+            guard day.high >= 32 else { break }
+            streak += 1
+            expectedDate = calendar.date(byAdding: .day, value: -1, to: expectedDate) ?? expectedDate
+        }
+
+        return streak
     }
 }
 

@@ -205,7 +205,7 @@ struct PreferencesRepositoryTests {
 
         let profile = try await repository.loadProfile()
 
-        #expect(profile.language == .system)
+        #expect(profile.language == .english)
     }
 
     @Test("Profile can be saved and loaded")

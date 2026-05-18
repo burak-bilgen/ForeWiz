@@ -9,9 +9,11 @@
 /* Begin PBXBuildFile section */
 		05D713FCDD53F46F64B743B2 /* WidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D42315E75821D881F0AFEB8 /* WidgetEntry.swift */; };
 		1C2BF16EB926075D1ABE048A /* WidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D5A8169BBE9FF4971056B1 /* WidgetProvider.swift */; };
+		81577DD945414BF39FE19D55 /* WidgetLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A551890B6D02452D94CF2556 /* WidgetLocalization.swift */; };
 		8857A0861617D03FE3A2F893 /* WeatherWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4934CEF03C1F8AFB1D8CD0 /* WeatherWidgetData.swift */; };
 		CF1EBD77B318F138E0340411 /* ForeWizWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529B75580BA0BED5EF21E057 /* ForeWizWidgets.swift */; };
 		D89F44D3F29829B0131566E4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E49C9E979C0B1315F9DFF77 /* Foundation.framework */; };
+		DFDF4C16A8CA405E88E3E49A /* ForeWizWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */; };
 		FBA2748D8C01D1F62A954030 /* WidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47375B365A07D56FEDCC1930 /* WidgetViews.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +48,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				DFDF4C16A8CA405E88E3E49A /* ForeWizWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -61,7 +64,8 @@
 		67305E872F9E05220034CAA8 /* ForeWizTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForeWizTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67305E912F9E05220034CAA8 /* ForeWizUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForeWizUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		67A870F62FAF23C3005B23F5 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = file; path = ForeWizWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.extensionkit-extension"; path = ForeWizWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A551890B6D02452D94CF2556 /* WidgetLocalization.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetLocalization.swift; path = ForeWizWidgets/WidgetLocalization.swift; sourceTree = "<group>"; };
 		A7D5A8169BBE9FF4971056B1 /* WidgetProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetProvider.swift; path = ForeWizWidgets/WidgetProvider.swift; sourceTree = "<group>"; };
 		FA4934CEF03C1F8AFB1D8CD0 /* WeatherWidgetData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WeatherWidgetData.swift; path = ForeWizWidgets/WeatherWidgetData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -162,6 +166,7 @@
 				4D42315E75821D881F0AFEB8 /* WidgetEntry.swift */,
 				A7D5A8169BBE9FF4971056B1 /* WidgetProvider.swift */,
 				47375B365A07D56FEDCC1930 /* WidgetViews.swift */,
+				A551890B6D02452D94CF2556 /* WidgetLocalization.swift */,
 			);
 			name = ForeWizWidgets;
 			sourceTree = "<group>";
@@ -354,6 +359,7 @@
 				05D713FCDD53F46F64B743B2 /* WidgetEntry.swift in Sources */,
 				1C2BF16EB926075D1ABE048A /* WidgetProvider.swift in Sources */,
 				FBA2748D8C01D1F62A954030 /* WidgetViews.swift in Sources */,
+				81577DD945414BF39FE19D55 /* WidgetLocalization.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

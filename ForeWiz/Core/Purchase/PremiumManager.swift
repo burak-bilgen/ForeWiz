@@ -63,7 +63,7 @@ final class PremiumManager {
             products = storeProducts.sorted { $0.price < $1.price }
         } catch {
             AppLogger.app.error("Failed to load StoreKit products: \(error.localizedDescription)")
-            purchaseError = L10n.text("premium_network_error")
+            purchaseError = "Mağazaya bağlanılamadı"
         }
 
         isLoadingProducts = false
@@ -98,7 +98,7 @@ final class PremiumManager {
             }
         } catch {
             AppLogger.app.error("Purchase failed: \(error.localizedDescription)")
-            purchaseError = L10n.text("premium_network_error")
+            purchaseError = "Mağazaya bağlanılamadı"
         }
 
         isPurchasing = false
@@ -118,13 +118,13 @@ final class PremiumManager {
 
             if hasPremium {
                 FeatureGate.currentTier = .premium
-                restoreMessage = L10n.text("premium_restore_success")
+                restoreMessage = "Premium geri yüklendi"
             } else {
-                restoreMessage = L10n.text("premium_restore_none")
+                restoreMessage = "Premium bulunamadı"
             }
         } catch {
             AppLogger.app.error("Restore failed: \(error.localizedDescription)")
-            restoreMessage = L10n.text("premium_network_error")
+            restoreMessage = "Mağazaya bağlanılamadı"
         }
 
         isRestoring = false
@@ -166,7 +166,7 @@ final class PremiumManager {
         guard yearlyViaMonthly.doubleValue > 0 else { return nil }
         let savings = Int((1 - yearlyDecimal.doubleValue / yearlyViaMonthly.doubleValue) * 100)
         guard savings > 0 else { return nil }
-        return L10n.formatted("premium_save_format", savings)
+        return "Kaydet: \(savings)%"
     }
 
     // MARK: - Helpers
@@ -200,9 +200,9 @@ extension Product {
         guard type == .autoRenewable,
               let sub = subscription else { return "" }
         switch sub.subscriptionPeriod.unit {
-        case .month: return L10n.text("premium_per_month")
-        case .year: return L10n.text("premium_per_year")
-        case .week: return L10n.text("premium_per_week")
+        case .month: return "/ay"
+        case .year: return "/yıl"
+        case .week: return "/hafta"
         default: return ""
         }
     }

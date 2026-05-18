@@ -167,7 +167,7 @@ private struct HomeLoadedContent: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 if let alert = state.assistant.criticalAlert {
                     CriticalAlertCard(signal: alert)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.0)
@@ -196,24 +196,30 @@ private struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
+                if let heatBanner = state.heatSafetyBanner {
+                    HeatSafetyBannerView(banner: heatBanner, heatStreakCount: state.heatStreakCount)
+                        .cardEntrance(appeared: contentReady, baseDelay: 0.20)
+                }
+
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
 
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.48)
 
-                if let attribution = state.attribution {
-                    AttributionView(info: attribution)
-                        .cardEntrance(appeared: contentReady, baseDelay: 0.56)
+                // AI Briefing — Apple Weather'de OLMAYAN özellikler
+                if let briefing = state.briefing {
+                    AIBriefingSection(briefing: briefing)
+                        .cardEntrance(appeared: contentReady, baseDelay: 0.52)
                 }
 
-                if !state.lastUpdatedText.isEmpty {
-                    LastUpdatedBadge(text: state.lastUpdatedText)
+                if let attribution = state.attribution {
+                    CompactFooter(attribution: attribution, lastUpdatedText: state.lastUpdatedText)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.60)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
         .scrollIndicators(.hidden)
         .safeAreaPadding(.bottom, 12)
@@ -307,36 +313,68 @@ private struct HeroCard: View {
                     }
                 }
 
-                // Weather Metrics
-                HStack(alignment: .center, spacing: 12) {
-                    // Temperature
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(weather.temperatureText)
-                            .font(.system(size: 42, weight: .thin, design: .rounded))
-                            .foregroundStyle(.white)
-                            .minimumScaleFactor(0.6)
-                            .lineLimit(1)
-                        Text(weather.conditionText)
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.5))
-                            .lineLimit(2)
-                    }
-                    .frame(minWidth: 70, alignment: .leading)
-
-                    Spacer()
-
-                    // Metric Grid
-                    HStack(spacing: 0) {
-                        MetricCell(icon: "thermometer.medium", value: weather.feelsLikeText
-                            .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""), label: L10n.text("home_metric_feels"))
-                        if weather.highTempText != "–" {
-                            MetricCell(icon: "arrow.up", value: weather.highTempText, label: L10n.text("home_metric_high"))
+                // Weather Metrics with Sunrise/Sunset
+                VStack(spacing: 12) {
+                    // Top row: Temperature + Metrics
+                    HStack(alignment: .center, spacing: 8) {
+                        // Temperature
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(weather.temperatureText)
+                                .font(.system(size: 42, weight: .thin, design: .rounded))
+                                .foregroundStyle(.white)
+                                .minimumScaleFactor(0.6)
+                                .lineLimit(1)
+                            Text(weather.conditionText)
+                                .font(.system(size: 13, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.5))
+                                .lineLimit(2)
                         }
-                        if weather.lowTempText != "–" {
-                            MetricCell(icon: "arrow.down", value: weather.lowTempText, label: L10n.text("home_metric_low"))
+                        .frame(minWidth: 70, alignment: .leading)
+
+                        Spacer(minLength: 4)
+
+                        // Metric cells grid
+                        HStack(spacing: 0) {
+                            MetricCell(icon: "thermometer.medium", value: weather.feelsLikeText
+                                .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""), label: L10n.text("home_metric_feels"))
+                                .frame(maxWidth: .infinity)
+                            if weather.highTempText != "–" {
+                                MetricCell(icon: "arrow.up", value: weather.highTempText, label: L10n.text("home_metric_high"))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            if weather.lowTempText != "–" {
+                                MetricCell(icon: "arrow.down", value: weather.lowTempText, label: L10n.text("home_metric_low"))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            MetricCell(icon: "humidity.fill", value: weather.humidityText, label: L10n.text("home_metric_humidity"))
+                                .frame(maxWidth: .infinity)
                         }
-                        MetricCell(icon: "humidity.fill", value: weather.humidityText, label: L10n.text("home_metric_humidity"))
                     }
+
+                    // Sunrise/Sunset row
+                    HStack(spacing: 16) {
+                        SunTimeRow(
+                            icon: "sunrise.fill",
+                            color: AppTheme.sunshine,
+                            time: weather.sunriseText ?? L10n.text("home_sunrise_unavailable"),
+                            label: L10n.text("home_sunrise_label")
+                        )
+                        .frame(maxWidth: .infinity)
+
+                        Divider()
+                            .frame(width: 1, height: 24)
+                            .overlay(.white.opacity(0.1))
+
+                        SunTimeRow(
+                            icon: "sunset.fill",
+                            color: AppTheme.ember,
+                            time: weather.sunsetText ?? L10n.text("home_sunset_unavailable"),
+                            label: L10n.text("home_sunset_label")
+                        )
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(10)
+                    .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
 
             }
@@ -411,16 +449,36 @@ private struct SunTimeRow: View {
     let icon: String
     let color: Color
     let time: String
+    let label: String
+
+    init(icon: String, color: Color, time: String, label: String = "") {
+        self.icon = icon
+        self.color = color
+        self.time = time
+        self.label = label
+    }
 
     var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.system(size: 12))
-                .foregroundStyle(color)
-            Text(time)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.65))
-                .lineLimit(1)
+        HStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 32, height: 32)
+                Image(systemName: icon)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(color)
+            }
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(label)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.35))
+                    .lineLimit(1)
+                Text(time)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            }
         }
     }
 }
@@ -627,6 +685,27 @@ private struct OutfitCard: View {
                     .foregroundStyle(.white)
                     .lineLimit(2)
 
+                // Human-like conversational advice
+                if let advice = outfit.detailedAdvice {
+                    HStack(spacing: 10) {
+                        Image(systemName: "quote.bubble.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(AppTheme.ember.opacity(0.6))
+                        Text(advice)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.8))
+                            .lineSpacing(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(AppTheme.ember.opacity(0.06), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(AppTheme.ember.opacity(0.1), lineWidth: 0.5)
+                    )
+                }
+
                 if !outfit.items.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 6) {
@@ -693,6 +772,8 @@ private struct HourlyForecastSection: View {
                     }
                     .padding(.horizontal, 2)
                 }
+                .scrollClipDisabled()
+                .padding(.horizontal, -8)
             }
         }
     }
@@ -831,40 +912,47 @@ private struct ForecastRow: View {
     }
 }
 
-// MARK: - Misc Views
+// MARK: - Compact Footer
 
-private struct AttributionView: View {
-    let info: WeatherAttributionInfo
+private struct CompactFooter: View {
+    let attribution: WeatherAttributionInfo
+    let lastUpdatedText: String
 
     var body: some View {
-        VStack(spacing: 4) {
-            Text(L10n.formatted("home_attribution_powered", info.serviceName))
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.25))
-            if let legal = info.legalAttributionText, !legal.isEmpty {
-                Text(legal)
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.15))
-                    .multilineTextAlignment(.center)
+        VStack(spacing: 6) {
+            // Attribution / Legal text
+            Group {
+                if let legal = attribution.legalAttributionText, !legal.isEmpty {
+                    Text(legal)
+                } else {
+                    Text(L10n.formatted("home_attribution_powered", attribution.serviceName))
+                }
+            }
+            .font(.system(size: 10, weight: .medium, design: .rounded))
+            .foregroundStyle(.white.opacity(0.25))
+            .multilineTextAlignment(.center)
+
+            if !lastUpdatedText.isEmpty {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 9))
+                    Text(L10n.formatted("home_attribution_updated", lastUpdatedText))
+                }
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.15))
             }
         }
-        .padding(.horizontal)
-    }
-}
-
-private struct LastUpdatedBadge: View {
-    let text: String
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: "clock.arrow.circlepath")
-                .font(.system(size: 10))
-            Text(L10n.formatted("home_attribution_updated", text))
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-        }
-        .foregroundStyle(.white.opacity(0.18))
         .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.vertical, 4)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 24)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.white.opacity(0.03))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(.white.opacity(0.06), lineWidth: 0.5)
+        )
     }
 }
 
@@ -1030,6 +1118,116 @@ struct HomeErrorView: View {
     )
 }
 
+// MARK: - Heat Safety Banner Card
+
+private struct HeatSafetyBannerView: View {
+    let banner: HeatSafetyBanner
+    let heatStreakCount: Int
+
+    private var severityColor: Color {
+        switch banner.severity {
+        case .extreme: AppTheme.danger
+        case .high: AppTheme.ember
+        default: AppTheme.warning
+        }
+    }
+
+    private var glowIntensity: CGFloat {
+        switch banner.severity {
+        case .extreme: 0.35
+        case .high: 0.2
+        default: 0.1
+        }
+    }
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            // Heat icon with glow
+            ZStack {
+                Circle()
+                    .fill(severityColor.opacity(glowIntensity))
+                    .frame(width: 44, height: 44)
+                    .blur(radius: 8)
+                Circle()
+                    .fill(severityColor.opacity(0.15))
+                    .frame(width: 38, height: 38)
+                Image(systemName: banner.iconName)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(severityColor)
+                    .symbolRenderingMode(.multicolor)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                // Title row
+                HStack(spacing: 6) {
+                    Text(L10n.text(banner.titleKey))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(severityColor)
+                        .lineLimit(1)
+
+                    if heatStreakCount >= 2 {
+                        HStack(spacing: 3) {
+                            Image(systemName: "flame.fill")
+                                .font(.system(size: 10))
+                            Text(L10n.formatted("heat_streak_format", heatStreakCount))
+                                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundStyle(AppTheme.ember)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(AppTheme.ember.opacity(0.12), in: Capsule())
+                    }
+                }
+
+                // Advice message
+                Text(L10n.text(banner.messageKey))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                // Quick tips row
+                HStack(spacing: 6) {
+                    HeatTip(icon: "drop.fill", text: L10n.text("heat_tip_hydrate"))
+                    HeatTip(icon: "sun.max.fill", text: L10n.text("heat_tip_shade"))
+                    if banner.severity >= .high {
+                        HeatTip(icon: "clock.fill", text: L10n.text("heat_tip_morning_evening"))
+                    }
+                }
+                .padding(.top, 2)
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(severityColor.opacity(0.08))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(severityColor.opacity(banner.severity == .extreme ? 0.3 : 0.15), lineWidth: 1)
+        )
+    }
+}
+
+private struct HeatTip: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 3) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .semibold))
+            Text(text)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+        }
+        .foregroundStyle(.white.opacity(0.5))
+        .padding(.horizontal, 7)
+        .padding(.vertical, 3)
+        .background(.white.opacity(0.06), in: Capsule())
+        .lineLimit(1)
+    }
+}
+
 // MARK: - Language & Permissions Section
 
 private struct LanguagePermissionsSection: View {
@@ -1127,7 +1325,9 @@ private struct ToolbarLanguageButton: View {
             Image(systemName: "globe")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.65))
-                .frame(width: 44, height: 44)
+                .frame(width: 36, height: 36)
+                .background(.white.opacity(0.08), in: Circle())
+                .overlay(Circle().stroke(.white.opacity(0.12), lineWidth: 0.5))
         }
         .accessibilityLabel(L10n.text("settings_language"))
         .confirmationDialog(L10n.text("settings_language"), isPresented: $showLanguagePicker) {

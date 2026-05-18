@@ -93,7 +93,11 @@ final class SevereWeatherAlertService {
             event = .highWind
         case .rain:
             event = .flashFlood
-        case .uv, .humidity, .poorComfort:
+        case .uv:
+            return nil
+        case .humidity:
+            return nil
+        case .poorComfort:
             return nil
         }
 
