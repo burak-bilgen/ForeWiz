@@ -26,6 +26,17 @@ struct AppRootView: View {
         .preferredColorScheme(.dark)
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
+        .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
+            let code = L10n.currentLanguageCode
+            coordinator.profile.language = code == "tr" ? .turkish : .english
+            Task {
+                do {
+                    try await coordinator.container.updateUserPreferencesUseCase.execute(profile: coordinator.profile)
+                } catch {
+                    AppLogger.persistence.error("Failed to save language: \(error.localizedDescription)")
+                }
+            }
+        }
         .task {
             guard didStart == false else {
                 return
@@ -111,18 +122,6 @@ private struct HomeRootView: View {
             }
 
             Task { await homeViewModel.refreshWhenAppBecomesActive() }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
-            let code = L10n.currentLanguageCode
-            coordinator.profile.language = code == "tr" ? .turkish : .english
-            Task {
-                do {
-                    try await coordinator.container.updateUserPreferencesUseCase.execute(profile: coordinator.profile)
-                } catch {
-                    AppLogger.persistence.error("Failed to save language: \(error.localizedDescription)")
-                }
-                await homeViewModel.reloadForLanguageChange()
-            }
         }
     }
 

@@ -29,6 +29,7 @@ final class OnboardingViewModel {
     func selectLanguage(_ lang: AppLanguage) {
         selectedLanguage = lang
         L10n.configure(language: lang)
+        NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
     }
 
     func requestLocationPermission() {
@@ -64,6 +65,7 @@ final class OnboardingViewModel {
     func makeProfile(inheriting existingProfile: UserComfortProfile = .default) -> UserComfortProfile {
         var profile = existingProfile
         profile.language = selectedLanguage
+        L10n.configure(language: selectedLanguage)
         return profile
     }
 }
