@@ -1,8 +1,8 @@
 import SwiftUI
+import Combine
 @preconcurrency import MapKit
 import CoreLocation
 import OSLog
-import Combine
 
 // MARK: - Destination Picker View
 struct DestinationPickerView: View {
@@ -73,13 +73,13 @@ struct DestinationPickerView: View {
                     .buttonStyle(.plain)
                 }
             }
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showConfirmationCard)
-            .animation(.spring(response: 0.3, dampingFraction: 0.8), value: searchCompleter.results.isEmpty)
+            .animation(AppTheme.cardSpring, value: showConfirmationCard)
+            .animation(AppTheme.cardSpring, value: searchCompleter.results.isEmpty)
             .onChange(of: locationManager.userLocation) { _, location in
                 guard let location else { return }
                 searchCompleter.setRegion(center: location.coordinate)
                 if isFirstAppearance {
-                    withAnimation(.easeOut(duration: 0.6)) {
+                    withAnimation(AppTheme.slowEaseOut) {
                         position = .region(MKCoordinateRegion(
                             center: location.coordinate,
                             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -363,7 +363,7 @@ struct DestinationPickerView: View {
 
             // Cancel button
             Button {
-                withAnimation(.spring(response: 0.3)) {
+                withAnimation(AppTheme.pressSpring) {
                     selectedCoordinate = nil
                     selectedName = ""
                     showConfirmationCard = false
@@ -416,11 +416,11 @@ struct DestinationPickerView: View {
                     searchText = ""
                     searchCompleter.clearResults()
 
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                    withAnimation(AppTheme.cardSpring) {
                         showConfirmationCard = true
                     }
 
-                    withAnimation(.easeInOut(duration: 0.5)) {
+                    withAnimation(AppTheme.defaultEaseOut) {
                         position = .region(MKCoordinateRegion(
                             center: coordinate,
                             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
@@ -455,6 +455,7 @@ struct DestinationPickerView: View {
 
 // MARK: - Location Search Completer
 
+@MainActor
 final class LocationSearchCompleter: NSObject, ObservableObject {
     @Published var results: [MKLocalSearchCompletion] = []
     @Published var selectedResult: MKMapItem?
@@ -485,14 +486,12 @@ final class LocationSearchCompleter: NSObject, ObservableObject {
         searchTask?.cancel()
 
         guard !query.isEmpty else {
-            Task { @MainActor in
-                results = []
-                isSearching = false
-            }
+            results = []
+            isSearching = false
             return
         }
 
-        searchTask = Task { @MainActor in
+        searchTask = Task {
             try? await Task.sleep(nanoseconds: 300_000_000)
             guard !Task.isCancelled else { return }
             isSearching = true
@@ -501,27 +500,21 @@ final class LocationSearchCompleter: NSObject, ObservableObject {
     }
 
     func clearResults() {
-        Task { @MainActor in
-            results = []
-            isSearching = false
-        }
+        results = []
+        isSearching = false
     }
 }
 
 extension LocationSearchCompleter: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        Task { @MainActor in
-            self.results = Array(completer.results.prefix(10))
-            self.isSearching = false
-        }
+        results = Array(completer.results.prefix(10))
+        isSearching = false
     }
 
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         AppLogger.search.error("Search completer failed: \(error.localizedDescription)")
-        Task { @MainActor in
-            self.results = []
-            self.isSearching = false
-        }
+        results = []
+        isSearching = false
     }
 }
 
@@ -588,7 +581,7 @@ struct DestinationFlag: View {
             )
             .scaleEffect(bounce ? 1.1 : 1.0)
             .onAppear {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.5).repeatForever(autoreverses: true)) {
+                withAnimation(AppTheme.cardSpring.repeatForever(autoreverses: true)) {
                     bounce = true
                 }
             }

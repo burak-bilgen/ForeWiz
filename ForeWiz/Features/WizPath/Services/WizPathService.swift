@@ -13,8 +13,8 @@ final class WizPathService {
     private let locationRepository: LocationRepository?
 
     private init() {
-        self.weatherRepository = DependencyContainer.shared?.weatherRepository
-        self.locationRepository = DependencyContainer.shared?.locationRepository
+        self.weatherRepository = DependencyContainer.shared.weatherRepository
+        self.locationRepository = DependencyContainer.shared.locationRepository
     }
 
     init(

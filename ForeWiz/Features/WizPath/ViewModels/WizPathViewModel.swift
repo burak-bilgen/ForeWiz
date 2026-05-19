@@ -96,7 +96,7 @@ final class WizPathViewModel {
         locationService: LocationService? = nil
     ) {
         self.wizPathService = wizPathService ?? .shared
-        self.locationService = locationService ?? DependencyContainer.shared?.locationService ?? LocationService()
+        self.locationService = locationService ?? DependencyContainer.shared.locationService
         loadCurrentLocation()
         loadRecentDestinations()
     }

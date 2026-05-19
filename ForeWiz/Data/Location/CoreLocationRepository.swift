@@ -72,6 +72,8 @@ final class CoreLocationRepository: NSObject, LocationRepository {
     }
 }
 
+// MARK: - CLLocationManagerDelegate
+
 extension CoreLocationRepository: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationContinuation?.resume(returning: map(manager.authorizationStatus))

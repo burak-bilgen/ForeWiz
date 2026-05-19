@@ -1,11 +1,3 @@
-import Combine
-import Foundation
-
-@MainActor
-final class RecommendationDetailViewModel: ObservableObject {
-    @Published private(set) var recommendation: DailyRecommendation
-
-    init(recommendation: DailyRecommendation) {
-        self.recommendation = recommendation
-    }
-}
+// RecommendationDetailViewModel removed — unused.
+// RecommendationDetailView takes DailyRecommendation directly.
+// If a ViewModel is needed in the future, use @Observable macro instead of ObservableObject.

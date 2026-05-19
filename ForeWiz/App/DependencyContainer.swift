@@ -3,7 +3,12 @@ import SwiftData
 
 @MainActor
 final class DependencyContainer {
-    nonisolated(unsafe) static var shared: DependencyContainer!
+    static var shared: DependencyContainer {
+        guard let instance else { fatalError("DependencyContainer not initialized. Call DependencyContainer.init() first.") }
+        return instance
+    }
+    private static var instance: DependencyContainer?
+
     let environment: AppEnvironment
     let dateProvider: DateProvider
     let activityWindowScoringEngine: ActivityWindowScoringEngine
@@ -20,7 +25,7 @@ final class DependencyContainer {
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
     
-    // MARK: - Severe Weather
+    // MARK: - Services
     let severeWeatherAlertService: SevereWeatherAlertService
     
     // MARK: - WizPath
@@ -76,7 +81,7 @@ final class DependencyContainer {
         self.severeWeatherAlertService = severeWeatherAlertService
         self.wizPathService = wizPathService
         self.locationService = locationService
-        Self.shared = self
+        Self.instance = self
     }
 
     static func simulator(modelContext: ModelContext) -> DependencyContainer {
@@ -112,13 +117,16 @@ final class DependencyContainer {
         // Prepare haptic engine on launch
         HapticEngine.shared.prepare()
         
+        let briefingService = WeatherBriefingService()
+
         let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(
             locationRepository: locationRepository,
             weatherRepository: weatherRepository,
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             weatherDecisionEngine: weatherEngine,
-            dateProvider: dateProvider
+            dateProvider: dateProvider,
+            weatherBriefingService: briefingService
         )
         let completeOnboardingUseCase = DefaultCompleteOnboardingUseCase(
             preferencesRepository: preferencesRepository
@@ -191,13 +199,16 @@ final class DependencyContainer {
         // Prepare haptic engine on launch
         HapticEngine.shared.prepare()
         
+        let briefingService = WeatherBriefingService()
+
         let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(
             locationRepository: locationRepository,
             weatherRepository: weatherRepository,
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             weatherDecisionEngine: weatherEngine,
-            dateProvider: dateProvider
+            dateProvider: dateProvider,
+            weatherBriefingService: briefingService
         )
         let completeOnboardingUseCase = DefaultCompleteOnboardingUseCase(
             preferencesRepository: preferencesRepository

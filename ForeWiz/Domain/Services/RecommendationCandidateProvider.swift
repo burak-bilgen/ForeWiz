@@ -135,7 +135,7 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
             )
         }
 
-        let firstSevere = severeHours.first!
+        let firstSevere = severeHours[0]
         let signals = [
             RecommendationSignal(
                 kind: .riskAvoidance,

@@ -96,7 +96,10 @@ extension LocationService {
             group.addTask {
                 try await operation()
             }
-            let result = try await group.next()!
+            guard let result = try await group.next() else {
+                group.cancelAll()
+                throw AppError.locationUnavailable
+            }
             group.cancelAll()
             return result
         }
