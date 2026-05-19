@@ -16,7 +16,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         var candidates: [NotificationPlan] = []
 
         if enabledCategories.contains(.morningBriefing),
-           let morningPlan = makeSmartMorningBriefing(
+           let morningPlan = MorningBriefingPlanner.makePlan(
             recommendation: recommendation,
             profile: profile,
             now: now,
@@ -26,7 +26,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         }
 
         if enabledCategories.contains(.outfitSuggestion),
-           let outfitPlan = makeOutfitPlan(
+           let outfitPlan = OutfitPlanBuilder.makePlan(
              recommendation: recommendation,
              profile: profile,
              now: now,
@@ -37,13 +37,13 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
         if enabledCategories.contains(.bestRunWindow),
            let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .goingOutside }),
-           let plan = makeActivityPlan(activityRecommendation: runningWindow, now: now, calendar: calendar),
-           isWorthNotifying(plan: plan, calendar: calendar) {
+           let plan = ActivityPlanBuilder.makePlan(activityRecommendation: runningWindow, now: now, calendar: calendar),
+           NotificationPlanHelpers.isWorthNotifying(plan: plan, calendar: calendar) {
             candidates.append(plan)
         }
 
         candidates.append(
-            contentsOf: makeSmartRiskPlans(
+            contentsOf: RiskPlanBuilder.makeSmartPlans(
                 recommendation: recommendation,
                 enabledCategories: enabledCategories,
                 now: now,
@@ -51,7 +51,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             )
         )
         candidates.append(
-            contentsOf: makeImmediateRiskPlans(
+            contentsOf: RiskPlanBuilder.makeImmediatePlans(
                 recommendation: recommendation,
                 enabledCategories: enabledCategories,
                 now: now,
@@ -59,12 +59,12 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             )
         )
 
-        let deduplicated = deduplicateSmart(candidates)
+        let deduplicated = NotificationPlanHelpers.deduplicateSmart(candidates)
 
         let filtered = deduplicated
             .filter { $0.fireDate >= now }
-            .filter { isQuiet($0.fireDate, quietHours: profile.quietHours, calendar: calendar) == false }
-            .filter { isWorthNotifying(plan: $0, calendar: calendar) }
+            .filter { NotificationPlanHelpers.isQuiet($0.fireDate, quietHours: profile.quietHours, calendar: calendar) == false }
+            .filter { NotificationPlanHelpers.isWorthNotifying(plan: $0, calendar: calendar) }
 
         let sorted = filtered.sorted { p0, p1 in
             if p0.priority == p1.priority {
@@ -77,344 +77,5 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
         }
 
         return Array(sorted.prefix(profile.maximumDailyNotifications.clamped(to: 1...3)))
-    }
-
-    // MARK: - Morning Briefing
-
-    private func makeSmartMorningBriefing(
-        recommendation: DailyRecommendation,
-        profile: UserComfortProfile,
-        now: Date,
-        calendar: Calendar
-    ) -> NotificationPlan? {
-        let preference = profile.notificationPreferences.first { $0.category == .morningBriefing }
-        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 30)
-
-        guard let fireDate = calendar.nextDate(
-            after: now,
-            matching: preferredTime,
-            matchingPolicy: .nextTime
-        ) else { return nil }
-
-        let body = buildSmartMorningBody(recommendation: recommendation)
-
-        return NotificationPlan(
-            id: stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
-            category: .morningBriefing,
-            fireDate: fireDate,
-            title: L10n.text("todays_weather_plan_is_ready"),
-            body: body,
-            priority: 70,
-            reason: L10n.text("notification_morning_reason")
-        )
-    }
-
-    private func buildSmartMorningBody(recommendation: DailyRecommendation) -> String {
-        let opening: String
-        switch recommendation.outdoorDecision {
-        case .good:
-            opening = L10n.text("today_looks_comfortable_for_outdoor")
-        case .moderate:
-            opening = L10n.text("outdoor_plans_are_fine_today")
-        case .risky:
-            opening = L10n.text("build_todays_outdoor_plan_carefully")
-        case .avoid:
-            opening = L10n.text("it_is_safer_to_keep")
-        }
-
-        var sentences = [opening]
-        if let bestWindow = recommendation.bestOutdoorWindow {
-            sentences.append(String(format: L10n.text("morning_best_time_format"), bestWindow.shortDisplayText))
-        }
-
-        if let risk = dominantRisk(in: recommendation), risk.severity >= .high {
-            sentences.append(String(format: L10n.text("morning_risk_format"), risk.title, actionText(for: risk)))
-        }
-
-        return sentences.joined(separator: " ")
-    }
-
-    // MARK: - Outfit Plan
-
-    private func makeOutfitPlan(
-        recommendation: DailyRecommendation,
-        profile: UserComfortProfile,
-        now: Date,
-        calendar: Calendar
-    ) -> NotificationPlan? {
-        let preference = profile.notificationPreferences.first { $0.category == .outfitSuggestion }
-        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 45)
-
-        guard let fireDate = calendar.nextDate(
-            after: now,
-            matching: preferredTime,
-            matchingPolicy: .nextTime
-        ) else { return nil }
-
-        let body = buildOutfitBody(recommendation.outfit)
-
-        return NotificationPlan(
-            id: stableID(category: .outfitSuggestion, fireDate: fireDate, calendar: calendar),
-            category: .outfitSuggestion,
-            fireDate: fireDate,
-            title: L10n.text("what_to_wear_today"),
-            body: body,
-            priority: 60,
-            reason: L10n.text("notification_outfit_reason")
-        )
-    }
-
-    private func buildOutfitBody(_ outfit: OutfitRecommendation) -> String {
-        let items = outfit.items.prefix(3).joined(separator: ", ")
-        let accessories = outfit.accessories.prefix(2).joined(separator: ", ")
-
-        var sentences: [String] = []
-        if items.isEmpty {
-            sentences.append(outfit.title)
-        } else {
-            sentences.append(String(format: L10n.text("outfit_items_format"), items))
-        }
-
-        if accessories.isEmpty == false {
-            sentences.append(String(format: L10n.text("outfit_accessories_format"), accessories))
-        }
-
-        if let warning = outfit.warning {
-            sentences.append(warning)
-        }
-
-        return sentences.joined(separator: " ")
-    }
-
-    // MARK: - Activity Plan
-
-    private func makeActivityPlan(
-        activityRecommendation: ActivityRecommendation,
-        now: Date,
-        calendar: Calendar
-    ) -> NotificationPlan? {
-        let fireDate = activityRecommendation.bestWindow.start
-        guard fireDate >= now.addingTimeInterval(30 * 60) else { return nil }
-
-        let time = activityRecommendation.bestWindow.shortDisplayText
-        let activityTitle = activityRecommendation.activityType.localizedTitle
-        let body = buildActivityBody(
-            activityTitle: activityTitle,
-            time: time,
-            score: activityRecommendation.score.rawValue
-        )
-
-        return NotificationPlan(
-            id: stableID(category: .bestRunWindow, fireDate: fireDate, calendar: calendar),
-            category: .bestRunWindow,
-            fireDate: fireDate,
-            title: String(format: L10n.text("activity_best_title_format"), activityTitle),
-            body: body,
-            priority: 80,
-            reason: activityRecommendation.reason
-        )
-    }
-
-    private func buildActivityBody(activityTitle: String, time: String, score: Int) -> String {
-        if score >= 80 {
-            return String(format: L10n.text("activity_best_body_format"), time, score)
-        }
-        if score >= 60 {
-            return String(format: L10n.text("activity_good_body_format"), time, score, activityTitle)
-        }
-        return String(format: L10n.text("activity_moderate_body_format"), time, score)
-    }
-
-    // MARK: - Risk Plans
-
-    private func makeSmartRiskPlans(
-        recommendation: DailyRecommendation,
-        enabledCategories: Set<NotificationCategory>,
-        now: Date,
-        calendar: Calendar
-    ) -> [NotificationPlan] {
-        let eligible = recommendation.avoidWindows.filter { window in
-            guard let category = notificationCategory(for: window.risk.type),
-                  enabledCategories.contains(category),
-                  window.severity >= .medium,
-                  window.window.start >= now else {
-                return false
-            }
-            return true
-        }
-
-        let grouped = Dictionary(grouping: eligible) { window in
-            fireDate(for: window, now: now, calendar: calendar)
-        }
-
-        return grouped.compactMap { startDate, windows in
-            makeCombinedRiskPlan(windows: windows, fireDate: startDate, calendar: calendar)
-        }
-        .sorted { p0, p1 in
-            if p0.fireDate == p1.fireDate {
-                return p0.category.rawValue < p1.category.rawValue
-            }
-            return p0.fireDate < p1.fireDate
-        }
-    }
-
-    private func makeImmediateRiskPlans(
-        recommendation: DailyRecommendation,
-        enabledCategories: Set<NotificationCategory>,
-        now: Date,
-        calendar: Calendar
-    ) -> [NotificationPlan] {
-        let fireDate = calendar.date(byAdding: .minute, value: 5, to: now) ?? now.addingTimeInterval(5 * 60)
-
-        return recommendation.risks
-            .filter { $0.severity >= .high }
-            .compactMap { risk -> NotificationPlan? in
-                guard let category = notificationCategory(for: risk.type),
-                      enabledCategories.contains(category) else { return nil }
-
-                return NotificationPlan(
-                    id: stableID(category: category, fireDate: fireDate, calendar: calendar) + ".urgent.\(risk.type.rawValue)",
-                    category: category,
-                    fireDate: fireDate,
-                    title: String(format: L10n.text("immediate_risk_title_format"), risk.title),
-                    body: String(format: L10n.text("immediate_risk_body_format"), risk.message, actionText(for: risk)),
-                    priority: priorityForSeverity(risk.severity),
-                    reason: risk.message
-                )
-            }
-    }
-
-    private func makeCombinedRiskPlan(
-        windows: [AvoidWindowRecommendation],
-        fireDate: Date,
-        calendar: Calendar
-    ) -> NotificationPlan? {
-        guard windows.isEmpty == false else { return nil }
-        let sorted = windows.sorted { $0.severity.rawValue > $1.severity.rawValue }
-
-        let severity = sorted[0].severity
-        guard severity >= .medium else { return nil }
-
-        let title = sorted[0].risk.title
-        let body = buildSmartRiskBody(sorted)
-
-        return NotificationPlan(
-            id: smartRiskID(sorted: sorted, fireDate: fireDate, calendar: calendar),
-            category: notificationCategory(for: sorted[0].risk.type) ?? .avoidHeatWindow,
-            fireDate: fireDate,
-            title: title,
-            body: body,
-            priority: priorityForSeverity(severity),
-            reason: sorted.map(\.reason).joined(separator: "; ")
-        )
-    }
-
-    private func buildSmartRiskBody(_ windows: [AvoidWindowRecommendation]) -> String {
-        let time = windows[0].window.shortDisplayText
-        let risks = windows.prefix(2).map { $0.risk.title }.joined(separator: ", ")
-        let primary = windows[0].risk
-
-        return String(format: L10n.text("smart_risk_body_format"), time, risks, actionText(for: primary))
-    }
-
-    private func dominantRisk(in recommendation: DailyRecommendation) -> WeatherRisk? {
-        recommendation.risks
-            .sorted { lhs, rhs in lhs.severity.rawValue > rhs.severity.rawValue }
-            .first { $0.severity >= .medium }
-    }
-
-    private func actionText(for risk: WeatherRisk) -> String {
-        switch risk.type {
-        case .heat: return L10n.text("stick_to_shade_water_and")
-        case .uv: return L10n.text("use_sunscreen_a_hat_and")
-        case .rain: return L10n.text("bring_an_umbrella_or_move")
-        case .wind, .storm: return L10n.text("avoid_long_exposed_outdoor_time")
-        case .humidity: return L10n.text("slow_the_pace_and_keep")
-        case .cold: return L10n.text("dress_in_layers_and_avoid")
-        case .poorComfort: return L10n.text("keeping_outdoor_time_short_is")
-        }
-    }
-
-    private func isWorthNotifying(plan: NotificationPlan, calendar: Calendar) -> Bool {
-        let hour = calendar.component(.hour, from: plan.fireDate)
-        if hour >= 22 || hour < 6 {
-            return plan.priority >= 90
-        }
-        if hour >= 12 && hour < 14 {
-            return plan.priority >= 60
-        }
-        return true
-    }
-
-    private func fireDate(
-        for window: AvoidWindowRecommendation,
-        now: Date,
-        calendar: Calendar
-    ) -> Date {
-        let warningLeadMinutes: Int
-        switch window.severity {
-        case .extreme: warningLeadMinutes = 60
-        case .high: warningLeadMinutes = 45
-        case .medium: warningLeadMinutes = 30
-        case .low: warningLeadMinutes = 15
-        }
-
-        let leadDate = calendar.date(
-            byAdding: .minute,
-            value: -warningLeadMinutes,
-            to: window.window.start
-        ) ?? window.window.start
-
-        return max(leadDate, now)
-    }
-
-    private func deduplicateSmart(_ plans: [NotificationPlan]) -> [NotificationPlan] {
-        var seen = Set<String>()
-        return plans.filter { plan in
-            let key = "\(plan.category)-\(plan.title.prefix(10))"
-            if seen.contains(key) { return false }
-            seen.insert(key)
-            return true
-        }
-    }
-
-    private func notificationCategory(for riskType: WeatherRiskType) -> NotificationCategory? {
-        switch riskType {
-        case .heat: return .avoidHeatWindow
-        case .uv: return .uvWarning
-        case .rain: return .rainWarning
-        case .wind: return .windWarning
-        case .storm: return .stormWarning
-        case .cold: return .coldWarning
-        case .humidity: return .humidityWarning
-        case .poorComfort: return .poorComfortWarning
-        }
-    }
-
-    private func priorityForSeverity(_ severity: RiskLevel) -> Int {
-        switch severity {
-        case .extreme: return 100
-        case .high: return 90
-        case .medium: return 75
-        case .low: return 50
-        }
-    }
-
-    private func isQuiet(_ date: Date, quietHours: TimeWindow?, calendar: Calendar) -> Bool {
-        guard let quietHours else { return false }
-        return quietHours.containsClockTime(of: date, calendar: calendar)
-    }
-
-    private func stableID(category: NotificationCategory, fireDate: Date, calendar: Calendar) -> String {
-        let components = calendar.dateComponents([.year, .month, .day], from: fireDate)
-        let date = "\(components.year ?? 0)-\(components.month ?? 0)-\(components.day ?? 0)"
-        return "forewiz.\(category.rawValue).\(date)"
-    }
-
-    private func smartRiskID(sorted: [AvoidWindowRecommendation], fireDate: Date, calendar: Calendar) -> String {
-        let types = sorted.map { $0.risk.type.rawValue }.sorted().joined(separator: "+")
-        let components = calendar.dateComponents([.year, .month, .day], from: fireDate)
-        let date = "\(components.year ?? 0)-\(components.month ?? 0)-\(components.day ?? 0)"
-        return "forewiz.risk.\(types).\(date)"
     }
 }
