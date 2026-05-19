@@ -13,17 +13,11 @@ struct WeatherInsightsView: View {
         ScrollView {
             VStack(spacing: 24) {
                 metricSelector
-
                 timeRangeSelector
-
                 chartSection
-
                 statisticsSection
-
                 trendsSection
-
                 comfortAnalysisSection
-
                 Spacer(minLength: 40)
             }
             .padding(.horizontal, 16)
@@ -38,6 +32,8 @@ struct WeatherInsightsView: View {
             }
         }
     }
+
+    // MARK: - Metric Selector
 
     private var metricSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -57,6 +53,8 @@ struct WeatherInsightsView: View {
         }
     }
 
+    // MARK: - Time Range Selector
+
     private var timeRangeSelector: some View {
         Picker(L10n.text("insights_time_range"), selection: $selectedTimeRange) {
             ForEach(TimeRange.allCases) { range in
@@ -67,6 +65,8 @@ struct WeatherInsightsView: View {
         .pickerStyle(.segmented)
     }
 
+    // MARK: - Chart Section
+
     @ViewBuilder
     private var chartSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -76,7 +76,6 @@ struct WeatherInsightsView: View {
                     Spacer(minLength: 12)
                     chartValue
                 }
-
                 VStack(alignment: .leading, spacing: 4) {
                     chartTitle
                     chartValue
@@ -187,6 +186,8 @@ struct WeatherInsightsView: View {
         return (min - padding)...(max + padding)
     }
 
+    // MARK: - Statistics Section
+
     private var statisticsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.text("insights_statistics"))
@@ -203,7 +204,6 @@ struct WeatherInsightsView: View {
                     icon: "arrow.up.circle.fill",
                     color: .red
                 )
-
                 StatisticCard(
                     title: L10n.text("insights_low"),
                     value: String(format: "%.1f", chartData.map(\.value).min() ?? 0),
@@ -211,7 +211,6 @@ struct WeatherInsightsView: View {
                     icon: "arrow.down.circle.fill",
                     color: .blue
                 )
-
                 StatisticCard(
                     title: L10n.text("insights_average"),
                     value: String(format: "%.1f", chartData.map(\.value).reduce(0, +) / Double(max(1, chartData.count))),
@@ -219,7 +218,6 @@ struct WeatherInsightsView: View {
                     icon: "minus.circle.fill",
                     color: .orange
                 )
-
                 StatisticCard(
                     title: L10n.text("insights_range"),
                     value: String(format: "%.1f", (chartData.map(\.value).max() ?? 0) - (chartData.map(\.value).min() ?? 0)),
@@ -234,6 +232,8 @@ struct WeatherInsightsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
+    // MARK: - Trends Section
+
     private var trendsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.text("insights_trends"))
@@ -245,13 +245,11 @@ struct WeatherInsightsView: View {
                     trend: calculateTempTrend(),
                     icon: "thermometer"
                 )
-
                 TrendRow(
                     title: L10n.text("insights_comfort_trend"),
                     trend: calculateComfortTrend(),
                     icon: "face.smiling"
                 )
-
                 TrendRow(
                     title: L10n.text("insights_precipitation_risk"),
                     trend: calculatePrecipitationRisk(),
@@ -263,6 +261,8 @@ struct WeatherInsightsView: View {
         .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
+
+    // MARK: - Comfort Analysis Section
 
     private var comfortAnalysisSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -279,6 +279,8 @@ struct WeatherInsightsView: View {
         .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
+
+    // MARK: - Computed
 
     private var comfortWindows: [ComfortWindow] {
         let hourly = snapshot.hourly
@@ -378,336 +380,32 @@ struct WeatherInsightsView: View {
     }
 }
 
-enum MetricType: String, CaseIterable, Identifiable {
-    case temperature, humidity, wind, uvIndex, precipitation
+// MARK: - Preview
 
-    var id: String { rawValue }
-
-    var localizedTitle: String {
-        switch self {
-        case .temperature: return L10n.text("metric_temperature")
-        case .humidity: return L10n.text("metric_humidity")
-        case .wind: return L10n.text("metric_wind")
-        case .uvIndex: return L10n.text("metric_uv")
-        case .precipitation: return L10n.text("metric_precipitation")
-        }
-    }
-
-    var unit: String {
-        switch self {
-        case .temperature: return L10n.text("unit_celsius")
-        case .humidity: return L10n.text("unit_percent")
-        case .wind: return L10n.text("unit_km_per_h")
-        case .uvIndex: return ""
-        case .precipitation: return L10n.text("unit_percent")
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .temperature: return .orange
-        case .humidity: return .blue
-        case .wind: return .cyan
-        case .uvIndex: return .purple
-        case .precipitation: return .indigo
-        }
-    }
-
-    func value(from point: HourlyWeatherPoint) -> Double {
-        switch self {
-        case .temperature: return point.apparentTemperatureCelsius
-        case .humidity: return (point.humidity ?? 0) * 100
-        case .wind: return point.windSpeedKph ?? 0
-        case .uvIndex: return Double(point.uvIndex ?? 0)
-        case .precipitation: return (point.precipitationChance ?? 0) * 100
-        }
-    }
-
-    func currentValue(from snapshot: WeatherSnapshot) -> String {
-        let current = snapshot.current
-        switch self {
-        case .temperature: return "\(Int(current.apparentTemperatureCelsius))\(L10n.text("unit_celsius"))"
-        case .humidity: return "\(Int((current.humidity ?? 0) * 100))\(L10n.text("unit_percent"))"
-        case .wind: return "\(Int(current.windSpeedKph ?? 0)) \(L10n.text("unit_km_per_h"))"
-        case .uvIndex: return "\(current.uvIndex ?? 0)"
-        case .precipitation: return "\(Int((current.precipitationChance ?? 0) * 100))\(L10n.text("unit_percent"))"
-        }
-    }
-}
-
-enum TimeRange: String, CaseIterable, Identifiable {
-    case today, next24Hours, tomorrow
-
-    var id: String { rawValue }
-
-    var localizedTitle: String {
-        switch self {
-        case .today: return L10n.text("range_today")
-        case .next24Hours: return L10n.text("range_24h")
-        case .tomorrow: return L10n.text("range_tomorrow")
-        }
-    }
-}
-
-enum Trend {
-    case rising, falling, stable
-
-    var icon: String {
-        switch self {
-        case .rising: return "arrow.up"
-        case .falling: return "arrow.down"
-        case .stable: return "minus"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .rising: return .green
-        case .falling: return .red
-        case .stable: return .orange
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .rising: return L10n.text("trend_increasing")
-        case .falling: return L10n.text("trend_decreasing")
-        case .stable: return L10n.text("trend_stable")
-        }
-    }
-}
-
-enum ComfortLevel {
-    case excellent, good, moderate, poor
-
-    var color: Color {
-        switch self {
-        case .excellent: return .green
-        case .good: return .blue
-        case .moderate: return .orange
-        case .poor: return .red
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .excellent: return L10n.text("comfort_excellent")
-        case .good: return L10n.text("comfort_good")
-        case .moderate: return L10n.text("comfort_moderate")
-        case .poor: return L10n.text("comfort_poor")
-        }
-    }
-}
-
-struct ChartDataPoint {
-    let hour: Int
-    let value: Double
-    let index: Int
-}
-
-struct ComfortWindow {
-    let startHour: Int
-    var endHour: Int?
-    let score: Int
-    let level: ComfortLevel
-
-    init(startHour: Int, endHour: Int? = nil, score: Int, level: ComfortLevel) {
-        self.startHour = startHour
-        self.endHour = endHour
-        self.score = score
-        self.level = level
-    }
-}
-
-struct MetricButton: View {
-    let metric: MetricType
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(spacing: 8) {
-                Image(systemName: iconName(for: metric))
-                    .font(.system(size: 24))
-                    .foregroundStyle(isSelected ? .white : metric.color)
-
-                Text(metric.localizedTitle)
-                    .font(.caption)
-                    .foregroundStyle(isSelected ? .white : .primary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.75)
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(isSelected ? metric.color : Color.white.opacity(0.06))
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: isSelected ? metric.color.opacity(0.3) : .clear, radius: 8)
-        }
-        .buttonStyle(.fullTapArea)
-    }
-
-    private func iconName(for metric: MetricType) -> String {
-        switch metric {
-        case .temperature: return "thermometer"
-        case .humidity: return "humidity"
-        case .wind: return "wind"
-        case .uvIndex: return "sun.max"
-        case .precipitation: return "cloud.rain"
-        }
-    }
-}
-
-struct StatisticCard: View {
-    let title: String
-    let value: String
-    let unit: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundStyle(color)
-                Spacer()
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("\(value)\(unit)")
-                    .font(.title3.bold())
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
-
-                Text(title)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(12)
-        .background(Color.white.opacity(0.04))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
-
-struct TrendRow: View {
-    let title: String
-    let trend: Trend
-    let icon: String
-
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundStyle(.secondary)
-                .frame(width: 24)
-
-            Text(title)
-                .font(.subheadline)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-                .layoutPriority(1)
-
-            Spacer(minLength: 8)
-
-            HStack(spacing: 4) {
-                Image(systemName: trend.icon)
-                Text(trend.description)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.trailing)
-            }
-            .font(.caption)
-            .foregroundStyle(trend.color)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(trend.color.opacity(0.1))
-            .clipShape(Capsule())
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-struct ComfortWindowRow: View {
-    let window: ComfortWindow
-
-    var body: some View {
-        HStack {
-            let startText = L10n.formatted("time_format_full", window.startHour)
-            let endText = window.endHour.map { L10n.formatted("time_format_full", $0) } ?? L10n.text("time_fallback_end")
-
-            Text("\(startText)\(L10n.text("time_range_separator"))\(endText)")
-                .font(.subheadline)
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-
-            Spacer(minLength: 8)
-
-            HStack(spacing: 4) {
-                Circle()
-                    .fill(window.level.color)
-                    .frame(width: 8, height: 8)
-
-                Text(window.level.description)
-                    .font(.caption)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.trailing)
-            }
-            .foregroundStyle(window.level.color)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(window.level.color.opacity(0.1))
-            .clipShape(Capsule())
-        }
-        .padding(.vertical, 8)
-    }
-}
-
-struct LegacyChartView: View {
-    let data: [ChartDataPoint]
-    let color: Color
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                if data.count > 1 {
-                    Path { path in
-                        let stepX = geometry.size.width / CGFloat(max(1, data.count - 1))
-                        let minValue = data.map(\.value).min() ?? 0
-                        let maxValue = data.map(\.value).max() ?? 1
-                        let range = maxValue - minValue
-
-                        for (index, point) in data.enumerated() {
-                            let x = CGFloat(index) * stepX
-                            let y = range > 0 ? (1 - CGFloat((point.value - minValue) / range)) * geometry.size.height : geometry.size.height / 2
-
-                            if index == 0 {
-                                path.move(to: CGPoint(x: x, y: y))
-                            } else {
-                                path.addLine(to: CGPoint(x: x, y: y))
-                            }
-                        }
-                    }
-                    .stroke(color, lineWidth: 2)
-
-                    ForEach(data, id: \.index) { point in
-                        let stepX = geometry.size.width / CGFloat(max(1, data.count - 1))
-                        let minValue = data.map(\.value).min() ?? 0
-                        let maxValue = data.map(\.value).max() ?? 1
-                        let range = maxValue - minValue
-                        let x = CGFloat(point.index) * stepX
-                        let y = range > 0 ? (1 - CGFloat((point.value - minValue) / range)) * geometry.size.height : geometry.size.height / 2
-
-                        Circle()
-                            .fill(color)
-                            .frame(width: 6, height: 6)
-                            .position(x: x, y: y)
-                    }
-                }
-            }
-        }
-    }
+#Preview {
+    let rec = PreviewWeatherFactory.dailyRecommendation()
+    let snapshot = WeatherSnapshot(
+        location: LocationCoordinate(latitude: 41.0082, longitude: 28.9784),
+        current: CurrentWeatherPoint(
+            date: Date(),
+            temperatureCelsius: 24,
+            apparentTemperatureCelsius: 25,
+            humidity: 0.55,
+            windSpeedKph: 14,
+            precipitationChance: 0.12,
+            precipitationAmountMm: 0,
+            uvIndex: 3,
+            conditionCode: "partlyCloudy",
+            isDaylight: true,
+            severeWeatherRisk: nil
+        ),
+        hourly: [],
+        daily: [],
+        fetchedAt: Date(),
+        attribution: nil
+    )
+    WeatherInsightsView(
+        snapshot: snapshot,
+        recommendation: rec
+    )
 }
