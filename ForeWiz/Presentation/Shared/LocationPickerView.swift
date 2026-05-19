@@ -79,7 +79,7 @@ struct LocationPickerView: View {
 
                 if savedLocations.count > 1 {
                     Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        withAnimation(AppTheme.cardSpring) {
                             editMode = editMode == .active ? .inactive : .active
                         }
                     } label: {
@@ -93,7 +93,7 @@ struct LocationPickerView: View {
         .padding(.vertical, 12)
         .opacity(appears ? 1 : 0)
         .offset(y: appears ? 0 : -10)
-        .animation(.easeOut(duration: 0.4), value: appears)
+        .animation(AppTheme.defaultEaseOut, value: appears)
     }
 
     // MARK: - Empty State
@@ -114,7 +114,7 @@ struct LocationPickerView: View {
                     .foregroundStyle(Color.white.opacity(0.3))
             }
             .scaleEffect(appears ? 1 : 0.6)
-            .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: appears)
+            .animation(AppTheme.sheetSpring.delay(AppTheme.defaultDelay), value: appears)
 
             Text(L10n.text("location_picker_empty"))
                 .font(.system(size: 18, weight: .bold))
@@ -149,7 +149,7 @@ struct LocationPickerView: View {
             }
             .buttonStyle(.fullTapArea)
             .opacity(appears ? 1 : 0)
-            .animation(.easeOut(duration: 0.5).delay(0.25), value: appears)
+            .animation(AppTheme.slowEaseOut.delay(AppTheme.defaultDelay + 0.17), value: appears)
 
             Spacer()
         }
@@ -197,7 +197,7 @@ struct LocationPickerView: View {
                         )
                         .padding(.horizontal, 16)
                         .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .move(edge: .trailing)).animation(.spring(response: 0.4, dampingFraction: 0.8)),
+                            insertion: .opacity.combined(with: .move(edge: .trailing)).animation(AppTheme.cardSpring),
                             removal: .opacity.combined(with: .scale(scale: 0.9))
                         ))
                     }
@@ -299,7 +299,7 @@ struct LocationPickerView: View {
     private func selectLocation(_ location: SavedLocation) {
         guard editMode == .inactive else { return }
         HapticEngine.shared.light()
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+        withAnimation(AppTheme.pressSpring) {
             selectedLocationID = location.id
         }
         onSelect(location)
@@ -417,12 +417,12 @@ private struct LocationCard: View {
                     }
                     .onEnded { _ in
                         if offset < -30 {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            withAnimation(AppTheme.cardSpring) {
                                 offset = -60
                                 showDelete = true
                             }
                         } else {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            withAnimation(AppTheme.cardSpring) {
                                 offset = 0
                                 showDelete = false
                             }
@@ -573,7 +573,7 @@ private struct ModernAddLocationView: View {
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: showSearchResults)
+        .animation(AppTheme.quickEaseOut, value: showSearchResults)
     }
 
     private func locationPreviewPanel(item: MKMapItem) -> some View {
@@ -653,7 +653,7 @@ private struct ModernAddLocationView: View {
         searchResults = []
         showSearchResults = false
 
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+        withAnimation(AppTheme.cardSpring) {
             cameraPosition = .region(MKCoordinateRegion(
                 center: item.location.coordinate,
                 latitudinalMeters: 1500,

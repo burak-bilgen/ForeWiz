@@ -85,8 +85,7 @@ private struct HomeRootView: View {
             loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
             scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
             preferencesRepository: coordinator.container.preferencesRepository,
-            dateProvider: coordinator.container.dateProvider,
-            activityWindowScoringEngine: coordinator.container.activityWindowScoringEngine,
+            homeViewStateFactory: coordinator.container.homeViewStateFactory,
             selectedLocationName: name
         ))
     }

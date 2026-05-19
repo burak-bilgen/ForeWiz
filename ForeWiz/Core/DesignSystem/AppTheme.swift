@@ -87,12 +87,57 @@ enum AppTheme {
     static let pillRadius: CGFloat = 18
     static let glassRadius: CGFloat = 20
 
-    // MARK: - Animation Tokens
+    // MARK: - Animation Tokens (Telegram-style)
+    //
+    // All animations use spring physics for 60fps natural motion.
+    // Never use easeInOut/easeOut for interactive animations — only for
+    // non-interactive transitions where spring would overshoot.
 
+    /// Button press (fast, subtle). Response: 0.2–0.25
+    static let pressSpring: Animation = .spring(response: 0.22, dampingFraction: 0.72)
+
+    /// Card entrance / list stagger. Response: 0.35–0.4
+    static let cardSpring: Animation = .spring(response: 0.38, dampingFraction: 0.82)
+
+    /// View transition / page change. Response: 0.45–0.5
+    static let transitionSpring: Animation = .spring(response: 0.48, dampingFraction: 0.85)
+
+    /// Sheet / modal presentation. Response: 0.55–0.65
+    static let sheetSpring: Animation = .spring(response: 0.6, dampingFraction: 0.8)
+
+    /// Stagger delay between items (seconds)
+    static let staggerDelay: Double = 0.05
+
+    /// Default ease-out for non-interactive transitions (background, splash)
+    static let slowEaseOut: Animation = .easeOut(duration: 0.55)
+
+    /// Standard ease-out for appearing elements
+    static let defaultEaseOut: Animation = .easeOut(duration: 0.35)
+
+    /// Fast ease-out for micro-interactions
+    static let quickEaseOut: Animation = .easeOut(duration: 0.2)
+
+    /// Slow pulse for splash/map markers (gentle, premium feel)
+    static let pulseEaseOut: Animation = .easeInOut(duration: 1.0)
+
+    /// Default stagger offset delay
+    static let defaultDelay: Double = 0.08
+
+    // MARK: - Legacy Tokens (for gradual migration)
+
+    @available(*, deprecated, message: "Use pressSpring or cardSpring instead")
     static let springSmooth: Animation = .spring(response: 0.5, dampingFraction: 0.85)
+
+    @available(*, deprecated, message: "Use pressSpring instead")
     static let springSnappy: Animation = .spring(response: 0.32, dampingFraction: 0.78)
-    static let smooth: Animation = .easeInOut(duration: 0.35)
+
+    @available(*, deprecated, message: "Use transitionSpring instead")
+    static let smooth: Animation = .easeOut(duration: 0.35)
+
+    @available(*, deprecated, message: "Use pressSpring instead")
     static let quick: Animation = .easeOut(duration: 0.18)
+
+    @available(*, deprecated, message: "Use sheetSpring instead")
     static let springBouncy: Animation = .spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.3)
 
     // MARK: - Weather Decision → Color Mapping

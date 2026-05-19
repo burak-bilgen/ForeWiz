@@ -14,6 +14,7 @@ struct HomeRecommendationResult: Equatable {
     let weatherFetchedAt: Date
     let attribution: WeatherAttributionInfo?
     let rankedCandidates: [RecommendationCandidate]
+    let briefing: DailyWeatherBriefing?
 
     static func == (lhs: HomeRecommendationResult, rhs: HomeRecommendationResult) -> Bool {
         lhs.recommendation == rhs.recommendation &&

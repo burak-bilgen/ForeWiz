@@ -128,7 +128,7 @@ struct LiquidGlassButton: View {
                     isPressed = false
                 }
         )
-        .animation(.spring(response: 0.28, dampingFraction: 0.72), value: isPressed)
+        .animation(AppTheme.pressSpring, value: isPressed)
         .accessibilityLabel(accessibilityLabel)
     }
 
@@ -317,7 +317,7 @@ struct ToolbarRefreshButton: View {
         .contentShape(Rectangle())
 
         .buttonStyle(.plain)
-        .animation(.linear(duration: 0.8), value: isSpinning)
+        .animation(.linear(duration: 0.8), value: isSpinning) // Linear OK for rotation
         .accessibilityLabel(L10n.text("refresh_weather"))
     }
 }

@@ -3,33 +3,14 @@ import Foundation
 struct HomeViewState: Equatable {
     let recommendation: DailyRecommendation
     let assistant: HomeAssistantViewState
-    let plan: HomePlanViewState
     let currentWeather: HomeCurrentWeatherViewState
     let dailyForecasts: [DailyForecastItem]
     let hourlyScores: [HourlyScoreItem]
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
     let warningMessage: String?
-    let heatSafetyBanner: HeatSafetyBanner?
-    let heatStreakCount: Int
     let briefing: DailyWeatherBriefing?
     let attribution: WeatherAttributionInfo?
-}
-
-struct HomePlanViewState: Equatable {
-    let title: String
-    let subtitle: String
-    let items: [HomePlanItem]
-}
-
-struct HomePlanItem: Equatable, Identifiable {
-    let id: String
-    let icon: String
-    let title: String
-    let timeText: String
-    let detail: String
-    let tone: HomeAssistantTone
-    let isPrimary: Bool
 }
 
 struct HomeAssistantViewState: Equatable {
@@ -67,35 +48,6 @@ struct HourlyScoreItem: Equatable, Identifiable {
     let symbolName: String
     let temperatureText: String
     let precipitationChance: Double
-}
-
-// MARK: - Heat Safety Banner
-
-struct HeatSafetyBanner: Equatable, Identifiable {
-    let id: String = "heat-safety"
-    let severity: RiskLevel
-    let currentTemp: Double
-    let adviceKey: String
-
-    var iconName: String {
-        switch severity {
-        case .extreme: "thermometer.sun.triangle.fill"
-        case .high: "thermometer.sun.fill"
-        default: "sun.max.trianglebadge.exclamationmark.fill"
-        }
-    }
-
-    var titleKey: String {
-        switch severity {
-        case .extreme: "heat_banner_critical_title"
-        case .high: "heat_banner_high_title"
-        default: "heat_banner_warning_title"
-        }
-    }
-
-    var messageKey: String {
-        adviceKey
-    }
 }
 
 struct HomeCurrentWeatherViewState: Equatable {

@@ -37,7 +37,7 @@ struct JourneyHUDView: View {
 
                     // Expand Button
                     Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        withAnimation(AppTheme.cardSpring) {
                             isExpanded.toggle()
                             HapticEngine.shared.light()
                         }
@@ -223,7 +223,7 @@ struct HUDDetailPanel: View {
                     RoundedRectangle(cornerRadius: 3)
                         .fill(safetyScoreColor)
                         .frame(width: geometry.size.width * (Double(safetyScore) / 100.0), height: 6)
-                        .animation(.spring(response: 0.6), value: safetyScore)
+                        .animation(AppTheme.sheetSpring, value: safetyScore)
                 }
             }
             .frame(height: 6)

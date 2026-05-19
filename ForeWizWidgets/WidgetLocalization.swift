@@ -30,7 +30,7 @@ enum WidgetL10n {
     private static let translations: [String: [String: String]] = [
         "widget_outdoor_label": [
             "en": "Outdoor",
-            "tr": "Dış Mekan"
+            "tr": "Açık Hava"
         ],
         "widget_score_label": [
             "en": "Score",
@@ -70,7 +70,7 @@ enum WidgetL10n {
         ],
         "widget_updated": [
             "en": "Updated",
-            "tr": "Güncellenme"
+            "tr": "Güncellendi"
         ],
         "widget_feels_like": [
             "en": "Feels like",
@@ -106,7 +106,7 @@ enum WidgetL10n {
         ],
         "widget_config_error_msg": [
             "en": "Reinstall the app to fix widget configuration.",
-            "tr": "Widget'ı yapılandırmak için uygulamayı yeniden yükle."
+            "tr": "Widget'ı düzeltmek için uygulamayı yeniden yükle."
         ],
         "widget_corrupted_title": [
             "en": "Update needed",
@@ -126,7 +126,7 @@ enum WidgetL10n {
         ],
         "widget_tap_to_open": [
             "en": "Tap to open",
-            "tr": "Dokun ve aç"
+            "tr": "Açmak İçin Dokun"
         ],
     ]
 }

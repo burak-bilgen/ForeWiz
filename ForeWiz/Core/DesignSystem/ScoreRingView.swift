@@ -55,7 +55,8 @@ struct ScoreRingView: View {
         .onAppear {
             animate(to: score.displayValue / 10)
             if !reduceMotion {
-                withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true).delay(0.8)) {
+                // Single spring pulse on appear — no endless loop
+                withAnimation(AppTheme.transitionSpring.delay(0.6)) {
                     glowPulse = true
                 }
             }

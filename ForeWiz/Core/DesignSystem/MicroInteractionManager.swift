@@ -36,8 +36,8 @@ final class MicroInteractionManager {
     
     /// Entrance animation for cards with staggered delay.
     func cardEntranceAnimation(index: Int, baseDelay: Double = 0.0) -> Animation {
-        .spring(response: 0.5, dampingFraction: 0.8)
-        .delay(baseDelay + Double(index) * 0.08)
+        AppTheme.cardSpring
+        .delay(baseDelay + Double(index) * AppTheme.staggerDelay)
     }
     
     /// Initial offset for card entrance.
@@ -73,7 +73,7 @@ final class MicroInteractionManager {
     
     /// Animation for state changes.
     var stateChangeAnimation: Animation {
-        .spring(response: 0.4, dampingFraction: 0.85)
+        AppTheme.transitionSpring
     }
     
     // MARK: - Haptic Integration
@@ -181,85 +181,3 @@ extension View {
     }
 }
 
-// MARK: - Weather Symbol Animation
-
-struct AnimatedWeatherSymbol: View {
-    let symbolName: String
-    let condition: WeatherCondition
-    @State private var isAnimating = false
-    @State private var scale: CGFloat = 1.0
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-    
-    var body: some View {
-        Image(systemName: symbolName)
-            .scaleEffect(scale)
-            .opacity(isAnimating ? 1.0 : 0.8)
-            .onAppear {
-                if !reduceMotion {
-                    isAnimating = true
-                    startAnimation()
-                }
-            }
-    }
-    
-    private func startAnimation() {
-        let baseAnimation = Animation.easeInOut(duration: animationDuration)
-        
-        withAnimation(baseAnimation.repeatForever(autoreverses: true)) {
-            scale = animationScale
-        }
-    }
-    
-    private var animationDuration: Double {
-        switch condition {
-        case .rainy, .stormy: return 0.5
-        case .snowy: return 0.8
-        case .cloudy: return 1.0
-        case .clear: return 2.0
-        case .foggy: return 3.0
-        }
-    }
-    
-    private var animationScale: CGFloat {
-        switch condition {
-        case .rainy, .stormy: return 1.1
-        case .snowy: return 1.05
-        case .cloudy: return 1.08
-        case .clear: return 1.15
-        case .foggy: return 1.03
-        }
-    }
-}
-
-// MARK: - Preview
-
-#Preview {
-    VStack(spacing: 20) {
-        // Button with micro-interaction
-        Button("Premium Button") {}
-            .microButton()
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        
-        // Cards with staggered entrance
-        ForEach(0..<3) { index in
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.gray.opacity(0.2))
-                .frame(height: 60)
-                .microCardEntrance(index: index, baseDelay: 0.5)
-        }
-        
-        // Refresh button
-        Image(systemName: "arrow.clockwise")
-            .font(.title)
-            .microRefresh(isRefreshing: true)
-        
-        // Animated weather symbol
-        AnimatedWeatherSymbol(symbolName: "cloud.rain.fill", condition: .rainy)
-            .font(.system(size: 50))
-            .foregroundColor(.blue)
-    }
-    .padding()
-}

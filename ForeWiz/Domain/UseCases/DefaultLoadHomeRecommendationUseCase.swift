@@ -12,6 +12,8 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
     private let store: RecommendationStore
     private let dateProvider: DateProvider
     private let cachePolicy: WeatherCachePolicy
+    private let weatherBriefingService: WeatherBriefingService
+    private let presentationMapper: WeatherPresentationMapper
     private let liveFetchAttempts = 3
 
     init(
@@ -25,7 +27,9 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         explainer: RecommendationExplainer = DefaultRecommendationExplainer(),
         store: RecommendationStore = DefaultRecommendationStore(),
         dateProvider: DateProvider,
-        cachePolicy: WeatherCachePolicy = WeatherCachePolicy()
+        cachePolicy: WeatherCachePolicy = WeatherCachePolicy(),
+        weatherBriefingService: WeatherBriefingService = WeatherBriefingService(),
+        presentationMapper: WeatherPresentationMapper = WeatherPresentationMapper()
     ) {
         self.locationRepository = locationRepository
         self.weatherRepository = weatherRepository
@@ -38,6 +42,8 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         self.store = store
         self.dateProvider = dateProvider
         self.cachePolicy = cachePolicy
+        self.weatherBriefingService = weatherBriefingService
+        self.presentationMapper = presentationMapper
     }
 
     func execute(
@@ -71,7 +77,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             cacheWidgetData(
                 snapshot: snapshot,
                 outdoorScore: result.recommendation.outdoorScore.rawValue,
-                locationName: "Current Location"
+                locationName: L10n.text("home_current_location")
             )
             return result
         } catch {
@@ -160,6 +166,13 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         let rankedCandidates = ranker.rank(candidates, context: context)
         store.saveCandidates(rankedCandidates)
 
+        // Generate AI-powered daily briefing
+        let briefing = weatherBriefingService.generateBriefing(
+            snapshot: snapshot,
+            recommendation: recommendation,
+            profile: profile
+        )
+
         return HomeRecommendationResult(
             recommendation: recommendation,
             currentWeather: snapshot.current,
@@ -173,7 +186,8 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             warningMessage: warningMessage,
             weatherFetchedAt: snapshot.fetchedAt,
             attribution: snapshot.attribution,
-            rankedCandidates: rankedCandidates
+            rankedCandidates: rankedCandidates,
+            briefing: briefing
         )
     }
 
@@ -181,33 +195,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         ErrorHandler.normalized(error)
     }
 
-    private func conditionDescription(for conditionCode: String?) -> String {
-        let condition = conditionCode?.lowercased() ?? ""
-        if condition.contains("thunder") || condition.contains("storm") {
-            return L10n.text("weather_storm")
-        } else if condition.contains("rain") || condition.contains("drizzle") {
-            return L10n.text("weather_rain")
-        } else if condition.contains("snow") || condition.contains("sleet") {
-            return L10n.text("weather_snow")
-        } else if condition.contains("cloud") {
-            return L10n.text("weather_cloudy")
-        } else if condition.contains("fog") || condition.contains("haze") {
-            return L10n.text("weather_foggy")
-        } else if condition.contains("clear") || condition.contains("sun") {
-            return L10n.text("weather_clear")
-        }
-        return "—"
-    }
 
-    private func dailyScore(for day: DailyWeatherPoint) -> Int {
-        var s = 100.0
-        s -= abs(day.highTemperatureCelsius - 24) * 1.8
-        s -= abs(15 - day.lowTemperatureCelsius) * 1.8
-        if let precip = day.precipitationChance {
-            s -= precip * 0.55
-        }
-        return Int(max(0, min(100, s)))
-    }
 
     private func cacheWidgetData(snapshot: WeatherSnapshot, outdoorScore: Int, locationName: String) {
         let calendar = Calendar.current
@@ -219,7 +207,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             return f
         }()
 
-        let description = conditionDescription(for: snapshot.current.conditionCode)
+        let description = presentationMapper.conditionText(for: snapshot.current.conditionCode)
 
         let widgetData = WidgetCacheData(
             locationName: locationName,
@@ -235,7 +223,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
                     highTemp: day.highTemperatureCelsius,
                     lowTemp: day.lowTemperatureCelsius,
                     conditionSymbol: day.symbolName ?? "cloud.sun.fill",
-                    outdoorScore: dailyScore(for: day),
+                    outdoorScore: presentationMapper.dailyScore(highCelsius: day.highTemperatureCelsius, lowCelsius: day.lowTemperatureCelsius, precipitationChance: day.precipitationChance),
                     isToday: calendar.isDateInToday(day.date),
                     precipitationChance: day.precipitationChance ?? 0
                 )

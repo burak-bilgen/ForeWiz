@@ -67,7 +67,7 @@ struct WizPathDashboardView: View {
             } message: {
                 Text(viewModel.errorMessage ?? "")
             }
-            .animation(.spring(response: 0.4, dampingFraction: 0.82), value: viewModel.state)
+            .animation(AppTheme.cardSpring, value: viewModel.state)
             .onAppear { hasAppeared = true }
         }
     }

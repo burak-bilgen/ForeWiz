@@ -37,7 +37,7 @@ struct OnboardingView: View {
     }
 
     private func animatePage() {
-        withAnimation(.easeOut(duration: 0.8)) {
+        withAnimation(AppTheme.slowEaseOut) {
             pageAppeared = true
         }
     }

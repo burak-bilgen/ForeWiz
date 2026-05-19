@@ -69,7 +69,7 @@ struct WizPathMapView: View {
         }
         .onChange(of: viewModel.currentRoute) { _, route in
             if let r = route {
-                withAnimation(.easeInOut(duration: 0.6)) {
+                withAnimation(AppTheme.slowEaseOut) {
                     position = .region(routeRegion(r))
                 }
             }
@@ -129,7 +129,7 @@ struct WizPathMapView: View {
 
     private var toggleRouteButton: some View {
         Button {
-            withAnimation(.spring(response: 0.3)) {
+            withAnimation(AppTheme.pressSpring) {
                 viewModel.isShowingRoute.toggle()
             }
             HapticEngine.shared.light()
@@ -195,7 +195,7 @@ struct OriginMarker: View {
             Circle()
                 .fill(Color.liquidAccent.opacity(pulse ? 0.3 : 0.15))
                 .frame(width: pulse ? 36 : 26, height: pulse ? 36 : 26)
-                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: pulse)
+                .animation(AppTheme.pulseEaseOut.repeatForever(autoreverses: true), value: pulse)
 
             Image(systemName: "location.circle.fill")
                 .font(.system(size: 22))
@@ -237,7 +237,7 @@ struct WeatherMarker: View {
         .scaleEffect(isVisible ? 1 : 0.5)
         .opacity(isVisible ? 1 : 0)
         .onAppear {
-            withAnimation(.spring(response: 0.3).delay(0.15)) {
+            withAnimation(AppTheme.pressSpring.delay(0.15)) {
                 isVisible = true
             }
         }

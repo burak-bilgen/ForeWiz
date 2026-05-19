@@ -60,7 +60,7 @@ private struct InsightsHeader: View {
         .padding(.top, 8)
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 14)
-        .onAppear { withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.05)) { appeared = true } }
+        .onAppear { withAnimation(AppTheme.sheetSpring.delay(AppTheme.staggerDelay)) { appeared = true } }
     }
 }
 
@@ -369,7 +369,7 @@ private struct AnimatedBar: View {
                 .fill(color)
                 .frame(height: appeared ? height : 4)
                 .animation(
-                    reduceMotion ? nil : .spring(response: 0.55, dampingFraction: 0.75).delay(delay),
+                    reduceMotion ? nil : AppTheme.cardSpring.delay(delay),
                     value: appeared
                 )
         }

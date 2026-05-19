@@ -60,7 +60,11 @@ struct HomeViewModelTests {
                 error: loadError
             ),
             scheduleSmartNotificationsUseCase: MockScheduleSmartNotificationsUseCase(),
-            preferencesRepository: MockPreferencesRepository()
+            preferencesRepository: MockPreferencesRepository(),
+            homeViewStateFactory: HomeViewStateFactory(
+                dateProvider: SystemDateProvider(),
+                activityWindowScoringEngine: DefaultActivityWindowScoringEngine()
+            )
         )
     }
 }
@@ -182,7 +186,8 @@ private extension HomeRecommendationResult {
             warningMessage: nil,
             weatherFetchedAt: now,
             attribution: nil,
-            rankedCandidates: []
+            rankedCandidates: [],
+            briefing: nil
         )
     }
 }
