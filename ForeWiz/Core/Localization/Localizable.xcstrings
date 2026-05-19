@@ -176,7 +176,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@: %2$@, Dış mekan puanı %3$lld"
+            "value": "%1$@: %2$@, Açık hava puanı %3$lld"
           }
         }
       }
@@ -2101,7 +2101,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı sıcak (%d°C) EV batarya verimliliğini düşürür. Menzil azalabilir."
+            "value": "Aşırı sıcak (%d°C) Elektrikli araç bataryası verimliliğini düşürür. Menzil azalabilir."
           }
         }
       }
@@ -2135,7 +2135,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "EV Batarya Uyarısı"
+            "value": "Elektrikli Araç Bataryası Uyarısı"
           }
         }
       }
@@ -4659,7 +4659,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yuksek risk"
+            "value": "Yüksek risk"
           }
         }
       }
@@ -4676,7 +4676,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yuksek migren riski - parlak ekranlardan kacinin, mola verin."
+            "value": "Yüksek migren riski - parlak ekranlardan kaçının, mola verin."
           }
         }
       }
@@ -4744,7 +4744,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta migren riski - isiklari los tutun ve su icin."
+            "value": "Orta migren riski - ışıkları loş tutun ve su için."
           }
         }
       }
@@ -4778,7 +4778,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Riskli solunum kosullari bugun."
+            "value": "Riskli solunum koşulları bugün."
           }
         }
       }
@@ -4829,7 +4829,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iyi"
+            "value": "İyi"
           }
         }
       }
@@ -4846,7 +4846,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iyi nefes kosullari - temiz havanin tadini cikarin."
+            "value": "İyi nefes koşulları - temiz havanın tadını çıkarın."
           }
         }
       }
@@ -4897,7 +4897,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mukemmel"
+            "value": "Mükemmel"
           }
         }
       }
@@ -4914,7 +4914,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mukemmel uyku havasi - pencere acin ve temiz havanin tadini cikarin."
+            "value": "Mükemmel uyku havası - pencere acin ve temiz havanın tadını çıkarın."
           }
         }
       }
@@ -4965,7 +4965,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iyi"
+            "value": "İyi"
           }
         }
       }
@@ -4982,7 +4982,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iyi uyku kosullari."
+            "value": "İyi uyku koşulları."
           }
         }
       }
@@ -5016,7 +5016,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kotu uyku havasi - yatak odanizi serin tutun."
+            "value": "Kotu uyku havası - yatak odanizi serin tutun."
           }
         }
       }
@@ -5033,7 +5033,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iyi enerji"
+            "value": "İyi enerji"
           }
         }
       }
@@ -5050,7 +5050,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dis mekan aktiviteleri icin iyi enerji."
+            "value": "Dis mekan aktiviteleri için iyi enerji."
           }
         }
       }
@@ -5067,7 +5067,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yuksek enerji"
+            "value": "Yüksek enerji"
           }
         }
       }
@@ -5084,7 +5084,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yuksek dis mekan enerjisi - egzersiz icin harika."
+            "value": "Yüksek dis mekan enerjisi - egzersiz için harika."
           }
         }
       }
@@ -5169,7 +5169,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bazi hava faktorleri bugun nasil hissettiginizi etkileyebilir."
+            "value": "Bazı hava faktörleri bugün nasıl hissettiğinizi etkileyebilir."
           }
         }
       }
@@ -5186,7 +5186,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugunku hava genel olarak sagliginiz icin iyi."
+            "value": "Bugünku hava genel olarak sağlığınız için iyi."
           }
         }
       }
@@ -5203,7 +5203,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugunku hava sagliginiz icin harika."
+            "value": "Bugünku hava sağlığınız için harika."
           }
         }
       }
@@ -5220,7 +5220,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugunku hava saglik icin zorlu."
+            "value": "Bugünku hava sağlık için zorlu."
           }
         }
       }
@@ -7770,7 +7770,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava kalitesi idealin altinda. Disarida kisa süre kal ve rahat hareket et."
+            "value": "Hava kalitesi idealin altında. Dışarıda kısa süre kal ve rahat hareket et."
           }
         }
       }
@@ -8639,7 +8639,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vahsi hava kapida - disari cikmaya cesareti olanlara"
+            "value": "Vahşi hava kapıda - dışarı cikmaya cesareti olanlara"
           }
         }
       }
@@ -8656,7 +8656,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Disarisi soguk - iceride sicak bir icecek icin mukemmel bahane"
+            "value": "Dışarısi soğuk - içeride sıcak bir içecek için mükemmel bahane"
           }
         }
       }
@@ -8673,7 +8673,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Onumuzde dramatik gokyuzu - bugun bir aciklama yapiyor"
+            "value": "Önümüzde dramatik gökyüzü - bugün bir açıklama yapiyor"
           }
         }
       }
@@ -8690,7 +8690,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Parlak ve enerjik - disarida olmak icin yaratilmis bir gun"
+            "value": "Parlak ve enerjik - dışarıda olmak için yaratılmış bir gun"
           }
         }
       }
@@ -8707,7 +8707,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sicak ve puslu - bugun kendi yavas temposunda ilerliyor"
+            "value": "Sıcak ve puslu - bugün kendi yavaş temposunda ilerliyor"
           }
         }
       }
@@ -8724,7 +8724,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sessiz gri bir gun - iceride keyif yapmak icin mukemmel"
+            "value": "Sessiz gri bir gun - içeride keyif yapmak için mükemmel"
           }
         }
       }
@@ -8741,7 +8741,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sis ve gizem - dunya bugun yumusak ve ruya gibi"
+            "value": "Sis ve gizem - dünya bugün yumuşak ve rüya gibi"
           }
         }
       }
@@ -8775,7 +8775,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sakin ve huzurlu - yumusak bir gun seni bekliyor"
+            "value": "Sakin ve huzurlu - yumuşak bir gun seni bekliyor"
           }
         }
       }
@@ -8792,7 +8792,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mukemmel dengede - doga bugun en guzel halinde"
+            "value": "Mükemmel dengede - doğa bugün en güzel halinde"
           }
         }
       }
@@ -8809,7 +8809,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gokyuzunden karisik sinyaller - her seyden biraz bekle"
+            "value": "Gökyüzünden karışık sinyaller - her şeyden biraz bekle"
           }
         }
       }
@@ -8911,7 +8911,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Elementler bugun kaslarini esnetiyor - guclu ruzgarlar, dramatik bulutlar."
+            "value": "Elementler bugün kaslarını esnetiyor - güçlü rüzgarlar, dramatik bulutlar."
           }
         }
       }
@@ -8928,7 +8928,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Soguk geldi, dunyayi buzlu bir kucaklamaya aldi."
+            "value": "Soğuk geldi, dünyayı buzlu bir kucaklamaya aldı."
           }
         }
       }
@@ -8945,7 +8945,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gokyuzu bugun bir sov yapiyor. Karanlik bulutlar geliyor, ruzgar hizlaniyor."
+            "value": "Gökyüzü bugün bir şov yapiyor. Karanlık bulutlar geliyor, rüzgar hızlanıyor."
           }
         }
       }
@@ -8962,7 +8962,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gunes acti ve hava enerjiyle ugulduyor bugun."
+            "value": "Güneş açtı ve hava enerjiyle uğulduyor bugün."
           }
         }
       }
@@ -8979,7 +8979,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sicaklik havada agir agir asili kaliyor, her seyi yavaslatiyor."
+            "value": "Sıcaklik havada ağır ağır asılı kaliyor, her seyi yavaşlatıyor."
           }
         }
       }
@@ -8996,7 +8996,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gokyuzu bugun yumusak grilere boyanmis. Yagmur camlara nazikce vuruyor."
+            "value": "Gökyüzü bugün yumuşak grilere boyanmış. Yağmur camlara nazikçe vuruyor."
           }
         }
       }
@@ -9013,7 +9013,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sis dunyayi yumusak sessiz bir battaniyeye sariyor bugun."
+            "value": "Sis dünyayı yumuşak sessiz bir battaniyeye sarıyor bugün."
           }
         }
       }
@@ -9047,7 +9047,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilik bir hava ortusu bugun her seyin uzerine yayiliyor."
+            "value": "Ilık bir hava örtüsü bugün her seyin uzerine yayiliyor."
           }
         }
       }
@@ -9064,7 +9064,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Her sey bugun uyum icinde - sicaklik, ruzgar, isik."
+            "value": "Her sey bugün uyum içinde - sıcaklik, rüzgar, isik."
           }
         }
       }
@@ -9081,7 +9081,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava bir turlu karar veremiyor bugun."
+            "value": "Hava bir turlu karar veremiyor bugün."
           }
         }
       }
@@ -9098,7 +9098,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugunun tatli noktasi %@."
+            "value": "Bugünun tatlı noktası %@."
           }
         }
       }
@@ -9115,7 +9115,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava soguk - katmanli giyinin ve atkiyi unutmayin."
+            "value": "Hava soğuk - katmanli giyinin ve atkiyi unutmayin."
           }
         }
       }
@@ -9132,7 +9132,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugun onemli bir hava sorunu yok - disari cikin ve keyfini cikarin."
+            "value": "Bugün önemli bir hava sorunu yok - dışarı çıkın ve keyfini çıkarın."
           }
         }
       }
@@ -9149,7 +9149,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Disarisi sicak. Yavaslayin ve su icin."
+            "value": "Dışarısi sıcak. Yavaşlayın ve su için."
           }
         }
       }
@@ -9166,7 +9166,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kavurucu sicak ve yuksek UV - oglen 12 ile 3 arasinda golgede kalin."
+            "value": "Kavurucu sıcak ve yüksek UV - öğlen 12 ile 3 arasinda gölgede kalın."
           }
         }
       }
@@ -9200,7 +9200,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mumkunse iceride kalin - firtina geliyor."
+            "value": "Mümkünse içeride kalın - fırtına geliyor."
           }
         }
       }
@@ -9217,7 +9217,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "UV endeksi bugun yuksek - gunes kremi sart."
+            "value": "UV endeksi bugün yüksek - güneş kremi şart."
           }
         }
       }
@@ -9234,7 +9234,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Disarisi ruzgarli. Sapkanizi tutun."
+            "value": "Dışarısi rüzgarli. Şapkanızı tutun."
           }
         }
       }
@@ -9495,7 +9495,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nem oranı dış mekan koşullarını rahatsız edici hale getirdiğinde uyarı alın."
+            "value": "Nem oranı açık hava koşullarını rahatsız edici hale getirdiğinde uyarı alın."
           }
         }
       }
@@ -9631,7 +9631,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Disari çikabilirsin. Sadece planinda biraz esneklik birak."
+            "value": "Dışarı çikabilirsin. Sadece planinda biraz esneklik birak."
           }
         }
       }
@@ -9735,7 +9735,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Genel dış mekan konforu tercihlerinizin altına düştüğünde haber alın."
+            "value": "Genel açık hava konforu tercihlerinizin altına düştüğünde haber alın."
           }
         }
       }
@@ -11118,7 +11118,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dış mekan puanı: %lld"
+            "value": "Açık hava puanı: %lld"
           }
         }
       }
@@ -12225,7 +12225,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "EV Şarj İstasyonu"
+            "value": "Elektrikli Araç Şarj İstasyonu"
           }
         }
       }
@@ -12973,7 +12973,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı sıcak (%d°C) EV menzilini %%30 azaltabilir. Ek şarj molaları ekleyin."
+            "value": "Aşırı sıcak (%d°C) Elektrikli araç menzilini %%30 azaltabilir. Ek şarj molaları ekleyin."
           }
         }
       }
@@ -13407,7 +13407,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava kalitesi nefes almanı etkileyebilir. Uzun süreli dış mekan maruziyetini sınırlamaya çalış."
+            "value": "Hava kalitesi nefes almanı etkileyebilir. Uzun süreli açık hava maruziyetini sınırlamaya çalış."
           }
         }
       }
@@ -14195,7 +14195,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tahminlerde agir hava kosullari var. Disari planlarini ertelemek daha güvenli."
+            "value": "Tahminlerde ağır hava koşulları var. Dışarı planlarini ertelemek daha güvenli."
           }
         }
       }
@@ -16119,7 +16119,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktivite pencerelerini egzersiz saatine göre önceliklendiririm."
+            "value": "Aktivite aralıklarını egzersiz saatine göre önceliklendiririm."
           }
         }
       }
@@ -18668,7 +18668,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dış mekan puanı"
+            "value": "Açık hava puanı"
           }
         }
       }
@@ -19045,7 +19045,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ayrılış Optimize Edici"
+            "value": "Ayrılış Optimize Ediçi"
           }
         }
       }
