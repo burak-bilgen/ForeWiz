@@ -1,5 +1,4 @@
 import SwiftUI
-import Combine
 
 // MARK: - Enhanced Weather Splash Kind
 enum EnhancedWeatherSplashKind: String, CaseIterable {
@@ -19,14 +18,14 @@ enum EnhancedWeatherSplashKind: String, CaseIterable {
     
     var displayName: String {
         switch self {
-        case .sunny: return "Güneşli"
-        case .rainy: return "Yağmurlu"
-        case .snowy: return "Karlı"
-        case .stormy: return "Fırtınalı"
-        case .cloudy: return "Bulutlu"
-        case .foggy: return "Sisli"
-        case .windy: return "Rüzgarlı"
-        case .nightClear: return "Açık Gece"
+        case .sunny: return L10n.text("weather_clear")
+        case .rainy: return L10n.text("weather_rain")
+        case .snowy: return L10n.text("weather_snow")
+        case .stormy: return L10n.text("weather_storm")
+        case .cloudy: return L10n.text("weather_cloudy")
+        case .foggy: return L10n.text("weather_foggy")
+        case .windy: return L10n.text("weather_windy")
+        case .nightClear: return L10n.text("weather_clear_night")
         }
     }
     

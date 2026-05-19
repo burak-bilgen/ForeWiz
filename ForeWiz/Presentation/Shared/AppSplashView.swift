@@ -1,4 +1,3 @@
-import Combine
 import SwiftUI
 
 // MARK: - Liquid Glass Splash View
@@ -19,7 +18,7 @@ struct AppSplashView: View {
                         .fill(AppTheme.liquidAccent.opacity(glowPulse ? 0.18 : 0.08))
                         .frame(width: 130, height: 130)
                         .blur(radius: 28)
-                        .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: glowPulse)
+                        .animation(AppTheme.pulseEaseOut.repeatForever(autoreverses: true), value: glowPulse)
 
                     Circle()
                         .fill(.ultraThinMaterial)
@@ -49,11 +48,11 @@ struct AppSplashView: View {
             }
         }
         .onAppear {
-            withAnimation(.spring(response: 0.65, dampingFraction: 0.72)) {
+            withAnimation(AppTheme.sheetSpring) {
                 iconScale = 1.0
                 iconOpacity = 1.0
             }
-            withAnimation(.easeOut(duration: 0.5).delay(0.3)) {
+            withAnimation(AppTheme.defaultEaseOut.delay(0.3)) {
                 textOpacity = 1.0
             }
             glowPulse = true

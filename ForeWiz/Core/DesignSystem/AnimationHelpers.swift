@@ -1,5 +1,5 @@
-import Combine
 import SwiftUI
+import Combine
 
 // MARK: - Animated Liquid Orb Background
 /// Static gradient background with liquid glass aesthetic.
@@ -220,8 +220,8 @@ struct CardEntranceModifier: ViewModifier {
                 .scaleEffect(appeared ? 1 : 0.95)
                 .offset(y: appeared ? 0 : 16)
                 .animation(
-                    .spring(response: 0.5, dampingFraction: 0.82)
-                        .delay(baseDelay + Double(index) * 0.06),
+                    AppTheme.cardSpring
+                        .delay(baseDelay + Double(index) * AppTheme.staggerDelay),
                     value: appeared
                 )
         }
@@ -285,7 +285,7 @@ struct PressScaleButtonStyle: ButtonStyle {
         configuration.label
             .contentShape(Rectangle())
             .scaleEffect(configuration.isPressed ? scale : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+            .animation(AppTheme.pressSpring, value: configuration.isPressed)
     }
 }
 
@@ -294,7 +294,7 @@ struct FullTapAreaButtonStyle: ButtonStyle {
         configuration.label
             .contentShape(Rectangle())
             .opacity(configuration.isPressed ? 0.78 : 1.0)
-            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+            .animation(AppTheme.pressSpring, value: configuration.isPressed)
     }
 }
 
@@ -314,12 +314,14 @@ struct PulseGlowModifier: ViewModifier {
     var color: Color
     var radius: CGFloat = 14
     @State private var pulse = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
         content
-            .shadow(color: color.opacity(pulse ? 0.55 : 0.2), radius: pulse ? radius : radius * 0.5, x: 0, y: 0)
+            .shadow(color: color.opacity(pulse ? 0.5 : 0.2), radius: pulse ? radius : radius * 0.6, x: 0, y: 0)
             .onAppear {
-                withAnimation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true)) {
+                // Single spring animation — no endless loop
+                withAnimation(AppTheme.transitionSpring) {
                     pulse = true
                 }
             }
@@ -390,7 +392,7 @@ struct StaggerEntranceModifier: ViewModifier {
             .opacity(appeared ? 1 : 0)
             .offset(y: appeared ? 0 : 24)
             .animation(
-                .spring(response: 0.5, dampingFraction: 0.82)
+                AppTheme.cardSpring
                     .delay(Double(index) * baseDelay),
                 value: appeared
             )
