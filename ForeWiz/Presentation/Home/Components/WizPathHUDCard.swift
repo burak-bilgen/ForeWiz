@@ -73,9 +73,10 @@ struct WizPathHUDCard: View {
         .contentShape(Rectangle())
 
         .buttonStyle(.plain)
-        .pressEvents(
-            onPress: { withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } },
-            onRelease: { withAnimation(.easeInOut(duration: 0.1)) { isPressed = false } }
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } }
+                .onEnded { _ in withAnimation(.easeInOut(duration: 0.1)) { isPressed = false } }
         )
         .frame(minHeight: 48)
     }

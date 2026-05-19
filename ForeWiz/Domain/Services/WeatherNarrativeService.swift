@@ -123,8 +123,6 @@ struct WeatherNarrativeService {
         humidity: Double,
         hour: Int
     ) -> WeatherNarrative.WeatherPersonality {
-        let isNight = !isDaylight
-
         if hasStorm || condition.contains("thunder") {
             return .dramatic
         }
