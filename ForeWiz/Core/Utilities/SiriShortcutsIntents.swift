@@ -9,7 +9,7 @@ import WidgetKit
 @available(iOS 16.0, *)
 struct GetWeatherRecommendationIntent: AppIntent {
     static var title: LocalizedStringResource { "Get Weather Recommendation" }
-    static var description = IntentDescription(stringLiteral: "Get personalized weather recommendation for your current location")
+    static var description = IntentDescription("Get personalized weather recommendation for your current location")
 
     static var openAppWhenRun: Bool = false
 
@@ -52,7 +52,7 @@ struct GetWeatherRecommendationIntent: AppIntent {
 @available(iOS 16.0, *)
 struct GetCurrentTemperatureIntent: AppIntent {
     static var title: LocalizedStringResource { "Get Current Temperature" }
-    static var description = IntentDescription(stringLiteral: "Get the current temperature for your location")
+    static var description = IntentDescription("Get the current temperature for your location")
 
     static var openAppWhenRun: Bool = false
 
@@ -82,7 +82,7 @@ struct GetCurrentTemperatureIntent: AppIntent {
 @available(iOS 16.0, *)
 struct GetOutfitRecommendationIntent: AppIntent {
     static var title: LocalizedStringResource { "Get Outfit Recommendation" }
-    static var description = IntentDescription(stringLiteral: "Get clothing recommendations based on current weather")
+    static var description = IntentDescription("Get clothing recommendations based on current weather")
 
     static var openAppWhenRun: Bool = false
 
@@ -113,7 +113,7 @@ struct GetOutfitRecommendationIntent: AppIntent {
 @available(iOS 16.0, *)
 struct GetBestActivityWindowIntent: AppIntent {
     static var title: LocalizedStringResource { "Get Best Activity Window" }
-    static var description = IntentDescription(stringLiteral: "Find the best time window for outdoor activities today")
+    static var description = IntentDescription("Find the best time window for outdoor activities today")
 
     static var openAppWhenRun: Bool = false
 
@@ -169,7 +169,7 @@ struct GetBestActivityWindowIntent: AppIntent {
 @available(iOS 16.0, *)
 struct CheckWeatherRisksIntent: AppIntent {
     static var title: LocalizedStringResource { "Check Weather Risks" }
-    static var description = IntentDescription(stringLiteral: "Check for any weather warnings or risks for today")
+    static var description = IntentDescription("Check for any weather warnings or risks for today")
 
     static var openAppWhenRun: Bool = false
 
@@ -204,7 +204,7 @@ struct CheckWeatherRisksIntent: AppIntent {
 @available(iOS 16.0, *)
 struct RefreshWeatherDataIntent: AppIntent {
     static var title: LocalizedStringResource { "Refresh Weather Data" }
-    static var description = IntentDescription(stringLiteral: "Fetch the latest weather data for your location")
+    static var description = IntentDescription("Fetch the latest weather data for your location")
 
     static var openAppWhenRun: Bool = true
 
