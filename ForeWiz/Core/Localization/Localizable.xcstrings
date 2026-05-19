@@ -13337,7 +13337,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "refresh weather"
+            "value": "Hava Durumunu Güncelle"
           }
         }
       }
@@ -14297,7 +14297,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "type poor comfort"
+            "value": "Konfor Düşüklüğü"
           }
         }
       }
@@ -19830,7 +19830,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Optimal"
+            "value": "En Uygun"
           }
         }
       }
