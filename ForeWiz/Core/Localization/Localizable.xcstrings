@@ -4506,7 +4506,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Düşük eklem rahatsızlığı — harika"
+            "value": "Düşük eklem rahatsızlığı - hareketli kalmak için harika bir gün."
           }
         }
       }
@@ -4540,7 +4540,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta eklem rahatsizligi - hafif esneme yardimci olabilir."
+            "value": "Orta eklem rahatsızlığı - hafif esneme hareketleri yardımcı olabilir."
           }
         }
       }
@@ -4608,7 +4608,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dayaniklilik"
+            "value": "Dayanıklılık"
           }
         }
       }
@@ -4625,7 +4625,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Asiri"
+            "value": "Aşırı"
           }
         }
       }
@@ -4642,7 +4642,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Asiri migren riski - stresi azaltin ve mumkunse dinlenin."
+            "value": "Aşırı migren riski - stresten kaçının ve mümkünse dinlenin."
           }
         }
       }
@@ -4676,7 +4676,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yüksek migren riski - parlak ekranlardan kaçının, mola verin."
+            "value": "Yüksek migren riski - güneş ışığına karşı korunun ve sık sık mola verin."
           }
         }
       }
@@ -4693,7 +4693,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dusuk risk"
+            "value": "Düşük risk"
           }
         }
       }
@@ -4710,7 +4710,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dusuk migren riski - gununuzu normal gecirebilirsiniz."
+            "value": "Düşük migren riski - gününüzü normal geçirebilirsiniz."
           }
         }
       }
@@ -4744,7 +4744,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta migren riski - ışıkları loş tutun ve su için."
+            "value": "Orta migren riski - güneş gözlüğü takın ve bol su için."
           }
         }
       }
@@ -4778,7 +4778,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Riskli solunum koşulları bugün."
+            "value": "Bugün solunum açısından riskli koşullar var - dikkatli olun."
           }
         }
       }
@@ -4812,7 +4812,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Astim veya hassasiyetiniz varsa dikkatli olun."
+            "value": "Astım veya hassasiyetiniz varsa dikkatli olun."
           }
         }
       }
@@ -4846,7 +4846,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "İyi nefes koşulları - temiz havanın tadını çıkarın."
+            "value": "Nefes almak için ideal gün - derin bir nefes alın ve temiz havanın tadını çıkarın."
           }
         }
       }
@@ -4880,7 +4880,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta solunum konforu."
+            "value": "Solunum açısından orta düzeyde konfor."
           }
         }
       }
@@ -4914,7 +4914,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mükemmel uyku havası - pencere acin ve temiz havanın tadını çıkarın."
+            "value": "Mükemmel uyku için ideal hava - ferah bir uyku çekin."
           }
         }
       }
@@ -4948,7 +4948,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta uyku kalitesi - vantilator yardimci olabilir."
+            "value": "Orta uyku kalitesi - vantilatör yardımcı olabilir."
           }
         }
       }
@@ -4999,7 +4999,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kotu"
+            "value": "Kötü"
           }
         }
       }
@@ -5016,7 +5016,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kotu uyku havası - yatak odanizi serin tutun."
+            "value": "Kötü uyku koşulları - yatak odanızı serin tutun."
           }
         }
       }
@@ -5050,7 +5050,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dis mekan aktiviteleri için iyi enerji."
+            "value": "Açık hava aktiviteleri için iyi enerji."
           }
         }
       }
@@ -5084,7 +5084,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yüksek dis mekan enerjisi - egzersiz için harika."
+            "value": "Açık hava için yüksek enerji - egzersiz için harika."
           }
         }
       }
@@ -5101,7 +5101,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dusuk enerji"
+            "value": "Düşük enerji"
           }
         }
       }
@@ -5118,7 +5118,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dusuk dis mekan enerjisi - aktiviteleri hafif tutun."
+            "value": "Düşük enerji - aktivitelerinizi hafif tutun."
           }
         }
       }
@@ -5186,7 +5186,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugünku hava genel olarak sağlığınız için iyi."
+            "value": "Bugünkü hava genel olarak sağlığınız için iyi."
           }
         }
       }
@@ -5203,7 +5203,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugünku hava sağlığınız için harika."
+            "value": "Bugünkü hava sağlığınız için harika."
           }
         }
       }
@@ -5220,7 +5220,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugünku hava sağlık için zorlu."
+            "value": "Bugünkü hava koşulları sağlık açısından zorlu."
           }
         }
       }
@@ -9030,7 +9030,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava temiz ve canlandırıcı, sanki biri tüm pencereleri açmış gibi."
+            "value": "Hava pırıl pırıl ve canlandırıcı - derin bir nefes alın ve enerjilenin."
           }
         }
       }
