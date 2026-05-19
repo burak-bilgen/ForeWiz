@@ -123,23 +123,6 @@ enum AppTheme {
     /// Default stagger offset delay
     static let defaultDelay: Double = 0.08
 
-    // MARK: - Legacy Tokens (for gradual migration)
-
-    @available(*, deprecated, message: "Use pressSpring or cardSpring instead")
-    static let springSmooth: Animation = .spring(response: 0.5, dampingFraction: 0.85)
-
-    @available(*, deprecated, message: "Use pressSpring instead")
-    static let springSnappy: Animation = .spring(response: 0.32, dampingFraction: 0.78)
-
-    @available(*, deprecated, message: "Use transitionSpring instead")
-    static let smooth: Animation = .easeOut(duration: 0.35)
-
-    @available(*, deprecated, message: "Use pressSpring instead")
-    static let quick: Animation = .easeOut(duration: 0.18)
-
-    @available(*, deprecated, message: "Use sheetSpring instead")
-    static let springBouncy: Animation = .spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.3)
-
     // MARK: - Weather Decision → Color Mapping
 
     static func color(for decision: OutdoorDecision) -> Color {

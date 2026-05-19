@@ -91,7 +91,7 @@ struct OnboardingView: View {
                         let selected = viewModel.selectedLanguage == lang
                         Button {
                             HapticEngine.shared.selectionChanged()
-                            withAnimation(AppTheme.springSmooth) {
+                            withAnimation(AppTheme.cardSpring) {
                                 viewModel.selectLanguage(lang)
                             }
                         } label: {

@@ -45,7 +45,7 @@ struct HomeView: View {
                         kind: splashKind,
                         onDismiss: { showSplash = false },
                         onFadeOut: {
-                            withAnimation(AppTheme.springSmooth) {
+                            withAnimation(AppTheme.cardSpring) {
                                 contentReady = true
                             }
                         }
