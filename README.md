@@ -1,161 +1,405 @@
-# ForeWiz — Personal Weather Decision Assistant
+# 🌤️ ForeWiz — Personal Weather Decision Assistant
 
 <p align="center">
-  <img src="https://github.com/burak-bilgen/ForeWiz/blob/main/ForeWiz/Assets.xcassets/AppIcon.appiconset/1024.png?raw=true" width="120" height="120" alt="ForeWiz">
+  <img src="https://github.com/bilgenworks/forewiz/blob/main/ForeWiz/Assets.xcassets/AppIcon.appiconset/1024.png?raw=true" width="120" height="120" alt="ForeWiz">
 </p>
 
 <p align="center">
-  <strong>Your weather sidekick. Smart outfit suggestions, activity timing, and AI-powered recommendations.</strong>
+  <strong>Your AI-powered weather sidekick. Not just weather — decisions.</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/iOS-26%2B-green?style=flat-square&logo=apple" alt="iOS 26+">
-  <img src="https://img.shields.io/badge/Swift-6.3-orange?style=flat-square&logo=swift" alt="Swift 6.3">
+  <img src="https://img.shields.io/badge/iOS-17%2B-blue?style=flat-square&logo=apple" alt="iOS 17+">
+  <img src="https://img.shields.io/badge/Swift-6.0-orange?style=flat-square&logo=swift" alt="Swift 6.0">
   <img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-blue?style=flat-square" alt="Architecture">
+  <img src="https://img.shields.io/badge/Dependencies-Zero-success?style=flat-square" alt="Zero Dependencies">
 </p>
+
+ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It doesn't just tell you it's raining — it tells you *when* to go out, *what* to wear, *where* the weather is safest on your route, and *how* it might affect your health.
+
+> Built entirely with Apple's native frameworks. **Zero third-party dependencies.**
 
 ---
 
-## Features
+## ✨ Key Features
 
-### ☀️ Smart Home Screen
-Real-time weather card with animated gradient backgrounds, temperature, conditions, wind, humidity, UV, and sunrise/sunset — all in a beautiful glassmorphic design.
+### 🧠 AI Decision Engine
+ForeWiz processes weather data through a chain of specialized engines to produce holistic recommendations:
 
-### 🤖 AI Outfit Suggestions
-Tap "AI Outfit Tip" on the home screen to get intelligent clothing recommendations based on current weather conditions. Powered by `NaturalLanguage` NLP processing with smart fallback.
+| Engine | What It Does |
+|--------|-------------|
+| **WeatherDecisionEngine** | Computes overall outdoor score (0–100), classifies into good/moderate/risky/avoid, identifies optimal time windows |
+| **ActivityWindowScoringEngine** | Scores each hour (0–100) based on temperature, precipitation, UV, wind, humidity, and time-of-day bonuses |
+| **OutfitDecisionEngine** | Recommends clothing combinations from 10+ categories with natural-language advice |
+| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina — 5 independent calculators |
+| **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes (energetic, melancholic, serene, dramatic, cozy, etc.) |
+| **ComparativeWeatherService** | Compares today against seasonal norms, yesterday, and weekly trends with anomaly detection |
+| **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable daily briefing with prioritized action items |
+| **DefaultWeatherRiskClassifier** | Classifies 8 risk types: heat, UV, rain, wind, storm, humidity, cold, poorComfort |
 
-### 📈 Temperature Trend Chart
-Interactive bezier curve chart showing hourly comfort scores for the next 12 hours. See how the day progresses at a glance.
+### 🌡️ Health-Weather Correlation
+ForeWiz goes beyond basic weather by showing **how weather affects your body**:
+
+| Factor | Inputs | Output |
+|--------|--------|--------|
+| **Migraine Risk** | Temperature swing, humidity, storms, UV | 0–10 risk score + explanation |
+| **Sleep Quality** | Night temperature, humidity, wind, storms | 0–10 forecast + advice |
+| **Joint Pain** | Cold+humidity combo, sudden drops | 0–10 index + tips |
+| **Respiratory Comfort** | Cold air, humidity, wind+dry | 0–10 risk + recommendations |
+| **Stamina/Energy** | Heat index, humidity amplification, cold | 0–10 energy forecast |
+
+→ **Overall Health Score** (0–100) with a one-sentence summary.
+
+### 🗺️ WizPath — Climate-Aware Route Planning
+Plan your journey with **weather-aware routing**. WizPath calculates weather conditions at every segment of your route based on estimated arrival time:
+
+- **Multi-modal**: Driving (15-min segments) or Walking (30-min segments)
+- **Color-coded map**: Neon Green (good) → Orange (caution) → Red (dangerous)
+- **Sentinel Alerts**: High-value notifications only when delays exceed 30 min or 40%
+- **Extreme Heat Module**: EV battery warnings at 38°C+, pedestrian heat stroke alerts at 36°C+, climate multipliers for ETA
+- **Departure Optimizer**: Finds the best time to leave based on weather + traffic
+- **Journey HUD**: Real-time safety score, active hazards, next safe stop
 
 ### 🔔 Smart Notifications
-Severe weather alerts, best time recommendations, and daily summaries — all configurable. Background refresh keeps data current.
+Five notification planners work together to keep you informed without noise:
 
-### 📍 Multi-Location Support
-Save and switch between multiple cities. Beautiful map-based search with `MapKit` integration. Swipe-to-delete, hero current-location card.
+- **Morning Briefing** — Daily weather narrative + key action items
+- **Outfit Plan** — Clothing recommendations for the day
+- **Activity Plan** — Best outdoor windows based on comfort scores
+- **Smart Risk Plans** — Severe weather alerts with interruption levels
+- **Immediate Risk Plans** — Time-sensitive danger warnings
 
-### 🎨 Dynamic Design System
-Fluid animated backgrounds that change color based on weather conditions (sunny, rainy, cloudy, stormy, snowy). Glassmorphism cards, spring animations, reduce-motion support.
+→ Deduplication, quiet hours, configurable daily limits.
 
-### 🗣️ Localization
-Fully localized in **English** and **Turkish**. Easy to extend with additional languages.
+### 🎨 Liquid Glass Design System
+A premium dark-mode aesthetic with fluid animations:
+
+- **LiquidOrbBackground** — Animated gradient orbs that change with weather conditions
+- **GlassCard** — Ultra-thin material cards with neon accents
+- **Micro-interactions** — Haptic feedback, spring animations, staggered entrances
+- **Weather-responsive palettes** — Clear sky, stormy, snowy, rainy, night modes
+- **Scene transitions** — CardEntrance, StaggerEntrance, Float, PulseGlow modifiers
+- **Enhanced Splash** — Weather-conditioned animated splash screen
+
+### 📱 Home Screen & Widgets
+
+**Home Screen:**
+- Real-time weather card with temperature, conditions, wind, humidity, UV
+- AI-generated briefing section (narrative + health + comparative)
+- WizPath HUD card for quick journey status
+- Multi-location support with map-based search
+- Language switcher and location picker in toolbar
+
+**Widgets (WidgetKit):**
+- **System Small** — Current conditions + outdoor score ring
+- **System Medium** — Current conditions + 4-day forecast with score bars
+- **Lock Screen Inline** — Temperature + condition text
+- **Lock Screen Circular** — Outdoor score ring
+- **Lock Screen Rectangular** — Detailed current conditions
+
+### 🌍 Localization & Accessibility
+- **English** and **Turkish** (fully translated via `.xcstrings`)
+- Dynamic language switching at runtime
+- Accessibility: dynamic type, reduce motion support, VoiceOver labels
+- Biometric and haptic feedback for interactions
+
+### 🧩 Siri Shortcuts (6 Intents)
+- Get current outdoor score
+- Get today's recommendation
+- Check health-weather impact
+- Get outfit suggestion
+- Get activity windows
+- Quick refresh
+
+### 🚚 Background Refresh
+- BGTaskScheduler for periodic weather updates
+- Background notifications for severe weather changes
+- Smart cache invalidation (15-min TTL, stale data detection)
 
 ---
 
-## Technology Stack
-
-| Layer | Technology |
-|-------|-----------|
-| **UI** | SwiftUI with custom design system |
-| **Weather** | Apple WeatherKit |
-| **Location** | CoreLocation + MapKit |
-| **Persistence** | SwiftData |
-| **Notifications** | UserNotifications (UNUserNotificationCenter) |
-| **Background** | BGTaskScheduler |
-| **NLP** | NaturalLanguage (NLTagger) |
-| **Haptics** | CoreHaptics (UIFeedbackGenerator) |
-| **Architecture** | Clean Architecture + MVVM-C |
-| **Concurrency** | Swift actors, async/await |
-| **Widget** | WidgetKit (system small/medium, lock screen) |
-
----
-
-## Architecture
+## 🏗️ Architecture
 
 ```
 ForeWiz/
-├── App/               # App entry, coordinator, DI container
+├── App/               # Entry point, coordinator, dependency injection
 ├── Core/              # Design system, localization, utilities
-│   ├── DesignSystem/  # Theme, colors, typography, animations
-│   ├── Localization/  # L10n system, xcstrings
-│   └── Utilities/     # Logging, haptics, performance, AI service
-├── Data/              # WeatherKit, CoreLocation, SwiftData
+│   ├── DesignSystem/  # Theme, colors, animations, glass components
+│   ├── Localization/  # L10n system, xcstrings (EN + TR)
+│   ├── Location/      # LocationService with hardened timeout
+│   ├── Network/       # Retry policies
+│   ├── Purchase/      # Premium subscription (optional)
+│   └── Utilities/     # Logger, haptics, deep links, analytics, formatters
+├── Data/              # Repository implementations
 │   ├── Location/      # CoreLocation repository + mocks
-│   ├── Notifications/ # UNNotification repository
-│   ├── Persistence/   # SwiftData models
-│   └── Weather/       # WeatherKit integration, mapper, cache
-├── Domain/            # Business logic, entities, engines
-│   ├── Entities/      # Models (Article, Weather, Recommendation)
-│   ├── Enums/         # ActivityType, WeatherScore, etc.
-│   ├── Repositories/  # Protocol interfaces
-│   ├── Services/      # Decision engines, scoring, alerts
-│   └── UseCases/      # Business operations
+│   ├── Notifications/ # UNNotification repository + content factory
+│   ├── Persistence/   # SwiftData models (UserPreferences, WeatherSnapshot)
+│   └── Weather/       # WeatherKit repository, mapper, cache policy
+├── Domain/            # Business logic (pure Swift, Foundation only)
+│   ├── Entities/      # Models: DailyRecommendation, WeatherScore, Narrative, etc.
+│   ├── Enums/         # ActivityType, RiskLevel, OutdoorDecision, etc.
+│   ├── Repositories/  # Protocol interfaces (Location, Weather, Preferences, etc.)
+│   ├── Services/      # Decision engines, scoring, alerts, planners
+│   └── UseCases/      # Business operations (LoadRecommendation, ScheduleNotifications, etc.)
+├── Features/          # Feature modules
+│   └── WizPath/       # Climate-aware route planning (map, dashboard, sentinel)
 ├── Presentation/      # SwiftUI views + ViewModels
-│   ├── Home/          # Main weather screen, trend chart
-│   ├── Insights/      # Weather insights and analytics
-│   ├── Onboarding/    # First-launch experience
-│   ├── Recommendations/ # Detailed recommendations
-│   ├── Settings/      # Preferences, notifications
-│   └── Shared/        # Location picker, root views
-└── ForeWizWidget/     # Widget extension
+│   ├── Home/          # Main screen, briefing, HUD card
+│   ├── Insights/      # Weather insights view
+│   ├── Onboarding/    # Language + permissions setup
+│   ├── Recommendations/ # Detailed recommendation view
+│   └── Shared/        # Location picker, splash, root views, error screens
+└── ForeWizWidgets/         # Widget extension (small, medium, lock screen)
+    ├── WidgetProvider.swift
+    ├── WidgetViews.swift
+    ├── WidgetLocalization.swift
+    └── WidgetEntry.swift
 ```
 
 ### Key Design Decisions
 
-- **Zero third-party dependencies** — no CocoaPods, SPM, or Carthage
-- **Domain layer imports Foundation only** — clean separation of concerns
-- **Actor-based concurrency** — thread-safe data access
-- **Protocol-driven repositories** — mockable, testable data layer
-- **Deterministic decision engines** — fully unit tested
-- **IntelligenceService** — Apple Intelligence ready with graceful fallback
+| Principle | Implementation |
+|-----------|---------------|
+| **Clean Architecture + MVVM-C** | Domain is pure Swift (Foundation only), Data handles I/O, Presentation owns SwiftUI |
+| **Zero Dependencies** | Every framework is Apple-first-party: SwiftUI, WeatherKit, SwiftData, CoreLocation, MapKit, WidgetKit, AppIntents, CoreHaptics, BackgroundTasks |
+| **Actor-based Concurrency** | Thread-safe services with Swift actors + async/await |
+| **Protocol-driven Repositories** | Every data source has a protocol + mock + production implementation |
+| **Deterministic Engines** | All decision engines are pure functions — fully unit testable |
+| **Dependency Injection** | Centralized `DependencyContainer` with `.live()` and `.simulator()` factories |
+| **Facade Refactoring** | Large files (>400 lines) split into focused, single-responsibility modules |
 
 ---
 
-## Getting Started
+## 📦 Module Overview
+
+<details>
+<summary><b>Domain Layer — 50+ files</b></summary>
+
+```
+Services/
+├── WeatherDecisionEngine.swift          # Core decision orchestrator
+├── ActivityWindowScoringEngine.swift    # Hourly scoring (0-100)
+├── OutfitDecisionEngine.swift           # 10+ clothing categories
+├── HealthWeatherService.swift           # 5 health calculators
+│   ├── HealthMigraineCalculator.swift
+│   ├── HealthSleepCalculator.swift
+│   ├── HealthJointCalculator.swift
+│   ├── HealthRespiratoryCalculator.swift
+│   └── HealthStaminaCalculator.swift
+├── WeatherNarrativeService.swift        # Human-like story generation
+├── WeatherBriefingService.swift         # Combines all analyses
+├── ComparativeWeatherService.swift      # Normals, trends, anomalies
+├── DefaultWeatherRiskClassifier.swift   # 8 risk types
+├── NotificationPlanningEngine.swift     # 5 notification planners
+│   ├── MorningBriefingPlanner.swift
+│   ├── OutfitPlanBuilder.swift
+│   ├── ActivityPlanBuilder.swift
+│   ├── RiskPlanBuilder.swift
+│   └── NotificationPlanHelpers.swift
+├── RecommendationStore.swift            # Cached recommendations
+├── RecommendationExplainer.swift        # Human-readable explanations
+├── SevereWeatherAlertService.swift      # Critical alerts
+├── FeatureGate.swift                    # Feature flags
+└── DepartureOptimizerService.swift      # Optimal departure finder (WizPath)
+
+Entities/
+├── DailyRecommendation.swift
+├── WeatherScore.swift
+├── WeatherNarrative.swift
+├── HealthWeatherAnalysis.swift
+├── ComparativeWeatherAnalysis.swift
+├── DailyWeatherBriefing.swift
+├── OutfitRecommendation.swift
+├── ActivityRecommendation.swift
+├── UserComfortProfile.swift
+├── TimeWindow.swift
+├── WeatherSnapshot.swift
+├── HourlyWeatherPoint.swift
+├── DailyWeatherPoint.swift
+├── SavedLocation.swift
+└── NotificationPreference.swift
+
+UseCases/
+├── LoadHomeRecommendationUseCase.swift
+├── UpdateUserPreferencesUseCase.swift
+├── CompleteOnboardingUseCase.swift
+└── ScheduleSmartNotificationsUseCase.swift
+```
+</details>
+
+<details>
+<summary><b>Presentation Layer — 20+ views</b></summary>
+
+```
+Home/
+├── HomeView.swift                     # Main screen with toolbar + content + splash
+├── HomeViewModel.swift                # State management
+├── HomeViewState.swift                # Loadable state enum
+├── HomeViewStateFactory.swift         # State construction
+└── Components/
+    ├── AIBriefingSection.swift        # Narrative + health + comparative UI
+    └── WizPathHUDCard.swift           # Quick journey status
+
+Onboarding/
+├── OnboardingView.swift               # Language + permissions setup
+└── OnboardingViewModel.swift
+
+Recommendations/
+├── RecommendationDetailView.swift
+├── RecommendationDetailViewModel.swift
+└── Components/
+    ├── RecommendationWhyThisView.swift # Explanation UI
+    └── HourlyRecommendationRow.swift
+
+Shared/
+├── AppRootView.swift                   # Navigation root
+├── AppSplashView.swift                 # Animated launch
+├── LocationPickerView.swift            # Map-based city search
+├── ScreenErrorView.swift               # Error + retry
+└── ShareSheet.swift
+```
+</details>
+
+<details>
+<summary><b>Core Design System — 15+ components</b></summary>
+
+```
+DesignSystem/
+├── AppTheme.swift                      # Colors, typography, motion tokens
+├── ThemeManager.swift                  # Dark mode manager
+├── GlassCard.swift                     # Ultra-thin material cards
+├── GlassButton.swift                   # Glass-styled buttons
+├── ScoreRingView.swift                 # Animated score rings
+├── OrbBackground.swift                 # LiquidOrb + AnimatedOrbBackground
+├── EntranceAnimations.swift            # StaggerEntrance, CardEntrance, Float
+├── ShimmerAndSheen.swift               # Shimmer + LiquidSheen modifiers
+├── ButtonStyles.swift                  # PressScale, FullTapArea
+├── PulseAndLoader.swift                # PulseGlow + PulsingDotsLoader
+├── AnimationHelpers.swift              # Preview helpers
+├── WeatherGradientService.swift        # Weather-responsive gradient orchestrator
+├── WeatherGradientTypes.swift          # GradientSet + ParticleEffect types
+├── WeatherGradientGenerator.swift      # Gradient computation
+├── WeatherAwareBackground.swift        # Background view
+├── WeatherStateTransitionManager.swift # Smooth transitions between weather states
+├── MicroInteractionManager.swift       # Haptic + animation coordination
+├── AdvancedAnimations.swift            # Reactive animations
+└── EnhancedWeatherSplash.swift         # Weather-conditioned splash
+```
+</details>
+
+---
+
+## 🚀 Getting Started
 
 ### Requirements
-- Xcode 26+
-- iOS 26+ deployment target
-- Apple Developer account with WeatherKit entitlement
+- Xcode 16+
+- iOS 17+ deployment target
+- Apple Developer account with **WeatherKit** entitlement
 
 ### Setup
+
 ```bash
 git clone https://github.com/bilgenworks/forewiz.git
 cd forewiz
 open ForeWiz.xcodeproj
 ```
 
-Enable WeatherKit capability in Xcode: Target → Signing & Capabilities → + → WeatherKit.
+1. Select the **ForeWiz** target
+2. Signing & Capabilities → Add **WeatherKit**
+3. Build and run (`⌘R`)
 
----
-
-## Testing
+### Running Tests
 
 ```bash
-xcodebuild test -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'platform=iOS Simulator,name=iPhone 16'
+xcodebuild test -project ForeWiz.xcodeproj -scheme ForeWiz \
+  -sdk iphonesimulator \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max'
 ```
 
-The project includes unit tests for:
+Test domains:
 - Decision engines (weather, outfit, activity window)
 - Notification planning
 - Localization coverage
 - Error handling
 - Data consistency
+- Performance benchmarks
 
 ---
 
-## Build & CI
+## 🔧 Build & CI
 
 ```bash
-xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generic/platform=iOS'
+xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
 ```
 
-CI pipeline (`.github/workflows/ci.yml`):
-- Lint with SwiftLint
-- Build all targets
-- Run unit tests
-- Verify localization
+**CI Pipeline (`.github/workflows/ci.yml`):**
+1. SwiftLint linting (`--strict`)
+2. Build all targets
+3. Run unit tests
+4. Localization completeness check
 
 ---
 
-## Privacy
+## 📊 Project Statistics
 
-- **Location is used only for local weather** — no background tracking
-- **All preferences stored on-device** via SwiftData
-- **No analytics, no telemetry, no third-party SDKs**
-- **No data leaves your device**
+| Metric | Value |
+|--------|-------|
+| **Total Swift files** | ~140 |
+| **Unit tests** | 25+ test suites |
+| **Localized strings** | 150+ keys (EN + TR) |
+| **External dependencies** | **0** (100% Apple-first-party) |
+| **Deployment target** | iOS 17+ |
+
+### File Size Management
+Large files systematically refactored into focused modules:
+
+| Original File | Before | After | Reduction |
+|---------------|--------|-------|-----------|
+| `HomeView.swift` | 899 | ~150 | -749 |
+| `WizPathDashboardView.swift` | 847 | ~150 | -697 |
+| `EnhancedWeatherSplash.swift` | 712 | ~120 | -592 |
+| `LocationPickerView.swift` | 702 | ~200 | -502 |
+| `SiriShortcutsManager.swift` | 460 | 0 (deleted) | -460 |
+| `HealthWeatherService.swift` | 440 | ~80 | -360 |
+| `DefaultNotificationPlanningEngine.swift` | 420 | ~70 | -350 |
+| `WeatherGradientService.swift` | 413 | ~50 | -363 |
+| `AnimationHelpers.swift` | 424 | ~20 | -404 |
+| **Total** | **~7,800** | **~1,700** | **-6,100** |
+
+---
+
+## 🔒 Privacy
+
+- **Location**: Used only for local weather — no background tracking, no sharing
+- **Preferences**: All stored **on-device** via SwiftData — never transmitted
+- **Analytics**: **Zero** — no telemetry, no analytics SDKs, no third-party code
+- **Network**: Only connects to Apple WeatherKit — no data leaves your device
+
+---
+
+## 🧪 Testing Strategy
+
+| Test Suite | What It Covers |
+|-----------|----------------|
+| `WeatherDecisionEngineTests` | Outdoor scoring, risk detection, window selection |
+| `OutfitDecisionEngineTests` | Category selection, advice generation |
+| `ActivityWindowScoringEngineTests` | Hourly scoring, time bonuses, edge cases |
+| `HealthWeatherServiceTests` | All 5 calculators, overall scoring |
+| `NotificationPlanningEngineTests` | Plan creation, deduplication, scheduling |
+| `WeatherBriefingServiceTests` | Narrative integration, action items |
+| `DataConsistencyTests` | Cache coherence, repository integration |
+| `LocalizationTests` | Key coverage, format strings |
+| `ErrorHandlerTests` | Error propagation, user messages |
+| `PerformanceTests` | Scoring throughput, concurrency safety |
+
+---
+
+## 📱 License
+
+Private project. All rights reserved.
 
 ---
 
 <p align="center">
-  <sub>Built with ☀️ + 🧊 by <a href="https://bilgenworks.com">Bilgen Works</a></sub>
+  <sub>Built with ☀️ + 🧊 by Bilgen Works</sub>
 </p>
