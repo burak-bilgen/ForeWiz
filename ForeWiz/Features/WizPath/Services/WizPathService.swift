@@ -91,11 +91,25 @@ final class WizPathService {
 
         let directions = MKDirections(request: request)
 
-        let response = try await directions.calculate()
-        guard let route = response.routes.first else {
-            throw WizPathError.routeUnavailable
+        do {
+            let response = try await directions.calculate()
+            guard let route = response.routes.first else {
+                throw WizPathError.routeUnavailable
+            }
+            return route
+        } catch let error as MKError {
+            // MapKit error codes (raw values for broader compatibility)
+            // MKErrorDirectionsNotAvailable = 4, MKErrorServerFailure = 2
+            let nsError = error as NSError
+            switch nsError.code {
+            case 4: // MKErrorDirectionsNotAvailable
+                throw WizPathError.destinationUnreachable
+            case 2, 5: // MKErrorServerFailure, MKErrorNetworkFailure
+                throw WizPathError.routeUnavailable
+            default:
+                throw WizPathError.routeUnavailable
+            }
         }
-        return route
     }
 
     // MARK: - Segment Interpolation

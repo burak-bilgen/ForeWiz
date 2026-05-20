@@ -6,6 +6,7 @@ struct HomeViewState: Equatable {
     let currentWeather: HomeCurrentWeatherViewState
     let dailyForecasts: [DailyForecastItem]
     let hourlyScores: [HourlyScoreItem]
+    let keyEvents: [DayKeyEvent]
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
     let warningMessage: String?

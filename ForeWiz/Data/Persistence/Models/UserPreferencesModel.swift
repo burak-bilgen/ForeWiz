@@ -20,6 +20,7 @@ final class UserPreferencesModel {
     var accentPaletteRaw: String?
     var savedLocationsData: Data?
     var selectedLocationID: String = "current-location"
+    var weatherParticleIntensity: Double = 0.15
     var createdAt: Date
     var updatedAt: Date
 
@@ -102,7 +103,8 @@ final class UserPreferencesModel {
             accentPalette: accentPalette,
             language: language,
             savedLocations: locations,
-            selectedLocationID: selectedID
+            selectedLocationID: selectedID,
+            weatherParticleIntensity: weatherParticleIntensity.clamped(to: 0...1)
         )
     }
 
@@ -128,6 +130,7 @@ final class UserPreferencesModel {
         self.accentPaletteRaw = profile.accentPalette.rawValue
         self.savedLocationsData = encoded(normalizedSavedLocations(profile.savedLocations))
         self.selectedLocationID = profile.selectedLocationID
+        self.weatherParticleIntensity = profile.weatherParticleIntensity.clamped(to: 0...1)
         self.updatedAt = Date()
     }
 

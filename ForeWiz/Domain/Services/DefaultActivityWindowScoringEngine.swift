@@ -31,7 +31,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             score -= 15
         }
 
-        if hourOfDay >= 22 || hourOfDay < 5 {
+        if hourOfDay >= 21 || hourOfDay < 5 {
             score -= 20
         } else if hourOfDay >= 20 || hourOfDay < 6 {
             score -= 10
@@ -132,7 +132,8 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
     // MARK: - Active hours guard
 
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
-        let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 22
+        // Varsayılan aktif saat aralığı 07:00–21:00 (21:30 sonrası güvenli değil)
+        let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 21
 
         let startHour = 7
         if endHour > startHour {

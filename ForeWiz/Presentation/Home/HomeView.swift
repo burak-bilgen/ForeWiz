@@ -18,10 +18,6 @@ struct HomeView: View {
     @State private var toolbarAppeared = false
     @State private var showWizPathSheet = false
 
-    private var wizPathRouteStatus: RouteStatus {
-        WizPathHUDStatus.shared.currentStatus
-    }
-
     private var currentSymbol: String {
         if case .loaded(let state) = viewModel.state { return state.currentWeather.symbolName }
         return "cloud.fill"
@@ -37,6 +33,11 @@ struct HomeView: View {
                 LiquidOrbBackground(palette: orbPalette)
                     .ignoresSafeArea()
                     .animation(AppTheme.slowEaseOut, value: currentSymbol)
+
+                // Weather particle background — günün hava durumuna göre animasyon
+                EnhancedWeatherParticles(kind: splashKind, progress: viewModel.particleIntensity)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
 
                 content
 
@@ -94,11 +95,18 @@ struct HomeView: View {
             .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay), value: toolbarAppeared)
         }
 
+        ToolbarItem(placement: .topBarLeading) {
+            ToolbarWizPathButton(action: { showWizPathSheet = true })
+                .opacity(toolbarAppeared ? 1 : 0)
+                .offset(y: toolbarAppeared ? 0 : -4)
+                .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay + 0.05), value: toolbarAppeared)
+        }
+
         ToolbarItem(placement: .topBarTrailing) {
             ToolbarLanguageButton()
                 .opacity(toolbarAppeared ? 1 : 0)
                 .offset(y: toolbarAppeared ? 0 : -4)
-                .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay + 0.05), value: toolbarAppeared)
+                .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay + 0.10), value: toolbarAppeared)
         }
     }
 
@@ -123,9 +131,7 @@ struct HomeView: View {
             HomeLoadedContent(
                 state: state,
                 contentReady: contentReady,
-                refresh: { await viewModel.refresh() },
-                showWizPathSheet: $showWizPathSheet,
-                wizPathRouteStatus: wizPathRouteStatus
+                refresh: { await viewModel.refresh() }
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)),
@@ -187,8 +193,7 @@ struct HomeView: View {
             scheduleSmartNotificationsUseCase: DefaultScheduleSmartNotificationsUseCase(
                 notificationRepository: UserNotificationRepository(),
                 notificationPlanningEngine: DefaultNotificationPlanningEngine(),
-                dateProvider: dateProvider,
-                severeWeatherAlertService: SevereWeatherAlertService.shared
+                dateProvider: dateProvider
             ),
             preferencesRepository: preferencesRepo,
             homeViewStateFactory: factory

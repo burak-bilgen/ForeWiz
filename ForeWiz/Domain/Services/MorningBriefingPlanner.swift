@@ -2,7 +2,8 @@ import Foundation
 
 // MARK: - Morning Briefing Planner
 
-/// Builds the morning briefing notification plan from weather recommendation data.
+/// Builds the morning briefing notification — a short, human-like daily weather summary.
+/// All text is in natural Turkish, as if a friend is giving you the weather lowdown.
 enum MorningBriefingPlanner {
 
     static func makePlan(
@@ -12,7 +13,7 @@ enum MorningBriefingPlanner {
         calendar: Calendar
     ) -> NotificationPlan? {
         let preference = profile.notificationPreferences.first { $0.category == .morningBriefing }
-        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 30)
+        let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 0)
 
         guard let fireDate = calendar.nextDate(
             after: now,
@@ -20,43 +21,68 @@ enum MorningBriefingPlanner {
             matchingPolicy: .nextTime
         ) else { return nil }
 
-        let body = buildBody(recommendation: recommendation)
+        let body = buildBody(recommendation: recommendation, now: now, calendar: calendar)
 
         return NotificationPlan(
             id: NotificationPlanHelpers.stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
             category: .morningBriefing,
             fireDate: fireDate,
-            title: L10n.text("todays_weather_plan_is_ready"),
+            title: L10n.text("notification_morning_title"),
             body: body,
             priority: 70,
-            reason: L10n.text("notification_morning_reason")
+            reason: "günlük hava özeti"
         )
     }
 
     // MARK: - Body Builder
 
-    private static func buildBody(recommendation: DailyRecommendation) -> String {
-        let opening: String
+    private static func buildBody(recommendation: DailyRecommendation, now: Date, calendar: Calendar) -> String {
+        var parts: [String] = []
+
+        // Opening based on decision — arkadaşça, doğal bir dille
         switch recommendation.outdoorDecision {
         case .good:
-            opening = L10n.text("today_looks_comfortable_for_outdoor")
+            parts.append(L10n.text("notif_morning_good"))
         case .moderate:
-            opening = L10n.text("outdoor_plans_are_fine_today")
+            parts.append(L10n.text("notif_morning_moderate"))
         case .risky:
-            opening = L10n.text("build_todays_outdoor_plan_carefully")
+            parts.append(L10n.text("notif_morning_risky"))
         case .avoid:
-            opening = L10n.text("it_is_safer_to_keep")
+            parts.append(L10n.text("notif_morning_avoid"))
         }
 
-        var sentences = [opening]
-        if let bestWindow = recommendation.bestOutdoorWindow {
-            sentences.append(String(format: L10n.text("morning_best_time_format"), bestWindow.shortDisplayText))
+        // Best window — varsa ve henüz geçmemişse ekle
+        if let window = recommendation.bestOutdoorWindow, window.end > now {
+            let timeInfo = window.shortDisplayText
+            switch recommendation.outdoorDecision {
+            case .good:
+                parts.append(String(format: L10n.text("notif_morning_window_good"), timeInfo))
+            default:
+                parts.append(String(format: L10n.text("notif_morning_window_ok"), timeInfo))
+            }
         }
 
-        if let risk = NotificationPlanHelpers.dominantRisk(in: recommendation), risk.severity >= .high {
-            sentences.append(String(format: L10n.text("morning_risk_format"), risk.title, NotificationPlanHelpers.actionText(for: risk)))
+        // Top risk warning — doğal dille uyarı
+        if let risk = recommendation.risks.first(where: { $0.severity >= .high }) {
+            let riskTip = actionTip(for: risk)
+            if let window = recommendation.bestOutdoorWindow, window.end > now {
+                parts.append(String(format: L10n.text("notif_morning_risk_with_tip"), risk.title, riskTip))
+            } else {
+                parts.append(String(format: L10n.text("notif_morning_risk_only"), risk.title, riskTip))
+            }
         }
 
-        return sentences.joined(separator: " ")
+        return parts.joined(separator: " ")
+    }
+
+    private static func actionTip(for risk: WeatherRisk) -> String {
+        switch risk.type {
+        case .heat: return L10n.text("notif_tip_heat")
+        case .uv: return L10n.text("notif_tip_uv")
+        case .rain: return L10n.text("notif_tip_rain")
+        case .wind, .storm: return L10n.text("notif_tip_wind")
+        case .cold: return L10n.text("notif_tip_cold")
+        case .humidity, .poorComfort: return L10n.text("notif_tip_comfort")
+        }
     }
 }

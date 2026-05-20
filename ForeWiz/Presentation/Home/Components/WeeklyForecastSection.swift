@@ -52,11 +52,11 @@ struct ForecastRow: View {
                 .frame(width: 20)
 
             HStack(spacing: 4) {
-                Text("\\(Int(forecast.highTemp))\\(L10n.text(\"unit_degree\"))")
+                Text("\(Int(round(forecast.highTemp)))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                Text("\\(Int(forecast.lowTemp))\\(L10n.text(\"unit_degree\"))")
+                Text("\(Int(round(forecast.lowTemp)))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.35))
                     .lineLimit(1)
@@ -69,7 +69,7 @@ struct ForecastRow: View {
                 HStack(spacing: 3) {
                     Image(systemName: "drop.fill")
                         .font(.system(size: 8))
-                    Text("\\(Int(forecast.precipitationChance * 100))\\(L10n.text(\"unit_percent\"))")
+                    Text("\(Int(forecast.precipitationChance * 100))\(L10n.text("unit_percent"))")
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .lineLimit(1)
                 }
@@ -82,7 +82,7 @@ struct ForecastRow: View {
                 .fill(scoreColor.opacity(0.6))
                 .frame(width: 2, height: 20)
 
-            Text("\\(forecast.outdoorScore)")
+            Text("\(forecast.outdoorScore)")
                 .font(.system(size: 13, weight: .bold, design: .rounded))
                 .foregroundStyle(scoreColor)
                 .frame(width: 28, alignment: .trailing)

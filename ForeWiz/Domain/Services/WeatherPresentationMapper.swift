@@ -64,13 +64,13 @@ struct WeatherPresentationMapper {
         switch unitSystem {
         case .metric:
             value = celsius
-            suffix = "°"
+            suffix = L10n.text("unit_degree")
         case .imperial:
             value = (celsius * 9 / 5) + 32
             suffix = "°F"
         }
 
-        return value.formatted(.number.precision(.fractionLength(0))) + suffix
+        return String(format: "%.0f", value) + suffix
     }
 
     /// Converts a Celsius temperature to the value in the target unit system (for numeric display).

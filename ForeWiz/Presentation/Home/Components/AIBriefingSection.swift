@@ -5,6 +5,7 @@ import SwiftUI
 /// Combines weather data into meaningful, human-readable insights.
 struct AIBriefingSection: View {
     let briefing: DailyWeatherBriefing
+    @State private var expanded = false
 
     var body: some View {
         VStack(spacing: 14) {
@@ -31,14 +32,40 @@ struct AIBriefingSection: View {
             // Key Takeaway
             TakeawayCard(text: briefing.keyTakeaway)
 
-            // Health Card
-            HealthCard(health: briefing.health)
+            // Expandable content: Health + Comparative + Action Items
+            if expanded {
+                HealthCard(health: briefing.health)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
 
-            // Comparative Card
-            ComparativeCard(comparative: briefing.comparative)
+                ComparativeCard(comparative: briefing.comparative)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
 
-            // Action Items
-            ActionItemsCard(items: briefing.actionItems)
+                ActionItemsCard(items: briefing.actionItems)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+
+            // Expand / Collapse button
+            Button(action: {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                    expanded.toggle()
+                }
+            }) {
+                HStack(spacing: 6) {
+                    Text(expanded ? L10n.text("briefing_show_less") : L10n.text("briefing_show_more"))
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 10, weight: .bold))
+                        .rotationEffect(.degrees(expanded ? 180 : 0))
+                }
+                .foregroundStyle(AppTheme.liquidAccent.opacity(0.7))
+                .padding(.vertical, 8)
+                .padding(.horizontal, 16)
+                .background(
+                    Capsule()
+                        .fill(AppTheme.liquidAccent.opacity(0.08))
+                )
+            }
+            .buttonStyle(.plain)
         }
     }
 

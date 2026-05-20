@@ -8,6 +8,7 @@ import OSLog
 final class HomeViewModel {
     private(set) var state: LoadableState<HomeViewState> = .idle
     private(set) var selectedLocationName: String = L10n.text( "home_current_location")
+    private(set) var particleIntensity: Double = 0.15
 
     private let loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase
     private let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
@@ -107,6 +108,7 @@ final class HomeViewModel {
             let result = try await loadHomeRecommendationUseCase
                 .execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
             let profile = try await preferencesRepository.loadProfile()
+            self.particleIntensity = profile.weatherParticleIntensity
 
             // Generate AI-powered daily briefing
             state = .loaded(
@@ -131,7 +133,8 @@ final class HomeViewModel {
             do {
                 _ = try await scheduleSmartNotificationsUseCase.execute(
                     recommendation: result.recommendation,
-                    profile: profile
+                    profile: profile,
+                    hourlyPoints: result.hourlyPoints
                 )
             } catch {
                 AppLogger.notifications.error("Failed to schedule notifications: \(error.localizedDescription)")

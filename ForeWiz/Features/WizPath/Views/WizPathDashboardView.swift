@@ -95,51 +95,53 @@ struct WizPathDashboardView: View {
     // MARK: - Active Route State
 
     private var activeRouteContent: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 12) {
-                // Map
-                WizPathMapView(viewModel: viewModel)
-                    .frame(height: 260)
-                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                    .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-
-                // Offline banner
-                if viewModel.state.isOffline {
-                    OfflineBanner(retry: { Task { await viewModel.calculateRoute() } })
+        GeometryReader { geometry in
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 12) {
+                    // Map - fixed height with proper layout
+                    WizPathMapView(viewModel: viewModel)
+                        .frame(height: min(260, geometry.size.height * 0.35))
+                        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
                         .padding(.horizontal, 16)
-                }
+                        .padding(.top, 8)
 
-                // Journey HUD (compact)
-                if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
-                    JourneyHUDView(data: route.journeyHUDData)
+                    // Offline banner
+                    if viewModel.state.isOffline {
+                        OfflineBanner(retry: { Task { await viewModel.calculateRoute() } })
+                            .padding(.horizontal, 16)
+                    }
+
+                    // Journey HUD (compact)
+                    if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
+                        JourneyHUDView(data: route.journeyHUDData)
+                            .padding(.horizontal, 16)
+                    }
+
+                    // Route info panel
+                    if let route = viewModel.currentRoute {
+                        WizPathRouteInfoPanel(
+                            route: route,
+                            destinationName: viewModel.destinationName,
+                            bestDepartureTime: viewModel.bestDepartureTime,
+                            departureTimeReason: viewModel.departureTimeReason,
+                            showDepartureOptimizer: { showDepartureOptimizer = true },
+                            onReset: { viewModel.reset() },
+                            onUpdateDepartureTime: { viewModel.updateDepartureTime($0) }
+                        )
                         .padding(.horizontal, 16)
-                }
+                    }
 
-                // Route info panel
-                if let route = viewModel.currentRoute {
-                    WizPathRouteInfoPanel(
-                        route: route,
-                        destinationName: viewModel.destinationName,
-                        bestDepartureTime: viewModel.bestDepartureTime,
-                        departureTimeReason: viewModel.departureTimeReason,
-                        showDepartureOptimizer: { showDepartureOptimizer = true },
-                        onReset: { viewModel.reset() },
-                        onUpdateDepartureTime: { viewModel.updateDepartureTime($0) }
-                    )
-                    .padding(.horizontal, 16)
+                    // Attribution
+                    Text(L10n.text("wizpath_powered_by_apple_maps"))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .padding(.top, 4)
+                        .padding(.bottom, 24)
                 }
-
-                // Attribution
-                Text(L10n.text("wizpath_powered_by_apple_maps"))
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 4)
-                    .padding(.bottom, 24)
             }
+            .safeAreaPadding(.bottom, 8)
         }
-        .safeAreaPadding(.bottom, 8)
     }
 }
 

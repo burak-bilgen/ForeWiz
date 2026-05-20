@@ -137,8 +137,7 @@ final class DependencyContainer {
         let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
             notificationRepository: notificationRepository,
             notificationPlanningEngine: notificationEngine,
-            dateProvider: dateProvider,
-            severeWeatherAlertService: severeWeatherAlertService
+            dateProvider: dateProvider
         )
 
         return DependencyContainer(
@@ -219,8 +218,7 @@ final class DependencyContainer {
         let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
             notificationRepository: notificationRepository,
             notificationPlanningEngine: notificationEngine,
-            dateProvider: dateProvider,
-            severeWeatherAlertService: severeWeatherAlertService
+            dateProvider: dateProvider
         )
 
         return DependencyContainer(

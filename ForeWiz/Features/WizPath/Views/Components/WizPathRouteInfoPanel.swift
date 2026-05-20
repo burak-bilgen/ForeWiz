@@ -59,12 +59,12 @@ struct WizPathRouteInfoPanel: View {
                     Spacer()
                     if let temp = route.segments.first?.weather?.temperature {
                         RouteStatItem(icon: "thermometer.medium",
-                                 value: "\\(Int(temp))°",
-                                 label: L10n.text("wizpath_avg_temp"))
+                             value: "\(Int(temp))\(L10n.text("unit_degree"))",
+                             label: L10n.text("wizpath_avg_temp"))
                         Spacer()
                     }
                     RouteStatItem(icon: "exclamationmark.triangle.fill",
-                             value: "\\(route.weatherChangePoints.count)",
+                             value: "\(route.weatherChangePoints.count)",
                              label: L10n.text("wizpath_weather_changes"))
                 }
 
@@ -117,14 +117,14 @@ struct WizPathRouteInfoPanel: View {
         let h = Int(duration) / 3600
         let m = (Int(duration) % 3600) / 60
         if h > 0 {
-            return "\\(h) \\(L10n.text(\"wizpath_hours\")) \\(m) \\(L10n.text(\"wizpath_minutes\"))"
+            return "\(h) \(L10n.text("wizpath_hours")) \(m) \(L10n.text("wizpath_minutes"))"
         }
-        return "\\(m) \\(L10n.text(\"wizpath_minutes\"))"
+        return "\(m) \(L10n.text("wizpath_minutes"))"
     }
 
     private func formattedDistance(_ dist: CLLocationDistance) -> String {
         let km = dist / 1000
-        return km >= 10 ? "\\(Int(km)) \\(L10n.text(\"unit_km\"))" : String(format: "%.1f \\(L10n.text(\"unit_km\"))", km)
+        return km >= 10 ? "\(Int(km)) \(L10n.text("unit_km"))" : String(format: "%.1f \(L10n.text("unit_km"))", km)
     }
 }
 

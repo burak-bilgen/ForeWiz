@@ -11,6 +11,15 @@ import Combine
 @MainActor
 final class HapticEngine: ObservableObject {
     static let shared = HapticEngine()
+
+    /// Whether haptics are available on this device (disabled on simulator)
+    private let isAvailable: Bool = {
+#if targetEnvironment(simulator)
+        return false
+#else
+        return true
+#endif
+    }()
     
     private let lightImpact = UIImpactFeedbackGenerator(style: .light)
     private let mediumImpact = UIImpactFeedbackGenerator(style: .medium)
@@ -27,7 +36,7 @@ final class HapticEngine: ObservableObject {
     /// Prepares all generators for upcoming interactions.
     /// Call this before showing interactive UI to minimize latency.
     func prepare() {
-        guard !isPrepared else { return }
+        guard isAvailable, !isPrepared else { return }
         
         lightImpact.prepare()
         mediumImpact.prepare()
@@ -42,6 +51,7 @@ final class HapticEngine: ObservableObject {
     
     /// Marks generators as needing preparation on next use.
     func resetPreparation() {
+        guard isAvailable else { return }
         isPrepared = false
     }
 }
@@ -50,31 +60,37 @@ final class HapticEngine: ObservableObject {
 
 extension HapticEngine {
     func light() {
+        guard isAvailable else { return }
         lightImpact.impactOccurred()
         lightImpact.prepare()
     }
     
     func medium() {
+        guard isAvailable else { return }
         mediumImpact.impactOccurred()
         mediumImpact.prepare()
     }
     
     func heavy() {
+        guard isAvailable else { return }
         heavyImpact.impactOccurred()
         heavyImpact.prepare()
     }
     
     func soft() {
+        guard isAvailable else { return }
         softImpact.impactOccurred()
         softImpact.prepare()
     }
     
     func rigid() {
+        guard isAvailable else { return }
         rigidImpact.impactOccurred()
         rigidImpact.prepare()
     }
     
     func impact(intensity: Double) {
+        guard isAvailable else { return }
         let style: UIImpactFeedbackGenerator.FeedbackStyle
         switch intensity {
         case 0..<0.2: style = .light
@@ -93,16 +109,19 @@ extension HapticEngine {
 
 extension HapticEngine {
     func success() {
+        guard isAvailable else { return }
         notification.notificationOccurred(.success)
         notification.prepare()
     }
     
     func warning() {
+        guard isAvailable else { return }
         notification.notificationOccurred(.warning)
         notification.prepare()
     }
     
     func error() {
+        guard isAvailable else { return }
         notification.notificationOccurred(.error)
         notification.prepare()
     }
@@ -112,6 +131,7 @@ extension HapticEngine {
 
 extension HapticEngine {
     func selectionChanged() {
+        guard isAvailable else { return }
         selection.selectionChanged()
         selection.prepare()
     }

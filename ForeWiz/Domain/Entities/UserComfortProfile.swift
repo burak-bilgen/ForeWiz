@@ -10,6 +10,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var language: AppLanguage
     var savedLocations: [SavedLocation]
     var selectedLocationID: String
+    var weatherParticleIntensity: Double // 0 (kapalı) – 1 (maks), varsayılan 0.15
 
     init(
         usualWorkoutTime: DateComponents? = nil,
@@ -20,7 +21,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         accentPalette: AppAccentPalette = .sky,
         language: AppLanguage = .english,
         savedLocations: [SavedLocation] = [SavedLocation.currentLocation],
-        selectedLocationID: String = "current-location"
+        selectedLocationID: String = "current-location",
+        weatherParticleIntensity: Double = 0.15
     ) {
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
@@ -31,6 +33,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.language = language
         self.savedLocations = savedLocations
         self.selectedLocationID = selectedLocationID
+        self.weatherParticleIntensity = weatherParticleIntensity.clamped(to: 0...1)
     }
 
     static var `default`: UserComfortProfile {

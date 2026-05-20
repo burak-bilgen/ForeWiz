@@ -7,9 +7,6 @@ struct HomeLoadingView: View {
         VStack(spacing: 20) {
             PulsingDotsLoader(color: .white.opacity(0.5), dotSize: 10)
                 .floating(amplitude: 6)
-            Text(L10n.text("home_loading_text"))
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.35))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

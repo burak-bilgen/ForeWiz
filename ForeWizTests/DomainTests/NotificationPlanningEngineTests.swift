@@ -45,10 +45,10 @@ struct NotificationPlanningEngineTests {
         let now = WeatherTestFixtures.date(month: 7, day: 10, hour: 9)
         var profile = WeatherTestFixtures.profile(maximumDailyNotifications: 3)
         profile.notificationPreferences = NotificationCategory.allCases.map { category in
-            let enabled = category == .morningBriefing || category == .outfitSuggestion
+            let enabled = category == .morningBriefing
             let preferredTime = category == .morningBriefing
                 ? DateComponents(hour: 8, minute: 0)
-                : DateComponents(hour: 7, minute: 45)
+                : nil
             return NotificationPreference(category: category, isEnabled: enabled, preferredTime: preferredTime)
         }
 
@@ -60,7 +60,7 @@ struct NotificationPlanningEngineTests {
         )
 
         let categories = Set(plans.map(\.category))
-        #expect(categories.isSubset(of: [.morningBriefing, .outfitSuggestion]))
+        #expect(categories.isSubset(of: [.morningBriefing]))
         #expect(categories.isEmpty == false)
         #expect(plans.allSatisfy { $0.fireDate > now })
     }

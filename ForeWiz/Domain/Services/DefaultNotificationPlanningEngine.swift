@@ -15,6 +15,7 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
         var candidates: [NotificationPlan] = []
 
+        // 1. Morning briefing
         if enabledCategories.contains(.morningBriefing),
            let morningPlan = MorningBriefingPlanner.makePlan(
             recommendation: recommendation,
@@ -25,35 +26,10 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             candidates.append(morningPlan)
         }
 
-        if enabledCategories.contains(.outfitSuggestion),
-           let outfitPlan = OutfitPlanBuilder.makePlan(
-             recommendation: recommendation,
-             profile: profile,
-             now: now,
-             calendar: calendar
-            ) {
-            candidates.append(outfitPlan)
-        }
-
-        if enabledCategories.contains(.bestRunWindow),
-           let runningWindow = recommendation.bestActivityWindows.first(where: { $0.activityType == .goingOutside }),
-           let plan = ActivityPlanBuilder.makePlan(activityRecommendation: runningWindow, now: now, calendar: calendar),
-           NotificationPlanHelpers.isWorthNotifying(plan: plan, calendar: calendar) {
-            candidates.append(plan)
-        }
-
+        // 2. Weather alerts for high+ risks
         candidates.append(
-            contentsOf: RiskPlanBuilder.makeSmartPlans(
+            contentsOf: RiskPlanBuilder.makeAlertPlans(
                 recommendation: recommendation,
-                enabledCategories: enabledCategories,
-                now: now,
-                calendar: calendar
-            )
-        )
-        candidates.append(
-            contentsOf: RiskPlanBuilder.makeImmediatePlans(
-                recommendation: recommendation,
-                enabledCategories: enabledCategories,
                 now: now,
                 calendar: calendar
             )
@@ -76,6 +52,10 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             return p0.priority > p1.priority
         }
 
-        return Array(sorted.prefix(profile.maximumDailyNotifications.clamped(to: 1...3)))
+        // Max 3 notifications per day, but weather alerts always pass through
+        let highPriority = sorted.filter { $0.priority >= 90 }
+        let regular = sorted.filter { $0.priority < 90 }
+
+        return highPriority + Array(regular.prefix(max(0, 2 - highPriority.count)))
     }
 }

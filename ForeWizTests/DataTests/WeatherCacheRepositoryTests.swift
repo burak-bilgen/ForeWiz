@@ -234,12 +234,8 @@ struct PreferencesRepositoryTests {
         profile.selectedLocationID = istanbul.id
         profile.notificationPreferences = [
             NotificationPreference(category: .morningBriefing, isEnabled: false, preferredTime: DateComponents(hour: 8)),
-            NotificationPreference(category: .outfitSuggestion, isEnabled: true, preferredTime: DateComponents(hour: 7, minute: 45)),
-            NotificationPreference(category: .bestRunWindow, isEnabled: true, preferredTime: nil),
-            NotificationPreference(category: .rainWarning, isEnabled: true, preferredTime: nil),
-            NotificationPreference(category: .windWarning, isEnabled: true, preferredTime: nil),
-            NotificationPreference(category: .uvWarning, isEnabled: true, preferredTime: nil),
-            NotificationPreference(category: .avoidHeatWindow, isEnabled: true, preferredTime: nil)
+            NotificationPreference(category: .keyEvent, isEnabled: true, preferredTime: nil),
+            NotificationPreference(category: .weatherAlert, isEnabled: true, preferredTime: nil)
         ]
 
         try await repository.saveProfile(profile)

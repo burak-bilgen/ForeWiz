@@ -38,7 +38,7 @@ struct WizPathWeatherSegmentCard: View {
                     .foregroundStyle(severityColor)
                     .shadow(color: severityColor.opacity(0.3), radius: 3)
 
-                Text("\\(Int(weather.temperature))°")
+                Text("\(Int(weather.temperature))\(L10n.text("unit_degree"))")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(.white)
 

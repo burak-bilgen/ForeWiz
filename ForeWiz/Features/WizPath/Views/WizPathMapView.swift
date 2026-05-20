@@ -17,7 +17,7 @@ struct WizPathMapView: View {
                 let coords = route.routeCoordinates
                 if coords.count > 1 {
                     MapPolyline(coordinates: coords)
-                        .stroke(routeColor(for: route), lineWidth: 2.5)
+                        .stroke(Color.routeRiskColor(route.overallRisk), lineWidth: 2.5)
                 }
 
                 // Destination annotation
@@ -149,14 +149,6 @@ struct WizPathMapView: View {
     }
 
     // MARK: - Helpers
-
-    private func routeColor(for route: WizPathRoute) -> Color {
-        switch route.overallRisk {
-        case .good: return .success
-        case .caution: return .warning
-        case .severe: return .danger
-        }
-    }
 
     private func routeRegion(_ route: WizPathRoute) -> MKCoordinateRegion {
         let coords = route.routeCoordinates

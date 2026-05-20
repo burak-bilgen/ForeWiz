@@ -49,7 +49,7 @@ struct HourlyPill: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text("\\(String(format: \"%02d\", item.hour))\\(L10n.text(\"time_format_hour\"))")
+            Text("\(String(format: "%02d", item.hour))\(L10n.text("time_format_hour"))")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
@@ -67,7 +67,7 @@ struct HourlyPill: View {
                 .fill(scoreColor)
                 .frame(width: 16, height: 3)
 
-            Text("\\(item.score)")
+            Text("\(item.score)")
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundStyle(scoreColor)
                 .lineLimit(1)

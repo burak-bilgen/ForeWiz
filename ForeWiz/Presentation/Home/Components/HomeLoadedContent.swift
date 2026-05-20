@@ -6,8 +6,6 @@ struct HomeLoadedContent: View {
     let state: HomeViewState
     let contentReady: Bool
     let refresh: () async -> Void
-    @Binding var showWizPathSheet: Bool
-    let wizPathRouteStatus: RouteStatus
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -26,31 +24,25 @@ struct HomeLoadedContent: View {
                 )
                 .cardEntrance(appeared: contentReady, baseDelay: 0.08)
 
-                // 3. WizPath journey entry
-                WizPathHUDCard(
-                    routeStatus: wizPathRouteStatus,
-                    onTap: {
-                        HapticEngine.shared.light()
-                        showWizPathSheet = true
-                    }
-                )
-                .cardEntrance(appeared: contentReady, baseDelay: 0.12)
-
-                // 4. Warning banner
+                // 3. Warning banner
                 if let warning = state.warningMessage {
                     WarningBanner(message: warning)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
-                // 5. Hourly forecast — time-sensitive, placed early
-                HourlyForecastSection(hourlyScores: state.hourlyScores)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.24)
-
-                // 6. AI briefing — narrative, health, comparative, actions
+                // 4. AI Briefing — günün kısa hikayesi (varsa)
                 if let briefing = state.briefing {
                     AIBriefingSection(briefing: briefing)
-                        .cardEntrance(appeared: contentReady, baseDelay: 0.32)
+                        .cardEntrance(appeared: contentReady, baseDelay: 0.24)
                 }
+
+                // 5. Key events — today's weather highlights
+                DayKeyEventsView(events: state.keyEvents)
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.24)
+
+                // 6. Hourly forecast — time-sensitive
+                HourlyForecastSection(hourlyScores: state.hourlyScores)
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.32)
 
                 // 7. Weekly forecast — planning reference
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)

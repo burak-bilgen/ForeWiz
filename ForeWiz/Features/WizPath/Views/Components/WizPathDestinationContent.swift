@@ -7,14 +7,16 @@ struct WizPathDestinationContent: View {
     let showDestinationPicker: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Map (taller when selecting)
-            WizPathMapView(viewModel: viewModel)
-                .frame(height: UIScreen.main.bounds.height * 0.45)
-                .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 10)
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
+        GeometryReader { geometry in
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Map (taller when selecting)
+                    WizPathMapView(viewModel: viewModel)
+                        .frame(height: geometry.size.height * 0.45)
+                        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                        .shadow(color: .black.opacity(0.25), radius: 24, x: 0, y: 10)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
 
             Spacer(minLength: 16)
 
@@ -49,8 +51,11 @@ struct WizPathDestinationContent: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .onChange(of: viewModel.travelMode) { _, _ in
-                        viewModel.refreshRoute()
+                    .onChange(of: viewModel.travelMode) { _, newMode in
+                        // Only recalculate if there's an active route
+                        if viewModel.currentRoute != nil {
+                            viewModel.switchTravelMode(to: newMode)
+                        }
                     }
 
                     // Set destination button
@@ -101,11 +106,13 @@ struct WizPathDestinationContent: View {
                     .padding(.bottom, 8)
             }
 
-            // Attribution
-            Text(L10n.text("wizpath_powered_by_apple_maps"))
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
-                .padding(.bottom, 16)
+                    // Attribution
+                    Text(L10n.text("wizpath_powered_by_apple_maps"))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .padding(.bottom, 16)
+                }
+            }
         }
     }
 }

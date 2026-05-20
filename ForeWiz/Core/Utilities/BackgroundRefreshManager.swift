@@ -106,7 +106,8 @@ final class BackgroundRefreshManager {
 
             _ = try await container.scheduleSmartNotificationsUseCase.execute(
                 recommendation: result.recommendation,
-                profile: try await container.preferencesRepository.loadProfile()
+                profile: try await container.preferencesRepository.loadProfile(),
+                hourlyPoints: result.hourlyPoints
             )
 
             WidgetCenter.shared.reloadAllTimelines()

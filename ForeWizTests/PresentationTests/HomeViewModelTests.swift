@@ -93,7 +93,7 @@ private final class MockLoadHomeRecommendationUseCase: LoadHomeRecommendationUse
 }
 
 private final class MockScheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase {
-    func execute(recommendation: DailyRecommendation, profile: UserComfortProfile) async throws -> [NotificationPlan] {
+    func execute(recommendation: DailyRecommendation, profile: UserComfortProfile, hourlyPoints: [HourlyWeatherPoint]) async throws -> [NotificationPlan] {
         []
     }
 }
