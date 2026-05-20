@@ -38,7 +38,12 @@ enum KeyEventNotificationPlanner {
         }
 
         // 2. Rain events — doğal dil: "Saat 14:00–16:00 arasında yağmur bekleniyor."
-        let rainClusters = clusterHours(todayPoints, where: { $0.precipitationChance ?? 0 >= 0.5 })
+        // Both precipitation chance >= 50% and condition-code keywords (e.g. "rain", "drizzle", "shower")
+        // trigger a rain event, since WeatherKit may report rain via condition codes even when
+        // the numerical precipitation chance is below 0.5.
+        let rainClusters = clusterHours(todayPoints, where: {
+            $0.precipitationChance ?? 0 >= 0.5 || isRainCondition($0.conditionCode)
+        })
         for (index, cluster) in rainClusters.enumerated() {
             let maxChance = cluster.map { $0.precipitationChance ?? 0 }.max() ?? 0
             let severity: DayKeyEvent.EventSeverity = maxChance >= 0.8 ? .high : .moderate
@@ -244,5 +249,14 @@ enum KeyEventNotificationPlanner {
         }
 
         return clusters
+    }
+
+    /// Returns true if the WeatherKit condition code indicates active precipitation.
+    private static func isRainCondition(_ code: String?) -> Bool {
+        guard let code = code?.lowercased() else { return false }
+        return code.contains("rain")
+            || code.contains("drizzle")
+            || code.contains("shower")
+            || code.contains("thunderstorm")
     }
 }
