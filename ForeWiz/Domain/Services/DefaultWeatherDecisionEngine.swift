@@ -275,6 +275,8 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             score = min(score, 34)
         } else if risks.contains(where: { $0.severity == .high }) {
             score = min(score, 58)
+        } else if risks.contains(where: { $0.severity == .medium }) {
+            score = min(score, 74)
         }
 
         return WeatherScore(rawValue: score)

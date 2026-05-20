@@ -161,7 +161,7 @@ struct DefaultWeatherRiskClassifier {
             )
         }
 
-        if (hour.precipitationChance ?? 0) >= 0.75 || (hour.precipitationAmountMm ?? 0) >= 2 {
+        if (hour.precipitationChance ?? 0) >= 0.7 || (hour.precipitationAmountMm ?? 0) >= 2 {
             return WeatherRisk(
                 type: .rain,
                 severity: .high,
@@ -286,7 +286,7 @@ struct DefaultWeatherRiskClassifier {
     private func rainRisk(for hour: HourlyWeatherPoint) -> WeatherRisk? {
         let precipitationChance = hour.precipitationChance ?? 0
         let precipitationAmount = hour.precipitationAmountMm ?? 0
-        guard precipitationChance >= 0.55 || precipitationAmount >= 1 else {
+        guard precipitationChance >= 0.5 || precipitationAmount >= 1 else {
             return nil
         }
 
