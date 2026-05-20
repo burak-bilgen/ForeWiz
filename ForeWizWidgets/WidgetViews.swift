@@ -16,41 +16,6 @@ private func scoreColor(_ score: Int) -> Color {
     }
 }
 
-private func weatherGradient(for symbol: String) -> LinearGradient {
-    switch symbol {
-    case _ where symbol.contains("sun") || symbol.contains("clear"):
-        LinearGradient(colors: [
-            Color(red: 0.15, green: 0.35, blue: 0.70),
-            Color(red: 0.06, green: 0.08, blue: 0.14)
-        ], startPoint: .top, endPoint: .bottom)
-    case _ where symbol.contains("moon"):
-        LinearGradient(colors: [
-            Color(red: 0.08, green: 0.06, blue: 0.20),
-            Color(red: 0.06, green: 0.08, blue: 0.14)
-        ], startPoint: .top, endPoint: .bottom)
-    case _ where symbol.contains("rain") || symbol.contains("drizzle"):
-        LinearGradient(colors: [
-            Color(red: 0.10, green: 0.15, blue: 0.30),
-            Color(red: 0.06, green: 0.08, blue: 0.14)
-        ], startPoint: .top, endPoint: .bottom)
-    case _ where symbol.contains("snow") || symbol.contains("sleet"):
-        LinearGradient(colors: [
-            Color(red: 0.20, green: 0.25, blue: 0.35),
-            Color(red: 0.06, green: 0.08, blue: 0.14)
-        ], startPoint: .top, endPoint: .bottom)
-    case _ where symbol.contains("bolt") || symbol.contains("thunder"):
-        LinearGradient(colors: [
-            Color(red: 0.20, green: 0.08, blue: 0.25),
-            Color(red: 0.06, green: 0.08, blue: 0.14)
-        ], startPoint: .top, endPoint: .bottom)
-    default:
-        LinearGradient(colors: [
-            Color(red: 0.10, green: 0.12, blue: 0.20),
-            Color(red: 0.06, green: 0.08, blue: 0.14)
-        ], startPoint: .top, endPoint: .bottom)
-    }
-}
-
 private func timeAgoText(from date: Date) -> String {
     let interval = -date.timeIntervalSinceNow
     if interval < 60 { return WidgetL10n.text("widget_just_now") }
@@ -59,13 +24,44 @@ private func timeAgoText(from date: Date) -> String {
     return ""
 }
 
-private let defaultGradient = LinearGradient(
-    colors: [
-        Color(red: 0.10, green: 0.12, blue: 0.20),
-        Color(red: 0.06, green: 0.08, blue: 0.14)
-    ],
-    startPoint: .top, endPoint: .bottom
-)
+private func glassBackground(accent: Color = Color(red: 0.25, green: 0.60, blue: 1.0)) -> some View {
+    ZStack {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .fill(.ultraThinMaterial)
+            .environment(\.colorScheme, .dark)
+
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        accent.opacity(0.0),
+                        accent.opacity(0.04),
+                        .white.opacity(0.02),
+                        accent.opacity(0.0)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .stroke(
+                LinearGradient(
+                    colors: [
+                        accent.opacity(0.18),
+                        accent.opacity(0.04),
+                        .white.opacity(0.10),
+                        accent.opacity(0.02),
+                        .white.opacity(0.05),
+                        accent.opacity(0.12)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                lineWidth: 0.5
+            )
+    }
+}
 
 // MARK: - Score Ring
 
@@ -77,14 +73,16 @@ private struct ScoreRing: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(scoreColor(score).opacity(0.2), lineWidth: lineWidth)
+                .stroke(scoreColor(score).opacity(0.15), lineWidth: lineWidth)
             Circle()
                 .trim(from: 0, to: CGFloat(score) / 100.0)
                 .stroke(scoreColor(score), style: .init(lineWidth: lineWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
+                .shadow(color: scoreColor(score).opacity(0.35), radius: 3)
             Text("\(score)")
                 .font(.system(size: size * 0.38, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
+                .monospacedDigit()
         }
         .frame(width: size, height: size)
     }
@@ -152,7 +150,7 @@ struct ForeWizWidgetMediumView: View {
                 forecastPanel(data: data)
             }
             .containerBackground(for: .widget) {
-                weatherGradient(for: data.currentConditionSymbol)
+                glassBackground()
             }
             .widgetURL(URL(string: "forewiz://home"))
             .overlay(alignment: .topTrailing) {
@@ -164,7 +162,7 @@ struct ForeWizWidgetMediumView: View {
         } else {
             emptyMediumView(for: entry.emptyState)
                 .containerBackground(for: .widget) {
-                    defaultGradient
+                    glassBackground()
                 }
                 .widgetURL(URL(string: "forewiz://home"))
         }
@@ -377,7 +375,7 @@ struct ForeWizWidgetSmallView: View {
             .padding(14)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .containerBackground(for: .widget) {
-                weatherGradient(for: data.currentConditionSymbol)
+                glassBackground()
             }
             .widgetURL(URL(string: "forewiz://home"))
             .overlay(alignment: .topTrailing) {
@@ -389,7 +387,7 @@ struct ForeWizWidgetSmallView: View {
         } else {
             emptySmallView(for: entry.emptyState)
                 .containerBackground(for: .widget) {
-                    defaultGradient
+                    glassBackground()
                 }
                 .widgetURL(URL(string: "forewiz://home"))
         }

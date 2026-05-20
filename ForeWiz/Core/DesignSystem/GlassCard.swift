@@ -18,7 +18,7 @@ struct LiquidGlassCard<Content: View>: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
-    @State private var sheenOffset: CGFloat = -1.0
+    @State private var sheenOffset: CGFloat = -1.5
 
     init(
         accentColor: Color = AppTheme.liquidAccent,
@@ -44,7 +44,7 @@ struct LiquidGlassCard<Content: View>: View {
                         .fill(.ultraThinMaterial)
                         .environment(\.colorScheme, .dark)
 
-                    // 2. Animated sheen — slow diagonal sweep
+                    // 2. Animated sheen — smooth diagonal sweep (eases in/out, autoreverses)
                     if !reduceMotion {
                         LiquidCardSheen(
                             cornerRadius: cornerRadius,
@@ -53,8 +53,8 @@ struct LiquidGlassCard<Content: View>: View {
                         )
                         .onAppear {
                             withAnimation(
-                                .linear(duration: 4.0)
-                                    .repeatForever(autoreverses: false)
+                                .easeInOut(duration: 6.0)
+                                    .repeatForever(autoreverses: true)
                                     .delay(1.0)
                             ) {
                                 sheenOffset = 1.5
@@ -62,42 +62,67 @@ struct LiquidGlassCard<Content: View>: View {
                         }
                     }
 
-                    // 3. Static gradient overlay
+                    // 2b. Static shimmer for cards that reduceMotion
+                    if reduceMotion {
+                        LiquidCardSheen(
+                            cornerRadius: cornerRadius,
+                            accentColor: accentColor,
+                            offset: 0.5
+                        )
+                    }
+
+                    // 3. Static gradient overlay (adaptive to color scheme)
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [
-                                    accentColor.opacity(0.0),
-                                    accentColor.opacity(0.06),
-                                    .white.opacity(0.02),
-                                    accentColor.opacity(0.0)
-                                ],
+                                colors: colorScheme == .dark
+                                    ? [
+                                        accentColor.opacity(0.0),
+                                        accentColor.opacity(0.04),
+                                        .white.opacity(0.01),
+                                        accentColor.opacity(0.0)
+                                    ]
+                                    : [
+                                        accentColor.opacity(0.0),
+                                        accentColor.opacity(0.06),
+                                        .white.opacity(0.02),
+                                        accentColor.opacity(0.0)
+                                    ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
 
-                    // 4. Accent border — refined light-catching stroke
+                    // 4. Accent border — refined light-catching stroke (adaptive)
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .stroke(
                             LinearGradient(
-                                colors: [
-                                    accentColor.opacity(0.30),
-                                    accentColor.opacity(0.06),
-                                    .white.opacity(0.15),
-                                    accentColor.opacity(0.04),
-                                    .white.opacity(0.08),
-                                    accentColor.opacity(0.20)
-                                ],
+                                colors: colorScheme == .dark
+                                    ? [
+                                        accentColor.opacity(0.20),
+                                        accentColor.opacity(0.04),
+                                        .white.opacity(0.08),
+                                        accentColor.opacity(0.02),
+                                        .white.opacity(0.04),
+                                        accentColor.opacity(0.12)
+                                    ]
+                                    : [
+                                        accentColor.opacity(0.30),
+                                        accentColor.opacity(0.06),
+                                        .white.opacity(0.15),
+                                        accentColor.opacity(0.04),
+                                        .white.opacity(0.08),
+                                        accentColor.opacity(0.20)
+                                    ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
                             lineWidth: 1.0
                         )
 
-                    // 5. Bottom edge highlight for depth
+                    // 5. Bottom edge highlight for depth (softer in dark mode)
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(.black.opacity(0.18), lineWidth: 1.5)
+                        .stroke(colorScheme == .dark ? .black.opacity(0.30) : .black.opacity(0.18), lineWidth: 1.5)
                         .blur(radius: 0.5)
                         .offset(x: 0, y: 2)
                 }
@@ -113,23 +138,24 @@ private struct LiquidCardSheen: View {
     let accentColor: Color
     let offset: CGFloat
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         GeometryReader { geo in
             LinearGradient(
                 colors: [
                     .clear,
-                    accentColor.opacity(0.08),
-                    .white.opacity(0.06),
-                    accentColor.opacity(0.03),
+                    accentColor.opacity(colorScheme == .dark ? 0.06 : 0.10),
+                    .white.opacity(colorScheme == .dark ? 0.04 : 0.08),
+                    accentColor.opacity(colorScheme == .dark ? 0.03 : 0.05),
                     .clear
                 ],
                 startPoint: .leading,
                 endPoint: .trailing
             )
-            .frame(width: geo.size.width * 0.7)
-            .offset(x: offset * (geo.size.width + geo.size.width * 0.4))
+            .frame(width: geo.size.width * 1.6)
+            .offset(x: offset * geo.size.width * 0.8)
             .blendMode(.plusLighter)
-            .clipped()
         }
     }
 }

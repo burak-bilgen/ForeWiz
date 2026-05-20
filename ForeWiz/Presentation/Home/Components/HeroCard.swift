@@ -9,133 +9,115 @@ struct HeroCard: View {
 
     private var accentColor: Color { AppTheme.toneColor(for: assistant.tone) }
     private var score: Int { recommendation.outdoorScore.rawValue }
+    private var weatherScore: WeatherScore { WeatherScore(rawValue: score) }
 
     var body: some View {
         LiquidGlassCard(accentColor: accentColor) {
-            VStack(alignment: .leading, spacing: 14) {
-                // Assistant Header
-                HStack(alignment: .top, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        // Badge
-                        HStack(spacing: 6) {
-                            Circle()
-                                .fill(accentColor.opacity(0.2))
-                                .frame(width: 6, height: 6)
-                            Text(L10n.text("home_assistant_badge"))
-                                .font(.system(size: 11, weight: .bold, design: .rounded))
-                                .minimumScaleFactor(0.8)
-                                .foregroundStyle(accentColor)
-                                .lineLimit(1)
-                        }
-
-                        // Headline
-                        Text(assistant.headline)
-                            .font(.system(size: 26, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .minimumScaleFactor(0.85)
-
-                        // Summary
-                        Text(assistant.summary)
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.65))
-                            .lineSpacing(2)
-                            .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 16) {
+                // MARK: Header — Badge + Headline
+                VStack(alignment: .leading, spacing: 8) {
+                    // Badge
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(accentColor.opacity(0.2))
+                            .frame(width: 6, height: 6)
+                        Text(L10n.text("home_assistant_badge"))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .minimumScaleFactor(0.8)
+                            .foregroundStyle(accentColor)
+                            .lineLimit(1)
                     }
-                    .layoutPriority(1)
 
-                    Spacer()
-
-                    ScoreRingView(score: WeatherScore(rawValue: score), size: 56, lineWidth: 4)
-                        .frame(width: 56, height: 56)
+                    // Headline
+                    Text(assistant.headline)
+                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .minimumScaleFactor(0.85)
                 }
 
-                // Weather Metrics — compact layout
-                VStack(spacing: 10) {
-                    // Temperature + compact metrics row
-                    HStack(alignment: .center, spacing: 12) {
-                        // Temperature — large, prominent
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(weather.temperatureText)
-                                .font(.system(size: 40, weight: .thin, design: .rounded))
-                                .foregroundStyle(.white)
-                                .minimumScaleFactor(0.6)
-                                .lineLimit(1)
-                            Text(weather.conditionText)
-                                .font(.system(size: 12, weight: .medium, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.45))
-                                .lineLimit(1)
-                        }
-                        .frame(minWidth: 65, alignment: .leading)
-
-                        Spacer(minLength: 4)
-
-                        // Compact metric chips: high·low · humidity · feels-like
-                        HStack(spacing: 8) {
-                            // Feels like
-                            CompactChip(
-                                icon: "thermometer.medium",
-                                value: weather.feelsLikeText
-                                    .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""),
-                                color: .white
-                            )
-
-                            Divider().frame(width: 1, height: 16).overlay(.white.opacity(0.1))
-
-                            // High/Low merged
-                            HStack(spacing: 2) {
-                                if weather.highTempText != "–" {
-                                    Image(systemName: "arrow.up")
-                                        .font(.system(size: 8, weight: .semibold))
-                                        .foregroundStyle(AppTheme.sunshine)
-                                    Text(weather.highTempText)
-                                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                        .foregroundStyle(.white)
-                                }
-                                if weather.lowTempText != "–" {
-                                    Text("·")
-                                        .foregroundStyle(.white.opacity(0.3))
-                                    Image(systemName: "arrow.down")
-                                        .font(.system(size: 8, weight: .semibold))
-                                        .foregroundStyle(AppTheme.sky)
-                                    Text(weather.lowTempText)
-                                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                        .foregroundStyle(.white)
-                                }
-                            }
-
-                            Divider().frame(width: 1, height: 16).overlay(.white.opacity(0.1))
-
-                            // Humidity
-                            CompactChip(
-                                icon: "humidity.fill",
-                                value: weather.humidityText,
-                                color: AppTheme.sky
-                            )
-                        }
+                // MARK: Main Row — Temperature + Score Ring
+                HStack(alignment: .center, spacing: 16) {
+                    // Temperature — large hero element
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(weather.temperatureText)
+                            .font(.system(size: 52, weight: .thin, design: .rounded))
+                            .foregroundStyle(.white)
+                            .minimumScaleFactor(0.6)
+                            .lineLimit(1)
+                        Text(weather.conditionText)
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .lineLimit(1)
                     }
 
-                    // Sunrise/Sunset — compact inline
-                    if weather.sunriseText != nil || weather.sunsetText != nil {
-                        HStack(spacing: 12) {
-                            SunTimeBadge(
+                    Spacer(minLength: 8)
+
+                    // Score Ring — larger & more prominent
+                    ScoreRingView(score: weatherScore, size: 72, lineWidth: 5, showOutOf100: true)
+                        .frame(width: 72, height: 72)
+                }
+
+                // MARK: Summary
+                Text(assistant.summary)
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                // MARK: Metrics Row — compact pills
+                HStack(spacing: 8) {
+                    // Feels like
+                    MetricPill(
+                        icon: "thermometer.medium",
+                        value: weather.feelsLikeText
+                            .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""),
+                        color: .white
+                    )
+
+                    // High / Low
+                    if weather.highTempText != "–" {
+                        MetricPill(
+                            icon: "arrow.up",
+                            value: weather.highTempText,
+                            color: AppTheme.sunshine
+                        )
+                    }
+                    if weather.lowTempText != "–" {
+                        MetricPill(
+                            icon: "arrow.down",
+                            value: weather.lowTempText,
+                            color: AppTheme.sky
+                        )
+                    }
+
+                    // Humidity
+                    if weather.humidityText != "–" {
+                        MetricPill(
+                            icon: "humidity.fill",
+                            value: weather.humidityText,
+                            color: AppTheme.sky
+                        )
+                    }
+                }
+
+                // MARK: Sunrise/Sunset — refined pill
+                if weather.sunriseText != nil || weather.sunsetText != nil {
+                    HStack(spacing: 12) {
+                        if let sunrise = weather.sunriseText {
+                            SunPill(
                                 icon: "sunrise.fill",
                                 color: AppTheme.sunshine,
-                                time: weather.sunriseText ?? "–"
-                            )
-                            Text("·")
-                                .foregroundStyle(.white.opacity(0.2))
-                            SunTimeBadge(
-                                icon: "sunset.fill",
-                                color: AppTheme.ember,
-                                time: weather.sunsetText ?? "–"
+                                time: sunrise
                             )
                         }
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.4))
-                        .padding(.vertical, 6)
-                        .padding(.horizontal, 10)
-                        .background(.white.opacity(0.03), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        if let sunset = weather.sunsetText {
+                            SunPill(
+                                icon: "sunset.fill",
+                                color: AppTheme.ember,
+                                time: sunset
+                            )
+                        }
                     }
                 }
             }
@@ -145,41 +127,55 @@ struct HeroCard: View {
     }
 }
 
-// MARK: - Compact Chip
+// MARK: - Metric Pill
 
-private struct CompactChip: View {
+private struct MetricPill: View {
     let icon: String
     let value: String
     let color: Color
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 5) {
             Image(systemName: icon)
                 .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(color.opacity(0.7))
+                .foregroundStyle(color.opacity(0.8))
             Text(value)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(1)
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(.white.opacity(0.06), lineWidth: 0.5)
+        )
     }
 }
 
-// MARK: - Sun Time Badge
+// MARK: - Sun Pill
 
-private struct SunTimeBadge: View {
+private struct SunPill: View {
     let icon: String
     let color: Color
     let time: String
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(color)
             Text(time)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.7))
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(.white.opacity(0.06), lineWidth: 0.5)
+        )
     }
 }
