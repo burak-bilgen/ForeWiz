@@ -46,7 +46,7 @@ struct ForeWizWidgetProvider: TimelineProvider {
         case .success(let data):
             return .with(data: data, at: date, isStale: false)
 
-        case .stale(let data, let ageSeconds):
+        case .stale(let data, _):
             // Still show data but mark as stale so the UI can show a warning
             return .with(data: data, at: date, isStale: true)
 
