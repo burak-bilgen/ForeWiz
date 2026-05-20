@@ -28,29 +28,22 @@ struct DayKeyEventsView: View {
         if !visibleEvents.isEmpty {
             LiquidGlassCard(accentColor: accentColor, innerPadding: 0) {
                 VStack(spacing: 0) {
-                    // Header
-                    HStack(spacing: 8) {
+                    // Header — compact
+                    HStack(spacing: 6) {
                         Image(systemName: "bell.badge.fill")
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(accentColor)
 
                         Text(L10n.text("keyevent_header"))
-                            .font(.system(size: 13, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.8))
+                            .font(.system(size: 11, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.6))
                             .textCase(.uppercase)
-                            .layoutPriority(1)
 
                         Spacer(minLength: 4)
-
-                        // Live indicator dot
-                        Circle()
-                            .fill(accentColor)
-                            .frame(width: 6, height: 6)
-                            .opacity(0.6)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 16)
-                    .padding(.bottom, 12)
+                    .padding(.top, 12)
+                    .padding(.bottom, 8)
 
                     // Events (max 3)
                     VStack(spacing: 6) {
