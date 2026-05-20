@@ -24,7 +24,6 @@ final class HomeViewStateFactory {
     func makeViewState(
         from result: HomeRecommendationResult,
         profile: UserComfortProfile,
-        briefing: DailyWeatherBriefing? = nil,
         unitSystem: UnitSystem = .current
     ) -> HomeViewState {
         HomeViewState(
@@ -37,7 +36,6 @@ final class HomeViewStateFactory {
             lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
             isUsingCachedWeather: result.isUsingCachedWeather,
             warningMessage: result.warningMessage,
-            briefing: briefing,
             attribution: result.attribution
         )
     }

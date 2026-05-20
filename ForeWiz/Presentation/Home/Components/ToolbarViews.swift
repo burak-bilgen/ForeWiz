@@ -22,9 +22,16 @@ struct ToolbarLanguageButton: View {
             Image(systemName: "globe")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.65))
-                .frame(width: 36, height: 36)
-                .background(.white.opacity(0.08), in: Circle())
-                .overlay(Circle().stroke(.white.opacity(0.12), lineWidth: 0.5))
+                .frame(width: 40, height: 40)
+                .background(
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+                )
+                .overlay(
+                    Circle()
+                        .stroke(.white.opacity(0.08), lineWidth: 0.5)
+                )
         }
         .accessibilityLabel(L10n.text("settings_language"))
     }
@@ -40,9 +47,16 @@ struct ToolbarWizPathButton: View {
             Image(systemName: "map.fill")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.65))
-                .frame(width: 36, height: 36)
-                .background(.white.opacity(0.08), in: Circle())
-                .overlay(Circle().stroke(.white.opacity(0.12), lineWidth: 0.5))
+                .frame(width: 40, height: 40)
+                .background(
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+                )
+                .overlay(
+                    Circle()
+                        .stroke(.white.opacity(0.08), lineWidth: 0.5)
+                )
         }
         .accessibilityLabel(L10n.text("wizpath_route_planner"))
     }

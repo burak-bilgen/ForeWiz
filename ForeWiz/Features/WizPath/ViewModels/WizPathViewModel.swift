@@ -77,6 +77,7 @@ final class WizPathViewModel {
 
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
+    var didLoadInitialLocation = false
 
     // MARK: - Computed
     var canCalculate: Bool {
@@ -111,12 +112,14 @@ final class WizPathViewModel {
                     latitude: locationCoord.latitude,
                     longitude: locationCoord.longitude
                 )
+                didLoadInitialLocation = true
                 AppLogger.wizPath.info("Location loaded: \(locationCoord.latitude), \(locationCoord.longitude)")
             } catch {
                 AppLogger.wizPath.error("Location error: \(error.localizedDescription)")
                 // Fallback to a default location
                 originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
                 originName = L10n.text("wizpath_fallback_location")
+                didLoadInitialLocation = true
             }
         }
     }

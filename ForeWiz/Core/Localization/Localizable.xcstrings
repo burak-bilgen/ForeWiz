@@ -59,7 +59,6 @@
         }
       }
     },
-    "#%lld": {},
     "%@ · %@": {
       "comment": "A title that includes a date range and a risk level. The first argument is a date range. The second argument is a risk level.",
       "extractionState": "manual",
@@ -471,40 +470,6 @@
         }
       }
     },
-    "action_card_empty": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No specific actions needed today."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugün özel bir önlem gerekmiyor."
-          }
-        }
-      }
-    },
-    "action_card_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart Actions"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Önerilen Aksiyonlar"
-          }
-        }
-      }
-    },
     "action_migraine": {
       "extractionState": "manual",
       "localizations": {
@@ -590,6 +555,7 @@
         }
       }
     },
+    "Activity": {},
     "activity_outside": {
       "extractionState": "manual",
       "localizations": {
@@ -603,6 +569,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dışarı Çıkma"
+          }
+        }
+      }
+    },
+    "activity_running": {
+      "comment": "Activity type label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koşu"
           }
         }
       }
@@ -879,6 +863,7 @@
         }
       }
     },
+    "Best Exercise Time": {},
     "better_to_postpone_outdoor_plans": {
       "extractionState": "manual",
       "localizations": {
@@ -892,59 +877,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mümkünse bugün planını içeri al"
-          }
-        }
-      }
-    },
-    "briefing_section_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI Weather Briefing"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yapay Zekâ ile Hava Durumu"
-          }
-        }
-      }
-    },
-    "briefing_show_less": {
-      "comment": "Button to collapse briefing details",
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show Less"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Daralt"
-          }
-        }
-      }
-    },
-    "briefing_show_more": {
-      "comment": "Button to expand briefing details",
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Show More"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Devamını Göster"
           }
         }
       }
@@ -1034,6 +966,62 @@
         }
       }
     },
+    "chart_axis_hour": {
+      "comment": "Chart x-axis label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hour"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat"
+          }
+        }
+      }
+    },
+    "chart_axis_value": {
+      "comment": "Chart y-axis label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Score"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puan"
+          }
+        }
+      }
+    },
+    "chart_now_label": {
+      "comment": "Chart current time marker label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şimdi"
+          }
+        }
+      }
+    },
+    "Check for any weather warnings or risks for today": {},
+    "Check Weather Risks": {},
     "clear_outdoor_day": {
       "extractionState": "manual",
       "localizations": {
@@ -1935,6 +1923,7 @@
         }
       }
     },
+    "Current Temperature": {},
     "current_location": {
       "extractionState": "manual",
       "localizations": {
@@ -2394,6 +2383,8 @@
         }
       }
     },
+    "Fetch the latest weather data for your location": {},
+    "Find the best time window for outdoor activities today": {},
     "for_timely_reminders": {
       "extractionState": "manual",
       "localizations": {
@@ -2462,6 +2453,13 @@
         }
       }
     },
+    "Get Best Activity Window": {},
+    "Get clothing recommendations based on current weather": {},
+    "Get Current Temperature": {},
+    "Get Outfit Recommendation": {},
+    "Get personalized weather recommendation for your current location": {},
+    "Get the current temperature for your location": {},
+    "Get Weather Recommendation": {},
     "good_to_go_with_light": {
       "extractionState": "manual",
       "localizations": {
@@ -2666,23 +2664,6 @@
         }
       }
     },
-    "health_card_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health and Weather"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık Durumu"
-          }
-        }
-      }
-    },
     "health_joint_extreme": {
       "extractionState": "manual",
       "localizations": {
@@ -2815,74 +2796,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Orta eklem rahatsızlığı - hafif esneme hareketleri yardımcı olabilir."
-          }
-        }
-      }
-    },
-    "health_metric_migraine": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Migraine"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Migren"
-          }
-        }
-      }
-    },
-    "health_metric_respiratory": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Respiratory"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solunum"
-          }
-        }
-      }
-    },
-    "health_metric_sleep": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sleep"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyku"
-          }
-        }
-      }
-    },
-    "health_metric_stamina": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stamina"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dayanıklılık"
           }
         }
       }
@@ -4797,13 +4710,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Extreme heat between %@, temperature up to %@ — stay in shade!"
+            "value": "Extreme heat! Around %@, it'll hit %@ — stay in the shade and drink plenty of water 🥵"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında hava %@'ye kadar çıkıyor, gölgede kalın!"
+            "value": "Aşırı sıcak! %@ civarında hava %@'yi bulacak, gölgede kal ve bol su iç 🥵"
           }
         }
       }
@@ -4814,13 +4727,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Temperature reaches %@ between %@."
+            "value": "Around %@, the temperature will climb to %@ — the hottest part of the day 🔥"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında hava %@'ye kadar ısınıyor."
+            "value": "Hava %@ civarında %@'ye kadar ısınacak, günün en sıcak saatleri 🔥"
           }
         }
       }
@@ -4865,13 +4778,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heavy rain expected between %@, be careful!"
+            "value": "Heavy rain expected %@ — best to stay indoors if you can 🌧️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında kuvvetli yağmur bekleniyor, dikkat!"
+            "value": "Kuvvetli yağmur %@ arasında bastıracak, dışarıdaysan bir yer bul kendine 🌧️"
           }
         }
       }
@@ -4882,13 +4795,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rain expected between %@"
+            "value": "Rain is on the way around %@ — grab an umbrella ☂️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında yağmur bekleniyor."
+            "value": "Yağmur %@ civarında başlıyor, şemsiyeni almayı unutma ☂️"
           }
         }
       }
@@ -4916,13 +4829,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Severe storm expected at %@, stay indoors!"
+            "value": "Severe storm warning! Hits hardest around %@ — find a safe spot 🚨"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@'te şiddetli fırtına bekleniyor, kapalı alanda kalın!"
+            "value": "Şiddetli fırtına geliyor! %@'te en yoğun anı, evde kal 🚨"
           }
         }
       }
@@ -4933,13 +4846,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Storm risk at %@, stay alert."
+            "value": "Storm is brewing around %@ — better to stay home if you can ⛈️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@'te fırtına riski var, dikkatli olun."
+            "value": "Fırtına kapıda! %@ civarında dikkatli ol, mecbur değilsen çıkma ⛈️"
           }
         }
       }
@@ -4967,13 +4880,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "UV index peaks at %d between %@, protection recommended."
+            "value": "UV index hits %d around %@ — slather on that sunscreen before heading out ☀️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında UV indeksi %d'ye çıkıyor, korunmanız önemli."
+            "value": "Güneş çok yakıcı! %@ arasında UV seviyesi %d'ye çıkıyor, krem sürmeden çıkma ☀️"
           }
         }
       }
@@ -5001,13 +4914,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wind reaches %d km/h between %@."
+            "value": "Wind picks up to %d km/h around %@ — hold onto your hat 🍃"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında rüzgar %d km/saat'e ulaşıyor."
+            "value": "Rüzgar %@ arasında %d km/saat'i bulacak, açık alanlarda dikkatli ol 🍃"
           }
         }
       }
@@ -5018,13 +4931,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Strong wind (%d km/h) expected between %@, be cautious!"
+            "value": "Strong winds (%d km/h) rolling in around %@ — best to stay sheltered 💨"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saat %@ arasında kuvvetli rüzgar (%d km/saat) esiyor, dikkatli olun!"
+            "value": "Kuvvetli rüzgar uyarısı! %@ arasında %d km/saat hızında esecek, sıkı giyin 💨"
           }
         }
       }
@@ -6680,6 +6593,7 @@
         }
       }
     },
+    "Outfit Recommendation": {},
     "outfit_advice_cold": {
       "extractionState": "manual",
       "localizations": {
@@ -7738,6 +7652,24 @@
         }
       }
     },
+    "premium_prompt_generic": {
+      "comment": "Generic premium upgrade prompt",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Upgrade to Premium to unlock this feature."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu özelliği açmak için Premium'a yükseltin."
+          }
+        }
+      }
+    },
     "premium_restored": {
       "comment": "Message shown when a user's premium purchase has been successfully restored.",
       "extractionState": "manual",
@@ -7788,6 +7720,78 @@
           "stringUnit": {
             "state": "translated",
             "value": "App Store'a bağlanılamadı"
+          }
+        }
+      }
+    },
+    "preview_legacy_glass": {
+      "comment": "Legacy glass preview text",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legacy Glass"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasik Cam"
+          }
+        }
+      }
+    },
+    "preview_liquid_glass": {
+      "comment": "Liquid glass preview text",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liquid Glass"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıvı Cam"
+          }
+        }
+      }
+    },
+    "preview_liquid_glass_animations": {
+      "comment": "Liquid glass animations preview text",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liquid Glass + Animations"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıvı Cam + Animasyonlar"
+          }
+        }
+      }
+    },
+    "preview_liquid_glass_desc": {
+      "comment": "Liquid glass description",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A modern glassmorphic card with dynamic gradient."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinamik gradyanlı modern cam kart."
           }
         }
       }
@@ -8115,6 +8119,42 @@
         }
       }
     },
+    "recommendation_explain_default": {
+      "comment": "Default recommendation explanation",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Based on weather conditions"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava koşullarına göre"
+          }
+        }
+      }
+    },
+    "recommendation_explain_schedule": {
+      "comment": "Schedule-based recommendation explanation",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Based on your schedule"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programınıza göre"
+          }
+        }
+      }
+    },
     "recommendation_explanation_title": {
       "comment": "Title for the feedback section asking if the recommendation was helpful.",
       "extractionState": "manual",
@@ -8187,6 +8227,96 @@
         }
       }
     },
+    "recommendation_good_range": {
+      "comment": "Good score range label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İyi"
+          }
+        }
+      }
+    },
+    "recommendation_moderate_range": {
+      "comment": "Moderate score range label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "recommendation_optimal_range": {
+      "comment": "Optimal score range label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optimal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optimal"
+          }
+        }
+      }
+    },
+    "recommendation_poor_range": {
+      "comment": "Poor score range label",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poor"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kötü"
+          }
+        }
+      }
+    },
+    "recommendation_signal_schedule": {
+      "comment": "Signal to check schedule",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your schedule"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programını kontrol et"
+          }
+        }
+      }
+    },
     "recommendation_why_title": {
       "comment": "Title for recommendation explanation screen.",
       "extractionState": "manual",
@@ -8205,6 +8335,8 @@
         }
       }
     },
+    "Refresh Weather": {},
+    "Refresh Weather Data": {},
     "refresh_weather": {
       "extractionState": "manual",
       "localizations": {
@@ -9006,6 +9138,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Güneş koruması gerekecek"
+          }
+        }
+      }
+    },
+    "risk_wind_strong": {
+      "comment": "Strong wind risk headline",
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strong Wind"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuvvetli Rüzgar"
           }
         }
       }
@@ -10374,6 +10524,7 @@
         }
       }
     },
+    "Type of activity you're planning": {},
     "unit_celsius": {
       "extractionState": "manual",
       "localizations": {
@@ -10578,6 +10729,7 @@
         }
       }
     },
+    "Weather Recommendation": {},
     "weather_clear": {
       "extractionState": "manual",
       "localizations": {
@@ -12198,295 +12350,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@'da hava kötüleşiyor"
-          }
-        }
-      }
-    },
-    "activity_running": {
-      "comment": "Activity type label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Running"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Koşu"
-          }
-        }
-      }
-    },
-    "chart_axis_hour": {
-      "comment": "Chart x-axis label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hour"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Saat"
-          }
-        }
-      }
-    },
-    "chart_axis_value": {
-      "comment": "Chart y-axis label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Score"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Puan"
-          }
-        }
-      }
-    },
-    "chart_now_label": {
-      "comment": "Chart current time marker label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Now"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şimdi"
-          }
-        }
-      }
-    },
-    "preview_legacy_glass": {
-      "comment": "Legacy glass preview text",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Legacy Glass"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Klasik Cam"
-          }
-        }
-      }
-    },
-    "preview_liquid_glass": {
-      "comment": "Liquid glass preview text",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Liquid Glass"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıvı Cam"
-          }
-        }
-      }
-    },
-    "preview_liquid_glass_animations": {
-      "comment": "Liquid glass animations preview text",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Liquid Glass + Animations"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıvı Cam + Animasyonlar"
-          }
-        }
-      }
-    },
-    "preview_liquid_glass_desc": {
-      "comment": "Liquid glass description",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A modern glassmorphic card with dynamic gradient."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dinamik gradyanlı modern cam kart."
-          }
-        }
-      }
-    },
-    "recommendation_explain_default": {
-      "comment": "Default recommendation explanation",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Based on weather conditions"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava koşullarına göre"
-          }
-        }
-      }
-    },
-    "recommendation_explain_schedule": {
-      "comment": "Schedule-based recommendation explanation",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Based on your schedule"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Programınıza göre"
-          }
-        }
-      }
-    },
-    "recommendation_good_range": {
-      "comment": "Good score range label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İyi"
-          }
-        }
-      }
-    },
-    "recommendation_moderate_range": {
-      "comment": "Moderate score range label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "recommendation_optimal_range": {
-      "comment": "Optimal score range label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Optimal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Optimal"
-          }
-        }
-      }
-    },
-    "recommendation_poor_range": {
-      "comment": "Poor score range label",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Poor"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kötü"
-          }
-        }
-      }
-    },
-    "recommendation_signal_schedule": {
-      "comment": "Signal to check schedule",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check your schedule"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Programını kontrol et"
-          }
-        }
-      }
-    },
-    "risk_wind_strong": {
-      "comment": "Strong wind risk headline",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Strong Wind"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kuvvetli Rüzgar"
-          }
-        }
-      }
-    },
-    "premium_prompt_generic": {
-      "comment": "Generic premium upgrade prompt",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upgrade to Premium to unlock this feature."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu özelliği açmak için Premium'a yükseltin."
           }
         }
       }

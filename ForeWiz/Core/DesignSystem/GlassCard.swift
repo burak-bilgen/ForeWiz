@@ -4,11 +4,11 @@ import SwiftUI
 /// Premium liquid glass card with animated sheen, depth, and adaptive accent colors.
 ///
 /// Features:
-/// - Animated gradient sheen that flows across the surface
+/// - Slow diagonal sheen animation (like Apple Wallet cards)
 /// - Deep glass morphism with multi-layer blur
 /// - Adaptive accent borders and glows
 /// - Micro-interaction press state
-/// - Accessibility optimizations
+/// - Accessibility optimizations with reduceMotion support
 struct LiquidGlassCard<Content: View>: View {
     let accentColor: Color
     let isInteractive: Bool
@@ -18,6 +18,7 @@ struct LiquidGlassCard<Content: View>: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.colorScheme) private var colorScheme
+    @State private var sheenOffset: CGFloat = -1.0
 
     init(
         accentColor: Color = AppTheme.liquidAccent,
@@ -38,19 +39,37 @@ struct LiquidGlassCard<Content: View>: View {
             .padding(innerPadding)
             .background(
                 ZStack {
-                    // Base glass layer
+                    // 1. Base glass layer
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
                         .environment(\.colorScheme, .dark)
 
-                    // Static gradient sheen overlay
+                    // 2. Animated sheen — slow diagonal sweep
+                    if !reduceMotion {
+                        LiquidCardSheen(
+                            cornerRadius: cornerRadius,
+                            accentColor: accentColor,
+                            offset: sheenOffset
+                        )
+                        .onAppear {
+                            withAnimation(
+                                .linear(duration: 4.0)
+                                    .repeatForever(autoreverses: false)
+                                    .delay(1.0)
+                            ) {
+                                sheenOffset = 1.5
+                            }
+                        }
+                    }
+
+                    // 3. Static gradient overlay
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [
                                     accentColor.opacity(0.0),
-                                    accentColor.opacity(0.08),
-                                    .white.opacity(0.04),
+                                    accentColor.opacity(0.06),
+                                    .white.opacity(0.02),
                                     accentColor.opacity(0.0)
                                 ],
                                 startPoint: .topLeading,
@@ -58,34 +77,60 @@ struct LiquidGlassCard<Content: View>: View {
                             )
                         )
 
-                    // Subtle inner glow
+                    // 4. Accent border — refined light-catching stroke
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .stroke(
                             LinearGradient(
                                 colors: [
-                                    accentColor.opacity(0.25),
-                                    accentColor.opacity(0.08),
-                                    .white.opacity(0.12),
-                                    accentColor.opacity(0.05)
+                                    accentColor.opacity(0.30),
+                                    accentColor.opacity(0.06),
+                                    .white.opacity(0.15),
+                                    accentColor.opacity(0.04),
+                                    .white.opacity(0.08),
+                                    accentColor.opacity(0.20)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 1.2
+                            lineWidth: 1.0
                         )
 
-                    // Inner shadow overlay
+                    // 5. Bottom edge highlight for depth
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(.black.opacity(0.3), lineWidth: 1)
-                        .blur(radius: 2)
-                        .mask(
-                            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                                .inset(by: -3)
-                                .strokeBorder(.black, lineWidth: 4)
-                        )
+                        .stroke(.black.opacity(0.18), lineWidth: 1.5)
+                        .blur(radius: 0.5)
+                        .offset(x: 0, y: 2)
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+}
+
+// MARK: - Animated Sheen Layer
+
+private struct LiquidCardSheen: View {
+    let cornerRadius: CGFloat
+    let accentColor: Color
+    let offset: CGFloat
+
+    var body: some View {
+        GeometryReader { geo in
+            LinearGradient(
+                colors: [
+                    .clear,
+                    accentColor.opacity(0.08),
+                    .white.opacity(0.06),
+                    accentColor.opacity(0.03),
+                    .clear
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: geo.size.width * 0.7)
+            .offset(x: offset * (geo.size.width + geo.size.width * 0.4))
+            .blendMode(.plusLighter)
+            .clipped()
+        }
     }
 }
 

@@ -10,7 +10,6 @@ struct HomeViewState: Equatable {
     let lastUpdatedText: String
     let isUsingCachedWeather: Bool
     let warningMessage: String?
-    let briefing: DailyWeatherBriefing?
     let attribution: WeatherAttributionInfo?
 }
 

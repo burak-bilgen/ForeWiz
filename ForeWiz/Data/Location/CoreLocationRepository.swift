@@ -10,7 +10,7 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         self.manager = CLLocationManager()
         super.init()
         manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
+        manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
     }
 
     deinit {

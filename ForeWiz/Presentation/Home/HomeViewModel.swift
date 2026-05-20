@@ -110,12 +110,10 @@ final class HomeViewModel {
             let profile = try await preferencesRepository.loadProfile()
             self.particleIntensity = profile.weatherParticleIntensity
 
-            // Generate AI-powered daily briefing
             state = .loaded(
                 homeViewStateFactory.makeViewState(
                     from: result,
-                    profile: profile,
-                    briefing: result.briefing
+                    profile: profile
                 )
             )
 

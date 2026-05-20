@@ -28,22 +28,29 @@ struct DayKeyEventsView: View {
         if !visibleEvents.isEmpty {
             LiquidGlassCard(accentColor: accentColor, innerPadding: 0) {
                 VStack(spacing: 0) {
-                    // Header — compact
-                    HStack(spacing: 6) {
+                    // Header
+                    HStack(spacing: 8) {
                         Image(systemName: "bell.badge.fill")
-                            .font(.system(size: 11, weight: .bold))
+                            .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(accentColor)
 
                         Text(L10n.text("keyevent_header"))
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.6))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.8))
                             .textCase(.uppercase)
+                            .layoutPriority(1)
 
                         Spacer(minLength: 4)
+
+                        // Live indicator dot
+                        Circle()
+                            .fill(accentColor)
+                            .frame(width: 6, height: 6)
+                            .opacity(0.6)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 8)
+                    .padding(.top, 16)
+                    .padding(.bottom, 12)
 
                     // Events (max 3)
                     VStack(spacing: 6) {
@@ -89,23 +96,10 @@ private struct EventRow: View {
 
             // Content
             VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 8) {
-                    Text(event.title)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-
-                    Text(event.timeDisplay)
-                        .font(.system(size: 11, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.45))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4, style: .continuous)
-                                .fill(.ultraThinMaterial)
-                                .environment(\.colorScheme, .dark)
-                        )
-                }
+                Text(event.title)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
                 Text(event.description)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))

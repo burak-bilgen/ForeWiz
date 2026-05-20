@@ -20,7 +20,7 @@ final class LocationService: NSObject, LocationRepository {
         self.timeout = timeout
         super.init()
         manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
+        manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         manager.distanceFilter = 500
     }
     

@@ -94,6 +94,15 @@ struct WizPathMapView: View {
                 ))
             }
         }
+        .onChange(of: viewModel.didLoadInitialLocation) { _, loaded in
+            guard loaded, let coord = viewModel.originCoordinate, viewModel.currentRoute == nil else { return }
+            withAnimation(AppTheme.slowEaseOut) {
+                position = .region(MKCoordinateRegion(
+                    center: coord,
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                ))
+            }
+        }
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
