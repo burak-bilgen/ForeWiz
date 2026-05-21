@@ -3,6 +3,7 @@ import Testing
 import CoreLocation
 @testable import ForeWiz
 
+@MainActor
 @Suite("WizPathClimateService Tests")
 struct WizPathClimateServiceTests {
     
@@ -291,7 +292,7 @@ struct WizPathClimateServiceTests {
         let adjusted = service.applyClimateAdjustment(to: route, analysis: analysis)
         
         #expect(adjusted.adjustedDuration > route.totalDuration)
-        #expect(addedTime > 0)
+        #expect(adjusted.addedTime > 0)
         #expect(adjusted.multiplier > 1.0)
     }
     

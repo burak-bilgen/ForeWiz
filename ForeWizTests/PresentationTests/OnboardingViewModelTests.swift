@@ -2,6 +2,7 @@ import Foundation
 import Testing
 @testable import ForeWiz
 
+@MainActor
 @Suite("OnboardingViewModel Tests")
 struct OnboardingViewModelTests {
     
@@ -123,16 +124,17 @@ struct OnboardingViewModelTests {
 // MARK: - Mock Notification Repository
 
 final class MockNotificationRepository: NotificationRepository {
+    func authorizationStatus() async -> NotificationAuthorizationStatus {
+        .notDetermined
+    }
+    
     func requestAuthorization() async -> NotificationAuthorizationStatus {
         .notDetermined
     }
     
-    func scheduleNotification(_ request: NotificationRequest) async throws {
+    func schedule(_ plans: [NotificationPlan]) async throws {
     }
     
-    func removePendingNotifications() async {
-    }
-    
-    func removeDeliveredNotifications() async {
+    func cancelPendingSmartNotifications() async {
     }
 }

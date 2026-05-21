@@ -3,6 +3,7 @@ import Testing
 import CoreLocation
 @testable import ForeWiz
 
+@MainActor
 @Suite("WizPathService Tests")
 struct WizPathServiceTests {
     

@@ -11,18 +11,17 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-1",
                 type: .storm,
                 severity: .high,
-                message: "Severe thunderstorm expected",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Severe Thunderstorm",
+                message: "Severe thunderstorm expected"
             )
         ]
         
         let alerts = service.makeAlerts(from: risks)
         
         #expect(alerts.count == 1)
-        #expect(alerts[0].event == .severeThunderstorm)
+        #expect(alerts[0].event == SevereWeatherEvent.severeThunderstorm)
         #expect(alerts[0].severity == .high)
     }
     
@@ -32,11 +31,10 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-2",
                 type: .storm,
                 severity: .low,
-                message: "Light rain expected",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Light Rain",
+                message: "Light rain expected"
             )
         ]
         
@@ -51,11 +49,10 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-3",
                 type: .uv,
                 severity: .high,
-                message: "High UV index",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "High UV",
+                message: "High UV index"
             )
         ]
         
@@ -70,11 +67,10 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-4",
                 type: .humidity,
                 severity: .high,
-                message: "High humidity",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "High Humidity",
+                message: "High humidity"
             )
         ]
         
@@ -89,11 +85,10 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-5",
                 type: .poorComfort,
                 severity: .high,
-                message: "Poor comfort level",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Poor Comfort",
+                message: "Poor comfort level"
             )
         ]
         
@@ -108,18 +103,17 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-6",
                 type: .heat,
                 severity: .extreme,
-                message: "Extreme heat warning",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Extreme Heat",
+                message: "Extreme heat warning"
             )
         ]
         
         let alerts = service.makeAlerts(from: risks)
         
         #expect(alerts.count == 1)
-        #expect(alerts[0].event == .extremeHeat)
+        #expect(alerts[0].event == SevereWeatherEvent.extremeHeat)
     }
     
     @Test("makeAlerts creates cold alert for cold risk")
@@ -128,18 +122,17 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-7",
                 type: .cold,
                 severity: .high,
-                message: "Extreme cold warning",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Extreme Cold",
+                message: "Extreme cold warning"
             )
         ]
         
         let alerts = service.makeAlerts(from: risks)
         
         #expect(alerts.count == 1)
-        #expect(alerts[0].event == .extremeCold)
+        #expect(alerts[0].event == SevereWeatherEvent.extremeCold)
     }
     
     @Test("makeAlerts creates wind alert for wind risk")
@@ -148,18 +141,17 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-8",
                 type: .wind,
                 severity: .high,
-                message: "High wind warning",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "High Wind",
+                message: "High wind warning"
             )
         ]
         
         let alerts = service.makeAlerts(from: risks)
         
         #expect(alerts.count == 1)
-        #expect(alerts[0].event == .highWind)
+        #expect(alerts[0].event == SevereWeatherEvent.highWind)
     }
     
     @Test("makeAlerts creates flash flood alert for rain risk")
@@ -168,18 +160,17 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-9",
                 type: .rain,
                 severity: .high,
-                message: "Heavy rain and flash flood",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Flash Flood",
+                message: "Heavy rain and flash flood"
             )
         ]
         
         let alerts = service.makeAlerts(from: risks)
         
         #expect(alerts.count == 1)
-        #expect(alerts[0].event == .flashFlood)
+        #expect(alerts[0].event == SevereWeatherEvent.flashFlood)
     }
     
     @Test("shouldNotify returns true for high severity alert")
@@ -255,11 +246,10 @@ struct SevereWeatherAlertServiceTests {
         
         let risks = [
             WeatherRisk(
-                id: "risk-10",
                 type: .storm,
                 severity: .high,
-                message: "Storm warning",
-                window: TimeWindow(start: Date(), end: Date().addingTimeInterval(3600))
+                title: "Storm Warning",
+                message: "Storm warning"
             )
         ]
         

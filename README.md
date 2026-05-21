@@ -12,12 +12,12 @@
   <img src="https://img.shields.io/badge/iOS-17%2B-blue?style=flat-square&logo=apple" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-6.0-orange?style=flat-square&logo=swift" alt="Swift 6.0">
   <img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-blue?style=flat-square" alt="Architecture">
-  <img src="https://img.shields.io/badge/Dependencies-Zero-success?style=flat-square" alt="Zero Dependencies">
+  <img src="https://img.shields.io/badge/Monetization-AdMob-purple?style=flat-square" alt="AdMob">
 </p>
 
 ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It doesn't just tell you it's raining — it tells you *when* to go out, *what* to wear, *where* the weather is safest on your route, and *how* it might affect your health.
 
-> Built entirely with Apple's native frameworks. **Zero third-party dependencies.**
+> Built with Apple's native frameworks + **Google AdMob** for sustainable monetization.
 
 ---
 
@@ -103,6 +103,24 @@ A premium dark-mode aesthetic with fluid animations:
 - Accessibility: dynamic type, reduce motion support, VoiceOver labels
 - Biometric and haptic feedback for interactions
 
+### 💰 Smart Ad Monetization
+ForeWiz uses **Google AdMob** with intelligent ad placement that respects user experience:
+
+| Ad Format | Placement | Strategy |
+|-----------|-----------|----------|
+| **Banner** | Native ad card + bottom home banner | Smart fatigue prevention, cooldown intervals |
+| **Native** | Inline content ad card | Context-aware placement in forecast sections |
+| **Interstitial** | Between navigation transitions | App-open ads (every N foregrounds) + session gating |
+| **Rewarded** | Optional video ads for premium features | User-initiated, value-exchange model |
+
+**Key Features:**
+- **AdFatiguePrevention** — Adaptive frequency capping based on user engagement
+- **AdRevenueTracker** — Per-unit revenue tracking with eCPM calculation
+- **AdPlacementStrategy** — Session-based placement rules, app-open gating
+- **AdConsentManager** — ATT (iOS 14.5+) and GDPR consent management
+- **AdAnalyticsEngine** — Impression, click, and revenue analytics
+- **Configurable daily limits & cooldowns** per ad unit
+
 ### 🧩 Siri Shortcuts (6 Intents)
 - Get current outdoor score
 - Get today's recommendation
@@ -124,12 +142,10 @@ A premium dark-mode aesthetic with fluid animations:
 ForeWiz/
 ├── App/               # Entry point, coordinator, dependency injection
 ├── Core/              # Design system, localization, utilities
-│   ├── DesignSystem/  # Theme, colors, animations, glass components
+│   ├── DesignSystem/  # Theme, colors, animations, glass components, ad views
 │   ├── Localization/  # L10n system, xcstrings (EN + TR)
 │   ├── Location/      # LocationService with hardened timeout
-│   ├── Network/       # Retry policies
-│   ├── Purchase/      # Premium subscription (optional)
-│   └── Utilities/     # Logger, haptics, deep links, analytics, formatters
+│   └── Utilities/     # Logger, haptics, deep links, AdMob integration, analytics
 ├── Data/              # Repository implementations
 │   ├── Location/      # CoreLocation repository + mocks
 │   ├── Notifications/ # UNNotification repository + content factory
@@ -144,9 +160,9 @@ ForeWiz/
 ├── Features/          # Feature modules
 │   └── WizPath/       # Climate-aware route planning (map, dashboard, sentinel)
 ├── Presentation/      # SwiftUI views + ViewModels
-│   ├── Home/          # Main screen, briefing, HUD card
+│   ├── Home/          # Main screen, briefing, HUD card, ad placements
 │   ├── Insights/      # Weather insights view
-│   ├── Onboarding/    # Language + permissions setup
+│   ├── Onboarding/    # Language + permissions setup (incl. ATT consent)
 │   ├── Recommendations/ # Detailed recommendation view
 │   └── Shared/        # Location picker, splash, root views, error screens
 └── ForeWizWidgets/         # Widget extension (small, medium, lock screen)
@@ -161,7 +177,7 @@ ForeWiz/
 | Principle | Implementation |
 |-----------|---------------|
 | **Clean Architecture + MVVM-C** | Domain is pure Swift (Foundation only), Data handles I/O, Presentation owns SwiftUI |
-| **Zero Dependencies** | Every framework is Apple-first-party: SwiftUI, WeatherKit, SwiftData, CoreLocation, MapKit, WidgetKit, AppIntents, CoreHaptics, BackgroundTasks |
+| **AdMob Monetization** | Google AdMob with smart fatigue prevention, revenue tracking, consent management, and configurable placements |
 | **Actor-based Concurrency** | Thread-safe services with Swift actors + async/await |
 | **Protocol-driven Repositories** | Every data source has a protocol + mock + production implementation |
 | **Deterministic Engines** | All decision engines are pure functions — fully unit testable |
@@ -347,7 +363,7 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 | **Total Swift files** | ~140 |
 | **Unit tests** | 25+ test suites |
 | **Localized strings** | 150+ keys (EN + TR) |
-| **External dependencies** | **0** (100% Apple-first-party) |
+| **External dependencies** | **Google AdMob** (monetization) — everything else Apple-first-party |
 | **Deployment target** | iOS 17+ |
 
 ### File Size Management

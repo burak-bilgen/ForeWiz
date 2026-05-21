@@ -3,6 +3,7 @@ import Testing
 import CoreLocation
 @testable import ForeWiz
 
+@MainActor
 @Suite("DepartureOptimizerService Tests")
 struct DepartureOptimizerServiceTests {
     
