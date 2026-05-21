@@ -42,10 +42,16 @@ struct HomeLoadedContent: View {
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
 
-                // 7. Footer — attribution + last updated
+                // 7. Ad banner — monetization
+                if AdManager.shared.canShowBanner() {
+                    GlassAdBanner(adUnit: .homeBanner)
+                        .cardEntrance(appeared: contentReady, baseDelay: 0.48)
+                }
+
+                // 8. Footer — attribution + last updated
                 if let attribution = state.attribution {
                     CompactFooter(attribution: attribution, lastUpdatedText: state.lastUpdatedText)
-                        .cardEntrance(appeared: contentReady, baseDelay: 0.48)
+                        .cardEntrance(appeared: contentReady, baseDelay: 0.56)
                 }
             }
             .padding(.horizontal, 20)

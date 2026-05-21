@@ -137,9 +137,7 @@ final class SevereWeatherAlertService {
         }
     }
 
-    func shouldNotify(alert: SevereWeatherAlert, isPremium: Bool) -> Bool {
-        guard isPremium else { return false }
-
+    func shouldNotify(alert: SevereWeatherAlert) -> Bool {
         let priority: Int
         switch alert.severity {
         case .extreme: priority = 100

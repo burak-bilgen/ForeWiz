@@ -182,8 +182,8 @@ struct SevereWeatherAlertServiceTests {
         #expect(alerts[0].event == .flashFlood)
     }
     
-    @Test("shouldNotify returns true for premium with high priority")
-    func shouldNotifyReturnsTrueForPremiumWithHighPriority() async throws {
+    @Test("shouldNotify returns true for high severity alert")
+    func shouldNotifyReturnsTrueForHighSeverityAlert() async throws {
         let service = SevereWeatherAlertService.shared
         
         let alert = SevereWeatherAlert(
@@ -198,17 +198,17 @@ struct SevereWeatherAlertServiceTests {
             areas: []
         )
         
-        #expect(service.shouldNotify(alert: alert, isPremium: true) == true)
+        #expect(service.shouldNotify(alert: alert) == true)
     }
     
-    @Test("shouldNotify returns false for free users")
-    func shouldNotifyReturnsFalseForFreeUsers() async throws {
+    @Test("shouldNotify returns true for extreme severity alert")
+    func shouldNotifyReturnsTrueForExtremeSeverityAlert() async throws {
         let service = SevereWeatherAlertService.shared
         
         let alert = SevereWeatherAlert(
             id: "alert-2",
             event: .severeThunderstorm,
-            severity: .high,
+            severity: .extreme,
             headline: "Severe Thunderstorm",
             description: "Test",
             instruction: "Test",
@@ -217,11 +217,11 @@ struct SevereWeatherAlertServiceTests {
             areas: []
         )
         
-        #expect(service.shouldNotify(alert: alert, isPremium: false) == false)
+        #expect(service.shouldNotify(alert: alert) == true)
     }
     
-    @Test("shouldNotify returns false for medium severity even for premium")
-    func shouldNotifyReturnsFalseForMediumSeverityEvenForPremium() async throws {
+    @Test("shouldNotify returns false for medium severity alert")
+    func shouldNotifyReturnsFalseForMediumSeverityAlert() async throws {
         let service = SevereWeatherAlertService.shared
         
         let alert = SevereWeatherAlert(
@@ -236,7 +236,7 @@ struct SevereWeatherAlertServiceTests {
             areas: []
         )
         
-        #expect(service.shouldNotify(alert: alert, isPremium: true) == false)
+        #expect(service.shouldNotify(alert: alert) == false)
     }
     
     @Test("SevereWeatherEvent priority scores")
