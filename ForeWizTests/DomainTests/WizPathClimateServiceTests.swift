@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import CoreLocation
+import WizPathKit
 @testable import ForeWiz
 
 @MainActor

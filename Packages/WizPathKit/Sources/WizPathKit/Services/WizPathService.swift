@@ -5,14 +5,14 @@ import OSLog
 
 // MARK: - WizPath Service
 @MainActor
-final class WizPathService {
+public final class WizPathService {
     private let cache = WizPathCache()
-    private let weatherRepository: WeatherRepository
-    private let locationRepository: LocationRepository
+    private let weatherRepository: WizPathWeatherSource
+    private let locationRepository: WizPathLocationSource
 
-    init(
-        weatherRepository: WeatherRepository,
-        locationRepository: LocationRepository
+    public init(
+        weatherRepository: WizPathWeatherSource,
+        locationRepository: WizPathLocationSource
     ) {
         self.weatherRepository = weatherRepository
         self.locationRepository = locationRepository
@@ -20,13 +20,12 @@ final class WizPathService {
 
     // MARK: - Main Route Calculation
 
-    func calculateRoute(
+    public func calculateRoute(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
         mode: TravelMode,
         departureTime: Date
     ) async throws -> WizPathRoute {
-        // Check cache first
         if let cached = cache.route(origin: origin, destination: destination, mode: mode) {
             AppLogger.wizPath.info("Using cached route")
             return cached
@@ -47,7 +46,6 @@ final class WizPathService {
             departureTime: departureTime
         )
 
-        // Attach real weather data to each segment
         let segmentsWithWeather = try await attachWeatherDataToSegments(segments: segments)
 
         let route = WizPathRoute(
@@ -91,13 +89,11 @@ final class WizPathService {
             }
             return route
         } catch let error as MKError {
-            // MapKit error codes (raw values for broader compatibility)
-            // MKErrorDirectionsNotAvailable = 4, MKErrorServerFailure = 2
             let nsError = error as NSError
             switch nsError.code {
-            case 4: // MKErrorDirectionsNotAvailable
+            case 4:
                 throw WizPathError.destinationUnreachable
-            case 2, 5: // MKErrorServerFailure, MKErrorNetworkFailure
+            case 2, 5:
                 throw WizPathError.routeUnavailable
             default:
                 throw WizPathError.routeUnavailable
@@ -142,12 +138,10 @@ final class WizPathService {
         return segments
     }
 
-    // MARK: - Real Weather Attachment via WeatherRepository
+    // MARK: - Real Weather Attachment
 
     private func attachWeatherDataToSegments(segments: [WizPathSegment]) async throws -> [WizPathSegment] {
         var updatedSegments = segments
-
-        // Group segments by hour to reduce WeatherKit API calls
         let calendar = Calendar.current
         let grouped = Dictionary(grouping: updatedSegments.indices) { index in
             calendar.component(.hour, from: segments[index].estimatedArrival)
@@ -158,7 +152,7 @@ final class WizPathService {
         for (hour, indices) in grouped {
             if let firstIndex = indices.first {
                 let segment = segments[firstIndex]
-                let coord = LocationCoordinate(
+                let coord = WizPathCoordinate(
                     latitude: segment.coordinate.latitude,
                     longitude: segment.coordinate.longitude
                 )
@@ -173,7 +167,6 @@ final class WizPathService {
                     }
                 } catch {
                     AppLogger.wizPath.error("Weather fetch failed for segment at hour \(hour): \(error.localizedDescription, privacy: .private)")
-                    // Fallback: use time-based estimation
                     let fallback = estimatedWeather(for: segments[firstIndex].coordinate, at: segments[firstIndex].estimatedArrival)
                     weatherCache[hour] = fallback
                     for index in indices {
@@ -186,9 +179,7 @@ final class WizPathService {
         return updatedSegments
     }
 
-    /// Convert WeatherSnapshot to SegmentWeather at a specific time
-    private func segmentWeather(from snapshot: WeatherSnapshot, at date: Date) -> SegmentWeather {
-        // Try to find the hourly forecast closest to our arrival time
+    private func segmentWeather(from snapshot: WizPathWeatherSnapshot, at date: Date) -> SegmentWeather {
         let calendar = Calendar.current
         let targetHour = calendar.component(.hour, from: date)
 
@@ -212,7 +203,6 @@ final class WizPathService {
             )
         }
 
-        // Fallback to current weather
         return SegmentWeather(
             condition: mapConditionCode(snapshot.current.symbolName ?? snapshot.current.conditionCode ?? "clear"),
             temperature: snapshot.current.temperatureCelsius,
@@ -223,7 +213,6 @@ final class WizPathService {
         )
     }
 
-    /// Map WeatherKit condition codes to SegmentWeatherCondition
     private func mapConditionCode(_ code: String) -> SegmentWeatherCondition {
         let lower = code.lowercased()
         if lower.contains("thunder") || lower.contains("storm") || lower.contains("bolt") { return .thunderstorm }
@@ -249,11 +238,9 @@ final class WizPathService {
         }
     }
 
-    /// Fallback weather estimation when API fails
     private func estimatedWeather(for coordinate: CLLocationCoordinate2D, at date: Date) -> SegmentWeather {
         let hour = Calendar.current.component(.hour, from: date)
         let minute = Calendar.current.component(.minute, from: date)
-        // Use minute-based deterministic variation instead of random
         let variation = Double(minute % 6) - 2.5
 
         let baseTemp: Double
@@ -267,8 +254,6 @@ final class WizPathService {
 
         let isNight = hour < 6 || hour >= 21
         let condition: SegmentWeatherCondition = isNight ? .clear : .partlyCloudy
-
-        // Deterministic wind speed based on hour
         let windSpeed: Double = 5 + Double((hour * 7 + 3) % 14)
 
         return SegmentWeather(
@@ -283,7 +268,7 @@ final class WizPathService {
 
     // MARK: - Traffic Update
 
-    func updateWithCurrentTraffic(route: WizPathRoute) async throws -> WizPathRoute {
+    public func updateWithCurrentTraffic(route: WizPathRoute) async throws -> WizPathRoute {
         try await calculateRoute(
             origin: route.origin,
             destination: route.destination,
@@ -294,7 +279,7 @@ final class WizPathService {
 
     // MARK: - Recent Destinations
 
-    func saveRecentDestination(name: String, coordinate: CLLocationCoordinate2D) {
+    public func saveRecentDestination(name: String, coordinate: CLLocationCoordinate2D) {
         var recents = loadRecentDestinations()
         let new = RecentDestination(name: name, latitude: coordinate.latitude, longitude: coordinate.longitude)
         recents.removeAll { $0.name == name }
@@ -306,7 +291,7 @@ final class WizPathService {
         }
     }
 
-    func loadRecentDestinations() -> [RecentDestination] {
+    public func loadRecentDestinations() -> [RecentDestination] {
         guard let data = Foundation.UserDefaults.standard.data(forKey: AppKeys.UserDefaults.wizPathRecentDestinations),
               let recents = try? JSONDecoder().decode([RecentDestination].self, from: data) else {
             return []
@@ -316,29 +301,34 @@ final class WizPathService {
 
     // MARK: - Location Services
 
-    func getCurrentLocation() async throws -> LocationCoordinate {
-        return try await locationRepository.getCurrentLocation()
+    public func getCurrentLocation() async throws -> WizPathCoordinate {
+        let coord = try await locationRepository.getCurrentLocation()
+        return coord
     }
 }
 
 // MARK: - Recent Destination Model
-struct RecentDestination: Codable, Hashable, Identifiable {
-    let name: String
-    let latitude: Double
-    let longitude: Double
+public struct RecentDestination: Codable, Hashable, Identifiable {
+    public let name: String
+    public let latitude: Double
+    public let longitude: Double
 
-    var id: String { name }
+    public var id: String { name }
 
-    var coordinate: CLLocationCoordinate2D {
+    public var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+
+    public init(name: String, latitude: Double, longitude: Double) {
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
     }
 }
 
 // MARK: - WizPath Cache
-
 final class WizPathCache {
-    static let shared = WizPathCache()
-
+    nonisolated(unsafe) static let shared = WizPathCache()
     private var routeCache: [String: WizPathRoute] = [:]
     private let queue = DispatchQueue(label: "com.forewiz.wizpath.cache", qos: .utility)
 

@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import CoreLocation
+import WizPathKit
 @testable import ForeWiz
 
 @MainActor
@@ -9,7 +10,7 @@ struct DepartureOptimizerServiceTests {
     
     @Test("findOptimalDepartureTime returns result with valid windows")
     func findOptimalDepartureTimeReturnsResultWithValidWindows() async throws {
-        let mockWeather = MockWeatherRepository()
+        let mockWeather = MockWizPathWeatherSource()
         let service = DepartureOptimizerService(weatherRepository: mockWeather)
         
         let now = Date()
@@ -29,7 +30,7 @@ struct DepartureOptimizerServiceTests {
     
     @Test("scored windows are sorted by total score descending")
     func scoredWindowsAreSortedByTotalScoreDescending() async throws {
-        let mockWeather = MockWeatherRepository()
+        let mockWeather = MockWizPathWeatherSource()
         let service = DepartureOptimizerService(weatherRepository: mockWeather)
         
         let now = Date()

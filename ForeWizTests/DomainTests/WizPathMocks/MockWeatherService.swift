@@ -1,5 +1,6 @@
 import Foundation
 import CoreLocation
+import WizPathKit
 @testable import ForeWiz
 
 // MARK: - Mock Weather Service

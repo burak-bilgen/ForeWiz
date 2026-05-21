@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import WizPathKit
 
 @MainActor
 final class DependencyContainer {
@@ -109,9 +110,11 @@ final class DependencyContainer {
         let severeWeatherAlertService = SevereWeatherAlertService.shared
         
         let locationService = LocationService(timeout: 8.0)
+        let wizPathLocationSource = WizPathLocationServiceAdapter(locationService: locationService)
+        let wizPathWeatherSource = WizPathWeatherServiceAdapter(weatherRepository: weatherRepository, dateProvider: dateProvider)
         let wizPathService = WizPathService(
-            weatherRepository: weatherRepository,
-            locationRepository: locationService as LocationRepository
+            weatherRepository: wizPathWeatherSource,
+            locationRepository: wizPathLocationSource
         )
         
         // Prepare haptic engine on launch
@@ -190,9 +193,14 @@ final class DependencyContainer {
         let retryPolicy = NetworkRetryPolicy.aggressive // More retries for production
         let severeWeatherAlertService = SevereWeatherAlertService.shared
         
-        let wizPathService = WizPathService(
+        let wizPathLocationSource = WizPathLocationServiceAdapter(locationService: locationService)
+        let wizPathWeatherSource = WizPathWeatherServiceAdapter(
             weatherRepository: weatherRepository,
-            locationRepository: locationRepository
+            dateProvider: dateProvider
+        )
+        let wizPathService = WizPathService(
+            weatherRepository: wizPathWeatherSource,
+            locationRepository: wizPathLocationSource
         )
         
         // Prepare haptic engine on launch

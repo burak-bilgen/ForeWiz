@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import WizPathKit
 
 // MARK: - Liquid Glass Home View
 /// Premium weather assistant home screen with Liquid Glass aesthetic.

@@ -1,6 +1,7 @@
 import Foundation
 import Testing
 import CoreLocation
+@testable import WizPathKit
 @testable import ForeWiz
 
 @MainActor
@@ -9,8 +10,8 @@ struct WizPathServiceTests {
     
     @Test("WizPathService initializes with DI")
     func serviceInitializesWithDI() async throws {
-        let mockWeather = MockWeatherRepository()
-        let mockLocation = MockLocationRepository()
+        let mockWeather = MockWizPathWeatherSource()
+        let mockLocation = MockWizPathLocationSource()
         
         let service = WizPathService(
             weatherRepository: mockWeather,
@@ -22,8 +23,8 @@ struct WizPathServiceTests {
     
     @Test("Recent destinations save and load")
     func recentDestinationsSaveAndLoad() async throws {
-        let mockWeather = MockWeatherRepository()
-        let mockLocation = MockLocationRepository()
+        let mockWeather = MockWizPathWeatherSource()
+        let mockLocation = MockWizPathLocationSource()
         let service = WizPathService(
             weatherRepository: mockWeather,
             locationRepository: mockLocation
@@ -42,14 +43,14 @@ struct WizPathServiceTests {
     
     @Test("Recent destinations limited to 10")
     func recentDestinationsLimitedToTen() async throws {
-        let mockWeather = MockWeatherRepository()
-        let mockLocation = MockLocationRepository()
+        let mockWeather = MockWizPathWeatherSource()
+        let mockLocation = MockWizPathLocationSource()
         let service = WizPathService(
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
         
-        Foundation.UserDefaults.standard.removeObject(forKey: AppKeys.UserDefaults.wizPathRecentDestinations)
+        Foundation.UserDefaults.standard.removeObject(forKey: WizPathKitKeys.UserDefaults.wizPathRecentDestinations)
         
         for i in 0..<15 {
             service.saveRecentDestination(
@@ -64,14 +65,14 @@ struct WizPathServiceTests {
     
     @Test("Recent destinations are deduplicated")
     func recentDestinationsAreDeduplicated() async throws {
-        let mockWeather = MockWeatherRepository()
-        let mockLocation = MockLocationRepository()
+        let mockWeather = MockWizPathWeatherSource()
+        let mockLocation = MockWizPathLocationSource()
         let service = WizPathService(
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
         
-        Foundation.UserDefaults.standard.removeObject(forKey: AppKeys.UserDefaults.wizPathRecentDestinations)
+        Foundation.UserDefaults.standard.removeObject(forKey: WizPathKitKeys.UserDefaults.wizPathRecentDestinations)
         
         let coord1 = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let coord2 = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
@@ -88,8 +89,8 @@ struct WizPathServiceTests {
     
     @Test("GetCurrentLocation returns mock location")
     func getCurrentLocationReturnsMockLocation() async throws {
-        let mockWeather = MockWeatherRepository()
-        let mockLocation = MockLocationRepository()
+        let mockWeather = MockWizPathWeatherSource()
+        let mockLocation = MockWizPathLocationSource()
         let service = WizPathService(
             weatherRepository: mockWeather,
             locationRepository: mockLocation

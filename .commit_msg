@@ -1,10 +1,10 @@
-fix: add missing localization keys and remove unused ones
+fix: clean up localization - remove 46 unused keys, add 4 missing keys
 
-- Added 38 missing L10n keys (weather_high, weather_humidity, weather_low,
-  chart_*, preview_*, recommendation_explain_*, recommendation_signal_*,
-  widget_*, risk_wind_strong, activity_running, recommendation_*_range)
-  with EN + TR translations
-- Removed 24 unused auto-generated English placeholder keys and
-  leftover refactored keys from Localizable.xcstrings
-- All keys verified against actual L10n.text()/L10n.formatted() usage
-  in Swift source files
+Remove 46 unreferenced localization keys (verified via grep in all file types):
+- ad_* (12): ad infrastructure leftovers - not yet referenced in UI
+- comparative_* (3): unused card/metric titles
+- premium_* (7): removed premium system leftovers
+- siri_* (24): unused Siri shortcut intent keys
+
+Add 4 missing keys referenced in LocalizationTests:
+- home_title, sensitivity_cold, sensitivity_hot, sensitivity_normal
