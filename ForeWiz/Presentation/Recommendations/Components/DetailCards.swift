@@ -111,7 +111,6 @@ struct DetailHeroCard: View {
             Text(recommendation.summaryText)
                 .font(.system(size: 14))
                 .foregroundStyle(Color.white.opacity(0.55))
-                .lineLimit(4)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .layoutPriority(1)
@@ -322,7 +321,6 @@ struct DetailRiskCard: View {
                                 Text(risk.message)
                                     .font(.system(size: 12))
                                     .foregroundStyle(Color.white.opacity(0.45))
-                                    .lineLimit(3)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                             .layoutPriority(1)

@@ -37,7 +37,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         let outdoorDecision = OutdoorDecision(score: outdoorScore)
 
         // Use ALL today's waking hours for best window calculation, so the result
-        // is based on the day's weather metrics — not the current time.
+        // is based on the day's weather metrics - not the current time.
         // This prevents the "best time" from shifting forward every time you open the app.
         let bestOutdoorWindow: TimeWindow? = calculateBestWindow(
             from: snapshot.hourly,
@@ -98,7 +98,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         guard outdoorDecision != .avoid else { return nil }
         guard risks.contains(where: { $0.severity == .extreme }) == false else { return nil }
 
-        // All today's waking hours — 07:00 to 21:00 (21:30 sonrası dışarı önerilmez)
+        // All today's waking hours - 07:00 to 21:00 (21:30 sonrası dışarı önerilmez)
         let dayHours = hourly
             .filter { calendar.isDateInToday($0.date) }
             .filter { hour in

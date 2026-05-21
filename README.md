@@ -1,11 +1,11 @@
-# 🌤️ ForeWiz — Personal Weather Decision Assistant
+# 🌤️ ForeWiz - Personal Weather Decision Assistant
 
 <p align="center">
   <img src="https://github.com/bilgenworks/forewiz/blob/main/ForeWiz/Assets.xcassets/AppIcon.appiconset/1024.png?raw=true" width="120" height="120" alt="ForeWiz">
 </p>
 
 <p align="center">
-  <strong>Your smart weather sidekick. Not just weather — decisions.</strong>
+  <strong>Your smart weather sidekick. Not just weather - decisions.</strong>
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Monetization-AdMob-purple?style=flat-square" alt="AdMob">
 </p>
 
-ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It doesn't just tell you it's raining — it tells you *when* to go out, *what* to wear, *where* the weather is safest on your route, and *how* it might affect your health.
+ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It doesn't just tell you it's raining - it tells you *when* to go out, *what* to wear, *where* the weather is safest on your route, and *how* it might affect your health.
 
 > Built with Apple's native frameworks + **Google AdMob** for sustainable monetization.
 
@@ -31,7 +31,7 @@ ForeWiz processes weather data through a chain of specialized engines to produce
 | **WeatherDecisionEngine** | Computes overall outdoor score (0–100), classifies into good/moderate/risky/avoid, identifies optimal time windows |
 | **ActivityWindowScoringEngine** | Scores each hour (0–100) based on temperature, precipitation, UV, wind, humidity, and time-of-day bonuses |
 | **OutfitDecisionEngine** | Recommends clothing combinations from 10+ categories with natural-language advice |
-| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina — 5 independent calculators |
+| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina - 5 independent calculators |
 | **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes (energetic, melancholic, serene, dramatic, cozy, etc.) |
 | **ComparativeWeatherService** | Compares today against seasonal norms, yesterday, and weekly trends with anomaly detection |
 | **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable daily briefing with prioritized action items |
@@ -50,7 +50,7 @@ ForeWiz goes beyond basic weather by showing **how weather affects your body**:
 
 → **Overall Health Score** (0–100) with a one-sentence summary.
 
-### 🗺️ WizPath — Climate-Aware Route Planning
+### 🗺️ WizPath - Climate-Aware Route Planning
 Plan your journey with **weather-aware routing**. WizPath calculates weather conditions at every segment of your route based on estimated arrival time:
 
 - **Multi-modal**: Driving (15-min segments) or Walking (30-min segments)
@@ -63,23 +63,23 @@ Plan your journey with **weather-aware routing**. WizPath calculates weather con
 ### 🔔 Smart Notifications
 Five notification planners work together to keep you informed without noise:
 
-- **Morning Briefing** — Daily weather narrative + key action items
-- **Outfit Plan** — Clothing recommendations for the day
-- **Activity Plan** — Best outdoor windows based on comfort scores
-- **Smart Risk Plans** — Severe weather alerts with interruption levels
-- **Immediate Risk Plans** — Time-sensitive danger warnings
+- **Morning Briefing** - Daily weather narrative + key action items
+- **Outfit Plan** - Clothing recommendations for the day
+- **Activity Plan** - Best outdoor windows based on comfort scores
+- **Smart Risk Plans** - Severe weather alerts with interruption levels
+- **Immediate Risk Plans** - Time-sensitive danger warnings
 
 → Deduplication, quiet hours, configurable daily limits.
 
 ### 🎨 Liquid Glass Design System
 A premium dark-mode aesthetic with fluid animations:
 
-- **LiquidOrbBackground** — Animated gradient orbs that change with weather conditions
-- **GlassCard** — Ultra-thin material cards with neon accents
-- **Micro-interactions** — Haptic feedback, spring animations, staggered entrances
-- **Weather-responsive palettes** — Clear sky, stormy, snowy, rainy, night modes
-- **Scene transitions** — CardEntrance, StaggerEntrance, Float, PulseGlow modifiers
-- **Enhanced Splash** — Weather-conditioned animated splash screen
+- **LiquidOrbBackground** - Animated gradient orbs that change with weather conditions
+- **GlassCard** - Ultra-thin material cards with neon accents
+- **Micro-interactions** - Haptic feedback, spring animations, staggered entrances
+- **Weather-responsive palettes** - Clear sky, stormy, snowy, rainy, night modes
+- **Scene transitions** - CardEntrance, StaggerEntrance, Float, PulseGlow modifiers
+- **Enhanced Splash** - Weather-conditioned animated splash screen
 
 ### 📱 Home Screen & Widgets
 
@@ -91,11 +91,11 @@ A premium dark-mode aesthetic with fluid animations:
 - Language switcher and location picker in toolbar
 
 **Widgets (WidgetKit):**
-- **System Small** — Current conditions + outdoor score ring
-- **System Medium** — Current conditions + 4-day forecast with score bars
-- **Lock Screen Inline** — Temperature + condition text
-- **Lock Screen Circular** — Outdoor score ring
-- **Lock Screen Rectangular** — Detailed current conditions
+- **System Small** - Current conditions + outdoor score ring
+- **System Medium** - Current conditions + 4-day forecast with score bars
+- **Lock Screen Inline** - Temperature + condition text
+- **Lock Screen Circular** - Outdoor score ring
+- **Lock Screen Rectangular** - Detailed current conditions
 
 ### 🌍 Localization & Accessibility
 - **English** and **Turkish** (fully translated via `.xcstrings`)
@@ -114,11 +114,11 @@ ForeWiz uses **Google AdMob** with intelligent ad placement that respects user e
 | **Rewarded** | Optional video ads for premium features | User-initiated, value-exchange model |
 
 **Key Features:**
-- **AdFatiguePrevention** — Adaptive frequency capping based on user engagement
-- **AdRevenueTracker** — Per-unit revenue tracking with eCPM calculation
-- **AdPlacementStrategy** — Session-based placement rules, app-open gating
-- **AdConsentManager** — ATT (iOS 14.5+) and GDPR consent management
-- **AdAnalyticsEngine** — Impression, click, and revenue analytics
+- **AdFatiguePrevention** - Adaptive frequency capping based on user engagement
+- **AdRevenueTracker** - Per-unit revenue tracking with eCPM calculation
+- **AdPlacementStrategy** - Session-based placement rules, app-open gating
+- **AdConsentManager** - ATT (iOS 14.5+) and GDPR consent management
+- **AdAnalyticsEngine** - Impression, click, and revenue analytics
 - **Configurable daily limits & cooldowns** per ad unit
 
 ### 🧩 Siri Shortcuts (6 Intents)
@@ -180,7 +180,7 @@ ForeWiz/
 | **AdMob Monetization** | Google AdMob with smart fatigue prevention, revenue tracking, consent management, and configurable placements |
 | **Actor-based Concurrency** | Thread-safe services with Swift actors + async/await |
 | **Protocol-driven Repositories** | Every data source has a protocol + mock + production implementation |
-| **Deterministic Engines** | All decision engines are pure functions — fully unit testable |
+| **Deterministic Engines** | All decision engines are pure functions - fully unit testable |
 | **Dependency Injection** | Centralized `DependencyContainer` with `.live()` and `.simulator()` factories |
 | **Facade Refactoring** | Large files (>400 lines) split into focused, single-responsibility modules |
 
@@ -189,7 +189,7 @@ ForeWiz/
 ## 📦 Module Overview
 
 <details>
-<summary><b>Domain Layer — 50+ files</b></summary>
+<summary><b>Domain Layer - 50+ files</b></summary>
 
 ```
 Services/
@@ -244,7 +244,7 @@ UseCases/
 </details>
 
 <details>
-<summary><b>Presentation Layer — 20+ views</b></summary>
+<summary><b>Presentation Layer - 20+ views</b></summary>
 
 ```
 Home/
@@ -277,7 +277,7 @@ Shared/
 </details>
 
 <details>
-<summary><b>Core Design System — 15+ components</b></summary>
+<summary><b>Core Design System - 15+ components</b></summary>
 
 ```
 DesignSystem/
@@ -363,7 +363,7 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 | **Total Swift files** | ~140 |
 | **Unit tests** | 25+ test suites |
 | **Localized strings** | 150+ keys (EN + TR) |
-| **External dependencies** | **Google AdMob** (monetization) — everything else Apple-first-party |
+| **External dependencies** | **Google AdMob** (monetization) - everything else Apple-first-party |
 | **Deployment target** | iOS 17+ |
 
 ### File Size Management
@@ -386,10 +386,10 @@ Large files systematically refactored into focused modules:
 
 ## 🔒 Privacy
 
-- **Location**: Used only for local weather — no background tracking, no sharing
-- **Preferences**: All stored **on-device** via SwiftData — never transmitted
-- **Analytics**: **Zero** — no telemetry, no analytics SDKs, no third-party code
-- **Network**: Only connects to Apple WeatherKit — no data leaves your device
+- **Location**: Used only for local weather - no background tracking, no sharing
+- **Preferences**: All stored **on-device** via SwiftData - never transmitted
+- **Analytics**: **Zero** - no telemetry, no analytics SDKs, no third-party code
+- **Network**: Only connects to Apple WeatherKit - no data leaves your device
 
 ---
 

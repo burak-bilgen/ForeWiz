@@ -93,7 +93,7 @@ struct WeatherPresentationMapper {
         let highTarget = 24.0
         let lowTarget = 16.0
 
-        // High temp penalty — aşırı sıcak günler çok daha ağır cezalandırılır
+        // High temp penalty - aşırı sıcak günler çok daha ağır cezalandırılır
         let highDeviation = abs(highCelsius - highTarget)
         if highCelsius > 32 {
             score -= highDeviation * 3.5
@@ -103,7 +103,7 @@ struct WeatherPresentationMapper {
             score -= highDeviation * 1.8
         }
 
-        // Low temp penalty — tropikal geceler (>20°C low) skoru düşürür
+        // Low temp penalty - tropikal geceler (>20°C low) skoru düşürür
         if lowCelsius > 20 {
             score -= (lowCelsius - 20) * 3.0
         } else {

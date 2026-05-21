@@ -8,54 +8,33 @@ struct HeroCard: View {
     let recommendation: DailyRecommendation
 
     private var accentColor: Color { AppTheme.toneColor(for: assistant.tone) }
-    private var score: Int { recommendation.outdoorScore.rawValue }
-    private var weatherScore: WeatherScore { WeatherScore(rawValue: score) }
 
     var body: some View {
         LiquidGlassCard(accentColor: accentColor) {
             VStack(alignment: .leading, spacing: 16) {
-                // MARK: Header — Badge + Headline
-                VStack(alignment: .leading, spacing: 8) {
-                    // Badge
-                    HStack(spacing: 6) {
-                        Circle()
-                            .fill(accentColor.opacity(0.2))
-                            .frame(width: 6, height: 6)
-                        Text(L10n.text("home_assistant_badge"))
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .minimumScaleFactor(0.8)
-                            .foregroundStyle(accentColor)
-                            .lineLimit(1)
-                    }
-
+                // MARK: Headline + Temperature
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
                     // Headline
                     Text(assistant.headline)
-                        .font(.system(size: 26, weight: .bold, design: .rounded))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .fixedSize(horizontal: false, vertical: true)
                         .minimumScaleFactor(0.85)
-                }
+                        .layoutPriority(1)
 
-                // MARK: Main Row — Temperature + Score Ring
-                HStack(alignment: .center, spacing: 16) {
-                    // Temperature — large hero element
-                    VStack(alignment: .leading, spacing: 2) {
+                    Spacer(minLength: 4)
+
+                    // Temperature + condition
+                    VStack(alignment: .trailing, spacing: 0) {
                         Text(weather.temperatureText)
-                            .font(.system(size: 52, weight: .thin, design: .rounded))
+                            .font(.system(size: 28, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white)
-                            .minimumScaleFactor(0.6)
                             .lineLimit(1)
                         Text(weather.conditionText)
-                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(1)
                     }
-
-                    Spacer(minLength: 8)
-
-                    // Score Ring — larger & more prominent
-                    ScoreRingView(score: weatherScore, size: 68, lineWidth: 5, showOutOf100: false)
-                        .frame(width: 68, height: 68)
                 }
 
                 // MARK: Summary
@@ -65,43 +44,49 @@ struct HeroCard: View {
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
 
-                // MARK: Metrics Row — compact pills
-                HStack(spacing: 8) {
+                // MARK: Metrics Row
+                FlowLayout(spacing: 8) {
                     // Feels like
                     MetricPill(
                         icon: "thermometer.medium",
+                        label: L10n.text("weather_feels_like"),
                         value: weather.feelsLikeText
                             .replacingOccurrences(of: L10n.text("weather_feels_like") + " ", with: ""),
                         color: .white
                     )
 
-                    // High / Low
-                    if weather.highTempText != "–" {
+                    // High
+                    if weather.highTempText != "-" {
                         MetricPill(
                             icon: "arrow.up",
+                            label: L10n.text("weather_high"),
                             value: weather.highTempText,
                             color: AppTheme.sunshine
                         )
                     }
-                    if weather.lowTempText != "–" {
+
+                    // Low
+                    if weather.lowTempText != "-" {
                         MetricPill(
                             icon: "arrow.down",
+                            label: L10n.text("weather_low"),
                             value: weather.lowTempText,
                             color: AppTheme.sky
                         )
                     }
 
                     // Humidity
-                    if weather.humidityText != "–" {
+                    if weather.humidityText != "-" {
                         MetricPill(
                             icon: "humidity.fill",
+                            label: L10n.text("weather_humidity"),
                             value: weather.humidityText,
                             color: AppTheme.sky
                         )
                     }
                 }
 
-                // MARK: Sunrise/Sunset — refined pill
+                // MARK: Sunrise/Sunset
                 if weather.sunriseText != nil || weather.sunsetText != nil {
                     HStack(spacing: 12) {
                         if let sunrise = weather.sunriseText {
@@ -131,24 +116,38 @@ struct HeroCard: View {
 
 private struct MetricPill: View {
     let icon: String
+    let label: String
     let value: String
     let color: Color
 
+    init(icon: String, label: String, value: String, color: Color) {
+        self.icon = icon
+        self.label = label
+        self.value = value
+        self.color = color
+    }
+
     var body: some View {
-        HStack(spacing: 5) {
-            Image(systemName: icon)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(color.opacity(0.8))
-            Text(value)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+        VStack(spacing: 2) {
+            HStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(color.opacity(0.8))
+                Text(value)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+            }
+            Text(label)
+                .font(.system(size: 8, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.35))
                 .lineLimit(1)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(.white.opacity(0.06), lineWidth: 0.5)
         )
     }

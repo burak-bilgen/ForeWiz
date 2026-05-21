@@ -21,7 +21,7 @@ enum KeyEventNotificationPlanner {
         var events: [DayKeyEvent] = []
         let calendar = Calendar.current
 
-        // 1. Best outdoor window (info severity — always shown)
+        // 1. Best outdoor window (info severity - always shown)
         if let window = recommendation.bestOutdoorWindow {
             let startHour = calendar.component(.hour, from: window.start)
             let endHour = calendar.component(.hour, from: window.end)
@@ -37,7 +37,7 @@ enum KeyEventNotificationPlanner {
             ))
         }
 
-        // 2. Rain / Heavy Rain — tüm yağmur saatlerini cluster et (thunderstorm hariç — storm event'inde)
+        // 2. Rain / Heavy Rain - tüm yağmur saatlerini cluster et (thunderstorm hariç - storm event'inde)
         let rainHours = todayPoints.filter {
             !isThunderstormCondition($0.conditionCode) &&
             ($0.precipitationChance ?? 0 >= 0.5 || isRainCondition($0.conditionCode))
@@ -53,14 +53,7 @@ enum KeyEventNotificationPlanner {
             let timeRange = timeText(startHour: startHour, endHour: endHour)
 
             let description: String
-            if totalMm > 0 {
-                let mmText = String(format: "%.1f", totalMm)
-                if isHeavy {
-                    description = String(format: L10n.text("keyevent_rain_heavy_desc_mm"), timeRange, mmText)
-                } else {
-                    description = String(format: L10n.text("keyevent_rain_light_desc_mm"), timeRange, mmText)
-                }
-            } else if isHeavy {
+            if isHeavy {
                 description = String(format: L10n.text("keyevent_rain_heavy_desc"), timeRange)
             } else {
                 description = String(format: L10n.text("keyevent_rain_light_desc"), timeRange)
@@ -78,7 +71,7 @@ enum KeyEventNotificationPlanner {
             ))
         }
 
-        // 3. Storm / severe weather — cluster consecutive hours
+        // 3. Storm / severe weather - cluster consecutive hours
         let stormClusters = clusterHours(todayPoints) { point in
             // Catch thunderstorm by condition code, OR severe weather risk
             if isThunderstormCondition(point.conditionCode) { return true }
@@ -122,9 +115,9 @@ enum KeyEventNotificationPlanner {
 
             let description: String
             if severity >= .high {
-                description = String(format: L10n.text("keyevent_cold_extreme_desc"), timeRange, tempText)
+                description = String(format: L10n.text("keyevent_cold_extreme_desc"), timeRange)
             } else {
-                description = String(format: L10n.text("keyevent_cold_desc"), timeRange, tempText)
+                description = String(format: L10n.text("keyevent_cold_desc"), timeRange)
             }
             events.append(DayKeyEvent(
                 id: "cold-\\(index)",
@@ -179,9 +172,9 @@ enum KeyEventNotificationPlanner {
             let timeRange = timeText(startHour: startHour, endHour: endHour + 1)
             let description: String
             if severity == .critical {
-                description = String(format: L10n.text("keyevent_heat_critical_desc"), timeRange, tempText)
+                description = String(format: L10n.text("keyevent_heat_critical_desc"), timeRange)
             } else {
-                description = String(format: L10n.text("keyevent_heat_desc"), timeRange, tempText)
+                description = String(format: L10n.text("keyevent_heat_desc"), timeRange)
             }
             events.append(DayKeyEvent(
                 id: "heat-\\(index)",
@@ -205,9 +198,9 @@ enum KeyEventNotificationPlanner {
             let timeRange = timeText(startHour: startHour, endHour: endHour + 1)
             let description: String
             if severity >= .high {
-                description = String(format: L10n.text("keyevent_wind_strong_desc"), timeRange, Int(maxWind))
+                description = String(format: L10n.text("keyevent_wind_strong_desc"), timeRange)
             } else {
-                description = String(format: L10n.text("keyevent_wind_desc"), timeRange, Int(maxWind))
+                description = String(format: L10n.text("keyevent_wind_desc"), timeRange)
             }
             events.append(DayKeyEvent(
                 id: "wind-\\(index)",
@@ -229,7 +222,7 @@ enum KeyEventNotificationPlanner {
             let startHour = calendar.component(.hour, from: cluster.first!.date)
             let endHour = calendar.component(.hour, from: cluster.last!.date)
             let timeRange = timeText(startHour: startHour, endHour: endHour + 1)
-            let description = String(format: L10n.text("keyevent_uv_desc"), timeRange, maxUv)
+            let description = String(format: L10n.text("keyevent_uv_desc"), timeRange)
             events.append(DayKeyEvent(
                 id: "uv-\\(index)",
                 type: .highUV,
@@ -242,7 +235,7 @@ enum KeyEventNotificationPlanner {
             ))
         }
 
-        // 10. Improving conditions (rain/snow clearing up) — positive event
+        // 10. Improving conditions (rain/snow clearing up) - positive event
         if let improvingEvent = detectImprovingConditions(
             todayPoints: todayPoints,
             calendar: calendar,

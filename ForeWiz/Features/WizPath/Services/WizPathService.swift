@@ -32,7 +32,7 @@ final class WizPathService {
             return cached
         }
 
-        AppLogger.wizPath.info("Calculating route from (\(origin.latitude),\(origin.longitude)) to (\(destination.latitude),\(destination.longitude))")
+        AppLogger.wizPath.info("Calculating route from (\(origin.latitude, privacy: .private),\(origin.longitude, privacy: .private)) to (\(destination.latitude, privacy: .private),\(destination.longitude, privacy: .private))")
 
         let mkRoute = try await calculateMKRoute(
             origin: origin,
@@ -172,7 +172,7 @@ final class WizPathService {
                         updatedSegments[index].weather = weather
                     }
                 } catch {
-                    AppLogger.wizPath.error("Weather fetch failed for segment at hour \(hour): \(error.localizedDescription)")
+                    AppLogger.wizPath.error("Weather fetch failed for segment at hour \(hour): \(error.localizedDescription, privacy: .private)")
                     // Fallback: use time-based estimation
                     let fallback = estimatedWeather(for: segments[firstIndex].coordinate, at: segments[firstIndex].estimatedArrival)
                     weatherCache[hour] = fallback

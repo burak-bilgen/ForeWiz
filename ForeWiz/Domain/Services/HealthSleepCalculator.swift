@@ -30,7 +30,7 @@ enum HealthSleepCalculator {
 
         if let avgNightTemp = nightHours.map({ $0.apparentTemperatureCelsius }).average {
             if avgNightTemp > 25 {
-                sleepScore -= 4 // Tropical night — very disruptive
+                sleepScore -= 4 // Tropical night - very disruptive
             } else if avgNightTemp > 22 {
                 sleepScore -= 3
             } else if avgNightTemp > 20 {

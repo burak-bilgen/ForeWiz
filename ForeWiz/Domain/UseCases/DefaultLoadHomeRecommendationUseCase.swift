@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase {
     private let locationRepository: LocationRepository
@@ -235,7 +236,15 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
 
         guard let defaults = UserDefaults(suiteName: "group.forewiz"),
               let encoded = try? JSONEncoder().encode(widgetData) else { return }
-        defaults.set(encoded, forKey: "com.forewiz.widget.weatherData")
+
+        // Use shared-container key if available, fall back to deterministic key
+        let key = WidgetKeyManager.loadOrCreateKey()
+        do {
+            let encrypted = try WidgetDataCrypto.encrypt(encoded, key: key)
+            defaults.set(encrypted, forKey: "com.forewiz.widget.weatherData")
+        } catch {
+            AppLogger.app.error("Failed to encrypt widget data: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     // MARK: - Widget Cache Models

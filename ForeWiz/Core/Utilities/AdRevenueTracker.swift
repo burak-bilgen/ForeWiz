@@ -29,7 +29,7 @@ final class AdRevenueTracker {
     /// Set estimated revenue for a unit (from AdMob SDK callback)
     func recordEstimatedRevenue(unit: AdManager.AdUnit, revenue: Double) {
         estimatedRevenueByUnit[unit, default: 0] += revenue
-        AppLogger.analytics.info("[Revenue] Estimated revenue for \(unit.rawValue): $\(revenue)")
+        AppLogger.analytics.info("[Revenue] Estimated revenue for \(unit.rawValue, privacy: .private): $\(revenue, privacy: .private)")
     }
     
     // MARK: - Metrics

@@ -15,7 +15,7 @@ struct DayKeyEventsView: View {
         visibleEvents.contains { !$0.isPositive && $0.severity >= .moderate }
     }
 
-    /// Info/positive event'ler (bestWindow, improving) — sadece hiç risk yoksa gösterilir
+    /// Info/positive event'ler (bestWindow, improving) - sadece hiç risk yoksa gösterilir
     private var infoEvents: [DayKeyEvent] {
         visibleEvents.filter { $0.isPositive }
     }
@@ -188,7 +188,6 @@ private struct EventRow: View {
                 Text(event.description)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(event.isPositive ? severityColor.opacity(0.7) : .white.opacity(0.55))
-                    .lineLimit(2)
                     .fixedSize(horizontal: false, vertical: true)
             }
 

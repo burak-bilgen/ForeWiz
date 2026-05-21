@@ -1,7 +1,10 @@
 import Foundation
+import CryptoKit
 
 /// Lightweight, codable model that the widget reads from UserDefaults (app group)
 /// to display forecast information. The main app saves a matching JSON blob.
+/// The stored data is encrypted with AES-GCM to prevent plaintext weather/location
+/// data from being readable by other apps in the same app group.
 struct WeatherWidgetData: Codable, Equatable, Sendable {
     let locationName: String
     let currentTemperature: Double
@@ -54,12 +57,19 @@ struct WeatherWidgetData: Codable, Equatable, Sendable {
             return .noSuite
         }
 
-        guard let data = defaults.data(forKey: Self.userDefaultsKey) else {
+        guard let encrypted = defaults.data(forKey: Self.userDefaultsKey) else {
             return .noData
         }
 
+        let decrypted: Data
         do {
-            let decoded = try JSONDecoder().decode(Self.self, from: data)
+            decrypted = try Self.decryptWidgetData(encrypted)
+        } catch {
+            return .corrupted("Decryption failed: \(error.localizedDescription)")
+        }
+
+        do {
+            let decoded = try JSONDecoder().decode(Self.self, from: decrypted)
             let age = -decoded.lastUpdated.timeIntervalSinceNow
             if age > staleThreshold {
                 return .stale(decoded, ageSeconds: age)
@@ -73,6 +83,35 @@ struct WeatherWidgetData: Codable, Equatable, Sendable {
     /// Simple load that returns nil on any failure (for backward compat / quick checks).
     static func load() -> WeatherWidgetData? {
         loadDetailed().data
+    }
+
+    // MARK: - Data Decryption
+
+    /// Decrypts widget data with AES-GCM.
+    /// Tries the shared-container key first (randomly generated, more secure).
+    /// Falls back to the deterministic key derived from the app group identifier.
+    private static func decryptWidgetData(_ data: Data) throws -> Data {
+        let key = loadEncryptionKey() ?? deterministicKey()
+        let sealedBox = try AES.GCM.SealedBox(combined: data)
+        return try AES.GCM.open(sealedBox, using: key)
+    }
+
+    /// Loads the encryption key from the shared app group container.
+    /// Returns nil if the key file doesn't exist (first launch or after reset).
+    private static func loadEncryptionKey() -> SymmetricKey? {
+        guard let url = FileManager.default
+            .containerURL(forSecurityApplicationGroupIdentifier: appGroupSuiteName)?
+            .appendingPathComponent(".widget-encryption-key-v1"),
+              let keyData = try? Data(contentsOf: url),
+              keyData.count == 32 else { return nil }
+        return SymmetricKey(data: keyData)
+    }
+
+    /// Deterministic fallback key derived from the app group identifier.
+    /// Matches the main app's fallback for backward compatibility.
+    private static func deterministicKey() -> SymmetricKey {
+        let material = "com.forewiz.widget.encryption.v1.\(appGroupSuiteName)"
+        return SymmetricKey(data: SHA256.hash(data: Data(material.utf8)))
     }
 }
 

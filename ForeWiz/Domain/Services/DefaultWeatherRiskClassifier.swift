@@ -190,7 +190,7 @@ struct DefaultWeatherRiskClassifier {
             )
         }
 
-        // 🌙 Night heat avoidance — serinlemek için gece saatleri
+        // 🌙 Night heat avoidance - serinlemek için gece saatleri
         if !(6..<22).contains(hourOfDay) && hour.apparentTemperatureCelsius >= 24 {
             return WeatherRisk(
                 type: .heat,
@@ -262,7 +262,7 @@ struct DefaultWeatherRiskClassifier {
         let hourOfDay = calendar.component(.hour, from: hour.date)
         let apparentTemp = hour.apparentTemperatureCelsius
 
-        // 🌙 Night Heat (Tropikal Gece) — >20°C at night disrupts sleep & recovery
+        // 🌙 Night Heat (Tropikal Gece) - >20°C at night disrupts sleep & recovery
         if !(6..<20).contains(hourOfDay) && apparentTemp > 20 {
             let severity: RiskLevel = apparentTemp >= 25 ? .high : .medium
             return WeatherRisk(
@@ -273,7 +273,7 @@ struct DefaultWeatherRiskClassifier {
             )
         }
 
-        // ☀️ Daytime Heat — kademeli threshold (küresel ısınma odaklı)
+        // ☀️ Daytime Heat - kademeli threshold (küresel ısınma odaklı)
         // Kritik: 40°C+ → extreme
         // Ekstrem: 36°C+ → high
         // Yüksek: 32°C+ → medium (gün ortası)

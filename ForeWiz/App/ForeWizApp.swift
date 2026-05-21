@@ -35,12 +35,40 @@ struct ForeWizApp: App {
                 schema: schema,
                 isStoredInMemoryOnly: false
             )
-            return try ModelContainer(
+
+            // 🔒 Pre-apply NSFileProtectionComplete to the store's parent directory
+            // BEFORE the ModelContainer opens the SQLite file. This ensures that
+            // any files created by SwiftData inherit the directory's protection.
+            let storeDir = config.url.deletingLastPathComponent()
+            try? FileManager.default.createDirectory(at: storeDir, withIntermediateDirectories: true,
+                attributes: [FileAttributeKey.protectionKey: FileProtectionType.completeUnlessOpen])
+            // Also apply protection attribute on the directory via NSURL path-based API
+            try? (storeDir as NSURL).setResourceValue(
+                FileProtectionType.completeUnlessOpen,
+                forKey: .fileProtectionKey
+            )
+
+            let container = try ModelContainer(
                 for: schema,
                 configurations: [config]
             )
+
+            // 🔐 Also set protection directly on the store file (belt-and-suspenders).
+            // This ensures the file is protected even if directory inheritance doesn't work.
+            if let storeFileURL = container.configurations.first?.url {
+                try? (storeFileURL as NSURL).setResourceValue(
+                    FileProtectionType.completeUnlessOpen,
+                    forKey: .fileProtectionKey
+                )
+                try? FileManager.default.setAttributes(
+                    [FileAttributeKey.protectionKey: FileProtectionType.completeUnlessOpen],
+                    ofItemAtPath: storeFileURL.path
+                )
+            }
+
+            return container
         } catch {
-            AppLogger.persistence.error("Persistent ModelContainer failed: \(error.localizedDescription)")
+            AppLogger.persistence.error("Persistent ModelContainer failed: \(error.localizedDescription, privacy: .private)")
         }
 
         AppLogger.persistence.error("Persistent ModelContainer failed - falling back to in-memory")
@@ -48,7 +76,7 @@ struct ForeWizApp: App {
             let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             return try ModelContainer(for: schema, configurations: [fallbackConfig])
         } catch {
-            AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription)")
+            AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription, privacy: .private)")
             // Last resort: minimal in-memory container with empty schema
             let minimalSchema = Schema([UserPreferencesModel.self])
             if let minimalConfig = try? ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true),

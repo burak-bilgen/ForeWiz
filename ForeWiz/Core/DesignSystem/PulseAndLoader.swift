@@ -13,7 +13,7 @@ struct PulseGlowModifier: ViewModifier {
         content
             .shadow(color: color.opacity(pulse ? 0.5 : 0.2), radius: pulse ? radius : radius * 0.6, x: 0, y: 0)
             .onAppear {
-                // Single spring animation — no endless loop
+                // Single spring animation - no endless loop
                 withAnimation(AppTheme.transitionSpring) {
                     pulse = true
                 }

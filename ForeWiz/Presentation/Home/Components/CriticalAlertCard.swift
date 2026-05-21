@@ -24,12 +24,12 @@ struct CriticalAlertCard: View {
                 Text(signal.subtitle)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
                 if !signal.hint.isEmpty {
                     Text(signal.hint)
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.45))
-                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }

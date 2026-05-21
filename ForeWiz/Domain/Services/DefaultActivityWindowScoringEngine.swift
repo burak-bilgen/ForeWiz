@@ -174,7 +174,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
     // MARK: - Helpers
 
-    /// Küresel ısınma odaklı ısı cezası — yüksek sıcaklıklar artık çok daha ağır cezalandırılıyor.
+    /// Küresel ısınma odaklı ısı cezası - yüksek sıcaklıklar artık çok daha ağır cezalandırılıyor.
     ///   < 12°C:  soğuk (22)
     ///   12-26°C: ideal (0)
     ///   26-29°C: sıcaklık başlangıcı (15)
@@ -222,7 +222,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
-    /// Nem cezası — ısı + nem kombinasyonu (Heat Index / Humidex) çok daha agresif.
+    /// Nem cezası - ısı + nem kombinasyonu (Heat Index / Humidex) çok daha agresif.
     /// Yüksek sıcaklıkta nem, hissedilen sıcaklığı dramatik artırır.
     private func humidityPenalty(
         _ humidity: Double?,

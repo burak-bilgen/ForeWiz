@@ -1089,7 +1089,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kritik: %@ — bugün önlem al"
+            "value": "Kritik: %@ - bugün önlem al"
           }
         }
       }
@@ -1255,13 +1255,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Extreme heat (%d°C) — increased travel risk"
+            "value": "Extreme heat (%d°C) - increased travel risk"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı sıcak (%d°C) — seyahat riski yüksek"
+            "value": "Aşırı sıcak (%d°C) - seyahat riski yüksek"
           }
         }
       }
@@ -1323,13 +1323,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heavy rain — reduced visibility"
+            "value": "Heavy rain - reduced visibility"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şiddetli yağmur — görüş mesafesi düşük"
+            "value": "Şiddetli yağmur - görüş mesafesi düşük"
           }
         }
       }
@@ -1340,13 +1340,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "High heat (%d°C) — moderate risk"
+            "value": "High heat (%d°C) - moderate risk"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yüksek sıcaklık (%d°C) — orta risk"
+            "value": "Yüksek sıcaklık (%d°C) - orta risk"
           }
         }
       }
@@ -1408,13 +1408,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Severe storm — dangerous conditions"
+            "value": "Severe storm - dangerous conditions"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şiddetli fırtına — tehlikeli koşullar"
+            "value": "Şiddetli fırtına - tehlikeli koşullar"
           }
         }
       }
@@ -1425,13 +1425,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Snow/Blizzard — very dangerous"
+            "value": "Snow/Blizzard - very dangerous"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kar fırtınası — çok tehlikeli"
+            "value": "Kar fırtınası - çok tehlikeli"
           }
         }
       }
@@ -1839,7 +1839,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Soğuk hava dalgası — uzun süreli."
+            "value": "Soğuk hava dalgası - uzun süreli."
           }
         }
       }
@@ -1856,7 +1856,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Soğuma — hafta boyunca düşüş."
+            "value": "Soğuma - hafta boyunca düşüş."
           }
         }
       }
@@ -1873,7 +1873,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcak hava dalgası — günler süren aşırı sıcak."
+            "value": "Sıcak hava dalgası - günler süren aşırı sıcak."
           }
         }
       }
@@ -1907,7 +1907,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Karışık — her gün farklı."
+            "value": "Karışık - her gün farklı."
           }
         }
       }
@@ -1924,7 +1924,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dengeli — benzer koşullar devam."
+            "value": "Dengeli - benzer koşullar devam."
           }
         }
       }
@@ -1941,7 +1941,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fırtınalı — önümüzdeki günler hareketli."
+            "value": "Fırtınalı - önümüzdeki günler hareketli."
           }
         }
       }
@@ -1958,7 +1958,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Isınma — hafta boyunca yükseliş."
+            "value": "Isınma - hafta boyunca yükseliş."
           }
         }
       }
@@ -2123,7 +2123,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Best time to step out is right here. No rush — weather's on your side."
+            "value": "Best time to step out is right here. No rush - weather's on your side."
           }
         },
         "tr": {
@@ -2818,7 +2818,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eklemlerin için zorlu bir gün — dinlen ve sıcak tut."
+            "value": "Eklemlerin için zorlu bir gün - dinlen ve sıcak tut."
           }
         }
       }
@@ -2852,7 +2852,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eklemlerin rahatsız — sıcak kal, ani hareket etme."
+            "value": "Eklemlerin rahatsız - sıcak kal, ani hareket etme."
           }
         }
       }
@@ -2886,7 +2886,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eklemlerin rahat — hareketli bir gün geçirebilirsin."
+            "value": "Eklemlerin rahat - hareketli bir gün geçirebilirsin."
           }
         }
       }
@@ -2920,7 +2920,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eklemlerin orta düzeyde rahatsız — hafif esneme iyi gelir."
+            "value": "Eklemlerin orta düzeyde rahatsız - hafif esneme iyi gelir."
           }
         }
       }
@@ -2954,7 +2954,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Migren riski çok yüksek — stresten uzak dur, mümkünse dinlen."
+            "value": "Migren riski çok yüksek - stresten uzak dur, mümkünse dinlen."
           }
         }
       }
@@ -2988,7 +2988,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yüksek migren riski — parlak ekranlardan kaçın, sık sık mola ver."
+            "value": "Yüksek migren riski - parlak ekranlardan kaçın, sık sık mola ver."
           }
         }
       }
@@ -3022,7 +3022,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Migren riski düşük — günün tadını çıkar."
+            "value": "Migren riski düşük - günün tadını çıkar."
           }
         }
       }
@@ -3056,7 +3056,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta migren riski — ışıkları kıs, bol su iç."
+            "value": "Orta migren riski - ışıkları kıs, bol su iç."
           }
         }
       }
@@ -3090,7 +3090,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün solunum için riskli — dikkatli olun."
+            "value": "Bugün solunum için riskli - dikkatli olun."
           }
         }
       }
@@ -3158,7 +3158,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nefes almak için ideal — derin bir nefes alın."
+            "value": "Nefes almak için ideal - derin bir nefes alın."
           }
         }
       }
@@ -3226,7 +3226,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mükemmel uyku havası — pencereni aç, rahat bir uyku çek."
+            "value": "Mükemmel uyku havası - pencereni aç, rahat bir uyku çek."
           }
         }
       }
@@ -3260,7 +3260,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyku kalitesi orta — vantilatör işe yarayabilir."
+            "value": "Uyku kalitesi orta - vantilatör işe yarayabilir."
           }
         }
       }
@@ -3328,7 +3328,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uyku için zor bir gece — yatak odanı serin tut."
+            "value": "Uyku için zor bir gece - yatak odanı serin tut."
           }
         }
       }
@@ -4767,13 +4767,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This is your window — everything's lining up perfectly to head outside!"
+            "value": "This is your window - everything's lining up perfectly to head outside!"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "İşte senin anın — dışarı çıkmak için her şey mükemmel sıralanmış!"
+            "value": "Tam zamanı! Dışarı çıkmak için hava mükemmel."
           }
         }
       }
@@ -4790,7 +4790,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tam Vakti"
+            "value": "İdeal Zaman"
           }
         }
       }
@@ -4824,7 +4824,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün Ne Var Ne Yok"
+            "value": "Günün Özeti"
           }
         }
       }
@@ -4835,13 +4835,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Extreme heat rolling in — we're looking at %@ around %@. Shade and water are your best friends today 🥵"
+            "value": "Extreme heat rolling in around %@ - shade and water are your best friends today 🥵"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı sıcak geliyor! %@ civarında %@'yi göreceğiz. Gölge ve bol su bugün en iyi dostun 🥵"
+            "value": "Aşırı sıcak geliyor! %@ civarında - gölge ve bol su bugün en iyi dostun 🥵"
           }
         }
       }
@@ -4852,13 +4852,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It's gonna get toasty — temps hitting %@ around %@. That's the peak of the heat today 🔥"
+            "value": "It's gonna get toasty around %@ - that's the peak of the heat today 🔥"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava ısınıyor — %@ civarında %@'yi bulacak. Günün en sıcak anı, dikkat 🔥"
+            "value": "Hava ısınıyor %@ civarında - günün en sıcak anı, dikkat 🔥"
           }
         }
       }
@@ -4903,13 +4903,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heavy rain rolling in %@ — good day to stay cozy indoors if you can 🌧️"
+            "value": "Heavy rain rolling in %@ - good day to stay cozy indoors if you can 🌧️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ arasında kuvvetli yağmur bastıracak — evde keyif yapma günü 🌧️"
+            "value": "%@ arasında kuvvetli yağmur bastıracak - evde keyif yapma günü 🌧️"
           }
         }
       }
@@ -4920,13 +4920,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Looks like rain's coming around %@ — might wanna grab that umbrella on your way out ☂️"
+            "value": "Looks like rain's coming around %@ - might wanna grab that umbrella on your way out ☂️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarı yağmur başlıyor gibi — çıkarken şemsiyeni kapıver ☂️"
+            "value": "%@ civarı yağmur başlıyor gibi - çıkarken şemsiyeni kapıver ☂️"
           }
         }
       }
@@ -4937,13 +4937,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heavy rain between %@ — dumping about %@mm. Perfect day to stay dry inside! 🌧️"
+            "value": "Heavy rain between %@ - dumping about %@mm. Perfect day to stay dry inside! 🌧️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ arasında sağanak var — toplam %@mm yağış bekliyoruz. Evde kalma günü! 🌧️"
+            "value": "%@ arasında sağanak var - toplam %@mm yağış bekliyoruz. Evde kalma günü! 🌧️"
           }
         }
       }
@@ -4954,13 +4954,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "We've got some rain around %@ — about %@mm coming down. Umbrella weather for sure ☂️"
+            "value": "We've got some rain around %@ - about %@mm coming down. Umbrella weather for sure ☂️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ arasında yağmur bekliyoruz — yaklaşık %@mm düşüyor. Şemsiye şart yani ☂️"
+            "value": "%@ arasında yağmur bekliyoruz - yaklaşık %@mm düşüyor. Şemsiye şart yani ☂️"
           }
         }
       }
@@ -4988,13 +4988,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Heads up — severe storm hitting hard around %@! Best to find shelter and stay safe 🚨"
+            "value": "Heads up - severe storm hitting hard around %@! Best to find shelter and stay safe 🚨"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dikkat! Şiddetli fırtına %@'te en tepe noktasında — güvende kal, sıcak kal 🚨"
+            "value": "Dikkat! Şiddetli fırtına %@'te en tepe noktasında - güvende kal, sıcak kal 🚨"
           }
         }
       }
@@ -5005,13 +5005,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Storm's brewing around %@ — if you don't have to go out, today's a good day to stay put ⛈️"
+            "value": "Storm's brewing around %@ - if you don't have to go out, today's a good day to stay put ⛈️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fırtına geliyor %@ civarında — mecbur değilsen bugün evde kalmak iyi fikir ⛈️"
+            "value": "Fırtına geliyor %@ civarında - mecbur değilsen bugün evde kalmak iyi fikir ⛈️"
           }
         }
       }
@@ -5039,13 +5039,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "UV index hitting %d around %@ — don't forget the sunscreen if you're heading out! ☀️"
+            "value": "UV index is high around %@ - don't forget the sunscreen if you're heading out! ☀️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "UV seviyesi %@ arasında %d'ye fırlıyor — dışarı çıkacaksan krem sürmeyi unutma! ☀️"
+            "value": "UV seviyesi %@ arasında çok yüksek - dışarı çıkacaksan krem sürmeyi unutma! ☀️"
           }
         }
       }
@@ -5073,13 +5073,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wind's picking up around %@ — %d km/h gusts. Might wanna hold onto that hat! 🍃"
+            "value": "Wind's picking up around %@ - hold onto your hat, it's getting gusty! 🍃"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rüzgâr %@ arasında hızlanıyor — %d km/saat'i bulacak. Şapkanı kap! 🍃"
+            "value": "Rüzgâr %@ arasında hızlanıyor - şapkanı kap, dikkatli ol! 🍃"
           }
         }
       }
@@ -5090,13 +5090,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Strong winds coming through — %d km/h around %@. Best to stay tucked in if you can 💨"
+            "value": "Strong winds coming through around %@ - best to stay tucked in if you can 💨"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kuvvetli rüzgâr esiyor — %@ arasında %d km/saat. Çıkmayacaksan evde kal iyisi mi 💨"
+            "value": "Kuvvetli rüzgâr esiyor - %@ arasında. Çıkmayacaksan evde kal iyisi mi 💨"
           }
         }
       }
@@ -5759,7 +5759,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Taze ve ferah — doğa reset butonuna basmış gibi"
+            "value": "Taze ve ferah - doğa reset butonuna basmış gibi"
           }
         }
       }
@@ -6314,13 +6314,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "There's a %@ risk though — %@."
+            "value": "There's a %@ risk though - %@."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ama %@ riski var — %@."
+            "value": "Ama %@ riski var - %@."
           }
         }
       }
@@ -6331,13 +6331,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Good morning. Be careful with outdoor plans today — the weather has some surprises."
+            "value": "Good morning. Be careful with outdoor plans today - the weather has some surprises."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın. Bugün dışarı planlarında dikkatli olun — havada bazı sürprizler var."
+            "value": "Günaydın. Bugün dışarı planlarında dikkatli olun - havada bazı sürprizler var."
           }
         }
       }
@@ -6759,7 +6759,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It's cold! A warm coat, sweater, and closed shoes are a must. Layer up — you can always take off if needed."
+            "value": "It's cold! A warm coat, sweater, and closed shoes are a must. Layer up - you can always take off if needed."
           }
         },
         "tr": {
@@ -6793,13 +6793,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It'll cool down significantly in the evening — take a light jacket or sweater if you plan to be out late."
+            "value": "It'll cool down significantly in the evening - take a light jacket or sweater if you plan to be out late."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Akşama doğru hava belirgin şekilde soğuyacak — geç saatlere kadar dışarıda kalacaksan yanına bir hırka veya ceket al."
+            "value": "Akşama doğru hava belirgin şekilde soğuyacak - geç saatlere kadar dışarıda kalacaksan yanına bir hırka veya ceket al."
           }
         }
       }
@@ -6827,13 +6827,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Extreme heat with high humidity — a light, breathable shirt and shorts are your best bet. Stay in the shade if you can."
+            "value": "Extreme heat with high humidity - a light, breathable shirt and shorts are your best bet. Stay in the shade if you can."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı sıcak ve yüksek nem — hafif, nefes alabilen bir tişört ve şort en iyi tercihin. Mümkünse gölgede kal."
+            "value": "Aşırı sıcak ve yüksek nem - hafif, nefes alabilen bir tişört ve şort en iyi tercihin. Mümkünse gölgede kal."
           }
         }
       }
@@ -6878,13 +6878,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hot and humid — go for lightweight, breathable fabrics. A cotton t-shirt and shorts will keep you comfortable."
+            "value": "Hot and humid - go for lightweight, breathable fabrics. A cotton t-shirt and shorts will keep you comfortable."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcak ve nemli — hafif, nefes alabilen kumaşlar tercih et. Pamuklu bir tişört ve şort rahat ettirir."
+            "value": "Sıcak ve nemli - hafif, nefes alabilen kumaşlar tercih et. Pamuklu bir tişört ve şort rahat ettirir."
           }
         }
       }
@@ -6895,13 +6895,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "It's humid out — go for loose, cotton or linen fabrics. They'll help you stay cool and avoid that sticky feeling."
+            "value": "It's humid out - go for loose, cotton or linen fabrics. They'll help you stay cool and avoid that sticky feeling."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nemli bir hava — bol, pamuklu veya keten kumaşlar tercih et. Serin kalmana ve o yapış yapış hissi önlemene yardımcı olur."
+            "value": "Nemli bir hava - bol, pamuklu veya keten kumaşlar tercih et. Serin kalmana ve o yapış yapış hissi önlemene yardımcı olur."
           }
         }
       }
@@ -6912,13 +6912,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Big temperature swing today — start with layers in the morning so you can peel them off by midday."
+            "value": "Big temperature swing today - start with layers in the morning so you can peel them off by midday."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün büyük bir sıcaklık farkı var — sabah katmanlı giyin ki öğlene doğru üstünü çıkarabilesin."
+            "value": "Bugün büyük bir sıcaklık farkı var - sabah katmanlı giyin ki öğlene doğru üstünü çıkarabilesin."
           }
         }
       }
@@ -6929,13 +6929,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mild and comfortable — a t-shirt with a light jacket or cardigan works great. You'll be glad you have the extra layer later."
+            "value": "Mild and comfortable - a t-shirt with a light jacket or cardigan works great. You'll be glad you have the extra layer later."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilık ve rahat — tişörtün üzerine hafif bir ceket veya hırka ideal. Fazladan katmanın olduğu için sonra memnun kalacaksın."
+            "value": "Ilık ve rahat - tişörtün üzerine hafif bir ceket veya hırka ideal. Fazladan katmanın olduğu için sonra memnun kalacaksın."
           }
         }
       }
@@ -6946,13 +6946,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rain is in the forecast — grab a rain jacket or umbrella. Waterproof shoes will save your day."
+            "value": "Rain is in the forecast - grab a rain jacket or umbrella. Waterproof shoes will save your day."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yağmur bekleniyor — yanına şemsiye al, ayakkabıların su geçirmezse daha iyi."
+            "value": "Yağmur bekleniyor - yanına şemsiye al, ayakkabıların su geçirmezse daha iyi."
           }
         }
       }
@@ -6963,13 +6963,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The sun is strong today — wear a hat, sunglasses, and don't skip the sunscreen. Your skin will thank you."
+            "value": "The sun is strong today - wear a hat, sunglasses, and don't skip the sunscreen. Your skin will thank you."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün güneş çok güçlü — şapka, güneş gözlüğü tak ve güneş kremini ihmal etme. Cildin sana teşekkür edecek."
+            "value": "Bugün güneş çok güçlü - şapka, güneş gözlüğü tak ve güneş kremini ihmal etme. Cildin sana teşekkür edecek."
           }
         }
       }
@@ -6997,13 +6997,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Warm and a bit muggy — a breathable top and light pants will do the trick. You might feel sticky by midday."
+            "value": "Warm and a bit muggy - a breathable top and light pants will do the trick. You might feel sticky by midday."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilık ve biraz bunaltıcı — nefes alabilen bir üst ve hafif pantolon iş görür. Öğlene doğru yapış yapış olabilirsin."
+            "value": "Ilık ve biraz bunaltıcı - nefes alabilen bir üst ve hafif pantolon iş görür. Öğlene doğru yapış yapış olabilirsin."
           }
         }
       }
@@ -7275,7 +7275,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava ılıman — normal giyinebilirsin."
+            "value": "Hava ılıman - normal giyinebilirsin."
           }
         }
       }
@@ -7292,7 +7292,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Soğuk — sıkı giyin."
+            "value": "Soğuk - sıkı giyin."
           }
         }
       }
@@ -7309,7 +7309,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcak gün — hafif giyin."
+            "value": "Sıcak gün - hafif giyin."
           }
         }
       }
@@ -7326,7 +7326,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilık hava — ince bir katman yeter."
+            "value": "Ilık hava - ince bir katman yeter."
           }
         }
       }
@@ -7428,7 +7428,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rüzgârlı — rüzgârlık al."
+            "value": "Rüzgârlı - rüzgârlık al."
           }
         }
       }
@@ -8366,7 +8366,7 @@
       }
     },
     "risk_critical_heat": {
-      "comment": "Critical heat warning title — 40°C+",
+      "comment": "Critical heat warning title - 40°C+",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8390,13 +8390,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Life-threatening heat — stay indoors, keep hydrated, and check on vulnerable individuals."
+            "value": "Life-threatening heat - stay indoors, keep hydrated, and check on vulnerable individuals."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hayati tehlike — içeride kalın, bol su için ve risk altındaki kişileri kontrol edin."
+            "value": "Hayati tehlike - içeride kalın, bol su için ve risk altındaki kişileri kontrol edin."
           }
         }
       }
@@ -8408,19 +8408,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Temperatures are rising — start hydrating and plan for shade."
+            "value": "Temperatures are rising - start hydrating and plan for shade."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcaklık yükseliyor — su içmeye başlayın ve gölge planı yapın."
+            "value": "Sıcaklık yükseliyor - su içmeye başlayın ve gölge planı yapın."
           }
         }
       }
     },
     "risk_early_heat_warning": {
-      "comment": "Early heat warning title — 28°C+",
+      "comment": "Early heat warning title - 28°C+",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -8728,19 +8728,19 @@
       }
     },
     "risk_night_heat_message": {
-      "comment": "Night heat message — hot night",
+      "comment": "Night heat message - hot night",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Warm night — expect poor sleep quality. Keep windows open and use a fan if possible."
+            "value": "Warm night - expect poor sleep quality. Keep windows open and use a fan if possible."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcak gece — uyku kalitesi düşebilir. Pencereyi aç, vantilatör varsa çalıştır."
+            "value": "Sıcak gece - uyku kalitesi düşebilir. Pencereyi aç, vantilatör varsa çalıştır."
           }
         }
       }
@@ -8819,13 +8819,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rain expected between %@-%@ with ~%d%% chance. Total around %@mm — umbrella's your best friend today."
+            "value": "Rain expected between %@-%@ with ~%d%% chance. Total around %@mm - umbrella's your best friend today."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@-%@ arası yağmur bekleniyor, ortalama %%%d ihtimalle. Toplam %@mm — şemsiye bugün en yakın arkadaşın."
+            "value": "%@-%@ arası yağmur bekleniyor, ortalama %%%d ihtimalle. Toplam %@mm - şemsiye bugün en yakın arkadaşın."
           }
         }
       }
@@ -9930,7 +9930,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şu anda %1$@ — %2$@"
+            "value": "Şu anda %1$@ - %2$@"
           }
         }
       }
@@ -11446,13 +11446,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d°C, ice on road — high risk"
+            "value": "%d°C, ice on road - high risk"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d°C, yolda buz — yüksek risk"
+            "value": "%d°C, yolda buz - yüksek risk"
           }
         }
       }
@@ -11480,13 +11480,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d°C with snow — slippery roads"
+            "value": "%d°C with snow - slippery roads"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%d°C kar — kaygan yollar"
+            "value": "%d°C kar - kaygan yollar"
           }
         }
       }
@@ -12386,13 +12386,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Brrr, it's gonna get chilly around %@ — dropping down to %@. Time to bundle up! 🧣"
+            "value": "Brrr, it's gonna get chilly around %@ - time to bundle up! 🧣"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarı hava soğuyor — %@'ye kadar düşüyor. Kalın giyinme vakti! 🧣"
+            "value": "%@ civarı hava soğuyor - kalın giyinme vakti! 🧣"
           }
         }
       }
@@ -12403,13 +12403,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Freezing temps ahead around %@ — feels like %@ with the wind chill. Stay warm out there! 🥶"
+            "value": "Freezing temps ahead around %@ - stay warm out there! 🥶"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarı dondurucu soğuk — rüzgârla birlikte %@ gibi hissettirecek. Sıcacık giyin! 🥶"
+            "value": "%@ civarı dondurucu soğuk - sıcacık giyin, dikkatli ol! 🥶"
           }
         }
       }
@@ -12437,13 +12437,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Snow's on the way around %@ — roads could get slick. Take it easy out there! ❄️"
+            "value": "Snow's on the way around %@ - roads could get slick. Take it easy out there! ❄️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarı kar bekliyoruz — yollar kayganlaşabilir. Dikkatli ol! ❄️"
+            "value": "%@ civarı kar bekliyoruz - yollar kayganlaşabilir. Dikkatli ol! ❄️"
           }
         }
       }
@@ -12471,13 +12471,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fog's rolling in around %@ — visibility's gonna be low. Take it slow if you're driving 🌫️"
+            "value": "Fog's rolling in around %@ - visibility's gonna be low. Take it slow if you're driving 🌫️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarı sis basıyor — görüş mesafesi düşecek. Araç kullanıyorsan yavaş git 🌫️"
+            "value": "%@ civarı sis basıyor - görüş mesafesi düşecek. Araç kullanıyorsan yavaş git 🌫️"
           }
         }
       }
@@ -12505,13 +12505,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rain's clearing up around %@ — afternoon's looking way better! Hang in there ☀️"
+            "value": "Rain's clearing up around %@ - afternoon's looking way better! Hang in there ☀️"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarı yağmur geçiyor — öğleden sonra çok daha güzel olacak! Dayan ☀️"
+            "value": "%@ civarı yağmur geçiyor - öğleden sonra çok daha güzel olacak! Dayan ☀️"
           }
         }
       }

@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import SwiftData
 
 @Model
@@ -164,8 +165,16 @@ final class UserPreferencesModel {
         try? JSONEncoder().encode(value)
     }
 
+    /// Safely decodes JSON data with fallback to default value on corruption.
+    /// Prevents app crashes from corrupt persistence data (e.g., after iCloud sync issues,
+    /// incomplete writes, or version migration mismatches).
     private func decoded<T: Decodable>(_ type: T.Type, from data: Data?) -> T? {
-        guard let data else { return nil }
-        return try? JSONDecoder().decode(type, from: data)
+        guard let data, !data.isEmpty else { return nil }
+        do {
+            return try JSONDecoder().decode(type, from: data)
+        } catch {
+            AppLogger.persistence.error("Failed to decode \(String(describing: type)): \(error.localizedDescription, privacy: .public) — data size: \(data.count) bytes, returning nil")
+            return nil
+        }
     }
 }

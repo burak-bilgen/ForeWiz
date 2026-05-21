@@ -61,7 +61,7 @@ struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
     let respiratoryLabel: String
     let respiratoryAdvice: String
 
-    /// Outdoor stamina/energy index — how much energy you'll have outside (0=exhausted, 10=energized)
+    /// Outdoor stamina/energy index - how much energy you'll have outside (0=exhausted, 10=energized)
     let staminaIndex: Int
     let staminaLabel: String
     let staminaAdvice: String
@@ -73,7 +73,7 @@ struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
     let healthSummary: String
 }
 
-/// Comparative analysis — how today's weather compares to seasonal norms, yesterday, and weekly patterns.
+/// Comparative analysis - how today's weather compares to seasonal norms, yesterday, and weekly patterns.
 struct ComparativeWeatherAnalysis: Codable, Equatable, Sendable {
     /// Temperature anomaly (how many degrees different from typical)
     let temperatureAnomalyCelsius: Double?
@@ -132,9 +132,9 @@ struct WeatherActionItem: Codable, Equatable, Identifiable, Sendable {
 
     enum ActionCategory: String, Codable, Sendable {
         case timing     // "Best time to go outside is 2-4 PM"
-        case health     // "Stay hydrated — high heat today"
+        case health     // "Stay hydrated - high heat today"
         case outfit     // "Grab a light jacket"
         case safety     // "Avoid being outside during the storm"
-        case lifestyle  // "Great day for laundry — low humidity"
+        case lifestyle  // "Great day for laundry - low humidity"
     }
 }

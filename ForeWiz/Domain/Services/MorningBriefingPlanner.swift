@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Morning Briefing Planner
 
-/// Builds the morning briefing notification — a short, human-like daily weather summary.
+/// Builds the morning briefing notification - a short, human-like daily weather summary.
 /// All text is in natural Turkish, as if a friend is giving you the weather lowdown.
 enum MorningBriefingPlanner {
 
@@ -39,7 +39,7 @@ enum MorningBriefingPlanner {
     private static func buildBody(recommendation: DailyRecommendation, now: Date, calendar: Calendar) -> String {
         var parts: [String] = []
 
-        // Opening based on decision — arkadaşça, doğal bir dille
+        // Opening based on decision - arkadaşça, doğal bir dille
         switch recommendation.outdoorDecision {
         case .good:
             parts.append(L10n.text("notif_morning_good"))
@@ -51,7 +51,7 @@ enum MorningBriefingPlanner {
             parts.append(L10n.text("notif_morning_avoid"))
         }
 
-        // Best window — varsa ve henüz geçmemişse ekle
+        // Best window - varsa ve henüz geçmemişse ekle
         if let window = recommendation.bestOutdoorWindow, window.end > now {
             let timeInfo = window.shortDisplayText
             switch recommendation.outdoorDecision {
@@ -62,7 +62,7 @@ enum MorningBriefingPlanner {
             }
         }
 
-        // Top risk warning — doğal dille uyarı
+        // Top risk warning - doğal dille uyarı
         if let risk = recommendation.risks.first(where: { $0.severity >= .high }) {
             let riskTip = actionTip(for: risk)
             if let window = recommendation.bestOutdoorWindow, window.end > now {

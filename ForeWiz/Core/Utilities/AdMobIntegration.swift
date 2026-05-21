@@ -184,7 +184,7 @@ final class AdMobIntegration {
         interstitialAd.present(from: viewController)
         currentInterstitialAd = nil
         
-        // Single tracking point — AdManager.recordImpression handles analytics/fatigue
+        // Single tracking point - AdManager.recordImpression handles analytics/fatigue
         AdManager.shared.recordImpression(.interstitial)
         AdRevenueTracker.shared.recordImpression(unit: .interstitial)
         AdPlacementStrategy.shared.recordAdShown(.interstitial)

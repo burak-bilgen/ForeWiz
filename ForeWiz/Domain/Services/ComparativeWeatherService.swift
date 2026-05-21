@@ -1,6 +1,6 @@
 import Foundation
 
-/// Comparative weather intelligence — tells you how today compares to seasonal norms, yesterday, and weekly patterns.
+/// Comparative weather intelligence - tells you how today compares to seasonal norms, yesterday, and weekly patterns.
 struct ComparativeWeatherService {
 
     func analyze(

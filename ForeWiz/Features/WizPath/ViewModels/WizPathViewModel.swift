@@ -113,9 +113,9 @@ final class WizPathViewModel {
                     longitude: locationCoord.longitude
                 )
                 didLoadInitialLocation = true
-                AppLogger.wizPath.info("Location loaded: \(locationCoord.latitude), \(locationCoord.longitude)")
+                AppLogger.wizPath.info("Location loaded: \(locationCoord.latitude, privacy: .private), \(locationCoord.longitude, privacy: .private)")
             } catch {
-                AppLogger.wizPath.error("Location error: \(error.localizedDescription)")
+                AppLogger.wizPath.error("Location error: \(error.localizedDescription, privacy: .private)")
                 // Fallback to a default location
                 originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
                 originName = L10n.text("wizpath_fallback_location")
@@ -221,7 +221,7 @@ final class WizPathViewModel {
             state = .error(error.localizedDescription)
             HapticEngine.shared.warning()
         } catch {
-            AppLogger.wizPath.error("Route calculation failed: \(error.localizedDescription)")
+            AppLogger.wizPath.error("Route calculation failed: \(error.localizedDescription, privacy: .private)")
             state = .error(L10n.text("wizpath_error_route_failed"))
             HapticEngine.shared.error()
         }

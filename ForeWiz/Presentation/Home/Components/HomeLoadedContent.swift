@@ -18,7 +18,7 @@ struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.0)
                 }
 
-                // 2. Hero card — current conditions + score
+                // 2. Hero card - current conditions + score
                 HeroCard(
                     assistant: state.assistant,
                     weather: state.currentWeather,
@@ -32,31 +32,31 @@ struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
-                // 4. Key events — today's weather highlights
+                // 4. Key events - today's weather highlights
                 DayKeyEventsView(events: state.keyEvents)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.24)
 
-                // 5. Hourly forecast — time-sensitive
+                // 5. Hourly forecast - time-sensitive
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.32)
 
-                // 6. Weekly forecast — planning reference
+                // 6. Weekly forecast - planning reference
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
 
-                // 7. Native ad — blends with content (shown after weekly forecast)
+                // 7. Native ad - blends with content (shown after weekly forecast)
                 if showNativeAd {
                     NativeAdCard()
                         .cardEntrance(appeared: contentReady, baseDelay: 0.48)
                 }
 
-                // 8. Banner ad — anchored monetization
+                // 8. Banner ad - anchored monetization
                 if AdManager.shared.canShow(.banner) {
                     AdBannerView()
                         .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.56 : 0.48)
                 }
 
-                // 9. Footer — attribution + last updated
+                // 9. Footer - attribution + last updated
                 if let attribution = state.attribution {
                     CompactFooter(attribution: attribution, lastUpdatedText: state.lastUpdatedText)
                         .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.64 : 0.56)

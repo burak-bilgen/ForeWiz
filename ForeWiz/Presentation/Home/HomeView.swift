@@ -34,7 +34,7 @@ struct HomeView: View {
                     .ignoresSafeArea()
                     .animation(AppTheme.slowEaseOut, value: currentSymbol)
 
-                // Weather particle background — günün hava durumuna göre animasyon
+                // Weather particle background - günün hava durumuna göre animasyon
                 EnhancedWeatherParticles(kind: splashKind, progress: viewModel.particleIntensity)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)

@@ -39,12 +39,34 @@ struct LiquidGlassCard<Content: View>: View {
             .padding(innerPadding)
             .background(
                 ZStack {
-                    // 1. Base glass layer
+                    // 1. Base glass layer - Apple-style frosted material
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
                         .environment(\.colorScheme, .dark)
 
-                    // 2. Animated sheen — smooth diagonal sweep (eases in/out, autoreverses)
+                    // 2. Clean neutral gradient overlay - cool tones only
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: colorScheme == .dark
+                                    ? [
+                                        .white.opacity(0.03),
+                                        .clear,
+                                        .white.opacity(0.01),
+                                        .clear
+                                    ]
+                                    : [
+                                        .white.opacity(0.06),
+                                        .clear,
+                                        .white.opacity(0.02),
+                                        .clear
+                                    ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+
+                    // 3. Animated sheen - subtle diagonal sweep
                     if !reduceMotion {
                         LiquidCardSheen(
                             cornerRadius: cornerRadius,
@@ -62,7 +84,7 @@ struct LiquidGlassCard<Content: View>: View {
                         }
                     }
 
-                    // 2b. Static shimmer for cards that reduceMotion
+                    // 3b. Static shimmer for reduced motion
                     if reduceMotion {
                         LiquidCardSheen(
                             cornerRadius: cornerRadius,
@@ -71,60 +93,45 @@ struct LiquidGlassCard<Content: View>: View {
                         )
                     }
 
-                    // 3. Static gradient overlay (adaptive to color scheme)
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: colorScheme == .dark
-                                    ? [
-                                        accentColor.opacity(0.0),
-                                        accentColor.opacity(0.04),
-                                        .white.opacity(0.01),
-                                        accentColor.opacity(0.0)
-                                    ]
-                                    : [
-                                        accentColor.opacity(0.0),
-                                        accentColor.opacity(0.06),
-                                        .white.opacity(0.02),
-                                        accentColor.opacity(0.0)
-                                    ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-
-                    // 4. Accent border — refined light-catching stroke (adaptive)
+                    // 4. Subtle cool border - Apple-style glass edge
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .stroke(
                             LinearGradient(
                                 colors: colorScheme == .dark
                                     ? [
-                                        accentColor.opacity(0.20),
-                                        accentColor.opacity(0.04),
-                                        .white.opacity(0.08),
-                                        accentColor.opacity(0.02),
-                                        .white.opacity(0.04),
-                                        accentColor.opacity(0.12)
+                                        .white.opacity(0.10),
+                                        .white.opacity(0.02),
+                                        .white.opacity(0.05),
+                                        .clear,
+                                        .white.opacity(0.03),
+                                        .white.opacity(0.07)
                                     ]
                                     : [
-                                        accentColor.opacity(0.30),
-                                        accentColor.opacity(0.06),
-                                        .white.opacity(0.15),
-                                        accentColor.opacity(0.04),
-                                        .white.opacity(0.08),
-                                        accentColor.opacity(0.20)
+                                        .white.opacity(0.20),
+                                        .white.opacity(0.04),
+                                        .white.opacity(0.10),
+                                        .clear,
+                                        .white.opacity(0.05),
+                                        .white.opacity(0.15)
                                     ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 1.0
+                            lineWidth: 0.8
                         )
 
-                    // 5. Bottom edge highlight for depth (softer in dark mode)
+                    // 5. Accent rim light - extremely subtle, only visible on accent-colored cards
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .stroke(colorScheme == .dark ? .black.opacity(0.30) : .black.opacity(0.18), lineWidth: 1.5)
+                        .stroke(
+                            accentColor.opacity(colorScheme == .dark ? 0.08 : 0.12),
+                            lineWidth: 0.5
+                        )
+
+                    // 6. Bottom edge shadow for depth
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(.black.opacity(0.20), lineWidth: 1.5)
                         .blur(radius: 0.5)
-                        .offset(x: 0, y: 2)
+                        .offset(x: 0, y: 1.5)
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
@@ -145,9 +152,9 @@ private struct LiquidCardSheen: View {
             LinearGradient(
                 colors: [
                     .clear,
-                    accentColor.opacity(colorScheme == .dark ? 0.06 : 0.10),
-                    .white.opacity(colorScheme == .dark ? 0.04 : 0.08),
-                    accentColor.opacity(colorScheme == .dark ? 0.03 : 0.05),
+                    .white.opacity(colorScheme == .dark ? 0.03 : 0.06),
+                    accentColor.opacity(colorScheme == .dark ? 0.04 : 0.06),
+                    .white.opacity(colorScheme == .dark ? 0.02 : 0.04),
                     .clear
                 ],
                 startPoint: .leading,

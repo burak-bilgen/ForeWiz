@@ -24,36 +24,38 @@ private func timeAgoText(from date: Date) -> String {
     return ""
 }
 
-private func glassBackground(accent: Color = Color(red: 0.25, green: 0.60, blue: 1.0)) -> some View {
+private func glassBackground() -> some View {
     ZStack {
         RoundedRectangle(cornerRadius: 20, style: .continuous)
             .fill(.ultraThinMaterial)
             .environment(\.colorScheme, .dark)
 
+        // Neutral cool overlay
         RoundedRectangle(cornerRadius: 20, style: .continuous)
             .fill(
                 LinearGradient(
                     colors: [
-                        accent.opacity(0.0),
-                        accent.opacity(0.04),
-                        .white.opacity(0.02),
-                        accent.opacity(0.0)
+                        .white.opacity(0.03),
+                        .clear,
+                        .white.opacity(0.01),
+                        .clear
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             )
 
+        // Cool white border
         RoundedRectangle(cornerRadius: 20, style: .continuous)
             .stroke(
                 LinearGradient(
                     colors: [
-                        accent.opacity(0.18),
-                        accent.opacity(0.04),
                         .white.opacity(0.10),
-                        accent.opacity(0.02),
+                        .white.opacity(0.02),
                         .white.opacity(0.05),
-                        accent.opacity(0.12)
+                        .clear,
+                        .white.opacity(0.03),
+                        .white.opacity(0.07)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
