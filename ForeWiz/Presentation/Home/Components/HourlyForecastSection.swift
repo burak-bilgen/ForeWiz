@@ -86,15 +86,19 @@ struct TemperatureTrendChart: View {
     var body: some View {
         let slots = hourlyScores.prefix(12)
         let temps = slots.map { extractTemp($0.temperatureText) }
-        let minTemp = floor(temps.min() ?? 0)
-        let maxTemp = ceil(temps.max() ?? 1)
-        let tempRange = max(maxTemp - minTemp, 3)
+        // Pad the range on both sides so bars never start from zero height.
+        // This prevents dramatic visual cliffs (e.g., 10°C vs 20°C no longer shows 4px vs 80px).
+        let rawMin = floor(temps.min() ?? 0)
+        let rawMax = ceil(temps.max() ?? 1)
+        let paddedMin = floor(rawMin - 5)
+        let paddedMax = ceil(rawMax + 5)
+        let tempRange = max(paddedMax - paddedMin, 8)
 
         HStack(alignment: .bottom, spacing: 4) {
             ForEach(Array(slots.enumerated()), id: \.element.id) { index, item in
                 let temp = temps[safe: index] ?? 0
-                let ratio = (temp - minTemp) / tempRange
-                let barHeight = max(ratio * 80, 4)
+                let ratio = max((temp - paddedMin) / tempRange, 0.08)
+                let barHeight = ratio * 80
 
                 VStack(spacing: 3) {
                     Text(item.temperatureText)
