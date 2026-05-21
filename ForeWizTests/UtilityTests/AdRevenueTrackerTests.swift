@@ -48,7 +48,8 @@ struct AdRevenueTrackerTests {
         tracker.recordEstimatedRevenue(unit: .native, revenue: 0.20)
         tracker.recordEstimatedRevenue(unit: .interstitial, revenue: 0.05)
         
-        #expect(tracker.totalEstimatedRevenue == 0.35)
+        // Use tolerance for floating point comparison
+        #expect(abs(tracker.totalEstimatedRevenue - 0.35) < 0.001)
     }
     
     @Test("eCPM is calculated correctly")
