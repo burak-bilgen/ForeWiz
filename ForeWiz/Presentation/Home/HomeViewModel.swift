@@ -15,7 +15,7 @@ final class HomeViewModel {
     private let preferencesRepository: PreferencesRepository
     private let homeViewStateFactory: HomeViewStateFactory
     private var didLoad = false
-    @ObservationIgnored private nonisolated(unsafe) var liveRetryTask: Task<Void, Never>?
+    @ObservationIgnored private var liveRetryTask: Task<Void, Never>?
 
     private var selectedLocation: SavedLocation?
 

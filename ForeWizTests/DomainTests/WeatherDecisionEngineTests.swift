@@ -38,8 +38,6 @@ struct WeatherDecisionEngineTests {
         #expect(goingOutStartHour.map { $0 < 12 || $0 >= 16 } == true)
     }
 
-    // Pre-existing crash with this fixture setup. Skipping.
-
     @Test func rainyDayProducesRainRiskAndUmbrellaSuggestion() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 11, day: 5, hour: 8)

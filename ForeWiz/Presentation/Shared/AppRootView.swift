@@ -59,11 +59,14 @@ struct AppRootView: View {
         case .onboarding:
             coordinator.rootFlow = .onboarding
         case .home:
-            break
+            coordinator.rootFlow = .main
         case .insights:
-            // Open insights view - can be expanded when insights screen gets navigation
-            break
+            coordinator.rootFlow = .main
+            coordinator.navigateToInsights = true
+            AnalyticsManager.shared.track(.insightsViewed)
         case .recommendationDetail(let id):
+            coordinator.rootFlow = .main
+            coordinator.selectedRecommendationID = id
             AnalyticsManager.shared.track(.recommendationViewed(id))
         }
 

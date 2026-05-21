@@ -11,15 +11,52 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
       - name: Install SwiftLint
         run: brew install swiftlint
+
       - name: Xcode Diagnostics
         run: |
           xcodebuild -version
           xcodebuild -showsdks
+
       - name: SwiftLint
         run: swiftlint lint --strict
+
+      - name: Localization Completeness Check
+        run: python3 scripts/check_localization_completeness.py
+
+      - name: Hardcoded Strings Check
+        run: bash scripts/check_hardcoded_strings.sh
+
+      - name: Lazy TR Translation Check
+        run: bash scripts/check_lazy_tr.sh
+
       - name: Build
         run: xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
+
+      - name: Detect Simulator
+        id: simulator
+        run: |
+          SIMULATOR=$(xcrun simctl list devices available | grep -m1 "iPhone" | sed 's/.*(\(.*\))/\1/')
+          echo "name=$SIMULATOR" >> $GITHUB_OUTPUT
+
       - name: Run Tests
-        run: xcodebuild test -project ForeWiz.xcodeproj -scheme ForeWiz -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16' CODE_SIGNING_ALLOWED=NO
+        run: |
+          xcodebuild test \
+            -project ForeWiz.xcodeproj \
+            -scheme ForeWiz \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}' \
+            CODE_SIGNING_ALLOWED=NO \
+            -resultBundlePath TestResults.xcresult
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.xcresult
+
+      - name: Build for Release Validation
+        run: xcodebuild build-for-testing -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO

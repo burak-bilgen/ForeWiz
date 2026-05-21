@@ -6,16 +6,9 @@ import OSLog
 // MARK: - WizPath Service
 @MainActor
 final class WizPathService {
-    static let shared = WizPathService()
-
     private let cache = WizPathCache()
-    private let weatherRepository: WeatherRepository?
-    private let locationRepository: LocationRepository?
-
-    private init() {
-        self.weatherRepository = DependencyContainer.shared.weatherRepository
-        self.locationRepository = DependencyContainer.shared.locationRepository
-    }
+    private let weatherRepository: WeatherRepository
+    private let locationRepository: LocationRepository
 
     init(
         weatherRepository: WeatherRepository,
@@ -171,9 +164,6 @@ final class WizPathService {
                 )
 
                 do {
-                    guard let weatherRepository else {
-                        throw AppError.weatherUnavailable
-                    }
                     let snapshot = try await weatherRepository.fetchWeather(for: coord)
                     let weather = segmentWeather(from: snapshot, at: segment.estimatedArrival)
                     weatherCache[hour] = weather
@@ -312,12 +302,12 @@ final class WizPathService {
         if recents.count > 10 { recents = Array(recents.prefix(10)) }
 
         if let data = try? JSONEncoder().encode(recents) {
-            UserDefaults.standard.set(data, forKey: "wizpath_recent_destinations")
+            Foundation.UserDefaults.standard.set(data, forKey: AppKeys.UserDefaults.wizPathRecentDestinations)
         }
     }
 
     func loadRecentDestinations() -> [RecentDestination] {
-        guard let data = UserDefaults.standard.data(forKey: "wizpath_recent_destinations"),
+        guard let data = Foundation.UserDefaults.standard.data(forKey: AppKeys.UserDefaults.wizPathRecentDestinations),
               let recents = try? JSONDecoder().decode([RecentDestination].self, from: data) else {
             return []
         }
@@ -327,9 +317,6 @@ final class WizPathService {
     // MARK: - Location Services
 
     func getCurrentLocation() async throws -> LocationCoordinate {
-        guard let locationRepository else {
-            throw AppError.locationUnavailable
-        }
         return try await locationRepository.getCurrentLocation()
     }
 }

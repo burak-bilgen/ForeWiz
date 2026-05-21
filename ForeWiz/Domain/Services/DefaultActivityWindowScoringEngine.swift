@@ -1,6 +1,22 @@
 import Foundation
 
 struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
+    
+    // MARK: - Scoring Constants
+    
+    private enum ScoringPenalties {
+        static let hotSummerMidday = 20
+        static let nighttime = 15
+        static let lateNight = 20
+        static let evening = 10
+        static let severeWeatherExtreme = 90
+        static let severeWeatherMultiplier = 18
+        static let defaultStartHour = 7
+        static let defaultEndHour = 21
+        static let bestWindowSize = 3
+        static let minimumAcceptableScore = 60
+    }
+    
     func score(
         hour: HourlyWeatherPoint,
         activity: ActivityType,
@@ -24,21 +40,21 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         score -= uvPenalty(hour.uvIndex, hourOfDay: hourOfDay)
 
         if isHotSummerMidday(month: month, hour: hourOfDay, apparentTemperature: apparentTemperature) {
-            score -= 20
+            score -= ScoringPenalties.hotSummerMidday
         }
 
         if hour.isDaylight == false {
-            score -= 15
+            score -= ScoringPenalties.nighttime
         }
 
         if hourOfDay >= 21 || hourOfDay < 5 {
-            score -= 20
+            score -= ScoringPenalties.lateNight
         } else if hourOfDay >= 20 || hourOfDay < 6 {
-            score -= 10
+            score -= ScoringPenalties.evening
         }
 
         if let severeWeatherRisk = hour.severeWeatherRisk {
-            score -= severeWeatherRisk == .extreme ? 90 : severeWeatherRisk.rawValue * 18
+            score -= severeWeatherRisk == .extreme ? ScoringPenalties.severeWeatherExtreme : severeWeatherRisk.rawValue * ScoringPenalties.severeWeatherMultiplier
         }
 
         return WeatherScore(rawValue: score)
@@ -89,7 +105,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         var bestAverage = -1
 
         for startIndex in scoredHours.indices {
-            let windowSize = 3
+            let windowSize = ScoringPenalties.bestWindowSize
             let endIndex = min(startIndex + windowSize, scoredHours.endIndex)
             let slice = scoredHours[startIndex..<endIndex]
             guard slice.isEmpty == false else { continue }
@@ -103,7 +119,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
             let average = slice.map { $0.score.rawValue }.reduce(0, +) / slice.count
 
-            if slice.allSatisfy({ $0.score.rawValue >= 60 }) && average > bestAverage {
+            if slice.allSatisfy({ $0.score.rawValue >= ScoringPenalties.minimumAcceptableScore }) && average > bestAverage {
                 bestAverage = average
                 bestSlice = slice
             }
@@ -132,10 +148,8 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
     // MARK: - Active hours guard
 
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
-        // Varsayılan aktif saat aralığı 07:00–21:00 (21:30 sonrası güvenli değil)
-        let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 21
-
-        let startHour = 7
+        let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? ScoringPenalties.defaultEndHour
+        let startHour = ScoringPenalties.defaultStartHour
         if endHour > startHour {
             return hourOfDay >= startHour && hourOfDay < endHour
         } else {

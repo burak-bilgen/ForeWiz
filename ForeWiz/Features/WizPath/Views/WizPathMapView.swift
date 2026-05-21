@@ -248,6 +248,17 @@ struct WeatherMarker: View {
 // MARK: - Preview
 
 #Preview {
-    WizPathMapView(viewModel: WizPathViewModel())
+    let mockLocation = MockLocationRepository()
+    let mockWeather = MockWeatherRepository()
+    let wizPathService = WizPathService(
+        weatherRepository: mockWeather,
+        locationRepository: mockLocation
+    )
+    let locationService = LocationService()
+    let viewModel = WizPathViewModel(
+        wizPathService: wizPathService,
+        locationService: locationService
+    )
+    return WizPathMapView(viewModel: viewModel)
         .frame(height: 300)
 }

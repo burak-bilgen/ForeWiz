@@ -93,11 +93,11 @@ final class WizPathViewModel {
 
     // MARK: - Init
     init(
-        wizPathService: WizPathService? = nil,
-        locationService: LocationService? = nil
+        wizPathService: WizPathService,
+        locationService: LocationService
     ) {
-        self.wizPathService = wizPathService ?? .shared
-        self.locationService = locationService ?? DependencyContainer.shared.locationService
+        self.wizPathService = wizPathService
+        self.locationService = locationService
         loadCurrentLocation()
         loadRecentDestinations()
     }

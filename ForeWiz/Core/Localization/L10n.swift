@@ -2,8 +2,8 @@ import Foundation
 
 enum L10n {
     private enum Constant {
-        static let languageOverrideKey = "forewiz.languageOverride.v1"
-        static let appGroupSuiteName = "group.forewiz"
+        static let languageOverrideKey = AppKeys.UserDefaults.languageOverride
+        static let appGroupSuiteName = AppKeys.appGroupSuiteName
         static let fallbackLanguageCode = "en"
         static let supportedLanguageCodes = Set(["en", "tr"])
     }

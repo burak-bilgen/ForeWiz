@@ -10,6 +10,7 @@ struct ToolbarLanguageButton: View {
                     L10n.configure(language: lang)
                     NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
                 } label: {
+                    
                     HStack {
                         Text(lang.localizedTitle)
                         if L10n.currentLanguageCode == lang.localeIdentifier {

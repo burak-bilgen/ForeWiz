@@ -14,6 +14,8 @@ final class AppCoordinator {
     var profile: UserComfortProfile = .default
     var latestRecommendation: DailyRecommendation?
     var showSettings = false
+    var navigateToInsights = false
+    var selectedRecommendationID: String?
 
     init(container: DependencyContainer, rootFlow: RootFlow = .onboarding) {
         self.container = container  
@@ -68,12 +70,12 @@ final class AppCoordinator {
             try? await container.preferencesRepository.deleteAll()
             try? await container.weatherCacheRepository.deleteAll()
 
-            let defaults = UserDefaults.standard
-            let suite = UserDefaults(suiteName: "group.forewiz")
-            defaults.removeObject(forKey: "forewiz.languageOverride.v1")
-            defaults.removeObject(forKey: "app_theme")
-            defaults.removeObject(forKey: "app_accent_color")
-            suite?.removeObject(forKey: "forewiz.languageOverride.v1")
+            let defaults = Foundation.UserDefaults.standard
+            let suite = Foundation.UserDefaults(suiteName: AppKeys.appGroupSuiteName)
+            defaults.removeObject(forKey: AppKeys.UserDefaults.languageOverride)
+            defaults.removeObject(forKey: AppKeys.UserDefaults.appTheme)
+            defaults.removeObject(forKey: AppKeys.UserDefaults.appAccentColor)
+            suite?.removeObject(forKey: AppKeys.UserDefaults.languageOverride)
 
             profile = .default
             rootFlow = .onboarding
@@ -83,5 +85,5 @@ final class AppCoordinator {
 
 
 extension Notification.Name {
-    static let appLanguageDidChange = Notification.Name("com.forewiz.languageDidChange")
+    static let appLanguageDidChange = AppKeys.NotificationName.appLanguageDidChange
 }

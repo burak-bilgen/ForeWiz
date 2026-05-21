@@ -18,6 +18,7 @@ final class AnalyticsManager {
         case homeRefresh
         case recommendationViewed(String)
         case settingsOpened
+        case insightsViewed
         case widgetAdded
 
         var name: String {
@@ -31,6 +32,7 @@ final class AnalyticsManager {
             case .homeRefresh: return "home_refresh"
             case .recommendationViewed: return "recommendation_viewed"
             case .settingsOpened: return "settings_opened"
+            case .insightsViewed: return "insights_viewed"
             case .widgetAdded: return "widget_added"
             }
         }

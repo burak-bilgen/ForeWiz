@@ -6,7 +6,7 @@ import CoreLocation
 /// Premium route planning dashboard with Liquid Glass aesthetic.
 /// Two clear states: destination selection | active route.
 struct WizPathDashboardView: View {
-    @State private var viewModel = WizPathViewModel()
+    @State private var viewModel: WizPathViewModel?
     @Environment(\.dismiss) private var dismiss
     @State private var showDestinationPicker = false
     @State private var showDepartureOptimizer = false
@@ -18,7 +18,18 @@ struct WizPathDashboardView: View {
                 AppBackground()
                     .ignoresSafeArea()
 
-                content
+                if let viewModel {
+                    contentView(viewModel: viewModel)
+                } else {
+                    ProgressView()
+                        .task {
+                            let container = DependencyContainer.shared
+                            viewModel = WizPathViewModel(
+                                wizPathService: container.wizPathService,
+                                locationService: container.locationService
+                            )
+                        }
+                }
             }
             .navigationTitle(L10n.text("wizpath_route_planner"))
             .navigationBarTitleDisplayMode(.inline)
@@ -37,68 +48,50 @@ struct WizPathDashboardView: View {
                     .accessibilityLabel(L10n.text("wizpath_close"))
                 }
             }
-            .sheet(isPresented: $showDestinationPicker) {
-                DestinationPickerView(
-                    recentDestinations: viewModel.recentDestinations,
-                    onSelect: { coordinate, name in
-                        viewModel.setDestination(coordinate: coordinate, name: name)
-                    },
-                    onSelectRecent: { recent in
-                        viewModel.selectRecentDestination(recent)
-                    }
-                )
-            }
-            .sheet(isPresented: $showDepartureOptimizer) {
-                if let route = viewModel.currentRoute {
-                    DepartureOptimizerView(
-                        route: route,
-                        onSelectTime: { date in
-                            viewModel.updateDepartureTime(date)
-                            showDepartureOptimizer = false
-                        }
-                    )
-                }
-            }
-            .alert(L10n.text("wizpath_route_error"), isPresented: .init(
-                get: { viewModel.errorMessage != nil },
-                set: { if !$0 { viewModel.dismissError() } }
-            )) {
-                Button(L10n.text("wizpath_ok")) { viewModel.dismissError() }
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
-            .animation(AppTheme.cardSpring, value: viewModel.state)
+            .animation(AppTheme.cardSpring, value: viewModel?.state)
             .onAppear { hasAppeared = true }
         }
     }
 
-    // MARK: - Content
-
     @ViewBuilder
-    private var content: some View {
+    private func contentView(viewModel: WizPathViewModel) -> some View {
         if viewModel.currentRoute != nil {
-            activeRouteContent
+            activeRouteContent(viewModel: viewModel)
         } else {
-            destinationSelectionContent
+            destinationSelectionContent(viewModel: viewModel)
         }
     }
 
-    // MARK: - Destination Selection State
-
-    private var destinationSelectionContent: some View {
+    private func destinationSelectionContent(viewModel: WizPathViewModel) -> some View {
         WizPathDestinationContent(
             viewModel: viewModel,
             showDestinationPicker: { showDestinationPicker = true }
         )
+        .sheet(isPresented: $showDestinationPicker) {
+            DestinationPickerView(
+                recentDestinations: viewModel.recentDestinations,
+                onSelect: { coordinate, name in
+                    viewModel.setDestination(coordinate: coordinate, name: name)
+                },
+                onSelectRecent: { recent in
+                    viewModel.selectRecentDestination(recent)
+                }
+            )
+        }
+        .alert(L10n.text("wizpath_route_error"), isPresented: .init(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.dismissError() } }
+        )) {
+            Button(L10n.text("wizpath_ok")) { viewModel.dismissError() }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
     }
 
-    // MARK: - Active Route State
-
-    private var activeRouteContent: some View {
+    private func activeRouteContent(viewModel: WizPathViewModel) -> some View {
         GeometryReader { geometry in
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 12) {
-                    // Map - fixed height with proper layout
                     WizPathMapView(viewModel: viewModel)
                         .frame(height: min(260, geometry.size.height * 0.35))
                         .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
@@ -106,19 +99,16 @@ struct WizPathDashboardView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 8)
 
-                    // Offline banner
                     if viewModel.state.isOffline {
                         OfflineBanner(retry: { Task { await viewModel.calculateRoute() } })
                             .padding(.horizontal, 16)
                     }
 
-                    // Journey HUD (compact)
                     if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
                         JourneyHUDView(data: route.journeyHUDData)
                             .padding(.horizontal, 16)
                     }
 
-                    // Route info panel
                     if let route = viewModel.currentRoute {
                         WizPathRouteInfoPanel(
                             route: route,
@@ -132,7 +122,6 @@ struct WizPathDashboardView: View {
                         .padding(.horizontal, 16)
                     }
 
-                    // Attribution
                     Text(L10n.text("wizpath_powered_by_apple_maps"))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
@@ -141,6 +130,25 @@ struct WizPathDashboardView: View {
                 }
             }
             .safeAreaPadding(.bottom, 8)
+        }
+        .sheet(isPresented: $showDepartureOptimizer) {
+            if let route = viewModel.currentRoute {
+                DepartureOptimizerView(
+                    route: route,
+                    onSelectTime: { date in
+                        viewModel.updateDepartureTime(date)
+                        showDepartureOptimizer = false
+                    }
+                )
+            }
+        }
+        .alert(L10n.text("wizpath_route_error"), isPresented: .init(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.dismissError() } }
+        )) {
+            Button(L10n.text("wizpath_ok")) { viewModel.dismissError() }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
     }
 }

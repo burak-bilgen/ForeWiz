@@ -130,19 +130,6 @@ enum AppLog {
     }
 }
 
-@propertyWrapper
-struct LogExecution {
-    var wrappedValue: () -> Void
-
-    init(wrappedValue: @escaping () -> Void) {
-        self.wrappedValue = {
-            AppLog.debug("Executing function")
-            wrappedValue()
-            AppLog.debug("Function completed")
-        }
-    }
-}
-
 extension AppLogger {
     static func logError(_ error: Error, category: String = "app", file: String = #file, function: String = #function, line: Int = #line) {
         let logger = Logger(subsystem: "com.forewiz.app", category: category)

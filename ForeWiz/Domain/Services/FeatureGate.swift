@@ -15,13 +15,17 @@ enum PremiumTier: String, Codable, Sendable {
 struct FeatureGate {
     /// Varsayılan .free — premium satın alındığında .premium olur.
     /// ForeWizApp.start() ve PremiumManager satın alma akışı bu değeri yönetir.
-    static var currentTier: PremiumTier = .free
+    @MainActor static var currentTier: PremiumTier = .free
 
-    static func isUnlocked(_ feature: Feature, tier: PremiumTier = currentTier) -> Bool {
+    @MainActor static func isUnlocked(_ feature: Feature) -> Bool {
+        currentTier.rank >= feature.requiredTier.rank
+    }
+
+    static func isUnlocked(_ feature: Feature, tier: PremiumTier) -> Bool {
         tier.rank >= feature.requiredTier.rank
     }
 
-    static func premiumPrompt(for feature: Feature) -> String {
+    @MainActor static func premiumPrompt(for feature: Feature) -> String {
         switch feature {
         case .dailyForecast, .hourlyForecast:
             return ""

@@ -4,12 +4,17 @@ opt_in_rules:
   - fatal_error_message
   - first_where
   - force_unwrapping
+  - force_cast
   - implicitly_unwrapped_optional
   - sorted_imports
   - redundant_nil_coalescing
   - closure_spacing
+  - closure_end_indentation
   - operator_usage_whitespace
   - vertical_whitespace
+  - trailing_closure
+  - prefer_self_type_over_type_of_self
+  - discouraged_object_literal
 
 analyzer_rules:
   - unused_import
