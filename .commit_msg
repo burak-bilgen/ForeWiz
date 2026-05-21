@@ -1,24 +1,23 @@
-feat: Complete Phase 1-3 — Premium subscription system and Widget Extension
+feat: production-ready security hardening and UI polish
 
-Phase 1 — Critical Fixes:
-- Extract ContainerProvider from SiriShortcutsManager with proper OSLog import
-- Wire SevereWeatherAlertService into DependencyContainer with FeatureGate gating
-- Complete DeepLinkHandler recommendationDetail case with analytics
-- Remove 500+ lines of dead AccessibilityHelpers code, inline into WizPathDashboardView
+Security:
+- PrivacyInfo.xcprivacy: App Store required privacy manifest
+- SwiftData encryption: NSFileProtectionComplete on store files
+- Widget data encryption: AES-GCM encrypts all widget cached data
+- Widget key management: random 256-bit key in shared container
+- PII audit: location coords and revenue data marked .private in logs
+- Client-side throttling: WeatherKit rate limiter (30s min interval)
+- JSON deserialization validation: crash-safe decode with error logging
 
-Phase 2 — Premium Subscription System (StoreKit 2):
-- PremiumManager: @Observable/@MainActor StoreKit 2 manager with product loading, purchasing, restoring, transaction observation
-- PremiumPaywallView: Liquid Glass paywall with feature grid, pricing cards (auto-selects yearly), restore flow
-- ForeWizApp: Products loaded and subscription checked on launch
-- SettingsView: PremiumStatusView with active badge or upgrade CTA + paywall sheet
-- HomeView: 14-day forecast locked behind premium CTA with paywall sheet
-- FeatureGate: Added .fourteenDayForecast case
-- 6 new premium localization keys
+UI Polish:
+- LiquidGlassCard: cool/neutral Apple-style frosted glass (removed yellowish tones)
+- ambientGradient: neutral cool tones for light/dark mode
+- Widget glass background: accent-color overlay removed, neutral white borders
+- ScoreRing: modern X/10 display with smooth animations
+- HeroCard: refined layout with integrated temperature display
 
-Phase 3 — Widget Extension:
-- ForeWizWidgets target with WidgetBundle, StaticConfiguration, TimelineProvider
-- Small widget: condition icon + temperature + outdoor score ring
-- Medium widget: conditions + score + 3-day forecast with score bars
-- Liquid Glass dark gradient aesthetic matching the app
-- App Group sharing (group.forewiz) between main app and widget
-- Automatic weather data caching to UserDefaults on each live fetch
+Localization:
+- Em dashes replaced with hyphens across all files
+- Key event notifications: numerical data removed, only event timing shown
+- Rain risk messages: merged format with time range and percentage
+- Ad localization strings: full EN + TR support
