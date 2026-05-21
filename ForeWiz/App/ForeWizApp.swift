@@ -18,6 +18,9 @@ struct ForeWizApp: App {
         Task {
             await AdManager.shared.initialize()
             AdConsentManager.shared.updateConsentStatus()
+            
+            // Initialize AdMob SDK
+            await AdMobIntegration.shared.initializeSDK()
         }
     }
 

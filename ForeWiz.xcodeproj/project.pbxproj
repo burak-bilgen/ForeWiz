@@ -11,6 +11,7 @@
 		1C2BF16EB926075D1ABE048A /* WidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7D5A8169BBE9FF4971056B1 /* WidgetProvider.swift */; };
 		81577DD945414BF39FE19D55 /* WidgetLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A551890B6D02452D94CF2556 /* WidgetLocalization.swift */; };
 		8857A0861617D03FE3A2F893 /* WeatherWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4934CEF03C1F8AFB1D8CD0 /* WeatherWidgetData.swift */; };
+		A1B2C3D4E5F6A7B8C9D0E1F4 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6A7B8C9D0E1F3 /* GoogleMobileAds */; };
 		CF1EBD77B318F138E0340411 /* ForeWizWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529B75580BA0BED5EF21E057 /* ForeWizWidgets.swift */; };
 		D89F44D3F29829B0131566E4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E49C9E979C0B1315F9DFF77 /* Foundation.framework */; };
 		DFDF4C16A8CA405E88E3E49A /* ForeWizWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 9D9DE3BF4DE0B5D49185C0A4 /* ForeWizWidgets.appex */; };
@@ -115,6 +116,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F6A7B8C9D0E1F4 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -226,6 +228,9 @@
 				67305E772F9E05210034CAA8 /* ForeWiz */,
 			);
 			name = ForeWiz;
+			packageProductDependencies = (
+				A1B2C3D4E5F6A7B8C9D0E1F3 /* GoogleMobileAds */,
+			);
 			productName = ForeWiz;
 			productReference = 67305E752F9E05210034CAA8 /* ForeWiz.app */;
 			productType = "com.apple.product-type.application";
@@ -305,6 +310,9 @@
 			);
 			mainGroup = 67305E6C2F9E05210034CAA8;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 67305E762F9E05210034CAA8 /* Products */;
 			projectDirPath = "";
@@ -799,6 +807,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1B2C3D4E5F6A7B8C9D0E1F3 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6A7B8C9D0E1F2 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 67305E6D2F9E05210034CAA8 /* Project object */;
 }
