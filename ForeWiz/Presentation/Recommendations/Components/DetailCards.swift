@@ -118,7 +118,7 @@ struct DetailHeroCard: View {
     }
 
     private var scoreRing: some View {
-        ScoreRingView(score: recommendation.outdoorScore, size: 76, showOutOf100: true)
+        ScoreRingView(score: recommendation.outdoorScore, size: 76, showOutOf100: false)
             .environment(\.colorScheme, .dark)
     }
 }

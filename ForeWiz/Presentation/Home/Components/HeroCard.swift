@@ -54,8 +54,8 @@ struct HeroCard: View {
                     Spacer(minLength: 8)
 
                     // Score Ring — larger & more prominent
-                    ScoreRingView(score: weatherScore, size: 72, lineWidth: 5, showOutOf100: true)
-                        .frame(width: 72, height: 72)
+                    ScoreRingView(score: weatherScore, size: 68, lineWidth: 5, showOutOf100: false)
+                        .frame(width: 68, height: 68)
                 }
 
                 // MARK: Summary

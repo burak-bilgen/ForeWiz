@@ -19,6 +19,8 @@ final class AnalyticsManager {
         case recommendationViewed(String)
         case settingsOpened
         case insightsViewed
+        case trackingPermissionGranted
+        case trackingPermissionDenied
         case widgetAdded
 
         var name: String {
@@ -28,6 +30,8 @@ final class AnalyticsManager {
             case .locationPermissionDenied: return "location_permission_denied"
             case .notificationPermissionGranted: return "notification_permission_granted"
             case .notificationPermissionDenied: return "notification_permission_denied"
+            case .trackingPermissionGranted: return "tracking_permission_granted"
+            case .trackingPermissionDenied: return "tracking_permission_denied"
             case .onboardingCompleted: return "onboarding_completed"
             case .homeRefresh: return "home_refresh"
             case .recommendationViewed: return "recommendation_viewed"

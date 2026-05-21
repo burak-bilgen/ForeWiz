@@ -148,6 +148,18 @@ struct OnboardingView: View {
                 ) {
                     viewModel.requestNotificationPermission()
                 }
+                
+                // Tracking permission for personalized ads
+                PermissionRow(
+                    icon: "hand.raised.fill",
+                    color: .purple,
+                    title: L10n.text("permission_tracking"),
+                    subtitle: L10n.text("permission_tracking_subtitle"),
+                    isGranted: viewModel.trackingStatus == .authorized,
+                    isRequired: false
+                ) {
+                    viewModel.requestTrackingPermission()
+                }
             }
         }
         .staggerEntrance(index: 4, appeared: pageAppeared)

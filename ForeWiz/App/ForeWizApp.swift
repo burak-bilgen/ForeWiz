@@ -116,10 +116,18 @@ struct ForeWizApp: App {
                 await AdManager.shared.refreshExpiredCaches()
             }
             
-            // Check for app open ad opportunity
-            if AdPlacementStrategy.shared.shouldShowAppOpen() {
-                // App open ad would be shown here
-                AdPlacementStrategy.shared.recordAdShown(.appOpen)
+            // Show app open ad at natural transition point
+            if AdPlacementStrategy.shared.shouldShowAppOpen(),
+               let rootVC = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first?
+                .windows
+                .first?
+                .rootViewController {
+                _ = AdMobIntegration.shared.showAppOpenAd(
+                    from: rootVC,
+                    onDismiss: {}
+                )
             }
         case .inactive:
             AppLifecycleManager.shared.applicationWillResignActive()

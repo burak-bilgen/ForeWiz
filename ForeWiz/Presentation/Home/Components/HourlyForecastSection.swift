@@ -67,7 +67,7 @@ struct HourlyPill: View {
                 .fill(scoreColor)
                 .frame(width: 16, height: 3)
 
-            Text("\(item.score)")
+            Text(String(format: "%.1f", Double(item.score) / 10.0))
                 .font(.system(size: 10, weight: .bold, design: .rounded))
                 .foregroundStyle(scoreColor)
                 .lineLimit(1)

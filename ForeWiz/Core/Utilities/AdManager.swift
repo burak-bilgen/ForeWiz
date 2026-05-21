@@ -19,7 +19,11 @@ final class AdManager {
     
     struct Config {
         /// Test mode - uses Google test ad unit IDs
+        #if DEBUG
         static let testMode = true
+        #else
+        static let testMode = false
+        #endif
         
         /// Maximum impressions per day per format
         static let maxBannerImpressionsPerDay = 100
@@ -48,6 +52,8 @@ final class AdManager {
         case native = "native"
         case interstitial = "interstitial"
         case appOpen = "app_open"
+        case rewarded = "rewarded"
+        case rewardedInterstitial = "rewarded_interstitial"
         
         /// Google test ad unit IDs (safe for development)
         var testID: String {
@@ -56,16 +62,20 @@ final class AdManager {
             case .native: return "ca-app-pub-3940256099942544/3986624511"
             case .interstitial: return "ca-app-pub-3940256099942544/4411468910"
             case .appOpen: return "ca-app-pub-3940256099942544/5662855259"
+            case .rewarded: return "ca-app-pub-3940256099942544/1712485313"
+            case .rewardedInterstitial: return "ca-app-pub-3940256099942544/5354046376"
             }
         }
         
         /// Production ad unit IDs (set these in AdMob dashboard)
         var productionID: String {
             switch self {
-            case .banner: return "forewiz_banner_prod"
-            case .native: return "forewiz_native_prod"
-            case .interstitial: return "forewiz_interstitial_prod"
-            case .appOpen: return "forewiz_appopen_prod"
+            case .banner: return "ca-app-pub-3149735625847287/1558365536"
+            case .native: return "ca-app-pub-3149735625847287/7796470827"
+            case .interstitial: return "ca-app-pub-3149735625847287/4268289356"
+            case .appOpen: return "ca-app-pub-3149735625847287/2544144142"
+            case .rewarded: return "ca-app-pub-3149735625847287/7136023057"
+            case .rewardedInterstitial: return "ca-app-pub-3149735625847287/2214868860"
             }
         }
         
@@ -79,6 +89,8 @@ final class AdManager {
             case .native: return Config.maxNativeImpressionsPerDay
             case .interstitial: return Config.maxInterstitialImpressionsPerDay
             case .appOpen: return Config.maxAppOpenImpressionsPerDay
+            case .rewarded: return 10
+            case .rewardedInterstitial: return 5
             }
         }
         
@@ -88,6 +100,8 @@ final class AdManager {
             case .native: return Config.minNativeInterval
             case .interstitial: return Config.minInterstitialInterval
             case .appOpen: return Config.minAppOpenInterval
+            case .rewarded: return 120
+            case .rewardedInterstitial: return 180
             }
         }
     }
@@ -137,6 +151,15 @@ final class AdManager {
         // Reset daily counters
         resetDailyCounters()
         
+        // Schedule daily reset at midnight
+        scheduleDailyReset()
+        
+        // Reset fatigue tracking
+        AdFatiguePrevention.shared.reset()
+        
+        // Start new analytics session
+        AdAnalyticsEngine.shared.startNewSession()
+        
         #if DEBUG
         AppLogger.app.info("[Ads] Running in TEST MODE with test ad unit IDs")
         #endif
@@ -169,14 +192,24 @@ final class AdManager {
         
         AppLogger.app.info("[Ads] Preloading banner...")
         
-        // Simulate ad load (replace with actual SDK call)
-        try? await Task.sleep(for: .milliseconds(500))
-        
-        isBannerCached = true
-        lastCacheTime[.banner] = Date()
-        onBannerLoaded?()
-        
-        AppLogger.app.info("[Ads] Banner preloaded")
+        // Delegate to AdMobIntegration for actual SDK loading
+        let adUnitID = AdUnit.banner.currentID
+        await withCheckedContinuation { continuation in
+            AdMobIntegration.shared.loadBannerAd(adUnitID: adUnitID) {
+                Task { @MainActor in
+                    self.isBannerCached = true
+                    self.lastCacheTime[.banner] = Date()
+                    self.onBannerLoaded?()
+                    AppLogger.app.info("[Ads] Banner preloaded")
+                    continuation.resume()
+                }
+            } onFailure: {
+                Task { @MainActor in
+                    AppLogger.app.warning("[Ads] Banner preload failed")
+                    continuation.resume()
+                }
+            }
+        }
     }
     
     func preloadNative() async {
@@ -184,13 +217,22 @@ final class AdManager {
         
         AppLogger.app.info("[Ads] Preloading native ad...")
         
-        try? await Task.sleep(for: .milliseconds(600))
-        
-        isNativeCached = true
-        lastCacheTime[.native] = Date()
-        onNativeLoaded?()
-        
-        AppLogger.app.info("[Ads] Native ad preloaded")
+        let adUnitID = AdUnit.native.currentID
+        await withCheckedContinuation { continuation in
+            AdMobIntegration.shared.loadNativeAd(adUnitID: adUnitID) { nativeAd in
+                Task { @MainActor in
+                    if nativeAd != nil {
+                        self.isNativeCached = true
+                        self.lastCacheTime[.native] = Date()
+                        self.onNativeLoaded?()
+                        AppLogger.app.info("[Ads] Native ad preloaded")
+                    } else {
+                        AppLogger.app.warning("[Ads] Native ad preload failed")
+                    }
+                    continuation.resume()
+                }
+            }
+        }
     }
     
     func preloadInterstitial() async {
@@ -198,13 +240,22 @@ final class AdManager {
         
         AppLogger.app.info("[Ads] Preloading interstitial...")
         
-        try? await Task.sleep(for: .milliseconds(800))
-        
-        isInterstitialCached = true
-        lastCacheTime[.interstitial] = Date()
-        onInterstitialLoaded?()
-        
-        AppLogger.app.info("[Ads] Interstitial preloaded")
+        let adUnitID = AdUnit.interstitial.currentID
+        await withCheckedContinuation { continuation in
+            AdMobIntegration.shared.loadInterstitialAd(adUnitID: adUnitID) { ad in
+                Task { @MainActor in
+                    if ad != nil {
+                        self.isInterstitialCached = true
+                        self.lastCacheTime[.interstitial] = Date()
+                        self.onInterstitialLoaded?()
+                        AppLogger.app.info("[Ads] Interstitial preloaded")
+                    } else {
+                        AppLogger.app.warning("[Ads] Interstitial preload failed")
+                    }
+                    continuation.resume()
+                }
+            }
+        }
     }
     
     func preloadAppOpen() async {
@@ -212,31 +263,48 @@ final class AdManager {
         
         AppLogger.app.info("[Ads] Preloading app open ad...")
         
-        try? await Task.sleep(for: .milliseconds(700))
-        
-        isAppOpenCached = true
-        lastCacheTime[.appOpen] = Date()
-        onAppOpenLoaded?()
-        
-        AppLogger.app.info("[Ads] App open ad preloaded")
+        let adUnitID = AdUnit.appOpen.currentID
+        await withCheckedContinuation { continuation in
+            AdMobIntegration.shared.loadAppOpenAd(adUnitID: adUnitID) { ad in
+                Task { @MainActor in
+                    if ad != nil {
+                        self.isAppOpenCached = true
+                        self.lastCacheTime[.appOpen] = Date()
+                        self.onAppOpenLoaded?()
+                        AppLogger.app.info("[Ads] App open ad preloaded")
+                    } else {
+                        AppLogger.app.warning("[Ads] App open preload failed")
+                    }
+                    continuation.resume()
+                }
+            }
+        }
     }
     
     // MARK: - Display Control
     
     /// Check if an ad can be shown (respects frequency caps and cooldowns)
     func canShow(_ unit: AdUnit) -> Bool {
-        // Check daily limit
-        let impressions = dailyImpressions[unit] ?? 0
-        guard impressions < unit.maxImpressionsPerDay else {
-            AppLogger.app.warning("[Ads] Daily limit reached for \(unit.rawValue)")
+        // Check fatigue prevention
+        guard AdFatiguePrevention.shared.shouldShowAd() else {
+            AppLogger.app.warning("[Ads] Ad blocked by fatigue prevention")
             return false
         }
         
-        // Check cooldown
+        // Check daily limit (adjusted by fatigue)
+        let impressions = dailyImpressions[unit] ?? 0
+        let adjustedLimit = AdFatiguePrevention.shared.adjustedDailyLimit(baseLimit: unit.maxImpressionsPerDay)
+        guard impressions < adjustedLimit else {
+            AppLogger.app.warning("[Ads] Daily limit reached for \(unit.rawValue) (adjusted: \(adjustedLimit))")
+            return false
+        }
+        
+        // Check cooldown (adjusted by fatigue)
         if case .some(let lastTime) = lastImpressionTime[unit], let lastTime {
             let elapsed = Date().timeIntervalSince(lastTime)
-            guard elapsed >= unit.minInterval else {
-                AppLogger.app.info("[Ads] Cooldown active for \(unit.rawValue): \(Int(unit.minInterval - elapsed))s remaining")
+            let adjustedInterval = AdFatiguePrevention.shared.adjustedInterval(baseInterval: unit.minInterval)
+            guard elapsed >= adjustedInterval else {
+                AppLogger.app.info("[Ads] Cooldown active for \(unit.rawValue): \(Int(adjustedInterval - elapsed))s remaining")
                 return false
             }
         }
@@ -267,6 +335,7 @@ final class AdManager {
         case .native: return isNativeCached
         case .interstitial: return isInterstitialCached
         case .appOpen: return isAppOpenCached
+        case .rewarded, .rewardedInterstitial: return false
         }
     }
     
@@ -274,6 +343,12 @@ final class AdManager {
     func recordImpression(_ unit: AdUnit) {
         dailyImpressions[unit, default: 0] += 1
         lastImpressionTime[unit] = Date()
+        
+        // Track in analytics
+        AdAnalyticsEngine.shared.recordEvent(.impression, unit: unit)
+        
+        // Track in fatigue prevention
+        AdFatiguePrevention.shared.recordImpression()
         
         AppLogger.analytics.info("[Ads] Impression: \(unit.rawValue) (daily: \(self.dailyImpressions[unit] ?? 0))")
         
@@ -296,12 +371,21 @@ final class AdManager {
     func recordClick(_ unit: AdUnit) {
         dailyClicks[unit, default: 0] += 1
         
+        // Track in analytics
+        AdAnalyticsEngine.shared.recordEvent(.click, unit: unit)
+        
+        // Track in fatigue prevention
+        AdFatiguePrevention.shared.recordClick()
+        
         AppLogger.analytics.info("[Ads] Click: \(unit.rawValue) (daily: \(self.dailyClicks[unit] ?? 0))")
     }
     
     /// Record ad load failure
     func recordFailure(_ unit: AdUnit, error: Error) {
         invalidateCache(unit)
+        
+        // Track in analytics
+        AdAnalyticsEngine.shared.recordEvent(.failed, unit: unit, metadata: ["error": error.localizedDescription])
         
         AppLogger.app.error("[Ads] Failed to load \(unit.rawValue): \(error.localizedDescription)")
         
@@ -310,7 +394,29 @@ final class AdManager {
         case .native: onNativeFailed?(error)
         case .interstitial: onInterstitialFailed?(error)
         case .appOpen: onAppOpenFailed?(error)
+        case .rewarded, .rewardedInterstitial: break
         }
+    }
+    
+    /// Record ad dismiss (user closed ad quickly)
+    func recordDismiss(_ unit: AdUnit) {
+        // Track in fatigue prevention
+        AdFatiguePrevention.shared.recordDismiss()
+        
+        // Track in analytics
+        AdAnalyticsEngine.shared.recordEvent(.dismissed, unit: unit)
+        
+        AppLogger.analytics.info("[Ads] Dismissed: \(unit.rawValue)")
+    }
+    
+    /// Record ad loaded event
+    func recordLoaded(_ unit: AdUnit) {
+        AdAnalyticsEngine.shared.recordEvent(.loaded, unit: unit)
+    }
+    
+    /// Record ad reward event
+    func recordReward(_ unit: AdUnit, amount: Double) {
+        AdAnalyticsEngine.shared.recordEvent(.reward, unit: unit, revenue: amount)
     }
     
     // MARK: - Cache Management
@@ -324,6 +430,7 @@ final class AdManager {
         case .native: isNativeCached = false
         case .interstitial: isInterstitialCached = false
         case .appOpen: isAppOpenCached = false
+        case .rewarded, .rewardedInterstitial: break
         }
         
         AppLogger.app.info("[Ads] Cache invalidated for \(unit.rawValue)")
@@ -348,6 +455,7 @@ final class AdManager {
                 case .native: await preloadNative()
                 case .interstitial: await preloadInterstitial()
                 case .appOpen: await preloadAppOpen()
+                case .rewarded, .rewardedInterstitial: break
                 }
             }
         }
@@ -371,6 +479,32 @@ final class AdManager {
         return dailyImpressions[unit, default: 0] < unit.maxImpressionsPerDay
     }
     
+    // MARK: - Daily Reset Scheduling
+    
+    /// Schedule automatic daily counter reset at midnight
+    private func scheduleDailyReset() {
+        let now = Date()
+        let calendar = Calendar.current
+        
+        // Calculate next midnight
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
+              let nextMidnight = calendar.date(bySetting: .hour, value: 0, of: tomorrow) else {
+            return
+        }
+        
+        let timeUntilMidnight = nextMidnight.timeIntervalSince(now)
+        
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(timeUntilMidnight))
+            await MainActor.run {
+                self?.resetDailyCounters()
+                self?.scheduleDailyReset() // Schedule next day's reset
+            }
+        }
+        
+        AppLogger.app.info("[Ads] Daily reset scheduled in \(Int(timeUntilMidnight / 60)) minutes")
+    }
+    
     // MARK: - Debug Info
     
     /// Get debug information about ad system state
@@ -390,6 +524,17 @@ final class AdManager {
             }
             info += "\n"
         }
+        
+        // Add fatigue info
+        info += AdFatiguePrevention.shared.debugInfo()
+        info += "\n"
+        
+        // Add analytics summary
+        info += AdAnalyticsEngine.shared.exportSummary()
+        info += "\n"
+        
+        // Add loading manager info
+        info += AdLoadingManager.shared.debugInfo()
         
         return info
     }

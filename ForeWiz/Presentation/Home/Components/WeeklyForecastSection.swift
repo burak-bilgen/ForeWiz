@@ -82,7 +82,7 @@ struct ForecastRow: View {
                 .fill(scoreColor.opacity(0.6))
                 .frame(width: 2, height: 20)
 
-            Text("\(forecast.outdoorScore)")
+            Text(String(format: "%.1f", Double(forecast.outdoorScore) / 10.0))
                 .font(.system(size: 13, weight: .bold, design: .rounded))
                 .foregroundStyle(scoreColor)
                 .frame(width: 28, alignment: .trailing)

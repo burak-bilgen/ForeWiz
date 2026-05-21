@@ -12,9 +12,10 @@ final class AdMobIntegration {
     // MARK: - State
     
     private(set) var isSDKInitialized = false
-    private var interstitialAd: InterstitialAd?
-    private var appOpenAd: AppOpenAd?
-    private var nativeAds: [NativeAd] = []
+    private(set) var currentInterstitialAd: InterstitialAd?
+    private(set) var currentAppOpenAd: AppOpenAd?
+    private(set) var currentNativeAds: [NativeAd] = []
+    private(set) var currentBannerView: BannerView?
     private var adLoader: AdLoader?
     
     // MARK: - Init
@@ -42,7 +43,40 @@ final class AdMobIntegration {
     
     // MARK: - Banner Ads
     
-    /// Create a banner ad view
+    /// Load a banner ad with callback (for AdManager preload)
+    func loadBannerAd(
+        adUnitID: String,
+        onSuccess: @escaping () -> Void,
+        onFailure: @escaping () -> Void
+    ) {
+        // Get root VC for banner loading
+        guard let rootVC = rootViewController() else {
+            onFailure()
+            return
+        }
+        
+        let bannerView = BannerView()
+        bannerView.adUnitID = adUnitID
+        bannerView.rootViewController = rootVC
+        bannerView.delegate = AdMobBannerDelegate.shared
+        
+        // Store banner before loading
+        self.currentBannerView = bannerView
+        
+        AdMobBannerDelegate.shared.onLoadCompletion = { success in
+            if success {
+                onSuccess()
+            } else {
+                onFailure()
+            }
+        }
+        
+        let request = Request()
+        bannerView.load(request)
+        AppLogger.app.info("[AdMob] Banner ad loading...")
+    }
+    
+    /// Create a banner view for inline display (used by AdBannerView)
     func createBannerView(
         adUnitID: String,
         rootViewController: UIViewController
@@ -51,26 +85,47 @@ final class AdMobIntegration {
         bannerView.adUnitID = adUnitID
         bannerView.rootViewController = rootViewController
         bannerView.delegate = AdMobBannerDelegate.shared
-        
         return bannerView
-    }
-    
-    /// Load a banner ad
-    func loadBannerAd(for bannerView: BannerView) {
-        let request = Request()
-        bannerView.load(request)
-        AppLogger.app.info("[AdMob] Banner ad loading...")
     }
     
     // MARK: - Native Ads
     
-    /// Load native ads
+    /// Load a single native ad with callback (for AdManager preload)
+    func loadNativeAd(
+        adUnitID: String,
+        completion: @escaping (NativeAd?) -> Void
+    ) {
+        guard let rootVC = rootViewController() else {
+            completion(nil)
+            return
+        }
+        
+        adLoader = AdLoader(
+            adUnitID: adUnitID,
+            rootViewController: rootVC,
+            adTypes: [.native],
+            options: []
+        )
+        adLoader?.delegate = AdMobNativeLoaderDelegate.shared
+        
+        AdMobNativeLoaderDelegate.shared.onSingleAdLoaded = { nativeAd in
+            completion(nativeAd)
+        }
+        AdMobNativeLoaderDelegate.shared.onLoadFailed = {
+            completion(nil)
+        }
+        
+        adLoader?.load(Request())
+        AppLogger.app.info("[AdMob] Loading native ad...")
+    }
+    
+    /// Load native ads (bulk)
     func loadNativeAds(
         adUnitID: String,
         rootViewController: UIViewController,
         completion: @escaping ([NativeAd]) -> Void
     ) {
-        nativeAds.removeAll()
+        currentNativeAds.removeAll()
         
         adLoader = AdLoader(
             adUnitID: adUnitID,
@@ -79,13 +134,13 @@ final class AdMobIntegration {
             options: []
         )
         adLoader?.delegate = AdMobNativeLoaderDelegate.shared
-        adLoader?.load(Request())
         
         AdMobNativeLoaderDelegate.shared.onAdsLoaded = { [weak self] ads in
-            self?.nativeAds = ads
+            self?.currentNativeAds = ads
             completion(ads)
         }
         
+        adLoader?.load(Request())
         AppLogger.app.info("[AdMob] Loading native ads...")
     }
     
@@ -107,8 +162,8 @@ final class AdMobIntegration {
             }
             
             Task { @MainActor in
-                self?.interstitialAd = ad
-                self?.interstitialAd?.fullScreenContentDelegate = AdMobInterstitialDelegate.shared
+                self?.currentInterstitialAd = ad
+                self?.currentInterstitialAd?.fullScreenContentDelegate = AdMobInterstitialDelegate.shared
                 AppLogger.app.info("[AdMob] Interstitial ad loaded")
                 completion(ad)
             }
@@ -120,15 +175,16 @@ final class AdMobIntegration {
         from viewController: UIViewController,
         onDismiss: @escaping () -> Void
     ) -> Bool {
-        guard let interstitialAd = interstitialAd else {
+        guard let interstitialAd = currentInterstitialAd else {
             AppLogger.app.info("[AdMob] No interstitial ad available")
             return false
         }
         
         AdMobInterstitialDelegate.shared.onAdDismissed = onDismiss
         interstitialAd.present(from: viewController)
-        self.interstitialAd = nil
+        currentInterstitialAd = nil
         
+        // Single tracking point — AdManager.recordImpression handles analytics/fatigue
         AdManager.shared.recordImpression(.interstitial)
         AdRevenueTracker.shared.recordImpression(unit: .interstitial)
         AdPlacementStrategy.shared.recordAdShown(.interstitial)
@@ -155,7 +211,7 @@ final class AdMobIntegration {
             }
             
             Task { @MainActor in
-                self?.appOpenAd = ad
+                self?.currentAppOpenAd = ad
                 AppLogger.app.info("[AdMob] App open ad loaded")
                 completion(ad)
             }
@@ -167,15 +223,16 @@ final class AdMobIntegration {
         from viewController: UIViewController,
         onDismiss: @escaping () -> Void
     ) -> Bool {
-        guard let appOpenAd = appOpenAd else {
+        guard let appOpenAd = currentAppOpenAd else {
             AppLogger.app.info("[AdMob] No app open ad available")
             return false
         }
         
         AdMobAppOpenDelegate.shared.onAdDismissed = onDismiss
         appOpenAd.present(from: viewController)
-        self.appOpenAd = nil
+        currentAppOpenAd = nil
         
+        // Single tracking point
         AdManager.shared.recordImpression(.appOpen)
         AdRevenueTracker.shared.recordImpression(unit: .appOpen)
         AdPlacementStrategy.shared.recordAdShown(.appOpen)
@@ -184,15 +241,26 @@ final class AdMobIntegration {
         return true
     }
     
+    // MARK: - Helpers
+    
+    private func rootViewController() -> UIViewController? {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first?
+            .windows
+            .first?
+            .rootViewController
+    }
+    
     // MARK: - Debug
     
     func debugInfo() -> String {
         """
         === AdMob Debug ===
         SDK Initialized: \(isSDKInitialized)
-        Interstitial Cached: \(interstitialAd != nil)
-        App Open Cached: \(appOpenAd != nil)
-        Native Ads Loaded: \(nativeAds.count)
+        Interstitial Cached: \(currentInterstitialAd != nil)
+        App Open Cached: \(currentAppOpenAd != nil)
+        Native Ads Loaded: \(currentNativeAds.count)
         """
     }
 }
@@ -203,12 +271,15 @@ final class AdMobIntegration {
 final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
     static let shared = AdMobBannerDelegate()
     
+    var onLoadCompletion: ((Bool) -> Void)?
+    
     nonisolated func bannerViewDidReceiveAd(_ bannerView: BannerView) {
         Task { @MainActor in
             AppLogger.app.info("[AdMob] Banner ad received")
+            AdManager.shared.recordLoaded(.banner)
             AdManager.shared.onBannerLoaded?()
-            AdManager.shared.recordImpression(.banner)
-            AdRevenueTracker.shared.recordImpression(unit: .banner)
+            onLoadCompletion?(true)
+            onLoadCompletion = nil
         }
     }
     
@@ -216,11 +287,14 @@ final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
         Task { @MainActor in
             AppLogger.app.error("[AdMob] Banner ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.banner, error: error)
+            onLoadCompletion?(false)
+            onLoadCompletion = nil
         }
     }
     
     nonisolated func bannerViewDidRecordImpression(_ bannerView: BannerView) {
         Task { @MainActor in
+            AdManager.shared.recordImpression(.banner)
             AdRevenueTracker.shared.recordImpression(unit: .banner)
         }
     }
@@ -240,6 +314,8 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
     static let shared = AdMobNativeLoaderDelegate()
     
     var onAdsLoaded: (([NativeAd]) -> Void)?
+    var onSingleAdLoaded: ((NativeAd?) -> Void)?
+    var onLoadFailed: (() -> Void)?
     private var loadedAds: [NativeAd] = []
     
     nonisolated func adLoader(_ adLoader: AdLoader, didReceive nativeAd: NativeAd) {
@@ -253,15 +329,17 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
     nonisolated func adLoaderDidFinishLoading(_ adLoader: AdLoader) {
         Task { @MainActor in
             AppLogger.app.info("[AdMob] Native ads loading finished: \(self.loadedAds.count) ads")
+            AdManager.shared.recordLoaded(.native)
             AdManager.shared.onNativeLoaded?()
-            self.onAdsLoaded?(self.loadedAds)
             
-            for ad in self.loadedAds {
-                AdManager.shared.recordImpression(.native)
-                AdRevenueTracker.shared.recordImpression(unit: .native)
+            if let singleCompletion = onSingleAdLoaded {
+                singleCompletion(loadedAds.first)
+                onSingleAdLoaded = nil
+            } else {
+                onAdsLoaded?(loadedAds)
             }
             
-            self.loadedAds.removeAll()
+            loadedAds.removeAll()
         }
     }
     
@@ -269,6 +347,11 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
         Task { @MainActor in
             AppLogger.app.error("[AdMob] Native ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.native, error: error)
+            onLoadFailed?()
+            onSingleAdLoaded?(nil)
+            onSingleAdLoaded = nil
+            onLoadFailed = nil
+            loadedAds.removeAll()
         }
     }
 }
@@ -278,6 +361,7 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
 extension AdMobNativeLoaderDelegate: NativeAdDelegate {
     nonisolated func nativeAdDidRecordImpression(_ nativeAd: NativeAd) {
         Task { @MainActor in
+            AdManager.shared.recordImpression(.native)
             AdRevenueTracker.shared.recordImpression(unit: .native)
         }
     }
@@ -308,9 +392,11 @@ final class AdMobInterstitialDelegate: NSObject, FullScreenContentDelegate {
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         Task { @MainActor in
             AppLogger.app.info("[AdMob] Interstitial ad dismissed")
+            AdManager.shared.recordDismiss(.interstitial)
             self.onAdDismissed?()
             
             Task {
+                AdAnalyticsEngine.shared.markLoadStart(.interstitial)
                 await AdManager.shared.preloadInterstitial()
             }
         }
@@ -335,9 +421,11 @@ final class AdMobAppOpenDelegate: NSObject, FullScreenContentDelegate {
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         Task { @MainActor in
             AppLogger.app.info("[AdMob] App open ad dismissed")
+            AdManager.shared.recordDismiss(.appOpen)
             self.onAdDismissed?()
             
             Task {
+                AdAnalyticsEngine.shared.markLoadStart(.appOpen)
                 await AdManager.shared.preloadAppOpen()
             }
         }

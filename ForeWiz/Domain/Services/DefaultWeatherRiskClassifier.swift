@@ -22,10 +22,19 @@ struct DefaultWeatherRiskClassifier {
             severeWeatherRisk: current.severeWeatherRisk
         )
 
-        let allRisks = ([currentAsHour] + hourly).flatMap { risks(for: $0, calendar: calendar) }
+        let allHours = [currentAsHour] + hourly
+        let allRisks = allHours.flatMap { risks(for: $0, calendar: calendar) }
         var bestByType: [WeatherRiskType: WeatherRisk] = [:]
 
-        for risk in allRisks {
+        // Group rain hours and create a single merged risk
+        let rainHours = allHours.filter { isRainyHour($0) }
+        if !rainHours.isEmpty, let mergedRain = mergeRainRisk(from: rainHours, calendar: calendar) {
+            bestByType[.rain] = mergedRain
+        }
+
+        // Non-rain risks
+        let nonRainRisks = allRisks.filter { $0.type != .rain }
+        for risk in nonRainRisks {
             if let existing = bestByType[risk.type], risk.severity <= existing.severity {
                 continue
             }
@@ -38,6 +47,45 @@ struct DefaultWeatherRiskClassifier {
             }
             return $0.severity > $1.severity
         }
+    }
+
+    private func isRainyHour(_ hour: HourlyWeatherPoint) -> Bool {
+        (hour.precipitationChance ?? 0) >= 0.5 || (hour.precipitationAmountMm ?? 0) >= 1
+    }
+
+    private func mergeRainRisk(from rainHours: [HourlyWeatherPoint], calendar: Calendar) -> WeatherRisk? {
+        guard let first = rainHours.first, let last = rainHours.last else { return nil }
+
+        let sortedHours = rainHours.sorted { $0.date < $1.date }
+        let maxChance = sortedHours.map { $0.precipitationChance ?? 0 }.max() ?? 0
+        let totalMm = sortedHours.map { $0.precipitationAmountMm ?? 0 }.reduce(0, +)
+        let maxMm = sortedHours.map { $0.precipitationAmountMm ?? 0 }.max() ?? 0
+
+        let severity: RiskLevel
+        if maxChance >= 0.75 || maxMm >= 2 {
+            severity = .high
+        } else {
+            severity = .medium
+        }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        formatter.locale = Locale(identifier: "tr_TR")
+
+        let startTime = formatter.string(from: first.date)
+        let endTime = formatter.string(from: calendar.date(byAdding: .hour, value: 1, to: last.date) ?? last.date)
+
+        let avgChance = Int((sortedHours.map { $0.precipitationChance ?? 0 }.reduce(0, +) / Double(sortedHours.count) * 100).rounded())
+
+        let title = L10n.text("risk_rain_high")
+        let message = String(format: L10n.text("risk_rain_merged_message"), startTime, endTime, avgChance, String(format: "%.1f", totalMm))
+
+        return WeatherRisk(
+            type: .rain,
+            severity: severity,
+            title: title,
+            message: message
+        )
     }
 
     func makeAvoidWindows(

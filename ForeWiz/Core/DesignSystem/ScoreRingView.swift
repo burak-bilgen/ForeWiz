@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Animated circular progress ring showing an outdoor-friendliness score.
-/// Adapts stroke width to size and respects reduce-motion.
+/// Displays score as X/10 with modern design.
 struct ScoreRingView: View {
     let score: WeatherScore
     var size: CGFloat = 92
@@ -17,12 +17,12 @@ struct ScoreRingView: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(Color.white.opacity(0.08), lineWidth: resolvedLineWidth)
+                .stroke(Color.white.opacity(0.06), lineWidth: resolvedLineWidth)
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
                     AngularGradient(
-                        colors: [scoreColor.opacity(0.6), scoreColor],
+                        colors: [scoreColor.opacity(0.5), scoreColor],
                         center: .center,
                         startAngle: .degrees(-90),
                         endAngle: .degrees(270)
@@ -30,32 +30,20 @@ struct ScoreRingView: View {
                     style: StrokeStyle(lineWidth: resolvedLineWidth, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
-                .shadow(color: scoreColor.opacity(glowPulse ? 0.55 : 0.25), radius: glowPulse ? 8 : 4)
-            VStack(spacing: 1) {
-                if showOutOf100 {
-                    Text(String(format: "%.0f", score.displayValue))
-                        .font(.system(size: size * 0.30, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.white)
-                    Text(L10n.text("home_score_out_of_100"))
-                        .font(.system(size: size * 0.12, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.4))
-                } else {
-                    Text(score.displayValue, format: .number.precision(.fractionLength(1)))
-                        .font(.system(size: size * 0.28, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.white)
-                    Text(L10n.text("home_score_out_of_10"))
-                        .font(.system(size: size * 0.11, weight: .medium, design: .rounded))
-                        .foregroundStyle(Color.white.opacity(0.4))
-                }
+                .shadow(color: scoreColor.opacity(glowPulse ? 0.4 : 0.15), radius: glowPulse ? 6 : 3)
+            VStack(spacing: 0) {
+                Text(score.displayText)
+                    .font(.system(size: size * 0.32, weight: .heavy, design: .rounded))
+                    .foregroundStyle(.white)
+                Text(score.subText)
+                    .font(.system(size: size * 0.13, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color.white.opacity(0.35))
             }
         }
         .frame(width: size, height: size)
         .onAppear {
             animate(to: score.displayValue / 10)
             if !reduceMotion {
-                // Single spring pulse on appear — no endless loop
                 withAnimation(AppTheme.transitionSpring.delay(0.6)) {
                     glowPulse = true
                 }
@@ -88,5 +76,19 @@ struct ScoreRingView: View {
         case 40..<60:  AppTheme.warning
         default:       AppTheme.danger
         }
+    }
+}
+
+extension WeatherScore {
+    var displayText: String {
+        let value = displayValue
+        if value.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(format: "%.0f", value)
+        }
+        return String(format: "%.1f", value)
+    }
+
+    var subText: String {
+        L10n.text("home_score_out_of_10")
     }
 }

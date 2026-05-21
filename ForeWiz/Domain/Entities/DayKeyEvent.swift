@@ -21,13 +21,19 @@ struct DayKeyEvent: Identifiable, Equatable, Sendable {
         case strongWind
         case highUV
         case bestWindow
+        case snow
+        case fog
+        case improving
+        case sunrise
+        case sunset
     }
 
     enum EventSeverity: Int, Comparable, Sendable, Equatable {
-        case low = 0
-        case moderate = 1
-        case high = 2
-        case critical = 3
+        case info = 0
+        case low = 1
+        case moderate = 2
+        case high = 3
+        case critical = 4
 
         static func < (lhs: EventSeverity, rhs: EventSeverity) -> Bool {
             lhs.rawValue < rhs.rawValue
@@ -44,5 +50,20 @@ struct DayKeyEvent: Identifiable, Equatable, Sendable {
             return String(format: "%02d:00", startHour)
         }
         return String(format: "%02d:00 – %02d:00", startHour, endHour)
+    }
+
+    /// Whether this is a positive/informational event (not a risk/warning)
+    var isPositive: Bool {
+        switch type {
+        case .bestWindow, .improving, .sunrise, .sunset:
+            return true
+        case .rain, .heavyRain, .storm, .heat, .cold, .strongWind, .highUV, .snow, .fog:
+            return false
+        }
+    }
+
+    /// Whether this event should be shown in key events even if severity is low/info
+    var alwaysShow: Bool {
+        type == .bestWindow || type == .improving
     }
 }

@@ -6,6 +6,7 @@ final class OnboardingViewModel {
     private(set) var selectedLanguage: AppLanguage = .english
     private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
     private(set) var notificationStatus: NotificationAuthorizationStatus = .notDetermined
+    private(set) var trackingStatus: AdConsentManager.ConsentStatus = .notDetermined
     private(set) var errorMessage: String?
 
     private let locationRepository: LocationRepository
@@ -58,6 +59,19 @@ final class OnboardingViewModel {
         }
     }
 
+    func requestTrackingPermission() {
+        Task {
+            @MainActor
+            let status = await AdConsentManager.shared.requestTrackingPermission()
+            trackingStatus = status
+            if status == .authorized {
+                AnalyticsManager.shared.track(.trackingPermissionGranted)
+            } else {
+                AnalyticsManager.shared.track(.trackingPermissionDenied)
+            }
+        }
+    }
+    
     func setErrorMessage(_ message: String?) {
         errorMessage = message
     }
