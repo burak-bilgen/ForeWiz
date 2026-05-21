@@ -166,7 +166,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         let rankedCandidates = ranker.rank(candidates, context: context)
         store.saveCandidates(rankedCandidates)
 
-        // Generate AI-powered daily briefing
+        // Generate daily briefing
         let briefing = weatherBriefingService.generateBriefing(
             snapshot: snapshot,
             recommendation: recommendation,

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <strong>Your AI-powered weather sidekick. Not just weather — decisions.</strong>
+  <strong>Your smart weather sidekick. Not just weather — decisions.</strong>
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@ ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable dec
 
 ## ✨ Key Features
 
-### 🧠 AI Decision Engine
+### 🧠 Decision Engine
 ForeWiz processes weather data through a chain of specialized engines to produce holistic recommendations:
 
 | Engine | What It Does |
@@ -85,7 +85,7 @@ A premium dark-mode aesthetic with fluid animations:
 
 **Home Screen:**
 - Real-time weather card with temperature, conditions, wind, humidity, UV
-- AI-generated briefing section (narrative + health + comparative)
+- Smart briefing section (narrative + health + comparative)
 - WizPath HUD card for quick journey status
 - Multi-location support with map-based search
 - Language switcher and location picker in toolbar
@@ -237,7 +237,7 @@ Home/
 ├── HomeViewState.swift                # Loadable state enum
 ├── HomeViewStateFactory.swift         # State construction
 └── Components/
-    ├── AIBriefingSection.swift        # Narrative + health + comparative UI
+    ├── BriefingSection.swift          # Narrative + health + comparative UI
     └── WizPathHUDCard.swift           # Quick journey status
 
 Onboarding/

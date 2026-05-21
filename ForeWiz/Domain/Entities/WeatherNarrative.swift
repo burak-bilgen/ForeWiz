@@ -1,6 +1,6 @@
 import Foundation
 
-/// AI-generated narrative that tells a human-friendly "story" about today's weather.
+/// Smart narrative that tells a human-friendly "story" about today's weather.
 /// Transforms raw weather data into a relatable, conversational experience.
 struct WeatherNarrative: Codable, Equatable, Sendable {
     /// One-line headline like "A sizzling summer day with a cool afternoon breeze"
@@ -38,7 +38,7 @@ struct WeatherNarrative: Codable, Equatable, Sendable {
     }
 }
 
-/// AI health-weather correlation analysis.
+/// Health-weather correlation analysis.
 /// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, and stamina.
 struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
     /// Migraine risk index (0=none, 10=extreme)

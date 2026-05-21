@@ -61,7 +61,6 @@ final class OnboardingViewModel {
 
     func requestTrackingPermission() {
         Task {
-            @MainActor
             let status = await AdConsentManager.shared.requestTrackingPermission()
             trackingStatus = status
             if status == .authorized {

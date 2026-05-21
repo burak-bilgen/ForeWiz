@@ -1,6 +1,6 @@
 import Foundation
 
-/// The master service that orchestrates all AI-powered weather analysis.
+/// The master service that orchestrates all weather analysis.
 /// Combines narrative storytelling, health intelligence, and comparative analysis
 /// into a single comprehensive daily briefing.
 struct WeatherBriefingService {
@@ -8,7 +8,7 @@ struct WeatherBriefingService {
     private let healthService = HealthWeatherService()
     private let comparativeService = ComparativeWeatherService()
 
-    /// Generates a complete AI-powered daily briefing from weather data.
+    /// Generates a complete daily briefing from weather data.
     /// Call this once per recommendation cycle to populate the briefing.
     func generateBriefing(
         snapshot: WeatherSnapshot,

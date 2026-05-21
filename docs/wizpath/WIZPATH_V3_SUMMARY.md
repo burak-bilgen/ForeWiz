@@ -367,7 +367,7 @@ let content = formatter.formatNotification(for: alert, context: context)
    - UV index integration for sun glare
    - Air quality (AQI) for health alerts
 
-2. **Predictive AI**
+2. **Predictive Intelligence**
    - ML model for heat impact on traffic
    - Historical pattern recognition
    - Personalized heat sensitivity profiles
