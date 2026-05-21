@@ -2,201 +2,137 @@ import Foundation
 import OSLog
 
 // MARK: - Ad Placement Strategy
-/// Intelligent ad placement system that determines optimal moments
-/// to show ads based on user behavior, session context, and natural
-/// transition points.
-///
-/// Follows Google AdMob best practices:
-/// - Show ads at natural breaks (not during active tasks)
-/// - Respect user flow and engagement patterns
-/// - Avoid ad fatigue with smart frequency distribution
+/// Determines when and where to show ads for optimal UX and revenue balance.
+/// Uses session context, user engagement, and fatigue signals to place ads.
 @MainActor
 final class AdPlacementStrategy {
     static let shared = AdPlacementStrategy()
     
-    // MARK: - Placement Points
+    // MARK: - Placement Contexts
     
-    enum PlacementPoint: String {
-        /// After app launch and initial load
-        case appLaunch
-        /// After user refreshes weather data
-        case weatherRefresh
-        /// After viewing detailed recommendation
-        case recommendationViewed
-        /// After checking WizPath route
-        case wizPathComplete
-        /// After changing location
-        case locationChanged
-        /// After viewing insights
-        case insightsViewed
-        /// After completing onboarding
-        case onboardingComplete
-        /// Natural break between scrolling sessions
-        case scrollBreak
+    enum PlacementContext: String {
+        case appLaunch = "app_launch"
+        case weatherRefresh = "weather_refresh"
+        case locationChange = "location_change"
+        case insightView = "insight_view"
+        case recommendationTap = "recommendation_tap"
+        case settingsOpen = "settings_open"
+        case wizpathOpen = "wizpath_open"
     }
     
     // MARK: - Configuration
     
     struct Config {
-        /// Minimum session duration before showing interstitial (seconds)
-        static let minSessionDurationForInterstitial: TimeInterval = 60
-        
-        /// Maximum interstitials per session
-        static let maxInterstitialsPerSession = 3
-        
-        /// Show interstitial after this many placement points
-        static let interstitialTriggerPoints = 4
-        
-        /// Show banner after this many seconds on screen
-        static let bannerShowDelay: TimeInterval = 2.0
-        
-        /// Don't show ads during first N seconds of app usage
-        static let gracePeriod: TimeInterval = 10
+        /// Minimum time between native ad placements (seconds)
+        static let minNativeInterval: TimeInterval = 300 // 5 minutes
+        /// Minimum time between banner refreshes
+        static let minBannerInterval: TimeInterval = 60
+        /// Show app open ad every N foreground events
+        static let appOpenEveryNForeground = 2
+        /// Minimum session length to show interstitial (seconds)
+        static let minSessionForInterstitial: TimeInterval = 120
     }
     
     // MARK: - State
     
+    private var lastNativeAdTime: Date?
+    private var lastBannerRefreshTime: Date?
+    private var foregroundCount = 0
     private var sessionStartTime: Date?
-    private var placementPointCount = 0
-    private var interstitialsThisSession = 0
-    private var lastInterstitialTime: Date?
-    private var hasShownLaunchAd = false
-    
-    // MARK: - Init
+    private var isSessionActive = false
+    private var shownAdsToday: [AdManager.AdUnit: Int] = [:]
     
     private init() {}
     
     // MARK: - Session Management
     
-    /// Call when user opens app or returns from background
     func sessionStarted() {
+        guard !isSessionActive else { return }
+        isSessionActive = true
         sessionStartTime = Date()
-        placementPointCount = 0
-        interstitialsThisSession = 0
-        hasShownLaunchAd = false
-        
-        AppLogger.app.info("[AdPlacement] Session started")
+        foregroundCount += 1
+        AppLogger.app.info("[AdPlacement] Session started (foreground #\(self.foregroundCount))")
     }
     
-    /// Call when user sends app to background
     func sessionEnded() {
+        isSessionActive = false
         sessionStartTime = nil
-        placementPointCount = 0
-        interstitialsThisSession = 0
-        
         AppLogger.app.info("[AdPlacement] Session ended")
     }
     
     // MARK: - Placement Decisions
     
-    /// Check if a banner ad should be shown at this placement point
-    func shouldShowBanner(at point: PlacementPoint) -> Bool {
-        guard isGracePeriodOver() else { return false }
-        guard AdManager.shared.canShow(.banner) else { return false }
-        
-        // Don't show banner immediately on launch
-        if point == .appLaunch {
-            return false
-        }
-        
+    /// Should show app open ad on this foreground event?
+    func shouldShowAppOpen() -> Bool {
+        guard foregroundCount >= Config.appOpenEveryNForeground else { return false }
+        guard AdManager.shared.canShow(.appOpen) else { return false }
         return true
     }
     
-    /// Check if a native ad should be shown at this placement point
-    func shouldShowNative(at point: PlacementPoint) -> Bool {
-        guard isGracePeriodOver() else { return false }
+    /// Should show a native ad in the given context?
+    func shouldShowNative(at context: PlacementContext) -> Bool {
         guard AdManager.shared.canShow(.native) else { return false }
         
-        // Native ads work well after content consumption
-        switch point {
-        case .recommendationViewed, .wizPathComplete, .insightsViewed:
-            return true
-        default:
-            return false
+        // Check cooldown
+        if let lastTime = lastNativeAdTime {
+            guard Date().timeIntervalSince(lastTime) >= Config.minNativeInterval else { return false }
         }
+        
+        return true
     }
     
-    /// Check if an interstitial ad should be shown at this placement point
-    func shouldShowInterstitial(at point: PlacementPoint) -> Bool {
-        guard isGracePeriodOver() else { return false }
+    /// Should show an interstitial ad at a natural transition point?
+    func shouldShowInterstitial(at context: PlacementContext) -> Bool {
         guard AdManager.shared.canShow(.interstitial) else { return false }
         
-        // Check session duration
+        // Only show if user has been in session for a while
         if let sessionStart = sessionStartTime {
-            let sessionDuration = Date().timeIntervalSince(sessionStart)
-            guard sessionDuration >= Config.minSessionDurationForInterstitial else {
-                return false
-            }
+            guard Date().timeIntervalSince(sessionStart) >= Config.minSessionForInterstitial else { return false }
         }
-        
-        // Check session limit
-        guard interstitialsThisSession < Config.maxInterstitialsPerSession else {
-            return false
-        }
-        
-        // Check cooldown
-        if let lastTime = lastInterstitialTime {
-            let elapsed = Date().timeIntervalSince(lastTime)
-            guard elapsed >= AdManager.AdUnit.interstitial.minInterval else {
-                return false
-            }
-        }
-        
-        // Check if we've hit enough placement points
-        placementPointCount += 1
-        guard placementPointCount >= Config.interstitialTriggerPoints else {
-            return false
-        }
-        
-        // Reset counter after showing
-        placementPointCount = 0
         
         return true
     }
     
-    /// Check if an app open ad should be shown
-    func shouldShowAppOpen() -> Bool {
-        guard !hasShownLaunchAd else { return false }
-        guard AdManager.shared.canShow(.appOpen) else { return false }
-        guard isGracePeriodOver() else { return false }
-        
-        hasShownLaunchAd = true
-        return true
+    /// Should show a banner ad in the current context?
+    func shouldShowBanner() -> Bool {
+        return AdManager.shared.canShow(.banner)
     }
     
     // MARK: - Recording
     
-    /// Record that an ad was shown
+    /// Record that an ad was shown (updates placement strategy state)
     func recordAdShown(_ unit: AdManager.AdUnit) {
+        shownAdsToday[unit, default: 0] += 1
+        
         switch unit {
-        case .interstitial:
-            interstitialsThisSession += 1
-            lastInterstitialTime = Date()
-        case .appOpen:
-            hasShownLaunchAd = true
+        case .native:
+            lastNativeAdTime = Date()
+        case .banner:
+            lastBannerRefreshTime = Date()
         default:
             break
         }
-        
-        AppLogger.app.info("[AdPlacement] Ad shown: \(unit.rawValue) (session interstitials: \(self.interstitialsThisSession))")
-    }
-    
-    // MARK: - Helpers
-    
-    private func isGracePeriodOver() -> Bool {
-        guard let sessionStart = sessionStartTime else { return false }
-        return Date().timeIntervalSince(sessionStart) >= Config.gracePeriod
     }
     
     // MARK: - Debug
     
     func debugInfo() -> String {
-        """
-        === Ad Placement Debug ===
-        Session Active: \(sessionStartTime != nil)
-        Placement Points: \(placementPointCount)/\(Config.interstitialTriggerPoints)
-        Interstitials This Session: \(interstitialsThisSession)/\(Config.maxInterstitialsPerSession)
-        Grace Period Over: \(isGracePeriodOver())
-        """
+        var info = "=== Ad Placement Strategy ===\n"
+        info += "Session Active: \(isSessionActive)\n"
+        info += "Foreground Count: \(foregroundCount)\n"
+        info += "Shown Today:\n"
+        for (unit, count) in shownAdsToday {
+            info += "  \(unit.rawValue): \(count)\n"
+        }
+        return info
+    }
+    
+    func reset() {
+        lastNativeAdTime = nil
+        lastBannerRefreshTime = nil
+        foregroundCount = 0
+        sessionStartTime = nil
+        isSessionActive = false
+        shownAdsToday.removeAll()
     }
 }

@@ -2,191 +2,76 @@ import Foundation
 import OSLog
 
 // MARK: - Ad Revenue Tracker
-/// Tracks ad revenue, impressions, clicks, and performance metrics.
-/// Provides daily/weekly/monthly revenue summaries for analytics.
+/// Tracks ad revenue events for analytics and optimization.
+/// Provides eCPM and revenue-per-unit calculations.
 @MainActor
 final class AdRevenueTracker {
     static let shared = AdRevenueTracker()
     
-    // MARK: - Revenue Event
-    
-    struct RevenueEvent {
-        let adUnit: AdManager.AdUnit
-        let timestamp: Date
-        let revenue: Double
-        let currency: String
-        let precision: Precision
-        
-        enum Precision: String {
-            case estimated
-            case publisherProvided
-            case exact
-        }
-    }
-    
-    // MARK: - Daily Summary
-    
-    struct DailySummary {
-        let date: Date
-        let impressions: Int
-        let clicks: Int
-        let revenue: Double
-        let ctr: Double
-        let eCPM: Double
-        
-        var formattedRevenue: String {
-            String(format: "$%.2f", revenue)
-        }
-        
-        var formattedCTR: String {
-            String(format: "%.2f%%", ctr)
-        }
-        
-        var formattedECPM: String {
-            String(format: "$%.2f", eCPM)
-        }
-    }
-    
-    // MARK: - State
-    
-    private var todayEvents: [RevenueEvent] = []
-    private var todayImpressions = 0
-    private var todayClicks = 0
-    private var todayRevenue: Double = 0
-    
-    // MARK: - Init
+    private var impressionsByUnit: [AdManager.AdUnit: Int] = [:]
+    private var clicksByUnit: [AdManager.AdUnit: Int] = [:]
+    private var estimatedRevenueByUnit: [AdManager.AdUnit: Double] = [:]
     
     private init() {}
     
-    // MARK: - Tracking
+    /// Record an ad impression (called by AdMob delegate callbacks)
+    func recordImpression(unit: AdManager.AdUnit) {
+        impressionsByUnit[unit, default: 0] += 1
+        AppLogger.analytics.info("[Revenue] Impression: \(unit.rawValue)")
+    }
     
-    /// Record an ad impression with estimated revenue
-    func recordImpression(
-        unit: AdManager.AdUnit,
-        estimatedRevenue: Double = 0.001
-    ) {
-        todayImpressions += 1
-        todayRevenue += estimatedRevenue
-        
-        let event = RevenueEvent(
-            adUnit: unit,
-            timestamp: Date(),
-            revenue: estimatedRevenue,
-            currency: "USD",
-            precision: .estimated
+    /// Record an ad click
+    func recordClick(unit: AdManager.AdUnit) {
+        clicksByUnit[unit, default: 0] += 1
+        AppLogger.analytics.info("[Revenue] Click: \(unit.rawValue)")
+    }
+    
+    /// Set estimated revenue for a unit (from AdMob SDK callback)
+    func recordEstimatedRevenue(unit: AdManager.AdUnit, revenue: Double) {
+        estimatedRevenueByUnit[unit, default: 0] += revenue
+        AppLogger.analytics.info("[Revenue] Estimated revenue for \(unit.rawValue): $\(revenue)")
+    }
+    
+    // MARK: - Metrics
+    
+    /// Total estimated revenue this session
+    var totalEstimatedRevenue: Double {
+        estimatedRevenueByUnit.values.reduce(0, +)
+    }
+    
+    /// eCPM (effective cost per mille) across all units
+    var eCPM: Double {
+        let totalImpressions = impressionsByUnit.values.reduce(0, +)
+        guard totalImpressions > 0 else { return 0 }
+        return (totalEstimatedRevenue / Double(totalImpressions)) * 1000
+    }
+    
+    /// Get stats for a specific unit
+    func stats(for unit: AdManager.AdUnit) -> (impressions: Int, clicks: Int, revenue: Double) {
+        (
+            impressions: impressionsByUnit[unit] ?? 0,
+            clicks: clicksByUnit[unit] ?? 0,
+            revenue: estimatedRevenueByUnit[unit] ?? 0
         )
-        todayEvents.append(event)
-        
-        AppLogger.analytics.info("[Revenue] Impression: \(unit.rawValue) ($\(String(format: "%.4f", estimatedRevenue)))")
-    }
-    
-    /// Record an ad click with estimated revenue
-    func recordClick(
-        unit: AdManager.AdUnit,
-        estimatedRevenue: Double = 0.05
-    ) {
-        todayClicks += 1
-        todayRevenue += estimatedRevenue
-        
-        let event = RevenueEvent(
-            adUnit: unit,
-            timestamp: Date(),
-            revenue: estimatedRevenue,
-            currency: "USD",
-            precision: .estimated
-        )
-        todayEvents.append(event)
-        
-        AppLogger.analytics.info("[Revenue] Click: \(unit.rawValue) ($\(String(format: "%.4f", estimatedRevenue)))")
-    }
-    
-    /// Record exact revenue from ad network callback
-    func recordExactRevenue(
-        unit: AdManager.AdUnit,
-        revenue: Double,
-        currency: String = "USD"
-    ) {
-        todayRevenue += revenue
-        
-        let event = RevenueEvent(
-            adUnit: unit,
-            timestamp: Date(),
-            revenue: revenue,
-            currency: currency,
-            precision: .exact
-        )
-        todayEvents.append(event)
-        
-        AppLogger.analytics.info("[Revenue] Exact: \(unit.rawValue) (\(currency) \(String(format: "%.4f", revenue)))")
-    }
-    
-    // MARK: - Summary
-    
-    /// Get today's revenue summary
-    func todaySummary() -> DailySummary {
-        let ctr = todayImpressions > 0 ? (Double(todayClicks) / Double(todayImpressions)) * 100 : 0
-        let eCPM = todayImpressions > 0 ? (todayRevenue / Double(todayImpressions)) * 1000 : 0
-        
-        return DailySummary(
-            date: Date(),
-            impressions: todayImpressions,
-            clicks: todayClicks,
-            revenue: todayRevenue,
-            ctr: ctr,
-            eCPM: eCPM
-        )
-    }
-    
-    /// Get revenue breakdown by ad unit
-    func revenueByUnit() -> [AdManager.AdUnit: Double] {
-        var breakdown: [AdManager.AdUnit: Double] = [:]
-        
-        for event in todayEvents {
-            breakdown[event.adUnit, default: 0] += event.revenue
-        }
-        
-        return breakdown
-    }
-    
-    /// Get impression breakdown by ad unit
-    func impressionsByUnit() -> [AdManager.AdUnit: Int] {
-        var breakdown: [AdManager.AdUnit: Int] = [:]
-        
-        for event in todayEvents {
-            breakdown[event.adUnit, default: 0] += 1
-        }
-        
-        return breakdown
-    }
-    
-    // MARK: - Reset
-    
-    /// Reset daily counters (call at midnight)
-    func resetDailyCounters() {
-        todayEvents.removeAll()
-        todayImpressions = 0
-        todayClicks = 0
-        todayRevenue = 0
-        
-        AppLogger.app.info("[Revenue] Daily counters reset")
     }
     
     // MARK: - Debug
     
     func debugInfo() -> String {
-        let summary = todaySummary()
-        var info = "=== Revenue Debug ===\n"
-        info += "Today's Revenue: \(summary.formattedRevenue)\n"
-        info += "Impressions: \(summary.impressions)\n"
-        info += "Clicks: \(summary.clicks)\n"
-        info += "CTR: \(summary.formattedCTR)\n"
-        info += "eCPM: \(summary.formattedECPM)\n\n"
-        
-        info += "By Unit:\n"
-        for (unit, revenue) in revenueByUnit() {
-            info += "  \(unit.rawValue): $\(String(format: "%.4f", revenue))\n"
+        var info = "=== Ad Revenue Tracker ===\n"
+        info += "Total Est. Revenue: $\(String(format: "%.4f", totalEstimatedRevenue))\n"
+        info += "eCPM: $\(String(format: "%.2f", eCPM))\n\n"
+        for unit in AdManager.AdUnit.allCases {
+            let s = stats(for: unit)
+            info += "\(unit.rawValue): \(s.impressions) impressions, \(s.clicks) clicks, $\(String(format: "%.4f", s.revenue))\n"
         }
-        
         return info
+    }
+    
+    /// Reset all counters
+    func reset() {
+        impressionsByUnit.removeAll()
+        clicksByUnit.removeAll()
+        estimatedRevenueByUnit.removeAll()
     }
 }

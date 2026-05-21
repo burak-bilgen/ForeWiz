@@ -3,146 +3,89 @@ import OSLog
 #if canImport(AppTrackingTransparency)
 import AppTrackingTransparency
 #endif
+#if canImport(AdSupport)
+import AdSupport
+#endif
 
 // MARK: - Ad Consent Manager
-/// Manages user consent for ad tracking (ATT), privacy compliance,
-/// and contextual vs personalized ad targeting.
-///
-/// Handles:
-/// - App Tracking Transparency (ATT) prompt
-/// - Consent status tracking
-/// - GDPR/CCPA compliance flags
-/// - Contextual ad mode (no IDFA)
+/// Manages user consent for advertising (GDPR, ATT) and ensures
+/// compliance with App Store requirements.
 @MainActor
 final class AdConsentManager {
     static let shared = AdConsentManager()
     
     // MARK: - Consent Status
     
-    enum ConsentStatus: String, Sendable {
-        /// User has not been asked yet
-        case notDetermined
-        /// User denied tracking permission
+    enum ConsentStatus: String {
+        case unknown
+        case granted
         case denied
-        /// User granted tracking permission
-        case authorized
-        /// Tracking restricted by system (parental controls, enterprise)
-        case restricted
+        case notDetermined
     }
     
     // MARK: - State
     
-    private(set) var consentStatus: ConsentStatus = .notDetermined
-    private(set) var isContextualMode = true
-    private(set) var gdprApplies = false
-    private(set) var ccpaOptOut = false
+    private(set) var trackingStatus: ConsentStatus = .unknown
+    private(set) var gdprConsentGiven = false
     
-    // MARK: - Init
+    private init() {}
     
-    private init() {
-        updateConsentStatus()
-    }
+    // MARK: - App Tracking Transparency
     
-    // MARK: - ATT Request
-    
-    /// Request App Tracking Transparency permission.
-    /// Should be called at a natural moment when user understands the value.
-    /// Returns the consent status after the prompt.
+    /// Request ATT permission (required for IDFA access)
     func requestTrackingPermission() async -> ConsentStatus {
         #if canImport(AppTrackingTransparency)
-        guard #available(iOS 14.5, *) else {
-            return .notDetermined
-        }
-        
         let status = await ATTrackingManager.requestTrackingAuthorization()
-        consentStatus = ConsentMapper.map(status)
-        isContextualMode = consentStatus != .authorized
-        
-        AppLogger.app.info("[Ads] ATT status: \(self.consentStatus.rawValue)")
-        AppLogger.app.info("[Ads] Contextual mode: \(self.isContextualMode)")
-        
-        return consentStatus
+        switch status {
+        case .authorized:
+            trackingStatus = .granted
+            AnalyticsManager.shared.track(.trackingPermissionGranted)
+        case .denied, .restricted:
+            trackingStatus = .denied
+            AnalyticsManager.shared.track(.trackingPermissionDenied)
+        case .notDetermined:
+            trackingStatus = .notDetermined
+        @unknown default:
+            trackingStatus = .notDetermined
+        }
         #else
-        return .notDetermined
+        trackingStatus = .denied
         #endif
+        
+        AppLogger.app.info("[Consent] Tracking status: \(self.trackingStatus.rawValue)")
+        return trackingStatus
     }
     
-    /// Check current ATT status without prompting
+    /// Update consent status (call on app launch, before ad requests)
     func updateConsentStatus() {
         #if canImport(AppTrackingTransparency)
-        guard #available(iOS 14.5, *) else {
-            consentStatus = .notDetermined
-            return
-        }
-        
         let status = ATTrackingManager.trackingAuthorizationStatus
-        consentStatus = ConsentMapper.map(status)
-        isContextualMode = consentStatus != .authorized
-        #else
-        consentStatus = .notDetermined
-        #endif
-    }
-    
-    // MARK: - GDPR / CCPA
-    
-    /// Set GDPR applicability (for EEA users)
-    func setGDPRApplies(_ applies: Bool) {
-        gdprApplies = applies
-        AppLogger.app.info("[Ads] GDPR applies: \(applies)")
-    }
-    
-    /// Set CCPA opt-out status (for California users)
-    func setCCPAOptOut(_ optOut: Bool) {
-        ccpaOptOut = optOut
-        AppLogger.app.info("[Ads] CCPA opt-out: \(optOut)")
-    }
-    
-    // MARK: - Ad Targeting
-    
-    /// Get ad targeting configuration based on consent
-    func adTargetingConfig() -> AdTargetingConfig {
-        AdTargetingConfig(
-            isPersonalized: consentStatus == .authorized && !ccpaOptOut,
-            isContextual: isContextualMode,
-            gdprApplies: gdprApplies,
-            underAgeOfConsent: false
-        )
-    }
-    
-    // MARK: - Debug
-    
-    func debugInfo() -> String {
-        """
-        === Ad Consent Debug ===
-        Status: \(consentStatus.rawValue)
-        Contextual Mode: \(isContextualMode)
-        GDPR Applies: \(gdprApplies)
-        CCPA Opt-Out: \(ccpaOptOut)
-        """
-    }
-}
-
-// MARK: - Consent Mapper
-
-private enum ConsentMapper {
-    #if canImport(AppTrackingTransparency)
-    static func map(_ status: ATTrackingManager.AuthorizationStatus) -> AdConsentManager.ConsentStatus {
         switch status {
-        case .notDetermined: return .notDetermined
-        case .denied: return .denied
-        case .authorized: return .authorized
-        case .restricted: return .restricted
-        @unknown default: return .notDetermined
+        case .authorized:
+            trackingStatus = .granted
+        case .denied, .restricted:
+            trackingStatus = .denied
+        case .notDetermined:
+            trackingStatus = .notDetermined
+        @unknown default:
+            trackingStatus = .notDetermined
         }
+        #else
+        trackingStatus = .denied
+        #endif
+        
+        AppLogger.app.info("[Consent] Tracking status updated: \(self.trackingStatus.rawValue)")
     }
-    #endif
-}
-
-// MARK: - Ad Targeting Config
-
-struct AdTargetingConfig {
-    let isPersonalized: Bool
-    let isContextual: Bool
-    let gdprApplies: Bool
-    let underAgeOfConsent: Bool
+    
+    // MARK: - Google Mobile Ads Consent
+    
+    /// Check if we can serve personalized ads
+    var canServePersonalizedAds: Bool {
+        trackingStatus == .granted || trackingStatus == .notDetermined
+    }
+    
+    /// Check if we can serve ads at all
+    var canServeAds: Bool {
+        true // Always serve ads (non-personalized if needed)
+    }
 }

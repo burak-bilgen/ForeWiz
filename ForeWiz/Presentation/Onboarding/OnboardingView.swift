@@ -155,7 +155,7 @@ struct OnboardingView: View {
                     color: .purple,
                     title: L10n.text("permission_tracking"),
                     subtitle: L10n.text("permission_tracking_subtitle"),
-                    isGranted: viewModel.trackingStatus == .authorized,
+                    isGranted: viewModel.trackingStatus == .granted,
                     isRequired: false
                 ) {
                     viewModel.requestTrackingPermission()

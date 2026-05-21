@@ -1,190 +1,57 @@
 import SwiftUI
+import GoogleMobileAds
+import UIKit
 
 // MARK: - Ad Banner View
-/// Professional banner ad component with:
-/// - Smart loading states (placeholder → ad → error)
-/// - Automatic refresh with configurable interval
-/// - Weather-aware styling that matches ForeWiz theme
-/// - Proper impression/click tracking
+/// Professional banner ad with real Google AdMob integration.
+/// Shows a real BannerView when loaded, graceful fallback on failure.
 struct AdBannerView: View {
-    let unit: AdManager.AdUnit
-    let refreshInterval: TimeInterval
-    @State private var state: AdState = .loading
+    let adUnitID: String
+    @State private var state: AdLoadState = .loading
     @State private var isVisible = false
+    @State private var bannerView: BannerView?
     
-    init(unit: AdManager.AdUnit, refreshInterval: TimeInterval = 60) {
-        self.unit = unit
-        self.refreshInterval = refreshInterval
+    init(adUnitID: String? = nil) {
+        self.adUnitID = adUnitID ?? AdManager.AdUnit.banner.currentID
     }
     
     var body: some View {
         Group {
             switch state {
             case .loading:
-                adPlaceholder
-            case .loaded:
-                adContent
+                bannerPlaceholder
+            case .loaded(let view):
+                BannerHostingView(bannerView: view)
+                    .frame(height: 50)
             case .failed:
-                adErrorView
+                EmptyView()
             case .hidden:
                 EmptyView()
             }
         }
         .opacity(isVisible ? 1 : 0)
         .scaleEffect(isVisible ? 1 : 0.95)
-        .animation(AppTheme.cardSpring, value: state)
+        .animation(AppTheme.cardSpring.delay(0.15), value: state)
         .onAppear {
             withAnimation(AppTheme.cardSpring.delay(0.2)) {
                 isVisible = true
             }
             loadAd()
         }
-        .onDisappear {
-            stopRefresh()
-        }
     }
     
-    // MARK: - Loading State
+    // MARK: - Placeholder
     
-    private var adPlaceholder: some View {
+    private var bannerPlaceholder: some View {
         GlassCard {
             HStack(spacing: 12) {
-                shimmerCircle
-                    .frame(width: 40, height: 40)
-                
+                ShimmerCircle(size: 32)
                 VStack(alignment: .leading, spacing: 6) {
-                    shimmerBar(width: 120, height: 12)
-                    shimmerBar(width: 80, height: 8)
+                    ShimmerBar(width: 100, height: 10)
+                    ShimmerBar(width: 70, height: 8)
                 }
-                
                 Spacer()
-                
-                shimmerBar(width: 60, height: 24)
-            }
-            .padding(.horizontal, 4)
-        }
-        .task {
-            try? await Task.sleep(for: .milliseconds(800))
-            withAnimation(.easeOut(duration: 0.3)) {
-                state = .loaded
-            }
-        }
-    }
-    
-    private var shimmerCircle: some View {
-        Circle()
-            .fill(Color.white.opacity(0.1))
-            .overlay(shimmerEffect)
-    }
-    
-    private func shimmerBar(width: CGFloat, height: CGFloat) -> some View {
-        RoundedRectangle(cornerRadius: 4)
-            .fill(Color.white.opacity(0.1))
-            .frame(width: width, height: height)
-            .overlay(shimmerEffect)
-    }
-    
-    private var shimmerEffect: some View {
-        GeometryReader { geometry in
-            LinearGradient(
-                colors: [.clear, .white.opacity(0.1), .clear],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
-            .frame(width: geometry.size.width * 2)
-            .offset(x: -geometry.size.width)
-            .animation(
-                .linear(duration: 1.5).repeatForever(autoreverses: false),
-                value: UUID()
-            )
-        }
-        .clipped()
-    }
-    
-    // MARK: - Loaded State
-    
-    private var adContent: some View {
-        GlassCard {
-            HStack(spacing: 12) {
-                adIcon
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(L10n.text("ad_sponsored_title"))
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                    
-                    Text(L10n.text("ad_sponsored_subtitle"))
-                        .font(.system(size: 11))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-                
-                Spacer()
-                
-                adActionButton
-            }
-            .padding(.horizontal, 4)
-        }
-        .onTapGesture {
-            AdManager.shared.recordClick(unit)
-            AdRevenueTracker.shared.recordClick(unit: unit)
-        }
-    }
-    
-    private var adIcon: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.accentColor.opacity(0.3),
-                            Color.accentColor.opacity(0.1)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 40, height: 40)
-            
-            Image(systemName: "sparkles")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Color.accentColor)
-        }
-    }
-    
-    private var adActionButton: some View {
-        Text(L10n.text("ad_learn_more"))
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(Color.accentColor)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(
-                Color.accentColor.opacity(0.15)
-                    .clipShape(Capsule())
-            )
-    }
-    
-    // MARK: - Error State
-    
-    private var adErrorView: some View {
-        GlassCard {
-            HStack {
-                Image(systemName: "banner.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(.secondary)
-                
-                Text(L10n.text("ad_unavailable"))
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                
-                Spacer()
-                
-                Button(action: retryLoad) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.accentColor)
-                }
+                ShimmerBar(width: 50, height: 20)
             }
             .padding(.horizontal, 4)
         }
@@ -193,344 +60,287 @@ struct AdBannerView: View {
     // MARK: - Lifecycle
     
     private func loadAd() {
-        guard AdManager.shared.canShow(unit) else {
+        guard AdManager.shared.canShow(.banner) else {
             state = .hidden
             return
         }
         
-        Task {
-            if AdManager.shared.isAdCached(unit) {
-                withAnimation(.easeOut(duration: 0.3)) {
-                    state = .loaded
-                }
-                AdManager.shared.recordImpression(unit)
-                AdRevenueTracker.shared.recordImpression(unit: unit)
-            } else {
-                await AdManager.shared.preloadBanner()
-                
-                if AdManager.shared.isAdCached(unit) {
+        guard let rootVC = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?
+            .windows
+            .first?
+            .rootViewController else {
+            state = .failed
+            return
+        }
+        
+        // Check for existing cached banner
+        if let existingBanner = AdMobIntegration.shared.currentBannerView {
+            withAnimation(.easeOut(duration: 0.3)) {
+                state = .loaded(existingBanner)
+            }
+            return
+        }
+        
+        // Load new banner
+        AdMobIntegration.shared.loadBannerAd(adUnitID: adUnitID) {
+            Task { @MainActor in
+                if let banner = AdMobIntegration.shared.currentBannerView {
                     withAnimation(.easeOut(duration: 0.3)) {
-                        state = .loaded
+                        self.state = .loaded(banner)
                     }
-                    AdManager.shared.recordImpression(unit)
-                    AdRevenueTracker.shared.recordImpression(unit: unit)
-                } else {
-                    state = .failed
                 }
+            }
+        } onFailure: {
+            Task { @MainActor in
+                self.state = .failed
+            }
+        }
+        
+        // Timeout fallback
+        Task {
+            try? await Task.sleep(for: .seconds(10))
+            if case .loading = state {
+                state = .failed
             }
         }
     }
+}
+
+// MARK: - Banner Hosting View
+
+private struct BannerHostingView: UIViewRepresentable {
+    let bannerView: BannerView
     
-    private func retryLoad() {
-        withAnimation(.easeOut(duration: 0.3)) {
-            state = .loading
-        }
-        loadAd()
+    func makeUIView(context: Context) -> BannerView {
+        bannerView.rootViewController = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?
+            .windows
+            .first?
+            .rootViewController
+        return bannerView
     }
     
-    private func stopRefresh() {
-    }
+    func updateUIView(_ uiView: BannerView, context: Context) {}
 }
 
 // MARK: - Native Ad Card
-/// Native-style ad card that blends seamlessly with content feeds.
-/// Features proper AdChoices placement, media view support, and
-/// customizable layout that matches ForeWiz's design system.
+/// Native ad card that displays a real Google NativeAd.
+/// Falls back gracefully if no ad is available.
 struct NativeAdCard: View {
-    let unit: AdManager.AdUnit
+    let adUnitID: String
     @State private var isVisible = false
+    @State private var nativeAd: NativeAd?
     @State private var isLoading = true
     
+    init(adUnitID: String? = nil) {
+        self.adUnitID = adUnitID ?? AdManager.AdUnit.native.currentID
+    }
+    
     var body: some View {
-        GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                adHeader
-                
-                if isLoading {
-                    nativePlaceholder
-                } else {
-                    nativeContent
-                }
+        Group {
+            if isLoading {
+                nativePlaceholder
+            } else if let ad = nativeAd {
+                // Real native ad via the existing AdNativeView
+                AdNativeView(nativeAd: ad)
+                    .frame(minHeight: 280)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            } else {
+                EmptyView()
             }
         }
         .opacity(isVisible ? 1 : 0)
         .offset(y: isVisible ? 0 : 10)
         .animation(AppTheme.cardSpring.delay(0.2), value: isVisible)
         .onAppear {
-            withAnimation {
-                isVisible = true
-            }
+            withAnimation { isVisible = true }
             loadAd()
         }
-        .onTapGesture {
-            AdManager.shared.recordClick(unit)
-            AdRevenueTracker.shared.recordClick(unit: unit)
-        }
     }
     
-    private var adHeader: some View {
-        HStack {
-            Text(L10n.text("ad_sponsored_label"))
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 3)
-                .background(
-                    Color.white.opacity(0.1)
-                        .clipShape(Capsule())
-                )
-            
-            Spacer()
-            
-            // AdChoices icon (required by Google)
-            Image(systemName: "info.circle")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-        }
-    }
+    // MARK: - Placeholder
     
     private var nativePlaceholder: some View {
-        HStack(spacing: 12) {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.1))
-                .frame(width: 60, height: 60)
-            
-            VStack(alignment: .leading, spacing: 6) {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.white.opacity(0.15))
-                    .frame(height: 14)
-                    .frame(width: 150)
-                
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.white.opacity(0.1))
-                    .frame(height: 10)
-                    .frame(width: 200)
-                
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color.white.opacity(0.1))
-                    .frame(height: 10)
-                    .frame(width: 120)
-            }
-            
-            Spacer()
-        }
-        .padding(.vertical, 4)
-        .onAppear {
-            Task {
-                try? await Task.sleep(for: .milliseconds(600))
-                withAnimation(.easeOut(duration: 0.3)) {
-                    isLoading = false
-                }
-            }
-        }
-    }
-    
-    private var nativeContent: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                adImagePlaceholder
-                
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(L10n.text("ad_native_title"))
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
-                    
-                    Text(L10n.text("ad_native_description"))
-                        .font(.system(size: 13))
+        GlassCard {
+            VStack(alignment: .leading, spacing: 12) {
+                // Sponsored label
+                HStack {
+                    Text(L10n.text("ad_sponsored_label"))
+                        .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.white.opacity(0.1).clipShape(Capsule()))
+                    Spacer()
                 }
                 
-                Spacer()
-            }
-            
-            HStack {
-                Spacer()
-                
-                Text(L10n.text("ad_install_now"))
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 8)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.accentColor, Color.accentColor.opacity(0.8)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .clipShape(Capsule())
-                    )
+                HStack(spacing: 12) {
+                    ShimmerBar(width: 60, height: 60, cornerRadius: 12)
+                    VStack(alignment: .leading, spacing: 6) {
+                        ShimmerBar(width: 150, height: 14)
+                        ShimmerBar(width: 200, height: 10)
+                        ShimmerBar(width: 120, height: 10)
+                    }
+                    Spacer()
+                }
+                .padding(.vertical, 4)
             }
         }
     }
     
-    private var adImagePlaceholder: some View {
-        RoundedRectangle(cornerRadius: 12)
-            .fill(
-                LinearGradient(
-                    colors: [
-                        Color.accentColor.opacity(0.2),
-                        Color.accentColor.opacity(0.05)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .frame(width: 60, height: 60)
-            .overlay {
-                Image(systemName: "sparkles")
-                    .font(.system(size: 24, weight: .medium))
-                    .foregroundStyle(Color.accentColor.opacity(0.6))
-            }
-    }
+    // MARK: - Lifecycle
     
     private func loadAd() {
-        guard AdManager.shared.canShow(unit) else { return }
+        guard AdManager.shared.canShow(.native) else {
+            isLoading = false
+            return
+        }
         
-        AdManager.shared.recordImpression(unit)
-        AdRevenueTracker.shared.recordImpression(unit: unit)
+        // Load native ad directly (cache is handled internally by loadNativeAd)
+        AdMobIntegration.shared.loadNativeAd(adUnitID: adUnitID) { ad in
+            Task { @MainActor in
+                self.nativeAd = ad
+                withAnimation(.easeOut(duration: 0.3)) {
+                    self.isLoading = false
+                }
+            }
+        }
+        
+        // Timeout fallback
+        Task {
+            try? await Task.sleep(for: .seconds(10))
+            if isLoading {
+                withAnimation { isLoading = false }
+            }
+        }
     }
 }
 
-// MARK: - Interstitial Ad Overlay
-/// Full-screen interstitial ad shown at natural break points.
-/// Features countdown timer, dismiss button, and proper lifecycle.
-struct InterstitialAdOverlay: View {
+// MARK: - Interstitial Ad Trigger
+/// Presents a real Google interstitial ad at natural break points.
+/// Shows a brief loading overlay while the ad prepares.
+struct InterstitialAdTrigger: ViewModifier {
+    @Binding var isPresented: Bool
     let onDismiss: () -> Void
-    @State private var canDismiss = false
-    @State private var countdown = 5
-    @State private var isVisible = false
     
-    private let countdownDuration = 5
+    @State private var isShowingAd = false
+    
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: isPresented) { _, newValue in
+                if newValue { showInterstitial() }
+            }
+    }
+    
+    private func showInterstitial() {
+        guard !isShowingAd else { return }
+        isShowingAd = true
+        
+        guard let rootVC = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first?
+            .windows
+            .first?
+            .rootViewController else {
+            isPresented = false
+            isShowingAd = false
+            return
+        }
+        
+        let success = AdMobIntegration.shared.showInterstitialAd(from: rootVC) {
+            isPresented = false
+            isShowingAd = false
+            onDismiss()
+        }
+        
+        if !success {
+            // No ad available, proceed
+            isPresented = false
+            isShowingAd = false
+            onDismiss()
+        }
+    }
+}
+
+extension View {
+    /// Present a real Google interstitial ad at natural transition points.
+    func interstitialAd(isPresented: Binding<Bool>, onDismiss: @escaping () -> Void = {}) -> some View {
+        modifier(InterstitialAdTrigger(isPresented: isPresented, onDismiss: onDismiss))
+    }
+}
+
+// MARK: - Shimmer Components (Fixed)
+/// Fixed shimmer bar with proper animation using @State instead of UUID().
+struct ShimmerBar: View {
+    let width: CGFloat
+    let height: CGFloat
+    var cornerRadius: CGFloat = 4
     
     var body: some View {
-        ZStack {
-            Color.black.opacity(0.9)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    if canDismiss { onDismiss() }
+        RoundedRectangle(cornerRadius: cornerRadius)
+            .fill(Color.white.opacity(0.1))
+            .frame(width: width, height: height)
+            .overlay(ShimmerEffect())
+            .clipped()
+    }
+}
+
+struct ShimmerCircle: View {
+    let size: CGFloat
+    
+    var body: some View {
+        Circle()
+            .fill(Color.white.opacity(0.1))
+            .frame(width: size, height: size)
+            .overlay(ShimmerEffect())
+            .clipped()
+    }
+}
+
+private struct ShimmerEffect: View {
+    @State private var offset: CGFloat = -1
+    
+    var body: some View {
+        GeometryReader { geometry in
+            LinearGradient(
+                colors: [.clear, .white.opacity(0.08), .clear],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: geometry.size.width * 2)
+            .offset(x: offset * geometry.size.width)
+            .onAppear {
+                withAnimation(
+                    .linear(duration: 1.5)
+                    .repeatForever(autoreverses: false)
+                ) {
+                    offset = 1
                 }
-            
-            VStack {
-                Spacer()
-                
-                VStack(spacing: 24) {
-                    interstitialContent
-                    
-                    if canDismiss {
-                        dismissButton
-                    } else {
-                        countdownIndicator
-                    }
-                }
-                .padding(28)
-                .background(
-                    RoundedRectangle(cornerRadius: 28)
-                        .fill(.ultraThinMaterial)
-                        .shadow(color: .black.opacity(0.4), radius: 30, y: 15)
-                )
-                .padding(.horizontal, 28)
-                .scaleEffect(isVisible ? 1 : 0.9)
-                .opacity(isVisible ? 1 : 0)
-                
-                Spacer()
             }
-        }
-        .onAppear {
-            withAnimation(AppTheme.cardSpring) {
-                isVisible = true
-            }
-            AdManager.shared.recordImpression(.interstitial)
-            AdRevenueTracker.shared.recordImpression(unit: .interstitial)
-            startCountdown()
-        }
-    }
-    
-    private var interstitialContent: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 56))
-                .foregroundStyle(Color.accentColor)
-                .symbolEffect(.bounce)
-            
-            Text(L10n.text("ad_interstitial_title"))
-                .font(.system(size: 24, weight: .bold))
-                .foregroundStyle(.primary)
-                .multilineTextAlignment(.center)
-            
-            Text(L10n.text("ad_interstitial_description"))
-                .font(.system(size: 15))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 8)
-        }
-    }
-    
-    private var dismissButton: some View {
-        VStack(spacing: 12) {
-            Button(action: onDismiss) {
-                Text(L10n.text("ad_continue"))
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .clipShape(Capsule())
-                    )
-            }
-            .buttonStyle(PressScaleButtonStyle())
-            
-            Text(L10n.text("ad_tap_to_dismiss"))
-                .font(.system(size: 12))
-                .foregroundStyle(.tertiary)
-        }
-    }
-    
-    private var countdownIndicator: some View {
-        VStack(spacing: 12) {
-            Text(L10n.formatted("ad_dismiss_in", countdown))
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.secondary)
-            
-            ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.2), lineWidth: 4)
-                    .frame(width: 40, height: 40)
-                
-                Circle()
-                    .trim(from: 0, to: Double(countdown) / Double(countdownDuration))
-                    .stroke(Color.accentColor, lineWidth: 4)
-                    .frame(width: 40, height: 40)
-                    .rotationEffect(.degrees(-90))
-            }
-        }
-    }
-    
-    private func startCountdown() {
-        Task {
-            for i in 1...countdownDuration {
-                try? await Task.sleep(for: .seconds(1))
-                countdown = i
-                if Task.isCancelled { return }
-            }
-            canDismiss = true
         }
     }
 }
 
-// MARK: - Ad State
+// MARK: - Ad Load State
 
-private enum AdState: Equatable {
+private enum AdLoadState: Equatable {
     case loading
-    case loaded
+    case loaded(BannerView)
     case failed
     case hidden
+    
+    static func == (lhs: AdLoadState, rhs: AdLoadState) -> Bool {
+        switch (lhs, rhs) {
+        case (.loading, .loading): return true
+        case (.loaded, .loaded): return true
+        case (.failed, .failed): return true
+        case (.hidden, .hidden): return true
+        default: return false
+        }
+    }
 }
 
 // MARK: - Preview
@@ -538,10 +348,12 @@ private enum AdState: Equatable {
 #Preview {
     ScrollView {
         VStack(spacing: 16) {
-            AdBannerView(unit: .banner)
-            NativeAdCard(unit: .native)
+            AdBannerView()
+                .padding(.horizontal)
+            NativeAdCard()
+                .padding(.horizontal)
         }
-        .padding()
+        .padding(.vertical)
     }
     .background(Color.black)
 }

@@ -46,13 +46,13 @@ struct HomeLoadedContent: View {
 
                 // 7. Native ad — blends with content (shown after weekly forecast)
                 if showNativeAd {
-                    NativeAdCard(unit: .native)
+                    NativeAdCard()
                         .cardEntrance(appeared: contentReady, baseDelay: 0.48)
                 }
 
                 // 8. Banner ad — anchored monetization
                 if AdManager.shared.canShow(.banner) {
-                    AdBannerView(unit: .banner)
+                    AdBannerView()
                         .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.56 : 0.48)
                 }
 

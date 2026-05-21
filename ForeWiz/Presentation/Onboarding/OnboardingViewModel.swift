@@ -63,7 +63,7 @@ final class OnboardingViewModel {
         Task {
             let status = await AdConsentManager.shared.requestTrackingPermission()
             trackingStatus = status
-            if status == .authorized {
+            if status == .granted {
                 AnalyticsManager.shared.track(.trackingPermissionGranted)
             } else {
                 AnalyticsManager.shared.track(.trackingPermissionDenied)
