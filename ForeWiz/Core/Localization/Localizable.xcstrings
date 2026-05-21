@@ -548,142 +548,6 @@
         }
       }
     },
-    "ad_continue": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Continue"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Devam Et"
-          }
-        }
-      }
-    },
-    "ad_dismiss_in": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dismiss in %d seconds"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d sn sonra kapanır"
-          }
-        }
-      }
-    },
-    "ad_install_now": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Install"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yükle"
-          }
-        }
-      }
-    },
-    "ad_interstitial_description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enjoy this message from our sponsor"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sponsor mesajı"
-          }
-        }
-      }
-    },
-    "ad_interstitial_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Take a Quick Break"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kısa Bir Mola Verin"
-          }
-        }
-      }
-    },
-    "ad_learn_more": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Learn More"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Detaylar"
-          }
-        }
-      }
-    },
-    "ad_native_description": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check out this great offer"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Size özel fırsat"
-          }
-        }
-      }
-    },
-    "ad_native_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Recommended for You"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sizin İçin Önerilen"
-          }
-        }
-      }
-    },
     "ad_sponsored_label": {
       "extractionState": "manual",
       "localizations": {
@@ -697,74 +561,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sponsorlu"
-          }
-        }
-      }
-    },
-    "ad_sponsored_subtitle": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Discover more"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keşfedin"
-          }
-        }
-      }
-    },
-    "ad_sponsored_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sponsored"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sponsorlu"
-          }
-        }
-      }
-    },
-    "ad_tap_to_dismiss": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap anywhere to dismiss"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kapatmak için dokun"
-          }
-        }
-      }
-    },
-    "ad_unavailable": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ad temporarily unavailable"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reklam geçici olarak kullanılamıyor"
           }
         }
       }
@@ -1670,23 +1466,6 @@
         }
       }
     },
-    "comparative_card_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compared to Normal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normale Göre"
-          }
-        }
-      }
-    },
     "comparative_dod_cooler": {
       "extractionState": "manual",
       "localizations": {
@@ -1751,40 +1530,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dünden %d°C daha sıcak"
-          }
-        }
-      }
-    },
-    "comparative_metric_dod": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "vs Yesterday"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Düne Göre"
-          }
-        }
-      }
-    },
-    "comparative_metric_pattern": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Week Pattern"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Haftalık Eğilim"
           }
         }
       }
@@ -7654,132 +7399,6 @@
         }
       }
     },
-    "premium_not_found": {
-      "comment": "Message shown when no active premium subscription is found during restore.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No active premium subscription found"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premium ürünü bulunamadı"
-          }
-        }
-      }
-    },
-    "premium_per_month": {
-      "comment": "Short label for monthly subscription period.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/mo"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/ay"
-          }
-        }
-      }
-    },
-    "premium_per_week": {
-      "comment": "Short label for weekly subscription period.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/wk"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/hafta"
-          }
-        }
-      }
-    },
-    "premium_per_year": {
-      "comment": "Short label for yearly subscription period.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/yr"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/yıl"
-          }
-        }
-      }
-    },
-    "premium_restored": {
-      "comment": "Message shown when a user's premium purchase has been successfully restored.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premium restored"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Premium geri alındı"
-          }
-        }
-      }
-    },
-    "premium_save_percent": {
-      "comment": "Savings hint showing the percentage saved by choosing yearly over monthly. %d is the percentage.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save %d%%"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d%% tasarruf"
-          }
-        }
-      }
-    },
-    "premium_store_error": {
-      "comment": "Error message when the App Store cannot be reached.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not reach the App Store"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "App Store'a bağlanılamadı"
-          }
-        }
-      }
-    },
     "range_24h": {
       "extractionState": "manual",
       "localizations": {
@@ -9304,23 +8923,6 @@
         }
       }
     },
-    "siri_available_shortcuts": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Available Shortcuts"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kullanılabilir Kısayollar"
-          }
-        }
-      }
-    },
     "siri_best_time_for_activity": {
       "extractionState": "manual",
       "localizations": {
@@ -9334,261 +8936,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ için en iyi zaman %@ - %@ arası. Puan: %@/100."
-          }
-        }
-      }
-    },
-    "siri_button_shortcuts": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Button Shortcuts"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kısayol Butonları"
-          }
-        }
-      }
-    },
-    "siri_example_exercise": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Example Exercise"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnek: Egzersiz"
-          }
-        }
-      }
-    },
-    "siri_example_outfit": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Example Outfit"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnek: Kıyafet"
-          }
-        }
-      }
-    },
-    "siri_example_risks": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Example Risks"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnek: Riskler"
-          }
-        }
-      }
-    },
-    "siri_example_weather": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Example Weather"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Örnek: Hava Durumu"
-          }
-        }
-      }
-    },
-    "siri_how_to_use": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "How To Use"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nasıl Kullanılır"
-          }
-        }
-      }
-    },
-    "siri_how_to_use_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "How To Use Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siri ile kullanmak için aşağıdaki gibi sorabilirsiniz:"
-          }
-        }
-      }
-    },
-    "siri_intent_exercise_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Exercise Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dışarı çıkmak için en iyi zamanı söyler"
-          }
-        }
-      }
-    },
-    "siri_intent_outfit_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Outfit Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugün ne giyeceğini söyler"
-          }
-        }
-      }
-    },
-    "siri_intent_refresh_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Refresh Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava durumunu yeniler"
-          }
-        }
-      }
-    },
-    "siri_intent_refresh_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Refresh Title"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Havayı Yenile"
-          }
-        }
-      }
-    },
-    "siri_intent_risks_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Risks Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava risklerini kontrol eder"
-          }
-        }
-      }
-    },
-    "siri_intent_temp_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Temp Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklığı ve hissedilen sıcaklığı söyler"
-          }
-        }
-      }
-    },
-    "siri_intent_temp_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Temp Title"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklık Sorgula"
-          }
-        }
-      }
-    },
-    "siri_intent_weather_rec_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Intent Weather Rec Desc"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava durumu önerisi verir"
           }
         }
       }
@@ -9844,142 +9191,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Şu anda %1$@ - %2$@"
-          }
-        }
-      }
-    },
-    "siri_shortcut_exercise": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut Exercise"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Egzersiz Zamanı"
-          }
-        }
-      }
-    },
-    "siri_shortcut_outfit": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut Outfit"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ne Giymeli"
-          }
-        }
-      }
-    },
-    "siri_shortcut_refresh": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut Refresh"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Durumunu Yenile"
-          }
-        }
-      }
-    },
-    "siri_shortcut_risks": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut Risks"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Risklerini Kontrol Et"
-          }
-        }
-      }
-    },
-    "siri_shortcut_temp": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut Temp"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklık Sorgula"
-          }
-        }
-      }
-    },
-    "siri_shortcut_weather_rec": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcut Weather Rec"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Önerisi"
-          }
-        }
-      }
-    },
-    "siri_shortcuts_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Shortcuts Title"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Siri Kısayolları"
-          }
-        }
-      }
-    },
-    "siri_try_phrase": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try Phrase"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şunları Dene:"
           }
         }
       }
@@ -13154,6 +12365,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Veri bekleniyor"
+          }
+        }
+      }
+    },
+    "home_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz Hava"
+          }
+        }
+      }
+    },
+    "sensitivity_cold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cold Sensitive"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Üşümeye Duyarlı"
+          }
+        }
+      }
+    },
+    "sensitivity_hot": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heat Sensitive"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıcaklığa Duyarlı"
+          }
+        }
+      }
+    },
+    "sensitivity_normal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normal"
           }
         }
       }

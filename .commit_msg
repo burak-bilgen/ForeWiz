@@ -1,23 +1,10 @@
-feat: production-ready security hardening and UI polish
+fix: add missing localization keys and remove unused ones
 
-Security:
-- PrivacyInfo.xcprivacy: App Store required privacy manifest
-- SwiftData encryption: NSFileProtectionComplete on store files
-- Widget data encryption: AES-GCM encrypts all widget cached data
-- Widget key management: random 256-bit key in shared container
-- PII audit: location coords and revenue data marked .private in logs
-- Client-side throttling: WeatherKit rate limiter (30s min interval)
-- JSON deserialization validation: crash-safe decode with error logging
-
-UI Polish:
-- LiquidGlassCard: cool/neutral Apple-style frosted glass (removed yellowish tones)
-- ambientGradient: neutral cool tones for light/dark mode
-- Widget glass background: accent-color overlay removed, neutral white borders
-- ScoreRing: modern X/10 display with smooth animations
-- HeroCard: refined layout with integrated temperature display
-
-Localization:
-- Em dashes replaced with hyphens across all files
-- Key event notifications: numerical data removed, only event timing shown
-- Rain risk messages: merged format with time range and percentage
-- Ad localization strings: full EN + TR support
+- Added 38 missing L10n keys (weather_high, weather_humidity, weather_low,
+  chart_*, preview_*, recommendation_explain_*, recommendation_signal_*,
+  widget_*, risk_wind_strong, activity_running, recommendation_*_range)
+  with EN + TR translations
+- Removed 24 unused auto-generated English placeholder keys and
+  leftover refactored keys from Localizable.xcstrings
+- All keys verified against actual L10n.text()/L10n.formatted() usage
+  in Swift source files
