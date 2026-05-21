@@ -15,12 +15,24 @@ enum MorningBriefingPlanner {
         let preference = profile.notificationPreferences.first { $0.category == .morningBriefing }
         let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 0)
 
-        guard let fireDate = calendar.nextDate(
-            after: now,
-            matching: preferredTime,
-            matchingPolicy: .nextTime
-        ) else { return nil }
+        var matchingComponents = preferredTime
+        matchingComponents.calendar = calendar
+        matchingComponents.timeZone = calendar.timeZone
+        matchingComponents.second = 0
+        matchingComponents.nanosecond = 0
+        matchingComponents.year = calendar.component(.year, from: now)
+        matchingComponents.month = calendar.component(.month, from: now)
+        matchingComponents.day = calendar.component(.day, from: now)
 
+        guard var fireDate = matchingComponents.date else { return nil }
+
+        // If the computed date is before or equal to now, move to the next day
+        if fireDate <= now {
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: fireDate) else {
+                return nil
+            }
+            fireDate = nextDay
+        }
         let body = buildBody(recommendation: recommendation, now: now, calendar: calendar)
 
         return NotificationPlan(

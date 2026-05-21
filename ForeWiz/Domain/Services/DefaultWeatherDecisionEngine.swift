@@ -100,7 +100,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
 
         // All today's waking hours - 07:00 to 21:00 (21:30 sonrası dışarı önerilmez)
         let dayHours = hourly
-            .filter { calendar.isDateInToday($0.date) }
+            .filter { calendar.isDate($0.date, inSameDayAs: now) }
             .filter { hour in
                 let h = calendar.component(.hour, from: hour.date)
                 return (7...21).contains(h)
@@ -122,7 +122,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         ) else { return nil }
 
         // If the day's best window has already passed entirely, don't show it
-        guard recommendation.bestWindow.end > now else { return nil }
+        guard recommendation.bestWindow.end >= now else { return nil }
 
         return recommendation.bestWindow
     }
