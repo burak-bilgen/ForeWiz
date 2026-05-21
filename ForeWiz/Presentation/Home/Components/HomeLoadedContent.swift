@@ -6,6 +6,8 @@ struct HomeLoadedContent: View {
     let state: HomeViewState
     let contentReady: Bool
     let refresh: () async -> Void
+    
+    @State private var showNativeAd = false
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -42,16 +44,22 @@ struct HomeLoadedContent: View {
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
 
-                // 7. Ad banner — monetization
-                if AdManager.shared.canShowBanner() {
-                    GlassAdBanner(adUnit: .homeBanner)
+                // 7. Native ad — blends with content (shown after weekly forecast)
+                if showNativeAd {
+                    NativeAdCard(unit: .native)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.48)
                 }
 
-                // 8. Footer — attribution + last updated
+                // 8. Banner ad — anchored monetization
+                if AdManager.shared.canShow(.banner) {
+                    AdBannerView(unit: .banner)
+                        .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.56 : 0.48)
+                }
+
+                // 9. Footer — attribution + last updated
                 if let attribution = state.attribution {
                     CompactFooter(attribution: attribution, lastUpdatedText: state.lastUpdatedText)
-                        .cardEntrance(appeared: contentReady, baseDelay: 0.56)
+                        .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.64 : 0.56)
                 }
             }
             .padding(.horizontal, 20)
@@ -60,5 +68,16 @@ struct HomeLoadedContent: View {
         .scrollIndicators(.hidden)
         .safeAreaPadding(.bottom, 12)
         .refreshable { await refresh() }
+        .onAppear {
+            evaluateAdPlacement()
+        }
+    }
+    
+    private func evaluateAdPlacement() {
+        // Native ad: show after content consumption
+        if AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh) {
+            showNativeAd = true
+            AdPlacementStrategy.shared.recordAdShown(.native)
+        }
     }
 }

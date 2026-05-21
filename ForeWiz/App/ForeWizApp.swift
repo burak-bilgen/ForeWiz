@@ -13,6 +13,12 @@ struct ForeWizApp: App {
     init() {
         modelContainer = Self.makeModelContainer()
         BackgroundRefreshManager.shared.registerTasks()
+        
+        // Initialize ad system early
+        Task {
+            await AdManager.shared.initialize()
+            AdConsentManager.shared.updateConsentStatus()
+        }
     }
 
     private static func makeModelContainer() -> ModelContainer {
@@ -100,10 +106,23 @@ struct ForeWizApp: App {
         case .active:
             AppLifecycleManager.shared.applicationWillEnterForeground()
             AppLifecycleManager.shared.applicationDidBecomeActive()
+            AdPlacementStrategy.shared.sessionStarted()
+            
+            // Refresh expired ad caches periodically
+            Task {
+                await AdManager.shared.refreshExpiredCaches()
+            }
+            
+            // Check for app open ad opportunity
+            if AdPlacementStrategy.shared.shouldShowAppOpen() {
+                // App open ad would be shown here
+                AdPlacementStrategy.shared.recordAdShown(.appOpen)
+            }
         case .inactive:
             AppLifecycleManager.shared.applicationWillResignActive()
         case .background:
             AppLifecycleManager.shared.applicationDidEnterBackground()
+            AdPlacementStrategy.shared.sessionEnded()
         @unknown default:
             break
         }
