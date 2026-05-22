@@ -18,13 +18,12 @@ struct ForeWizApp: App {
         // Set up WizPathKit localization bridge
         WizPathKitL10n.provider = ForeWizL10nProvider()
         
-        // Initialize ad system early
-        Task {
-            await AdManager.shared.initialize()
+        // Initialize consent before the ad SDK makes any request.
+        Task { @MainActor in
             AdConsentManager.shared.updateConsentStatus()
-            
-            // Initialize AdMob SDK
+            await AdConsentManager.shared.prepareConsentIfNeeded()
             await AdMobIntegration.shared.initializeSDK()
+            await AdManager.shared.initialize()
         }
     }
 
@@ -145,11 +144,14 @@ struct ForeWizApp: App {
             
             // Refresh expired ad caches periodically
             Task {
-                await AdManager.shared.refreshExpiredCaches()
+                if AdConsentManager.shared.canServeAds {
+                    await AdManager.shared.refreshExpiredCaches()
+                }
             }
             
             // Show app open ad at natural transition point
-            if AdPlacementStrategy.shared.shouldShowAppOpen(),
+            if AdConsentManager.shared.canServeAds,
+               AdPlacementStrategy.shared.shouldShowAppOpen(),
                let rootVC = UIApplication.shared.connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
                 .first?

@@ -3,6 +3,7 @@ import Testing
 @testable import ForeWiz
 
 @MainActor
+@Suite(.serialized)
 struct AdManagerTests {
     let manager = AdManager.shared
     
@@ -42,17 +43,14 @@ struct AdManagerTests {
         }
     }
     
-    @Test("canShow returns false for uncached ad units")
+    @Test("canShow returns false for uncached non-banner ad units")
     func canShowForUncachedUnits() {
         resetAllState()
         
-        // Without caching, only banner should potentially show (banner doesn't require cache)
+        // Non-banner units must always return false when uncached, regardless of consent
         for unit in AdManager.AdUnit.allCases {
             let canShow = manager.canShow(unit)
-            if unit == .banner {
-                // Banner doesn't require cache check
-                #expect(canShow == true)
-            } else {
+            if unit != .banner {
                 #expect(canShow == false, "\(unit.rawValue) should not be showable without cache")
             }
         }

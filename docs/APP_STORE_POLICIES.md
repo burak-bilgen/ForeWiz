@@ -8,14 +8,14 @@
 ## 📜 Privacy Policy
 
 **For App Store Connect → App Privacy → Privacy Policy URL**
-Host this document on your website (e.g., `https://bilgenworks.com/forewiz/privacy`) or use a
+Host this document on your website (e.g., `https://forewiz.app/privacy`) or use a
 privacy policy generator service.
 
 ---
 
 ### ForeWiz Privacy Policy
 
-**Last updated:** May 21, 2026
+**Last updated:** May 22, 2026
 
 #### 1. Data Collection & Usage
 
@@ -24,9 +24,9 @@ to provide weather-adaptive decision recommendations.
 
 | Data Type | Collected | Purpose | Third-Party Sharing |
 |-----------|-----------|---------|-------------------|
-| **Location** | Yes (foreground only) | To fetch local weather data from Apple WeatherKit | Never |
-| **Preferences** | Yes | App settings (language, accent color, notification prefs, saved locations) — stored on-device only | Never |
-| **Usage Data / Analytics** | **No** | ForeWiz does **not** include any analytics SDK, telemetry, or tracking code | N/A |
+| **Location** | Yes (foreground only) | To fetch local weather, route weather, maps, and nearby route places | Apple WeatherKit / MapKit |
+| **Preferences** | Yes | App settings (language, accent color, notification prefs, saved locations) — stored on-device/app group only | Never |
+| **Usage Data / Analytics** | Limited | Local app/ad performance events; no third-party analytics SDK | Not sold; AdMob receives ad interaction data for ad delivery |
 | **Advertising ID (IDFA)** | Yes (with consent) | Used by Google AdMob for personalized ad delivery | Google (via AdMob SDK) |
 | **Crash Reports** | **No** | No crash reporting SDK is integrated | N/A |
 | **Diagnostics** | **No** | No diagnostic data collection | N/A |
@@ -51,7 +51,8 @@ ForeWiz uses **Google AdMob** for monetization. The following applies:
 - **Network Connections:** The app connects only to:
   - Apple WeatherKit (weather data)
   - Google AdMob (ad delivery, with user consent)
-  - Apple MapKit (map tiles for WizPath route planning)
+  - Google UMP (ad consent forms/privacy options)
+  - Apple MapKit (map tiles, route planning, local search for WizPath)
 
 #### 4. Children's Privacy
 
@@ -67,7 +68,7 @@ Since all user data is stored on-device:
 
 #### 6. Contact
 
-For privacy questions: [your-email@example.com]
+For privacy questions: [support@forewiz.app]
 
 ---
 
@@ -95,7 +96,7 @@ Use this checklist when filling out the App Store Connect privacy questionnaire:
 | **Browsing History** | ❌ No | — | — |
 | **Device ID** | ✅ Yes (IDFA) | Third-Party Advertising | Yes (AdMob) |
 | **Purchase History** | ❌ No | — | — |
-| **Usage Data** | ❌ No | — | — |
+| **Product Interaction** | ✅ Yes | App Functionality / Advertising Performance | No |
 | **Crash Data** | ❌ No | — | — |
 | **Performance Data** | ❌ No | — | — |
 | **Diagnostics** | ❌ No | — | — |
@@ -123,7 +124,7 @@ Use this checklist when filling out the App Store Connect privacy questionnaire:
 | App preview video (optional) | ⬜ | Recommended for decision engine demo |
 | Privacy policy URL | ✅ | Host the document from Section 1 |
 | Age rating | ⬜ | See Section 2.3 |
-| Export compliance (ITSAppUsesNonExemptEncryption) | ⬜ | Set to NO (AdMob uses HTTPS only) |
+| Export compliance (ITSAppUsesNonExemptEncryption) | ✅ | Set to NO for exempt-only encryption |
 | Content rights (if any third-party content) | ✅ | Weather data from Apple, maps from Apple |
 
 ### 2.0 — Technical Requirements
@@ -145,8 +146,8 @@ Use this checklist when filling out the App Store Connect privacy questionnaire:
 
 | Key | Value | Status |
 |-----|-------|--------|
-| `NSLocationWhenInUseUsageDescription` | "ForeWiz uses your location to fetch local weather data." | ✅ |
-| `NSUserTrackingUsageDescription` | "We show personalized ads with your permission. Data is shared with AdMob." | ✅ |
+| `NSLocationWhenInUseUsageDescription` | "We use your location solely to provide weather recommendations tailored to where you are." | ✅ |
+| `NSUserTrackingUsageDescription` | "Your permission allows ForeWiz and our ad partner Google AdMob to use device identifiers to show more relevant ads and help keep the app free." | ✅ |
 | `CFBundleDisplayName` | ForeWiz | ✅ |
 | `BGTaskSchedulerPermittedIdentifiers` | Background weather refresh | ✅ |
 
@@ -198,11 +199,11 @@ In App Store Connect → App Information → Export Compliance:
 
 | Question | Answer | Reason |
 |----------|--------|--------|
-| Does your app use encryption? | **No** | AdMob uses standard HTTPS; no custom encryption |
-| Does your app qualify for exemption? | Yes | Category 5, Note 3 — apps using only HTTPS qualify |
-| Has your app been authorized for encryption? | N/A | No encryption used |
+| Does your app use encryption? | **Yes, exempt only** | HTTPS plus local AES-GCM encryption for widget app-group data |
+| Does your app qualify for exemption? | Yes | Standard network encryption and on-device data protection are exempt/non-exempt-free use cases |
+| Has your app been authorized for encryption? | N/A | No non-exempt encryption |
 
-**Set `ITSAppUsesNonExemptEncryption` to `NO`** in Info.plist.
+**Keep `ITSAppUsesNonExemptEncryption` set to `NO`** in Info.plist because the app does not use non-exempt encryption.
 
 ---
 
@@ -260,10 +261,10 @@ Smarter than weather. Good for decisions.
 
 ## 📄 Export Compliance Documentation
 
-No export compliance documentation is needed because:
-- ForeWiz does not implement custom encryption
-- All network communication uses standard HTTPS/TLS
-- Apple's automatic encryption exemption applies (CAT5NOTE3)
+No non-exempt export compliance documentation is needed because:
+- ForeWiz uses standard HTTPS/TLS plus local AES-GCM protection for widget app-group data
+- The encryption is for standard network security and on-device data protection
+- Apple's automatic encryption exemption applies for this use case (CAT5NOTE3)
 
 ---
 

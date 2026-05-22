@@ -41,9 +41,15 @@ final class AdMobRewardedIntegration {
         adUnitID: String,
         completion: @escaping (Bool) -> Void
     ) {
+        guard AdConsentManager.shared.canServeAds,
+              AdMobIntegration.shared.isSDKInitialized else {
+            completion(false)
+            return
+        }
+
         RewardedAd.load(
             with: adUnitID,
-            request: Request()
+            request: AdMobIntegration.shared.makeAdRequest()
         ) { [weak self] ad, error in
             if let error = error {
                 AppLogger.app.error("[AdMob] Rewarded ad load failed: \(error.localizedDescription)")
@@ -70,6 +76,11 @@ final class AdMobRewardedIntegration {
         onRewardGranted: @escaping (RewardConfig) -> Void,
         onRewardFailed: @escaping () -> Void
     ) -> Bool {
+        guard AdConsentManager.shared.canServeAds else {
+            onRewardFailed()
+            return false
+        }
+
         guard let rewardedAd = rewardedAd else {
             AppLogger.app.info("[AdMob] No rewarded ad available")
             onRewardFailed()
@@ -120,9 +131,15 @@ final class AdMobRewardedIntegration {
         adUnitID: String,
         completion: @escaping (Bool) -> Void
     ) {
+        guard AdConsentManager.shared.canServeAds,
+              AdMobIntegration.shared.isSDKInitialized else {
+            completion(false)
+            return
+        }
+
         RewardedInterstitialAd.load(
             with: adUnitID,
-            request: Request()
+            request: AdMobIntegration.shared.makeAdRequest()
         ) { [weak self] ad, error in
             if let error = error {
                 AppLogger.app.error("[AdMob] Rewarded interstitial load failed: \(error.localizedDescription)")
@@ -150,6 +167,11 @@ final class AdMobRewardedIntegration {
         onRewardGranted: @escaping (RewardConfig) -> Void,
         onRewardFailed: @escaping () -> Void
     ) -> Bool {
+        guard AdConsentManager.shared.canServeAds else {
+            onRewardFailed()
+            return false
+        }
+
         guard let rewardedInterstitialAd = rewardedInterstitialAd else {
             AppLogger.app.info("[AdMob] No rewarded interstitial ad available")
             onRewardFailed()

@@ -49,6 +49,11 @@ final class AdMobIntegration {
         onSuccess: @escaping () -> Void,
         onFailure: @escaping () -> Void
     ) {
+        guard canRequestAd() else {
+            onFailure()
+            return
+        }
+
         // Get root VC for banner loading
         guard let rootVC = rootViewController() else {
             onFailure()
@@ -71,8 +76,7 @@ final class AdMobIntegration {
             }
         }
         
-        let request = Request()
-        bannerView.load(request)
+        bannerView.load(makeAdRequest())
         AppLogger.app.info("[AdMob] Banner ad loading...")
     }
     
@@ -95,6 +99,11 @@ final class AdMobIntegration {
         adUnitID: String,
         completion: @escaping (NativeAd?) -> Void
     ) {
+        guard canRequestAd() else {
+            completion(nil)
+            return
+        }
+
         guard let rootVC = rootViewController() else {
             completion(nil)
             return
@@ -115,7 +124,7 @@ final class AdMobIntegration {
             completion(nil)
         }
         
-        adLoader?.load(Request())
+        adLoader?.load(makeAdRequest())
         AppLogger.app.info("[AdMob] Loading native ad...")
     }
     
@@ -125,6 +134,11 @@ final class AdMobIntegration {
         rootViewController: UIViewController,
         completion: @escaping ([NativeAd]) -> Void
     ) {
+        guard canRequestAd() else {
+            completion([])
+            return
+        }
+
         currentNativeAds.removeAll()
         
         adLoader = AdLoader(
@@ -140,7 +154,7 @@ final class AdMobIntegration {
             completion(ads)
         }
         
-        adLoader?.load(Request())
+        adLoader?.load(makeAdRequest())
         AppLogger.app.info("[AdMob] Loading native ads...")
     }
     
@@ -151,9 +165,14 @@ final class AdMobIntegration {
         adUnitID: String,
         completion: @escaping (InterstitialAd?) -> Void
     ) {
+        guard canRequestAd() else {
+            completion(nil)
+            return
+        }
+
         InterstitialAd.load(
             with: adUnitID,
-            request: Request()
+            request: makeAdRequest()
         ) { [weak self] ad, error in
             if let error = error {
                 AppLogger.app.error("[AdMob] Interstitial load failed: \(error.localizedDescription)")
@@ -175,6 +194,7 @@ final class AdMobIntegration {
         from viewController: UIViewController,
         onDismiss: @escaping () -> Void
     ) -> Bool {
+        guard AdConsentManager.shared.canServeAds else { return false }
         guard let interstitialAd = currentInterstitialAd else {
             AppLogger.app.info("[AdMob] No interstitial ad available")
             return false
@@ -200,9 +220,14 @@ final class AdMobIntegration {
         adUnitID: String,
         completion: @escaping (AppOpenAd?) -> Void
     ) {
+        guard canRequestAd() else {
+            completion(nil)
+            return
+        }
+
         AppOpenAd.load(
             with: adUnitID,
-            request: Request()
+            request: makeAdRequest()
         ) { [weak self] ad, error in
             if let error = error {
                 AppLogger.app.error("[AdMob] App open load failed: \(error.localizedDescription)")
@@ -223,6 +248,7 @@ final class AdMobIntegration {
         from viewController: UIViewController,
         onDismiss: @escaping () -> Void
     ) -> Bool {
+        guard AdConsentManager.shared.canServeAds else { return false }
         guard let appOpenAd = currentAppOpenAd else {
             AppLogger.app.info("[AdMob] No app open ad available")
             return false
@@ -242,6 +268,32 @@ final class AdMobIntegration {
     }
     
     // MARK: - Helpers
+
+    func makeAdRequest() -> Request {
+        let request = Request()
+
+        if !AdConsentManager.shared.canServePersonalizedAds {
+            let extras = Extras()
+            extras.additionalParameters = ["npa": "1"]
+            request.register(extras)
+        }
+
+        return request
+    }
+
+    private func canRequestAd() -> Bool {
+        guard AdConsentManager.shared.canServeAds else {
+            AppLogger.app.info("[AdMob] Ad request skipped because consent is not ready")
+            return false
+        }
+
+        guard isSDKInitialized else {
+            AppLogger.app.info("[AdMob] Ad request skipped because SDK is not initialized")
+            return false
+        }
+
+        return true
+    }
     
     private func rootViewController() -> UIViewController? {
         UIApplication.shared.connectedScenes
@@ -293,14 +345,14 @@ final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
     }
     
     nonisolated func bannerViewDidRecordImpression(_ bannerView: BannerView) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AdManager.shared.recordImpression(.banner)
             AdRevenueTracker.shared.recordImpression(unit: .banner)
         }
     }
     
     nonisolated func bannerViewDidRecordClick(_ bannerView: BannerView) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AdManager.shared.recordClick(.banner)
             AdRevenueTracker.shared.recordClick(unit: .banner)
         }
@@ -360,14 +412,14 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
 
 extension AdMobNativeLoaderDelegate: NativeAdDelegate {
     nonisolated func nativeAdDidRecordImpression(_ nativeAd: NativeAd) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AdManager.shared.recordImpression(.native)
             AdRevenueTracker.shared.recordImpression(unit: .native)
         }
     }
     
     nonisolated func nativeAdDidRecordClick(_ nativeAd: NativeAd) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AdManager.shared.recordClick(.native)
             AdRevenueTracker.shared.recordClick(unit: .native)
         }
@@ -383,7 +435,7 @@ final class AdMobInterstitialDelegate: NSObject, FullScreenContentDelegate {
     var onAdDismissed: (() -> Void)?
     
     nonisolated func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AppLogger.app.error("[AdMob] Interstitial failed to present: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.interstitial, error: error)
         }
@@ -412,7 +464,7 @@ final class AdMobAppOpenDelegate: NSObject, FullScreenContentDelegate {
     var onAdDismissed: (() -> Void)?
     
     nonisolated func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AppLogger.app.error("[AdMob] App open failed to present: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.appOpen, error: error)
         }

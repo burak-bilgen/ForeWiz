@@ -164,9 +164,11 @@ final class AdManager {
         AppLogger.app.info("[Ads] Running in TEST MODE with test ad unit IDs")
         #endif
         
-        // Preload ads on launch
-        if Config.preloadOnLaunch {
+        // Preload only after the ad SDK and consent layer are ready.
+        if Config.preloadOnLaunch, AdConsentManager.shared.canServeAds {
             await preloadAllAds()
+        } else {
+            AppLogger.app.info("[Ads] Initial preload skipped until consent is ready")
         }
         
         isInitialized = true
@@ -179,6 +181,11 @@ final class AdManager {
     
     /// Preload all ad formats for zero-latency display
     func preloadAllAds() async {
+        guard AdConsentManager.shared.canServeAds else {
+            AppLogger.app.info("[Ads] Preload skipped because ad consent is not ready")
+            return
+        }
+
         await withTaskGroup(of: Void.self) { group in
             group.addTask { await self.preloadBanner() }
             group.addTask { await self.preloadNative() }
@@ -285,6 +292,11 @@ final class AdManager {
     
     /// Check if an ad can be shown (respects frequency caps and cooldowns)
     func canShow(_ unit: AdUnit) -> Bool {
+        guard AdConsentManager.shared.canServeAds else {
+            AppLogger.app.info("[Ads] Ad blocked because consent is not ready")
+            return false
+        }
+
         // Check fatigue prevention
         guard AdFatiguePrevention.shared.shouldShowAd() else {
             AppLogger.app.warning("[Ads] Ad blocked by fatigue prevention")
@@ -475,6 +487,8 @@ final class AdManager {
     // MARK: - Helper
     
     private func canLoad(_ unit: AdUnit) -> Bool {
+        guard AdConsentManager.shared.canServeAds else { return false }
+        guard AdMobIntegration.shared.isSDKInitialized else { return false }
         guard !isAdCached(unit) else { return false }
         return dailyImpressions[unit, default: 0] < unit.maxImpressionsPerDay
     }

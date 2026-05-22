@@ -2,6 +2,7 @@ import Testing
 @testable import ForeWiz
 
 @MainActor
+@Suite(.serialized)
 struct AdLoadingManagerTests {
     let manager = AdLoadingManager.shared
     
