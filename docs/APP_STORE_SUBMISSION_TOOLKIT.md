@@ -79,29 +79,29 @@ Apple WeatherKit ile güçlendirilen ForeWiz, ham tahmin verilerini size özel, 
 
 Öne Çıkan Özellikler:
 
-🧠 AKILLI KARAR MOTORU
+AKILLI KARAR MOTORU
 * Kişiselleştirilmiş Hava Skoru: Sıcaklık, rüzgâr, UV ve neme göre gününüzün ne kadar konforlu geçeceğini gösteren 0-100 arası net bir puan alın.
 * En İyi Aktivite Saatleri: Koşu, bisiklet, yürüyüş veya dışarıda yemek için günün en ideal saat aralıklarını bulun.
 * Kıyafet Önerileri: Kararsızlığa son. Hissedilen sıcaklığa göre en uygun kıyafet kombinasyonu tavsiyelerine ulaşın.
 
-🏥 SAĞLIK & YAŞAM ANALİZLERİ
+SAĞLIK & YAŞAM ANALİZLERİ
 * Hava Durumu ve Vücudunuz: Değişen hava koşullarının fiziksel durumunuzu nasıl etkileyeceğini öğrenin.
 * Özel Hesaplayıcılar: Migren tetikleyicileri, eklem ağrıları, uyku kalitesi, solunum konforu ve dayanıklılık seviyeleri için proaktif risk skorları alın.
 * Koruyucu Sağlık Tavsiyeleri: Beklenmedik hava değişimlerine karşı vücudunuzu hazırlamanıza yardımcı olacak pratik öneriler.
 
-🗺️ WIZPATH — HAVA DURUMUNA DUYARLI ROTA PLANLAYICI
+WIZPATH — HAVA DURUMUNA DUYARLI ROTA PLANLAYICI
 * Yol Boyunca Hava: Rota üzerindeki hava koşullarını renk kodlu güvenlik katmanlarıyla (Yeşil = Güvenli, Turuncu = Dikkat, Kırmızı = Tehlikeli) doğrudan haritada görün.
 * Semt İsimleri ve Detaylar: Havanın tam olarak nerede değişeceğini (örneğin Kadıköy, Levent) akıllı ters coğrafi kodlama desteğiyle anında öğrenin.
 * Premium Harita Entegrasyonu: Apple Haritalar veya Google Haritalar'a eşit boyutlu, dokunsal geri bildirimli butonlarla tek dokunuşla geçiş yapın.
 * Akıllı Kalkış Planlayıcı: Şiddetli yağış, fırtına veya sıcaklık dalgalarından kaçınmak için yola çıkabileceğiniz en doğru zamanı bulun.
 * Önemli Bilgilendirme Kartı: Seyahatlerinizi halka açık harita kaynaklarını doğrulayarak güvenceye alan yasal bilgi kartıyla yola güvenle çıkın.
 
-🎨 LIQUID GLASS TASARIM SİSTEMİ
+LIQUID GLASS TASARIM SİSTEMİ
 * Canlı Arka Planlar: Yerel hava durumuna göre dinamik olarak renk değiştiren akışkan cam (glassmorphism) ve hareketli ışık küreleri ekranınızı canlandırır.
 * Dokunsal Geri Bildirim: Premium butonlar, yay etkili basış animasyonları ve pürüzsüz geçişlerle etkileşimi hissedin.
 * Göz Alıcı Karanlık Tema: Modern, gözü yormayan ve premium bir estetik için özel olarak tasarlandı.
 
-🔒 GİZLİLİK ODAKLI
+GİZLİLİK ODAKLI
 * Verileriniz sizde kalır. Üyelik gerektirmez, kullanım analizi toplamaz ve arka planda konumunuzu asla izlemez. Konum verileriniz sadece anlık hava tahminini getirmek için cihazınızda güvenli bir şekilde işlenir.
 
 ForeWiz, odağınızı bozmayan, kullanıcı deneyimine saygılı ve tamamen ücretsiz bir uygulamadır.

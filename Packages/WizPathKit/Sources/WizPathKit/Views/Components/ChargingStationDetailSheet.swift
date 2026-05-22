@@ -344,7 +344,6 @@ struct PremiumGlassMapButton: View {
                 Text(title)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
                     .minimumScaleFactor(0.8)
                 
                 Spacer(minLength: 0)

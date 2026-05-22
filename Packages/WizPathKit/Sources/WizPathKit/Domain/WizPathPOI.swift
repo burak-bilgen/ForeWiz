@@ -64,7 +64,7 @@ public enum POICategory: String, Sendable {
 
     public var iconName: String {
         switch self {
-        case .gasStation: return "fuel.pump.fill"
+        case .gasStation: return "fuelpump.fill"
         case .evCharger: return "bolt.car.fill"
         case .restStop: return "bed.double.fill"
         case .restaurant: return "fork.knife"
