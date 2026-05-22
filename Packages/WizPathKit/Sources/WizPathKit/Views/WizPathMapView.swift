@@ -32,22 +32,41 @@ public struct WizPathMapView: View {
                 ForEach(changePoints) { segment in
                     if let weather = segment.weather {
                         let placeName = viewModel.segmentPlaceNames[segment.id]
-                        let labelText = placeName.map { "\($0) · \(segment.etaDisplay)" } ?? segment.etaDisplay
                         Annotation(coordinate: segment.coordinate) {
                             Button {
                                 viewModel.selectedWeatherSegment = segment
                                 viewModel.showWeatherDetail = true
                                 HapticEngine.shared.light()
                             } label: {
-                                WizPathWeatherMarker(weather: weather, eta: labelText)
+                                WizPathWeatherMarker(weather: weather, eta: segment.etaDisplay)
                             }
                             .contentShape(Rectangle())
                             .buttonStyle(.plain)
                         } label: {
-                            Text(labelText)
-                                .font(.system(size: 9, weight: .medium))
+                            if let placeName {
+                                Text(placeName)
+                                    .font(.system(size: 9, weight: .medium))
+                                    .lineLimit(1)
+                            }
                         }
                     }
+                }
+            }
+            ForEach(viewModel.chargingStations) { station in
+                Annotation(coordinate: station.coordinate) {
+                    Button {
+                        viewModel.selectedChargingStation = station
+                        viewModel.showChargingStationDetail = true
+                        HapticEngine.shared.light()
+                    } label: {
+                        SmartStopMarker(category: station.category)
+                    }
+                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                } label: {
+                    Text(station.displayTitle)
+                        .font(.system(size: 8, weight: .medium))
+                        .lineLimit(1)
                 }
             }
             if let origin = viewModel.originCoordinate, viewModel.currentRoute != nil {
@@ -170,5 +189,37 @@ public struct WizPathWeatherMarker: View {
         }
         .scaleEffect(isVisible ? 1 : 0.5).opacity(isVisible ? 1 : 0)
         .onAppear { withAnimation(AppTheme.pressSpring.delay(0.15)) { isVisible = true } }
+    }
+}
+
+// MARK: - EV Charger Marker
+
+// MARK: - Smart Stop Marker
+
+public struct SmartStopMarker: View {
+    let category: POICategory
+    @State private var isVisible = false
+
+    public init(category: POICategory) {
+        self.category = category
+    }
+
+    public var body: some View {
+        let catColor = Color(hex: category.color)
+        ZStack {
+            Circle()
+                .fill(catColor.opacity(0.2))
+                .frame(width: isVisible ? 30 : 20, height: isVisible ? 30 : 20)
+            Circle()
+                .stroke(catColor.opacity(0.75), lineWidth: 1)
+                .frame(width: isVisible ? 26 : 18, height: isVisible ? 26 : 18)
+            Image(systemName: category.iconName)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(catColor)
+                .shadow(color: catColor.opacity(0.4), radius: 2)
+        }
+        .scaleEffect(isVisible ? 1 : 0.5)
+        .opacity(isVisible ? 1 : 0)
+        .onAppear { withAnimation(AppTheme.pressSpring.delay(0.1)) { isVisible = true } }
     }
 }

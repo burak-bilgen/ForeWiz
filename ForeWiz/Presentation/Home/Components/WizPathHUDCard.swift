@@ -1,21 +1,16 @@
 import SwiftUI
-
-// MARK: - Shared HUD Status
-@Observable
-final class WizPathHUDStatus {
-    static let shared = WizPathHUDStatus()
-    var currentStatus: RouteStatus = .noRoute
-    private init() {}
-}
+import WizPathKit
 
 // MARK: - WizPath HUD Card - Liquid Glass Premium
 /// Home screen entry point for WizPath with Liquid Glass aesthetic.
-/// Features animated glass background, pulse glow, and haptic feedback.
+/// Features rotating glowing borders, breathing warning overlays, and custom interactive springs.
 struct WizPathHUDCard: View {
     let routeStatus: RouteStatus
     let onTap: () -> Void
 
     @State private var isPressed = false
+    @State private var rotationAngle = 0.0
+    @State private var pulseScale = 1.0
 
     var body: some View {
         Button(action: {
@@ -28,6 +23,15 @@ struct WizPathHUDCard: View {
                     Circle()
                         .fill(accentColor.opacity(0.18))
                         .frame(width: 44, height: 44)
+                    
+                    // Breathing aura for warnings/alerts
+                    if isAlertActive {
+                        Circle()
+                            .stroke(accentColor.opacity(0.4), lineWidth: 1.5)
+                            .scaleEffect(pulseScale)
+                            .opacity(2.0 - pulseScale)
+                    }
+                    
                     Image(systemName: routeStatus.iconName)
                         .font(.system(size: 20, weight: .medium))
                         .symbolRenderingMode(.hierarchical)
@@ -60,28 +64,54 @@ struct WizPathHUDCard: View {
                     .fill(.ultraThinMaterial)
                     .environment(\.colorScheme, .dark)
             )
+            // Premium rotating glass border mapping
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(accentColor.opacity(0.25), lineWidth: 1)
+                    .stroke(
+                        AngularGradient(
+                            colors: [accentColor.opacity(0.55), .clear, accentColor.opacity(0.55), .clear, accentColor.opacity(0.55)],
+                            center: .center,
+                            angle: .degrees(rotationAngle)
+                        ),
+                        lineWidth: 1.2
+                    )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .stroke(.white.opacity(0.06), lineWidth: 1)
             )
-            .scaleEffect(isPressed ? 0.97 : 1.0)
+            // High-fidelity dynamic drop shadows
+            .shadow(color: accentColor.opacity(isPressed ? 0.12 : 0.22), radius: isPressed ? 6 : 14, x: 0, y: isPressed ? 3 : 6)
+            .scaleEffect(isPressed ? 0.96 : 1.0)
         }
         .contentShape(Rectangle())
-
         .buttonStyle(.plain)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } }
-                .onEnded { _ in withAnimation(.easeInOut(duration: 0.1)) { isPressed = false } }
+                .onEnded { _ in withAnimation(.easeInOut(duration: 0.15)) { isPressed = false } }
         )
         .frame(minHeight: 48)
+        .onAppear {
+            // Smooth, low-CPU infinite rotation for border glow
+            withAnimation(.linear(duration: 6.0).repeatForever(autoreverses: false)) {
+                rotationAngle = 360.0
+            }
+            // Breathing animation for hazard warning icons
+            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
+                pulseScale = 1.45
+            }
+        }
     }
 
     // MARK: - Computed Properties
+
+    private var isAlertActive: Bool {
+        switch routeStatus {
+        case .warning, .critical: return true
+        case .optimal, .noRoute: return false
+        }
+    }
 
     private var accentColor: Color {
         switch routeStatus {
@@ -111,23 +141,7 @@ struct WizPathHUDCard: View {
     }
 }
 
-// MARK: - Route Status
-
-enum RouteStatus: Equatable {
-    case optimal(destination: String, eta: String)
-    case warning(destination: String, hazard: String, eta: String)
-    case critical(destination: String, hazard: String)
-    case noRoute
-
-    var iconName: String {
-        switch self {
-        case .optimal: return "car.fill"
-        case .warning: return "exclamationmark.triangle.fill"
-        case .critical: return "xmark.octagon.fill"
-        case .noRoute: return "mappin.and.ellipse"
-        }
-    }
-}
+// RouteStatus enum is imported from WizPathKit
 
 // MARK: - Preview
 
@@ -143,3 +157,4 @@ enum RouteStatus: Equatable {
         .padding()
     }
 }
+
