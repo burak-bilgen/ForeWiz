@@ -60,13 +60,20 @@ public final class WizPathHUDStatus {
 public final class WizPathViewModel {
     // MARK: - Dependencies
     private let wizPathService: WizPathService
+    private let departureOptimizerService: DepartureOptimizerService?
     private let climateService = WizPathClimateService.shared
     private let sentinelService = WizPathSentinelService.shared
+    private let cyclingSafetyService = WizPathCyclingSafetyService.shared
 
     // MARK: - State
     public var state: WizPathViewState = .idle
     public var travelMode: TravelMode = .car
-    public var departureTime: Date = Date()
+    public var departureTime: Date = {
+        // Default to next hour, clamped to today/tomorrow
+        let now = Date()
+        let nextHour = Calendar.current.date(byAdding: .hour, value: 1, to: now) ?? now
+        return nextHour
+    }()
     public var destinationName: String = ""
     public var destinationCoordinate: CLLocationCoordinate2D?
     public var originCoordinate: CLLocationCoordinate2D?
@@ -80,10 +87,19 @@ public final class WizPathViewModel {
     public var isOnline = true
     public var bestDepartureTime: Date?
     public var departureTimeReason: String?
+    public var cyclingSafetyAnalysis: WizPathCyclingSafetyService.CyclingSafetyAnalysis?
+    public var cyclingSafetyRecommendations: [HealthRecommendation] = []
 
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
     public var didLoadInitialLocation = false
+    // Auto-refresh timer for traffic updates
+    private var refreshTimer: Task<Void, Never>?
+    private var isAutoRefreshing = false
+    public var selectedWeatherSegment: WizPathSegment?
+    public var showWeatherDetail = false
+    /// Resolved place names for weather change point segments (segment.id → place name)
+    public var segmentPlaceNames: [UUID: String] = [:]
 
     // MARK: - Computed
     public var canCalculate: Bool { destinationCoordinate != nil && !state.isCalculating && isOnline }
@@ -95,8 +111,9 @@ public final class WizPathViewModel {
     public var overallRisk: RouteRisk { currentRoute?.overallRisk ?? .good }
 
     // MARK: - Init
-    public init(wizPathService: WizPathService) {
+    public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil) {
         self.wizPathService = wizPathService
+        self.departureOptimizerService = departureOptimizerService
         loadCurrentLocation()
         loadRecentDestinations()
     }
@@ -141,16 +158,49 @@ public final class WizPathViewModel {
     // MARK: - Route Calculation
 
     public func calculateRoute() async {
-        guard isOnline else { state = .offline; return }
+        guard isOnline else {
+            if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
+                state = .routeReady(lastRoute)
+            } else {
+                state = .offline
+            }
+            isAutoRefreshing = false
+            return
+        }
         guard let origin = originCoordinate, let destination = destinationCoordinate else {
-            state = .error(WizPathKitL10n.text("wizpath_error_no_destination"))
+            if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
+                state = .routeReady(lastRoute)
+            } else {
+                state = .error(WizPathKitL10n.text("wizpath_error_no_destination"))
+            }
+            isAutoRefreshing = false
             return
         }
         state = .calculating
-        HapticEngine.shared.medium()
+        if !isAutoRefreshing { HapticEngine.shared.medium() }
         do {
             let route = try await wizPathService.calculateRoute(origin: origin, destination: destination, mode: travelMode, departureTime: departureTime)
             climateAnalysis = climateService.analyzeRouteClimate(route, travelMode: travelMode)
+                // Analyze cycling safety if applicable
+            if travelMode == .cycling {
+                cyclingSafetyAnalysis = cyclingSafetyService.analyzeCyclingSafety(route: route)
+                // Add health recommendations from climate service (hydration, crosswind, wet roads)
+                let winds = route.segments.compactMap { $0.weather?.windSpeed }
+                let temps = route.segments.compactMap { $0.weather?.temperature }
+                let precips = route.segments.compactMap { $0.weather?.precipitationChance }
+                let avgWind = winds.reduce(0, +) / Double(max(1, winds.count))
+                let avgTemp = temps.reduce(0, +) / Double(max(1, temps.count))
+                let maxPrecip = precips.max() ?? 0
+                cyclingSafetyRecommendations = climateService.getCyclingSafetyRecommendations(
+                    windSpeed: avgWind,
+                    temperature: avgTemp,
+                    precipitationChance: maxPrecip
+                )
+            } else {
+                cyclingSafetyAnalysis = nil
+                cyclingSafetyRecommendations = []
+            }
+            
             if let previousRoute = lastCalculatedRoute {
                 let routeConditions = route.segments.compactMap { $0.weather?.condition }
                 let worstCondition = routeConditions.max(by: { $0.severity.severityOrder < $1.severity.severityOrder })
@@ -175,45 +225,86 @@ public final class WizPathViewModel {
             }
             lastCalculatedRoute = route
             updateRouteStatus(for: route)
-            analyzeBestDepartureTime(route: route)
+            await analyzeBestDepartureTime(route: route)
             state = .routeReady(route)
             showJourneyHUD = true
-            HapticEngine.shared.success()
+            if !isAutoRefreshing { HapticEngine.shared.success() }
+            startAutoRefresh()
+            
+            // Resolve place names for weather change points (async, non-blocking)
+            Task {
+                let changePoints = route.weatherChangePoints
+                let names = await GeocodingHelper.shared.resolvePlaceNames(for: changePoints)
+                segmentPlaceNames = names
+            }
             AppLogger.wizPath.info("Route calculated: \(route.totalDuration)s, risk: \(route.overallRisk.rawValue)")
         } catch let error as WizPathError {
-            state = .error(error.localizedDescription)
-            HapticEngine.shared.warning()
+            if isAutoRefreshing {
+                AppLogger.wizPath.warning("Auto-refresh failed (keeping old route): \(error.localizedDescription)")
+                if let lastRoute = lastCalculatedRoute {
+                    state = .routeReady(lastRoute)
+                }
+            } else {
+                state = .error(error.localizedDescription)
+                HapticEngine.shared.warning()
+            }
         } catch {
             AppLogger.wizPath.error("Route calculation failed: \(error.localizedDescription)")
-            state = .error(WizPathKitL10n.text("wizpath_error_route_failed"))
-            HapticEngine.shared.error()
+            if isAutoRefreshing {
+                AppLogger.wizPath.warning("Auto-refresh failed (keeping old route): \(error.localizedDescription)")
+                if let lastRoute = lastCalculatedRoute {
+                    state = .routeReady(lastRoute)
+                }
+            } else {
+                state = .error(WizPathKitL10n.text("wizpath_error_route_failed"))
+                HapticEngine.shared.error()
+            }
         }
+        isAutoRefreshing = false
     }
 
     // MARK: - Departure Time Optimization
 
-    private func analyzeBestDepartureTime(route: WizPathRoute) {
+    private func analyzeBestDepartureTime(route: WizPathRoute) async {
         guard !route.segments.isEmpty else { return }
-        var bestTime: Date?
-        var bestSeverity: SegmentWeatherSeverity = .severe
+        guard let optimizer = departureOptimizerService else { return }
         let now = Date()
-        for offset in stride(from: 0, to: 360, by: 30) {
-            let candidateTime = now.addingTimeInterval(Double(offset) * 60)
-            let worstSeverity = route.segments.compactMap { $0.weather?.severity }.max(by: { a, b in a.severityOrder > b.severityOrder }) ?? .good
-            if worstSeverity.severityOrder < bestSeverity.severityOrder {
-                bestSeverity = worstSeverity
-                bestTime = candidateTime
+        let sixHoursLater = now.addingTimeInterval(6 * 3600)
+        
+        guard let origin = originCoordinate, let destination = destinationCoordinate else { return }
+        
+        do {
+            let result = try await optimizer.findOptimalDepartureTime(
+                origin: CLLocationCoordinate2D(latitude: origin.latitude, longitude: origin.longitude),
+                destination: CLLocationCoordinate2D(latitude: destination.latitude, longitude: destination.longitude),
+                travelMode: route.travelMode,
+                earliestDeparture: now,
+                latestDeparture: sixHoursLater
+            )
+            
+            // Only suggest if the best time is in the future
+            guard result.bestDepartureTime > now else { return }
+            
+            self.bestDepartureTime = result.bestDepartureTime
+            let formatter = DateFormatter()
+            formatter.dateStyle = .none
+            formatter.timeStyle = .short
+            
+            let bestWindow = result.scoredWindows.first
+            if bestWindow?.recommendation == .optimal || bestWindow?.recommendation == .good {
+                departureTimeReason = WizPathKitL10n.formatted(
+                    "wizpath_weather_improving",
+                    formatter.string(from: result.bestDepartureTime)
+                )
+            } else if let score = bestWindow?.totalScore {
+                departureTimeReason = WizPathKitL10n.formatted(
+                    "wizpath_best_score",
+                    score
+                )
             }
-        }
-        if let bestTime, bestTime != departureTime {
-            self.bestDepartureTime = bestTime
-            let timeDiff = bestTime.timeIntervalSince(departureTime)
-            let formatter = DateFormatter(); formatter.dateStyle = .none; formatter.timeStyle = .short
-            if timeDiff > 0 {
-                departureTimeReason = WizPathKitL10n.formatted("wizpath_weather_improving", formatter.string(from: bestTime))
-            } else {
-                departureTimeReason = WizPathKitL10n.formatted("wizpath_weather_worsening", formatter.string(from: bestTime))
-            }
+        } catch {
+            AppLogger.wizPath.error("Departure optimization failed: \(error.localizedDescription)")
+            // Silent fallback — bestDepartureTime stays nil
         }
     }
 
@@ -221,12 +312,27 @@ public final class WizPathViewModel {
 
     public func switchTravelMode(to mode: TravelMode) {
         travelMode = mode
+        // Reset cycling analysis when switching modes
+        if mode != .cycling {
+            cyclingSafetyAnalysis = nil
+            cyclingSafetyRecommendations = []
+        }
         HapticEngine.shared.selectionChanged()
         if currentRoute != nil { Task { await calculateRoute() } }
     }
 
     public func updateDepartureTime(_ date: Date) {
-        departureTime = date
+        // Clamp to future: if the selected time is in the past, advance to tomorrow at the same time
+        let now = Date()
+        let finalDate: Date
+        if date <= now {
+            let calendar = Calendar.current
+            finalDate = calendar.date(byAdding: .day, value: 1, to: date) ?? date
+            AppLogger.wizPath.info("Departure time was in the past, advanced to tomorrow: \(finalDate)")
+        } else {
+            finalDate = date
+        }
+        departureTime = finalDate
         HapticEngine.shared.selectionChanged()
         if currentRoute != nil { Task { await calculateRoute() } }
     }
@@ -237,14 +343,36 @@ public final class WizPathViewModel {
     }
 
     public func reset() {
+        refreshTimer?.cancel()
+        refreshTimer = nil
         state = .idle
         destinationCoordinate = nil
         destinationName = ""
         showJourneyHUD = false
+        showWeatherDetail = false
+        selectedWeatherSegment = nil
         HapticEngine.shared.light()
     }
 
     public func dismissError() { state = .idle }
+
+    // MARK: - Auto-Refresh Timer
+
+    /// Starts a periodic timer that recalculates the route every 3 minutes
+    /// to account for traffic changes. Stops if the route is reset.
+    private func startAutoRefresh() {
+        refreshTimer?.cancel()
+        refreshTimer = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 3 * 60 * 1_000_000_000) // 3 min
+                guard let self = self, !Task.isCancelled else { break }
+                guard self.currentRoute != nil, self.isOnline else { continue }
+                AppLogger.wizPath.info("Auto-refreshing route for traffic...")
+                self.isAutoRefreshing = true
+                await self.calculateRoute()
+            }
+        }
+    }
 
     // MARK: - Route Status for HUD
 

@@ -6,6 +6,7 @@ import CoreLocation
 public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
     case car = "car"
     case walking = "walking"
+    case cycling = "cycling"
 
     public var id: String { rawValue }
 
@@ -13,6 +14,7 @@ public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .car: return "car.fill"
         case .walking: return "figure.walk"
+        case .cycling: return "bicycle"
         }
     }
 
@@ -20,6 +22,7 @@ public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .car: return WizPathKitL10n.text("wizpath_mode_car")
         case .walking: return WizPathKitL10n.text("wizpath_mode_walking")
+        case .cycling: return WizPathKitL10n.text("wizpath_mode_cycling")
         }
     }
 
@@ -27,6 +30,7 @@ public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .car: return .automobile
         case .walking: return .walking
+        case .cycling: return .walking  // Apple Maps uses walking for cycling routes
         }
     }
 
@@ -34,6 +38,7 @@ public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .car: return 15 * 60
         case .walking: return 30 * 60
+        case .cycling: return 10 * 60  // More frequent segments for cycling (wind changes matter)
         }
     }
 
@@ -41,6 +46,24 @@ public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .car: return "#007AFF"
         case .walking: return "#FF9500"
+        case .cycling: return "#34C759"
+        }
+    }
+
+    /// Average speed in km/h for travel time estimation
+    public var averageSpeedKph: Double {
+        switch self {
+        case .car: return 40
+        case .walking: return 5
+        case .cycling: return 15
+        }
+    }
+
+    /// Whether this mode is vulnerable to crosswind
+    public var isWindSensitive: Bool {
+        switch self {
+        case .cycling: return true
+        case .car, .walking: return false
         }
     }
 }
@@ -144,6 +167,8 @@ public struct WizPathSegment: Identifiable, Equatable, Sendable {
     public let distanceFromStart: CLLocationDistance
     public let travelTime: TimeInterval
     public var weather: SegmentWeather?
+    /// Human-readable place name resolved via reverse geocoding (e.g. "Kadıköy", "Levent")
+    public var placeName: String?
 
     public init(id: UUID, coordinate: CLLocationCoordinate2D, estimatedArrival: Date,
                 distanceFromStart: CLLocationDistance, travelTime: TimeInterval, weather: SegmentWeather? = nil) {
@@ -153,6 +178,7 @@ public struct WizPathSegment: Identifiable, Equatable, Sendable {
         self.distanceFromStart = distanceFromStart
         self.travelTime = travelTime
         self.weather = weather
+        self.placeName = nil
     }
 
     public static func == (lhs: WizPathSegment, rhs: WizPathSegment) -> Bool {

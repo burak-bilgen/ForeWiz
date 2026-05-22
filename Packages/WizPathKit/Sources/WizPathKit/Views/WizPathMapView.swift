@@ -31,10 +31,21 @@ public struct WizPathMapView: View {
                 let changePoints = Array(route.weatherChangePoints.prefix(6))
                 ForEach(changePoints) { segment in
                     if let weather = segment.weather {
+                        let placeName = viewModel.segmentPlaceNames[segment.id]
+                        let labelText = placeName.map { "\($0) · \(segment.etaDisplay)" } ?? segment.etaDisplay
                         Annotation(coordinate: segment.coordinate) {
-                            WizPathWeatherMarker(weather: weather, eta: segment.etaDisplay)
+                            Button {
+                                viewModel.selectedWeatherSegment = segment
+                                viewModel.showWeatherDetail = true
+                                HapticEngine.shared.light()
+                            } label: {
+                                WizPathWeatherMarker(weather: weather, eta: labelText)
+                            }
+                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
                         } label: {
-                            Text(segment.etaDisplay)
+                            Text(labelText)
+                                .font(.system(size: 9, weight: .medium))
                         }
                     }
                 }

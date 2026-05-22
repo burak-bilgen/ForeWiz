@@ -32,7 +32,7 @@ ForeWiz processes weather data through a chain of specialized engines to produce
 | **ActivityWindowScoringEngine** | Scores each hour (0–100) based on temperature, precipitation, UV, wind, humidity, and time-of-day bonuses |
 | **OutfitDecisionEngine** | Recommends clothing combinations from 10+ categories with natural-language advice |
 | **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina - 5 independent calculators |
-| **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes (energetic, melancholic, serene, dramatic, cozy, etc.) |
+| **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes (energetic, melancholic, serene, dramatic, cozy, etc.) — now dynamically context-aware, referencing actual temperature, wind, humidity, and time of day |
 | **ComparativeWeatherService** | Compares today against seasonal norms, yesterday, and weekly trends with anomaly detection |
 | **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable daily briefing with prioritized action items |
 | **DefaultWeatherRiskClassifier** | Classifies 8 risk types: heat, UV, rain, wind, storm, humidity, cold, poorComfort |
@@ -55,6 +55,7 @@ Plan your journey with **weather-aware routing**. WizPath calculates weather con
 
 - **Multi-modal**: Driving (15-min segments) or Walking (30-min segments)
 - **Color-coded map**: Neon Green (good) → Orange (caution) → Red (dangerous)
+- **Place Name Annotations**: Weather change points now show real location names (e.g. "Kadıköy", "Levent") via reverse geocoding, so you know exactly where conditions shift
 - **Sentinel Alerts**: High-value notifications only when delays exceed 30 min or 40%
 - **Extreme Heat Module**: EV battery warnings at 38°C+, pedestrian heat stroke alerts at 36°C+, climate multipliers for ETA
 - **Departure Optimizer**: Finds the best time to leave based on weather + traffic
@@ -100,6 +101,7 @@ A premium dark-mode aesthetic with fluid animations:
 ### 🌍 Localization & Accessibility
 - **English** and **Turkish** (fully translated via `.xcstrings`)
 - **Formal Turkish tone** — all UI strings use formal "siz" (you) pronoun for corporate/professional voice
+- **Turkish naturalness audit**: All 22 WizPath Turkish translations reviewed — 18 spelling fixes (Tipii→Tipi, rüzgar→rüzgâr with circumflex) + 4 naturalness improvements ("tespit edildi" → "var"/"bekleniyor", "enkaz" → "döküntü")
 - Dynamic language switching at runtime
 - Accessibility: dynamic type, reduce motion support, VoiceOver labels
 - Biometric and haptic feedback for interactions
@@ -422,6 +424,19 @@ Private project. All rights reserved.
 ---
 
 ## 📋 Changelog
+
+### v1.2.0 — Dynamic Narrative, Learning Feedback & WizPath Polish
+
+| Change | Details |
+|--------|---------|
+| 🗺️ **Place Name Annotations** | WizPath map now shows real location names (e.g. "Kadıköy", "Levent") at weather change points via reverse geocoding with actor-based caching |
+| 🧠 **Dynamic Narrative Engine** | WeatherNarrativeService now context-aware — generates stories referencing actual temperature, wind, humidity, and time-of-day instead of static templates. 16 new localization keys |
+| 📝 **User Feedback System** | New WeatherFeedbackCard lets users rate forecasts (cold/good/hot). Feedback adjusts temperature offset and wind sensitivity for personalized future scores. 7 new localization keys |
+| 🗣️ **Turkish Naturalness Audit** | 22 WizPath translations reviewed: 18 spelling fixes (Tipii→Tipi, rüzgar→rüzgâr) + 4 naturalness improvements (AI-sounding phrases → natural Turkish) |
+| 🔒 **Swift 6 Concurrency Fixes** | GeocodingHelper rewritten with actor-based cache + sequential resolution to comply with strict concurrency |
+| 📋 **App Store Policies** | Comprehensive Privacy Policy, App Review checklist, and submission guide added to docs/
+
+---
 
 ### v1.1.0 — Code Quality & Localization Polish
 

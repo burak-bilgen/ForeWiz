@@ -33,13 +33,17 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         let apparentTemperature = hour.apparentTemperatureCelsius
         let month = calendar.component(.month, from: hour.date)
 
-        score -= goingOutTemperaturePenalty(apparentTemperature)
+        // Apply user-specific profile adjustments
+        let adjustedTemp = apparentTemperature + profile.temperatureOffset
+        let adjustedWind = (hour.windSpeedKph ?? 0) * profile.windSensitivityMultiplier
+
+        score -= goingOutTemperaturePenalty(adjustedTemp)
         score -= precipitationPenalty(hour)
-        score -= windPenalty(hour.windSpeedKph)
-        score -= humidityPenalty(hour.humidity, apparentTemperature: apparentTemperature)
+        score -= windPenalty(adjustedWind)
+        score -= humidityPenalty(hour.humidity, apparentTemperature: adjustedTemp)
         score -= uvPenalty(hour.uvIndex, hourOfDay: hourOfDay)
 
-        if isHotSummerMidday(month: month, hour: hourOfDay, apparentTemperature: apparentTemperature) {
+        if isHotSummerMidday(month: month, hour: hourOfDay, apparentTemperature: adjustedTemp) {
             score -= ScoringPenalties.hotSummerMidday
         }
 

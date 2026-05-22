@@ -198,4 +198,30 @@ final class HomeViewModel {
         }
     }
 
+    // MARK: - Feedback
+
+    /// Records user feedback about the weather recommendation and persists the updated profile.
+    func recordFeedback(_ feedback: UserWeatherFeedback) async {
+        do {
+            var profile = try await preferencesRepository.loadProfile()
+            profile.recordFeedback(feedback)
+            try await preferencesRepository.saveProfile(profile)
+            AppLogger.app.info("Feedback recorded: \(feedback). Temp offset now: \(profile.temperatureOffset)")
+        } catch {
+            AppLogger.app.error("Failed to save feedback: \(error.localizedDescription)")
+        }
+    }
+
+    /// Resets all learning data back to defaults.
+    func resetLearning() async {
+        do {
+            var profile = try await preferencesRepository.loadProfile()
+            profile.resetLearning()
+            try await preferencesRepository.saveProfile(profile)
+            AppLogger.app.info("Learning data reset")
+        } catch {
+            AppLogger.app.error("Failed to reset learning: \(error.localizedDescription)")
+        }
+    }
+
 }

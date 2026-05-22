@@ -6,6 +6,8 @@ struct HomeLoadedContent: View {
     let state: HomeViewState
     let contentReady: Bool
     let refresh: () async -> Void
+    let onFeedback: (UserWeatherFeedback) async -> Void
+    let onDismissFeedback: () -> Void
     
     @State private var showNativeAd = false
     @State private var showBannerAd = false
@@ -79,6 +81,16 @@ struct HomeLoadedContent: View {
                     // No footer but ad placed here — just show the ad
                     adSection(at: idx, baseDelay: 0.48)
                 }
+                
+                // Feedback card — let users personalize forecast recommendations
+                WeatherFeedbackCard(
+                    onFeedback: { feedback in
+                        Task { await onFeedback(feedback) }
+                    },
+                    onDismiss: { onDismissFeedback() }
+                )
+                .padding(.top, 4)
+                .cardEntrance(appeared: contentReady, baseDelay: 0.56)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)

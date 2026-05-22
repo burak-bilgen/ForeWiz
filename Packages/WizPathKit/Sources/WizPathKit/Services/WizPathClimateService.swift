@@ -49,7 +49,7 @@ public final class WizPathClimateService {
                     if travelMode == .car {
                         alerts.append(ClimateAlert(type: .evBatteryEfficiency, severity: .high, title: WizPathKitL10n.text("climate_ev_battery_title"), message: WizPathKitL10n.formatted("climate_ev_battery_message", Int(temp)), eta: segment.estimatedArrival, recommendation: WizPathKitL10n.text("climate_ev_battery_recommendation")))
                     }
-                    if travelMode == .walking {
+                    if travelMode == .walking || travelMode == .cycling {
                         alerts.append(ClimateAlert(type: .heatStrokeRisk, severity: .critical, title: WizPathKitL10n.text("climate_heat_stroke_title"), message: WizPathKitL10n.formatted("climate_heat_stroke_message", Int(temp)), eta: segment.estimatedArrival, recommendation: WizPathKitL10n.text("climate_heat_stroke_recommendation")))
                     }
                     alerts.append(ClimateAlert(type: .infrastructureStress, severity: .medium, title: WizPathKitL10n.text("climate_infrastructure_title"), message: WizPathKitL10n.formatted("climate_infrastructure_message", Int(temp)), eta: segment.estimatedArrival, recommendation: WizPathKitL10n.text("climate_infrastructure_recommendation")))
@@ -90,12 +90,34 @@ public final class WizPathClimateService {
 
     public func getHeatHealthRecommendations(temperature: Double, travelMode: TravelMode) -> [HealthRecommendation] {
         var recommendations: [HealthRecommendation] = []
-        if travelMode == .walking && temperature >= TemperatureThresholds.pedestrianHeatRisk {
+        if (travelMode == .walking || travelMode == .cycling) && temperature >= TemperatureThresholds.pedestrianHeatRisk {
             recommendations.append(HealthRecommendation(icon: "drop.fill", title: WizPathKitL10n.text("rec_hydration_title"), description: WizPathKitL10n.text("rec_hydration_desc")))
             recommendations.append(HealthRecommendation(icon: "tree.fill", title: WizPathKitL10n.text("rec_shade_title"), description: WizPathKitL10n.text("rec_shade_desc")))
             if temperature >= TemperatureThresholds.extremeHeat {
                 recommendations.append(HealthRecommendation(icon: "clock.badge.exclamationmark", title: WizPathKitL10n.text("rec_timing_title"), description: WizPathKitL10n.text("rec_timing_desc")))
             }
+        }
+        return recommendations
+    }
+
+    public func getCyclingSafetyRecommendations(windSpeed: Double, temperature: Double, precipitationChance: Double) -> [HealthRecommendation] {
+        var recommendations: [HealthRecommendation] = []
+        if windSpeed > 30 {
+            recommendations.append(HealthRecommendation(
+                icon: "wind",
+                title: WizPathKitL10n.text("wizpath_cycling_crosswind_title"),
+                description: WizPathKitL10n.formatted("wizpath_cycling_crosswind_message", "route", Int(windSpeed))
+            ))
+        }
+        if temperature >= TemperatureThresholds.pedestrianHeatRisk {
+            recommendations.append(HealthRecommendation(icon: "drop.fill", title: WizPathKitL10n.text("rec_hydration_title"), description: WizPathKitL10n.text("rec_hydration_desc")))
+        }
+        if precipitationChance > 0.3 {
+            recommendations.append(HealthRecommendation(
+                icon: "cloud.rain.fill",
+                title: WizPathKitL10n.text("wizpath_cycling_wet_roads_title"),
+                description: WizPathKitL10n.text("wizpath_cycling_wet_roads_desc")
+            ))
         }
         return recommendations
     }

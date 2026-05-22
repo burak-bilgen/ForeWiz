@@ -6,11 +6,32 @@ public struct WizPathDepartureOptimizerSheet: View {
     let route: WizPathRoute
     let onSelectTime: (Date) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedHour = 8
-    @State private var selectedMinute = 0
+    @State private var selectedHour: Int
+    @State private var selectedMinute: Int
 
     public init(route: WizPathRoute, onSelectTime: @escaping (Date) -> Void) {
         self.route = route; self.onSelectTime = onSelectTime
+        // Default to next sensible hour (current hour + 1, capped at 23)
+        let now = Date()
+        let currentHour = Calendar.current.component(.hour, from: now)
+        let defaultHour = min(currentHour + 1, 23)
+        self._selectedHour = State(initialValue: defaultHour)
+        self._selectedMinute = State(initialValue: 0)
+    }
+
+    /// Builds a departure date from the selected hour/minute, advancing to the next day if the time is already past.
+    private func buildDepartureDate() -> Date? {
+        let calendar = Calendar.current
+        let now = Date()
+        var components = calendar.dateComponents([.year, .month, .day], from: now)
+        components.hour = selectedHour
+        components.minute = selectedMinute
+        guard let candidate = calendar.date(from: components) else { return nil }
+        // If the candidate time is already past, schedule for tomorrow
+        if candidate <= now, let tomorrow = calendar.date(byAdding: .day, value: 1, to: candidate) {
+            return tomorrow
+        }
+        return candidate
     }
 
     public var body: some View {
@@ -36,7 +57,7 @@ public struct WizPathDepartureOptimizerSheet: View {
                                 Text(WizPathKitL10n.text("wizpath_quick_times")).font(.system(size: 12, weight: .semibold)).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
                                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible()), .init(.flexible()), .init(.flexible())], spacing: 8) {
                                     ForEach([6, 8, 10, 12, 14, 16, 18, 20], id: \.self) { hour in
-                                        WizPathQuickTimeChip(hour: hour, isSelected: selectedHour == hour && selectedMinute == 0) { selectedHour = hour; selectedMinute = 0 }
+                                        WizPathQuickTimeChip(hour: hour, isSelected: selectedHour == hour && selectedMinute == 0, isPast: hour <= Calendar.current.component(.hour, from: Date()) && Calendar.current.component(.hour, from: Date()) >= hour) { selectedHour = hour; selectedMinute = 0 }
                                     }
                                 }
                             }
@@ -44,9 +65,7 @@ public struct WizPathDepartureOptimizerSheet: View {
                     }
                     Spacer(minLength: 20)
                     Button {
-                        let calendar = Calendar.current; var components = calendar.dateComponents([.year, .month, .day], from: Date())
-                        components.hour = selectedHour; components.minute = selectedMinute
-                        if let date = calendar.date(from: components) { onSelectTime(date) }
+                        if let date = buildDepartureDate() { onSelectTime(date) }
                     } label: {
                         HStack(spacing: 8) { Image(systemName: "checkmark.circle.fill").font(.system(size: 18)); Text(WizPathKitL10n.text("wizpath_set_departure_time")).font(.system(size: 16, weight: .bold)) }
                             .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 16)
@@ -81,14 +100,15 @@ public struct WizPathTimePickerColumn: View {
 // MARK: - Quick Time Chip
 
 public struct WizPathQuickTimeChip: View {
-    let hour: Int; let isSelected: Bool; let action: () -> Void
-    public init(hour: Int, isSelected: Bool, action: @escaping () -> Void) { self.hour = hour; self.isSelected = isSelected; self.action = action }
+    let hour: Int; let isSelected: Bool; let isPast: Bool; let action: () -> Void
+    public init(hour: Int, isSelected: Bool, isPast: Bool = false, action: @escaping () -> Void) { self.hour = hour; self.isSelected = isSelected; self.isPast = isPast; self.action = action }
     public var body: some View {
         Button(action: action) {
             Text(String(format: "%02d:00", hour)).font(.system(size: 13, weight: .medium))
-                .foregroundStyle(isSelected ? .white : .white.opacity(0.8)).frame(maxWidth: .infinity).padding(.vertical, 8)
-                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(isSelected ? Color.liquidAccent : Color.white.opacity(0.06)))
+                .foregroundStyle(isSelected ? .white : (isPast ? .white.opacity(0.35) : .white.opacity(0.8))).frame(maxWidth: .infinity).padding(.vertical, 8)
+                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(isSelected ? Color.liquidAccent : (isPast ? Color.white.opacity(0.02) : Color.white.opacity(0.06))))
                 .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(isSelected ? Color.liquidAccent : Color.white.opacity(0.08), lineWidth: isSelected ? 1 : 0.5))
-        }.contentShape(Rectangle()).buttonStyle(.plain)
+                .opacity(isPast ? 0.5 : 1.0)
+        }.contentShape(Rectangle()).buttonStyle(.plain).disabled(isPast)
     }
 }

@@ -193,10 +193,10 @@ struct WizPathSentinelServiceTests {
     
     @Test("SuppressionReason descriptions")
     func suppressionReasonDescriptions() async throws {
-        #expect(SuppressionReason.belowThreshold.description.contains("below"))
-        #expect(SuppressionReason.rateLimited.description.contains("Rate limit"))
-        #expect(SuppressionReason.cooldownActive.description.contains("Cooldown"))
-        #expect(SuppressionReason.userDisabled.description.contains("disabled"))
+        #expect(!SuppressionReason.belowThreshold.description.isEmpty)
+        #expect(!SuppressionReason.rateLimited.description.isEmpty)
+        #expect(!SuppressionReason.cooldownActive.description.isEmpty)
+        #expect(!SuppressionReason.userDisabled.description.isEmpty)
     }
     
     @Test("WeatherContext isExtreme flag")

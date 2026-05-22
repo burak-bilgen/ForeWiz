@@ -239,30 +239,18 @@ public final class WizPathService {
     }
 
     private func estimatedWeather(for coordinate: CLLocationCoordinate2D, at date: Date) -> SegmentWeather {
+        AppLogger.wizPath.warning("Using estimated (fallback) weather — real data unavailable")
+        // Return a cautious fallback: slight rain + moderate temp, so the user sees something
+        // is wrong rather than a perfect sunny day
         let hour = Calendar.current.component(.hour, from: date)
-        let minute = Calendar.current.component(.minute, from: date)
-        let variation = Double(minute % 6) - 2.5
-
-        let baseTemp: Double
-        switch hour {
-        case 5..<9:  baseTemp = 14 + variation
-        case 9..<13: baseTemp = 20 + variation * 1.5
-        case 13..<17: baseTemp = 25 + variation * 2
-        case 17..<21: baseTemp = 19 + variation
-        default:      baseTemp = 12 + variation
-        }
-
         let isNight = hour < 6 || hour >= 21
-        let condition: SegmentWeatherCondition = isNight ? .clear : .partlyCloudy
-        let windSpeed: Double = 5 + Double((hour * 7 + 3) % 14)
-
         return SegmentWeather(
-            condition: condition,
-            temperature: baseTemp,
-            precipitationChance: isNight ? 0.05 : 0.15,
-            windSpeed: windSpeed,
-            visibility: isNight ? 12 : 10,
-            severity: condition.severity
+            condition: isNight ? .partlyCloudy : .cloudy,
+            temperature: 20,
+            precipitationChance: 0.2,
+            windSpeed: 10,
+            visibility: isNight ? 8 : 10,
+            severity: .fair
         )
     }
 
@@ -329,7 +317,13 @@ public struct RecentDestination: Codable, Hashable, Identifiable {
 // MARK: - WizPath Cache
 final class WizPathCache {
     nonisolated(unsafe) static let shared = WizPathCache()
-    private var routeCache: [String: WizPathRoute] = [:]
+    private struct CacheEntry {
+        let route: WizPathRoute
+        let timestamp: Date
+        static let ttl: TimeInterval = 15 * 60
+        var isExpired: Bool { Date().timeIntervalSince(timestamp) > Self.ttl }
+    }
+    private var routeCache: [String: CacheEntry] = [:]
     private let queue = DispatchQueue(label: "com.forewiz.wizpath.cache", qos: .utility)
 
     fileprivate init() {}
@@ -337,14 +331,23 @@ final class WizPathCache {
     func store(route: WizPathRoute) {
         queue.async {
             let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)"
-            self.routeCache[key] = route
+            self.routeCache[key] = CacheEntry(route: route, timestamp: Date())
+            // Periodic cleanup: remove expired entries
+            if self.routeCache.count > 20 {
+                self.routeCache = self.routeCache.filter { !$0.value.isExpired }
+            }
         }
     }
 
     func route(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> WizPathRoute? {
         queue.sync {
             let key = "\(origin.latitude),\(origin.longitude)|\(destination.latitude),\(destination.longitude)|\(mode.rawValue)"
-            return self.routeCache[key]
+            guard let entry = self.routeCache[key], !entry.isExpired else {
+                // Remove expired entry if present
+                self.routeCache.removeValue(forKey: key)
+                return nil
+            }
+            return entry.route
         }
     }
 

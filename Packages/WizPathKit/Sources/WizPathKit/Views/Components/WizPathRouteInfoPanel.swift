@@ -40,7 +40,7 @@ public struct WizPathRouteInfoPanel: View {
                     }
                     RouteStatItem(icon: "exclamationmark.triangle.fill", value: "\(route.weatherChangePoints.count)", label: WizPathKitL10n.text("wizpath_weather_changes"))
                 }
-                if let bestTime = bestDepartureTime, let reason = departureTimeReason {
+                    if let bestTime = bestDepartureTime, let reason = departureTimeReason, bestTime > Date() {
                     Divider().overlay(Color.white.opacity(0.06))
                     WizPathBestDepartureRow(bestTime: bestTime, reason: reason, onSet: onUpdateDepartureTime)
                 }

@@ -198,8 +198,10 @@ struct WeatherNarrativeService {
         }
     }
 
-    // MARK: - Story
+    // MARK: - Story (Dynamic - Context-Aware)
 
+    /// Generates a dynamic, context-aware story that references actual weather values
+    /// instead of returning the same static template every time.
     private func generateStory(
         apparentTemp: Double,
         condition: String,
@@ -214,31 +216,135 @@ struct WeatherNarrativeService {
         decision: OutdoorDecision,
         hour: Int
     ) -> String {
-        switch personality {
-        case .energetic:
-            return L10n.text("narrative_story_energetic")
-        case .melancholic:
-            return L10n.text("narrative_story_melancholic")
-        case .serene:
-            if score >= 80 {
-                return L10n.text("narrative_story_serene_perfect")
-            }
-            return L10n.text("narrative_story_serene")
-        case .dramatic:
-            return L10n.text("narrative_story_dramatic")
-        case .cozy:
-            return L10n.text("narrative_story_cozy")
-        case .refreshing:
-            return L10n.text("narrative_story_refreshing")
-        case .stubborn:
-            return L10n.text("narrative_story_stubborn")
-        case .lazy:
-            return L10n.text("narrative_story_lazy")
-        case .adventurous:
-            return L10n.text("narrative_story_adventurous")
-        case .mysterious:
-            return L10n.text("narrative_story_mysterious")
+        // Build context-aware opener with actual weather data
+        let contextPart = buildWeatherContext(
+            apparentTemp: apparentTemp,
+            condition: condition,
+            humidity: humidity,
+            windSpeed: windSpeed,
+            hasRain: hasRain,
+            hour: hour
+        )
+
+        // Get the personality story (still thematic, but now follows dynamic context)
+        let storyPart = getPersonalityStory(
+            personality: personality,
+            score: score,
+            decision: decision
+        )
+
+        // Add scoring context for extra relevance
+        let scoreContext = buildScoreContext(score: score)
+
+        // Combine: context → story (with scorer if available)
+        if !scoreContext.isEmpty {
+            return "\(contextPart) \(storyPart) \(scoreContext)"
         }
+        return "\(contextPart) \(storyPart)"
+    }
+
+    /// Builds a weather-aware opener dynamically from actual conditions.
+    private func buildWeatherContext(
+        apparentTemp: Double,
+        condition: String,
+        humidity: Double,
+        windSpeed: Double,
+        hasRain: Bool,
+        hour: Int
+    ) -> String {
+        let tempKey: String
+        switch apparentTemp {
+        case ..<5: tempKey = "narrative_dynamic_temp_cold"
+        case 5..<15: tempKey = "narrative_dynamic_temp_cool"
+        case 15..<22: tempKey = "narrative_dynamic_temp_ideal"
+        case 22..<30: tempKey = "narrative_dynamic_temp_warm"
+        default: tempKey = "narrative_dynamic_temp_hot"
+        }
+        let tempDesc = String(format: L10n.text(tempKey), Int(apparentTemp))
+
+        let windKey: String
+        if hasRain && windSpeed < 5 {
+            windKey = "narrative_dynamic_wind_calm"
+        } else if windSpeed < 10 {
+            windKey = "narrative_dynamic_wind_calm"
+        } else if windSpeed < 25 {
+            windKey = "narrative_dynamic_wind_light"
+        } else if windSpeed < 40 {
+            windKey = "narrative_dynamic_wind_moderate"
+        } else {
+            windKey = "narrative_dynamic_wind_strong"
+        }
+        let windDesc = L10n.text(windKey)
+
+        let humidityDesc: String
+        if humidity >= 0.7 {
+            humidityDesc = String(format: L10n.text("narrative_dynamic_humidity_high"), Int(humidity * 100))
+        } else if humidity <= 0.35 {
+            humidityDesc = L10n.text("narrative_dynamic_humidity_low")
+        } else {
+            humidityDesc = ""
+        }
+
+        // Time-of-day greeting
+        let timeGreeting: String
+        if hour < 10 {
+            timeGreeting = L10n.text("narrative_dynamic_morning")
+        } else if hour >= 19 {
+            timeGreeting = L10n.text("narrative_dynamic_evening")
+        } else {
+            timeGreeting = ""
+        }
+
+        let connector = L10n.text("narrative_dynamic_context_connector")
+
+        // Assemble context (greeting optional, humidity optional)
+        var parts: [String] = []
+        if !timeGreeting.isEmpty {
+            parts.append(timeGreeting)
+        }
+        parts.append(tempDesc)
+        parts.append(windDesc)
+        if !humidityDesc.isEmpty {
+            parts.append(humidityDesc)
+        }
+
+        return parts.joined(separator: " ") + connector
+    }
+
+    /// Returns the personality-specific story, with slight variations based on score.
+    private func getPersonalityStory(
+        personality: WeatherNarrative.WeatherPersonality,
+        score: Int,
+        decision: OutdoorDecision
+    ) -> String {
+        // For perfect days, always use the serene_perfect template — best fit
+        if score >= 80 {
+            return L10n.text("narrative_story_serene_perfect")
+        }
+
+        switch personality {
+        case .energetic: return L10n.text("narrative_story_energetic")
+        case .melancholic: return L10n.text("narrative_story_melancholic")
+        case .serene: return L10n.text("narrative_story_serene")
+        case .dramatic: return L10n.text("narrative_story_dramatic")
+        case .cozy: return L10n.text("narrative_story_cozy")
+        case .refreshing: return L10n.text("narrative_story_refreshing")
+        case .stubborn: return L10n.text("narrative_story_stubborn")
+        case .lazy: return L10n.text("narrative_story_lazy")
+        case .adventurous: return L10n.text("narrative_story_adventurous")
+        case .mysterious: return L10n.text("narrative_story_mysterious")
+        }
+    }
+
+    /// Adds a score-based observation to make the narrative feel more data-aware.
+    private func buildScoreContext(score: Int) -> String {
+        // Only add when context-rich enough to matter
+        if score >= 75 {
+            return String(format: L10n.text("narrative_dynamic_score_high"), score)
+        } else if score <= 30 {
+            return String(format: L10n.text("narrative_dynamic_score_low"), score)
+        }
+        return ""
     }
 
     // MARK: - Pro Tip

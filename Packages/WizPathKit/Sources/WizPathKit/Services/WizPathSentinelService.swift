@@ -150,10 +150,10 @@ public enum SuppressionReason: Sendable {
 
     public var description: String {
         switch self {
-        case .belowThreshold: return "Delay below sentinel threshold"
-        case .rateLimited: return "Rate limit exceeded (max 3/hour)"
-        case .cooldownActive: return "Cooldown period active (15 min)"
-        case .userDisabled: return "User disabled notifications"
+        case .belowThreshold: return WizPathKitL10n.text("sentinel_reason_below_threshold")
+        case .rateLimited: return WizPathKitL10n.text("sentinel_reason_rate_limited")
+        case .cooldownActive: return WizPathKitL10n.text("sentinel_reason_cooldown")
+        case .userDisabled: return WizPathKitL10n.text("sentinel_reason_disabled")
         }
     }
 }
