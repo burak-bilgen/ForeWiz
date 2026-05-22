@@ -17,7 +17,7 @@ public enum WidgetDataCrypto {
     ///   - key: Optional symmetric key. If nil, uses deterministic fallback.
     /// - Returns: Combined sealed box (nonce + ciphertext + tag)
     public static func encrypt(_ data: Data, key: SymmetricKey? = nil) throws -> Data {
-        let encryptionKey = try key ?? deterministicKey()
+        let encryptionKey = key ?? deterministicKey()
         let sealedBox = try AES.GCM.seal(data, using: encryptionKey)
         guard let combined = sealedBox.combined else {
             throw WidgetCryptoError.encryptionFailed
@@ -31,7 +31,7 @@ public enum WidgetDataCrypto {
     ///   - key: Optional symmetric key. If nil, uses deterministic fallback.
     /// - Returns: Original plaintext data
     public static func decrypt(_ data: Data, key: SymmetricKey? = nil) throws -> Data {
-        let encryptionKey = try key ?? deterministicKey()
+        let encryptionKey = key ?? deterministicKey()
         let sealedBox = try AES.GCM.SealedBox(combined: data)
         return try AES.GCM.open(sealedBox, using: encryptionKey)
     }

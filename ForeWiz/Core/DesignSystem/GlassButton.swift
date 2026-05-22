@@ -318,7 +318,7 @@ struct ToolbarRefreshButton: View {
 
         .buttonStyle(.plain)
         .animation(.linear(duration: 0.8), value: isSpinning) // Linear OK for rotation
-        .accessibilityLabel(L10n.text("refresh_weather"))
+        .accessibilityLabel(L10n.text("btn_refresh_weather"))
     }
 }
 

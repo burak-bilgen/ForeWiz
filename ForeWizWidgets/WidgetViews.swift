@@ -525,7 +525,7 @@ struct ForeWizWidgetEntryView: View {
         switch family {
         case .systemSmall:
             ForeWizWidgetSmallView(entry: entry)
-        case .systemMedium, .systemLarge:
+        case .systemMedium, .systemLarge, .systemExtraLarge:
             ForeWizWidgetMediumView(entry: entry)
         case .accessoryInline:
             ForeWizWidgetInlineView(entry: entry)
