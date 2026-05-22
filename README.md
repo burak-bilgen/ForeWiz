@@ -425,6 +425,19 @@ Private project. All rights reserved.
 
 ## 📋 Changelog
 
+### v1.3.0 — Premium UX Polish, Map Overlays & Localization Audits (Latest)
+
+| Change | Details |
+|--------|---------|
+| 🗺️ **WizPath HUD Redesign** | Removed redundant home entry button, replaced with a premium rotating haptic gradient border HUD card. Added blur spinner loading overlays on calculations and selection waiting states. |
+| 🔌 **Smart Stops Overhaul** | Enforced visual full-width cards on detail sheet. Handcrafted modern 52pt Maps redirect buttons with dual-gradient backgrounds, reactive spring physics, and haptic feedback. |
+| 🛡️ **Legal Safety Card** | Integrated a gorgeous frosted glass legal disclaimer card before maps redirection, protecting users from mapping inconsistencies. |
+| 🗣️ **Copywriting Audits** | Fully resolved Turkish robotic phrasing in tomorrow's briefs (removed "bugün" conflicts), and implemented dynamic lowercase first letter handling for natural, grammatically correct concatenations. |
+| 🌍 **Dropdown & Privacy Fallback** | Refactored language context selector to render native conditional Label checkmarks, and integrated external browser privacy policy redirect fallback for users outside EEA regions. |
+| 🎨 **Feedback Alignment** | Uniformly locked home weather feedback buttons to 54x42 dimensions with minimum scale factor support to prevent uneven layout boxes. |
+
+---
+
 ### v1.2.0 — Dynamic Narrative, Learning Feedback & WizPath Polish
 
 | Change | Details |
