@@ -14,10 +14,12 @@ public struct SmartStop: Identifiable, Sendable {
     public let safetyStatus: POISafetyStatus
     public let distanceFromRoute: CLLocationDistance
     public let estimatedStopDuration: TimeInterval
+    public let weatherRecommendation: String?
 
     public init(id: UUID, mapItem: MKMapItem, coordinate: CLLocationCoordinate2D, name: String,
                 category: POICategory, etaArrival: Date, weatherAtArrival: SegmentWeather?,
-                safetyStatus: POISafetyStatus, distanceFromRoute: CLLocationDistance, estimatedStopDuration: TimeInterval) {
+                safetyStatus: POISafetyStatus, distanceFromRoute: CLLocationDistance, estimatedStopDuration: TimeInterval,
+                weatherRecommendation: String? = nil) {
         self.id = id
         self.mapItem = mapItem
         self.coordinate = coordinate
@@ -28,6 +30,7 @@ public struct SmartStop: Identifiable, Sendable {
         self.safetyStatus = safetyStatus
         self.distanceFromRoute = distanceFromRoute
         self.estimatedStopDuration = estimatedStopDuration
+        self.weatherRecommendation = weatherRecommendation
     }
 
     public var displayTitle: String {

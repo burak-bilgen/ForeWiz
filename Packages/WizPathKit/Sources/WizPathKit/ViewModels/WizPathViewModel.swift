@@ -64,6 +64,7 @@ public final class WizPathViewModel {
     private let climateService = WizPathClimateService.shared
     private let sentinelService = WizPathSentinelService.shared
     private let cyclingSafetyService = WizPathCyclingSafetyService.shared
+    private let poiSearchService = POISearchService.shared
 
     // MARK: - State
     public var state: WizPathViewState = .idle
@@ -89,15 +90,22 @@ public final class WizPathViewModel {
     public var departureTimeReason: String?
     public var cyclingSafetyAnalysis: WizPathCyclingSafetyService.CyclingSafetyAnalysis?
     public var cyclingSafetyRecommendations: [HealthRecommendation] = []
+    public var isElectricVehicle = false
+    public var evRecommendations: [EVRecommendation] = []
+    public var chargingStations: [SmartStop] = []
 
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
     public var didLoadInitialLocation = false
     // Auto-refresh timer for traffic updates
     private var refreshTimer: Task<Void, Never>?
+    private var chargingStationsTask: Task<Void, Never>?
+    private var placeNameTask: Task<Void, Never>?
     private var isAutoRefreshing = false
     public var selectedWeatherSegment: WizPathSegment?
     public var showWeatherDetail = false
+    public var selectedChargingStation: SmartStop?
+    public var showChargingStationDetail = false
     /// Resolved place names for weather change point segments (segment.id → place name)
     public var segmentPlaceNames: [UUID: String] = [:]
 
@@ -200,7 +208,14 @@ public final class WizPathViewModel {
                 cyclingSafetyAnalysis = nil
                 cyclingSafetyRecommendations = []
             }
-            
+
+            // Compute EV recommendations only when the car is marked as electric.
+            if travelMode == .car, isElectricVehicle, let maxTemp = climateAnalysis?.maxTemperature {
+                evRecommendations = climateService.getEVRecommendations(temperature: maxTemp)
+            } else {
+                evRecommendations = []
+            }
+
             if let previousRoute = lastCalculatedRoute {
                 let routeConditions = route.segments.compactMap { $0.weather?.condition }
                 let worstCondition = routeConditions.max(by: { $0.severity.severityOrder < $1.severity.severityOrder })
@@ -228,15 +243,10 @@ public final class WizPathViewModel {
             await analyzeBestDepartureTime(route: route)
             state = .routeReady(route)
             showJourneyHUD = true
+            refreshChargingStations(for: route)
             if !isAutoRefreshing { HapticEngine.shared.success() }
             startAutoRefresh()
-            
-            // Resolve place names for weather change points (async, non-blocking)
-            Task {
-                let changePoints = route.weatherChangePoints
-                let names = await GeocodingHelper.shared.resolvePlaceNames(for: changePoints)
-                segmentPlaceNames = names
-            }
+            resolvePlaceNames(for: route)
             AppLogger.wizPath.info("Route calculated: \(route.totalDuration)s, risk: \(route.overallRisk.rawValue)")
         } catch let error as WizPathError {
             if isAutoRefreshing {
@@ -317,6 +327,10 @@ public final class WizPathViewModel {
             cyclingSafetyAnalysis = nil
             cyclingSafetyRecommendations = []
         }
+        if mode != .car {
+            isElectricVehicle = false
+            evRecommendations = []
+        }
         HapticEngine.shared.selectionChanged()
         if currentRoute != nil { Task { await calculateRoute() } }
     }
@@ -345,13 +359,175 @@ public final class WizPathViewModel {
     public func reset() {
         refreshTimer?.cancel()
         refreshTimer = nil
+        chargingStationsTask?.cancel()
+        chargingStationsTask = nil
+        placeNameTask?.cancel()
+        placeNameTask = nil
         state = .idle
         destinationCoordinate = nil
         destinationName = ""
         showJourneyHUD = false
         showWeatherDetail = false
         selectedWeatherSegment = nil
+        selectedChargingStation = nil
+        showChargingStationDetail = false
+        isElectricVehicle = false
+        evRecommendations = []
+        chargingStations = []
+        segmentPlaceNames = [:]
         HapticEngine.shared.light()
+    }
+
+    public func setElectricVehicleEnabled(_ enabled: Bool) {
+        guard isElectricVehicle != enabled else { return }
+        isElectricVehicle = enabled
+        updateElectricVehicleContent()
+        HapticEngine.shared.selectionChanged()
+    }
+
+    // MARK: - Route Annotations
+
+    private func updateElectricVehicleContent() {
+        if travelMode == .car, isElectricVehicle, let maxTemp = climateAnalysis?.maxTemperature {
+            evRecommendations = climateService.getEVRecommendations(temperature: maxTemp)
+        } else {
+            evRecommendations = []
+        }
+        if let route = currentRoute {
+            refreshChargingStations(for: route)
+        }
+    }
+
+    private func refreshChargingStations(for route: WizPathRoute) {
+        chargingStationsTask?.cancel()
+        chargingStations = []
+
+        let categories: [POICategory]
+        switch travelMode {
+        case .car:
+            if isElectricVehicle {
+                categories = [.evCharger, .restStop]
+            } else {
+                categories = [.gasStation, .restStop]
+            }
+        case .cycling, .walking:
+            categories = [.restStop, .restaurant]
+        }
+
+        let routeID = route.id
+        chargingStationsTask = Task { [weak self] in
+            guard let self else { return }
+            let foundStops = await self.poiSearchService.searchSmartStopsAlongRoute(route: route, categories: categories)
+            
+            guard !Task.isCancelled,
+                  self.currentRoute?.id == routeID else { return }
+                  
+            var enrichedStops: [SmartStop] = []
+            for stop in foundStops {
+                let weatherAtArrival = self.findArrivalWeather(for: stop.coordinate, in: route)
+                let safetyStatus = self.computeStopSafetyStatus(weather: weatherAtArrival)
+                let recommendation = self.generateWeatherRecommendation(
+                    category: stop.category,
+                    weather: weatherAtArrival,
+                    mode: self.travelMode
+                )
+                
+                let enriched = SmartStop(
+                    id: stop.id,
+                    mapItem: stop.mapItem,
+                    coordinate: stop.coordinate,
+                    name: stop.name,
+                    category: stop.category,
+                    etaArrival: stop.etaArrival,
+                    weatherAtArrival: weatherAtArrival,
+                    safetyStatus: safetyStatus,
+                    distanceFromRoute: stop.distanceFromRoute,
+                    estimatedStopDuration: stop.estimatedStopDuration,
+                    weatherRecommendation: recommendation
+                )
+                enrichedStops.append(enriched)
+            }
+            
+            self.chargingStations = enrichedStops
+        }
+    }
+
+    // MARK: - Smart Stop Helpers
+
+    private func findArrivalWeather(for coordinate: CLLocationCoordinate2D, in route: WizPathRoute) -> SegmentWeather? {
+        let stopLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let closestSegment = route.segments.min(by: {
+            let locA = CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
+            let locB = CLLocation(latitude: $1.coordinate.latitude, longitude: $1.coordinate.longitude)
+            return stopLocation.distance(from: locA) < stopLocation.distance(from: locB)
+        })
+        return closestSegment?.weather
+    }
+
+    private func computeStopSafetyStatus(weather: SegmentWeather?) -> POISafetyStatus {
+        guard let weather = weather else { return .safe }
+        switch weather.severity {
+        case .good: return .safe
+        case .fair: return .safe
+        case .caution: return .caution
+        case .severe: return .unsafe
+        }
+    }
+
+    private func generateWeatherRecommendation(category: POICategory, weather: SegmentWeather?, mode: TravelMode) -> String? {
+        guard let weather = weather else { return nil }
+        let isTurkish = Locale.current.language.languageCode?.identifier.lowercased().hasPrefix("tr") ?? false
+        
+        switch weather.condition {
+        case .thunderstorm, .heavyRain, .snow, .sleet:
+            if isTurkish {
+                switch category {
+                case .restStop, .restaurant:
+                    return "Kötü hava şartları (yağış/fırtına) nedeniyle bu noktada durup sığınmanızı öneririz."
+                default:
+                    return "Hava şartları zorlu; seyahat güvenliği için korunaklı bir alanda bekleyin."
+                }
+            } else {
+                switch category {
+                case .restStop, .restaurant:
+                    return "Heavy precipitation or storm ahead. We highly recommend resting here to seek shelter."
+                default:
+                    return "Challenging weather conditions. Consider taking a break for your travel safety."
+                }
+            }
+        case .windy:
+            if mode == .cycling || mode == .walking {
+                return isTurkish
+                    ? "Kuvvetli rüzgar bekleniyor. Rüzgar direncinden kaçınmak için ideal bir dinlenme noktası."
+                    : "Strong winds expected along the route. An excellent stop to catch your breath and find wind shadow."
+            }
+        case .rain:
+            return isTurkish
+                ? "Bölgede yağış var. Sıcak bir mola verip yola öyle devam edebilirsiniz."
+                : "Rain is present at this stop. Take a dry break before continuing."
+        default:
+            if weather.temperature >= 28.0 {
+                return isTurkish
+                    ? "Hava sıcaklığı yüksek (\(Int(weather.temperature))°C). Sıvı tüketimi ve serinleme için durabilirsiniz."
+                    : "High temperature alert (\(Int(weather.temperature))°C). Highly recommended stop for hydration and cooling down."
+            }
+        }
+        return nil
+    }
+
+    private func resolvePlaceNames(for route: WizPathRoute) {
+        placeNameTask?.cancel()
+        segmentPlaceNames = [:]
+
+        let routeID = route.id
+        let changePoints = route.weatherChangePoints
+        placeNameTask = Task { [weak self] in
+            let names = await GeocodingHelper.shared.resolvePlaceNames(for: changePoints)
+            guard !Task.isCancelled,
+                  let self,
+                  self.currentRoute?.id == routeID else { return }
+            self.segmentPlaceNames = names
+        }
     }
 
     public func dismissError() { state = .idle }
