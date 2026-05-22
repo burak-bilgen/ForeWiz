@@ -1,6 +1,5 @@
 import CoreLocation
 import Foundation
-import MapKit
 import OSLog
 
 @MainActor
@@ -183,12 +182,14 @@ final class HomeViewModel {
 
     private func resolveLocationName(for location: LocationCoordinate) {
         let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
-        guard let request = MKReverseGeocodingRequest(location: clLocation) else { return }
         Task {
             do {
-                let mapItems = try await request.mapItems
-                guard let item = mapItems.first else { return }
-                let locationName = item.addressRepresentations?.cityName ?? item.address?.shortAddress ?? item.name ?? L10n.text("home_current_location")
+                let placemark = try await CLGeocoder().reverseGeocodeLocation(clLocation).first
+                let locationName = placemark?.locality ??
+                    placemark?.subAdministrativeArea ??
+                    placemark?.administrativeArea ??
+                    placemark?.name ??
+                    L10n.text("home_current_location")
                 Task { @MainActor in
                     self.selectedLocationName = locationName
                 }

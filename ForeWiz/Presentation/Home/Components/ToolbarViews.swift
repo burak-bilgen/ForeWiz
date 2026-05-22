@@ -19,6 +19,16 @@ struct ToolbarLanguageButton: View {
                     }
                 }
             }
+
+            Divider()
+
+            Button {
+                Task {
+                    await AdConsentManager.shared.presentPrivacyOptions()
+                }
+            } label: {
+                Label(L10n.text("settings_privacy_choices"), systemImage: "hand.raised.fill")
+            }
         } label: {
             ZStack {
                 Image(systemName: "globe")
@@ -44,4 +54,3 @@ struct ToolbarWizPathButton: View {
         .accessibilityLabel(L10n.text("wizpath_route_planner"))
     }
 }
-

@@ -15,7 +15,7 @@ struct HourlyForecastSection: View {
 
                 if !hourlyScores.isEmpty {
                     TemperatureTrendChart(hourlyScores: hourlyScores)
-                        .frame(height: 130)
+                        .frame(height: 80)
                 }
 
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -39,14 +39,6 @@ struct HourlyForecastSection: View {
 struct HourlyPill: View {
     let item: HourlyScoreItem
 
-    private var scoreColor: Color {
-        switch item.score {
-        case 70...100: AppTheme.success
-        case 40..<70: AppTheme.warning
-        default: AppTheme.danger
-        }
-    }
-
     var body: some View {
         VStack(spacing: 4) {
             Text("\(String(format: "%02d", item.hour))\(L10n.text("time_format_hour"))")
@@ -61,15 +53,6 @@ struct HourlyPill: View {
             Text(item.temperatureText)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
-                .lineLimit(1)
-
-            RoundedRectangle(cornerRadius: 2)
-                .fill(scoreColor)
-                .frame(width: 16, height: 3)
-
-            Text(String(format: "%.1f", Double(item.score) / 10.0))
-                .font(.system(size: 10, weight: .bold, design: .rounded))
-                .foregroundStyle(scoreColor)
                 .lineLimit(1)
         }
         .padding(.horizontal, 8)
@@ -98,7 +81,7 @@ struct TemperatureTrendChart: View {
             ForEach(Array(slots.enumerated()), id: \.element.id) { index, item in
                 let temp = temps[safe: index] ?? 0
                 let ratio = max((temp - paddedMin) / tempRange, 0.08)
-                let barHeight = ratio * 80
+                let barHeight = ratio * 45
 
                 VStack(spacing: 3) {
                     Text(item.temperatureText)

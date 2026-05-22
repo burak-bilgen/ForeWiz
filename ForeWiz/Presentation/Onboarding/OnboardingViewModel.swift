@@ -10,6 +10,7 @@ final class OnboardingViewModel {
     private(set) var trackingStatus: AdConsentManager.ConsentStatus = .notDetermined
     private(set) var errorMessage: String?
     var showTrackingSettingsAlert = false
+    private(set) var profile: UserComfortProfile
 
     private let locationRepository: LocationRepository
     private let notificationRepository: NotificationRepository
@@ -21,6 +22,7 @@ final class OnboardingViewModel {
     ) {
         self.locationRepository = locationRepository
         self.notificationRepository = notificationRepository
+        self.profile = profile
         let code = L10n.currentLanguageCode
         selectedLanguage = code == "tr" ? .turkish : .english
         
@@ -30,7 +32,7 @@ final class OnboardingViewModel {
     }
 
     var canContinue: Bool {
-        locationStatus == .authorized
+        locationStatus == .authorized || !profile.savedLocations.filter { $0.id != "current-location" }.isEmpty
     }
 
     func selectLanguage(_ lang: AppLanguage) {
@@ -77,6 +79,12 @@ final class OnboardingViewModel {
             
             let status = await AdConsentManager.shared.requestTrackingPermission()
             trackingStatus = status
+
+            if AdConsentManager.shared.canServeAds {
+                AdManager.shared.clearAllCaches()
+                await AdManager.shared.preloadAllAds()
+            }
+
             if status == .granted {
                 AnalyticsManager.shared.track(.trackingPermissionGranted)
             } else {
@@ -99,10 +107,20 @@ final class OnboardingViewModel {
         UIApplication.shared.open(url)
     }
 
-    func makeProfile(inheriting existingProfile: UserComfortProfile = .default) -> UserComfortProfile {
-        var profile = existingProfile
-        profile.language = selectedLanguage
+    func addManualLocation(_ location: SavedLocation) {
+        var updatedProfile = profile
+        if !updatedProfile.savedLocations.contains(where: { $0.id == location.id }) {
+            updatedProfile.savedLocations.append(location)
+        }
+        updatedProfile.selectedLocationID = location.id
+        self.profile = updatedProfile
+        self.errorMessage = nil
+    }
+
+    func makeProfile() -> UserComfortProfile {
+        var updatedProfile = profile
+        updatedProfile.language = selectedLanguage
         L10n.configure(language: selectedLanguage)
-        return profile
+        return updatedProfile
     }
 }

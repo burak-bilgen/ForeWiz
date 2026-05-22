@@ -137,7 +137,8 @@ struct HomeView: View {
                 contentReady: contentReady,
                 refresh: { await viewModel.refresh() },
                 onFeedback: { await viewModel.recordFeedback($0) },
-                onDismissFeedback: { /* Card auto-hides; no extra dismiss action needed */ }
+                onDismissFeedback: { /* Card auto-hides; no extra dismiss action needed */ },
+                onWizPathTap: { showWizPathSheet = true }
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)),

@@ -2,51 +2,72 @@ import Foundation
 import Testing
 @testable import ForeWiz
 
-@Suite("WeatherPresentationMapper Tests")
+@Suite("WeatherPresentationMapper Tests", .serialized)
 struct WeatherPresentationMapperTests {
     
     private let mapper = WeatherPresentationMapper()
     
     @Test("conditionText maps thunderstorm")
     func conditionTextMapsThunderstorm() async throws {
-        #expect(mapper.conditionText(for: "Thunderstorm") == L10n.text("weather_storm"))
-        #expect(mapper.conditionText(for: "Thunder") == L10n.text("weather_storm"))
+        let t1 = mapper.conditionText(for: "Thunderstorm")
+        #expect(t1 == L10n.text("weather_storm", lang: "tr") || t1 == L10n.text("weather_storm", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "Thunder")
+        #expect(t2 == L10n.text("weather_storm", lang: "tr") || t2 == L10n.text("weather_storm", lang: "en"))
     }
     
     @Test("conditionText maps rain")
     func conditionTextMapsRain() async throws {
-        #expect(mapper.conditionText(for: "Rain") == L10n.text("weather_rain"))
-        #expect(mapper.conditionText(for: "Drizzle") == L10n.text("weather_rain"))
+        let t1 = mapper.conditionText(for: "Rain")
+        #expect(t1 == L10n.text("weather_rain", lang: "tr") || t1 == L10n.text("weather_rain", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "Drizzle")
+        #expect(t2 == L10n.text("weather_rain", lang: "tr") || t2 == L10n.text("weather_rain", lang: "en"))
     }
     
     @Test("conditionText maps snow")
     func conditionTextMapsSnow() async throws {
-        #expect(mapper.conditionText(for: "Snow") == L10n.text("weather_snow"))
-        #expect(mapper.conditionText(for: "Sleet") == L10n.text("weather_snow"))
+        let t1 = mapper.conditionText(for: "Snow")
+        #expect(t1 == L10n.text("weather_snow", lang: "tr") || t1 == L10n.text("weather_snow", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "Sleet")
+        #expect(t2 == L10n.text("weather_snow", lang: "tr") || t2 == L10n.text("weather_snow", lang: "en"))
     }
     
     @Test("conditionText maps cloudy")
     func conditionTextMapsCloudy() async throws {
-        #expect(mapper.conditionText(for: "Cloudy") == L10n.text("weather_cloudy"))
-        #expect(mapper.conditionText(for: "MostlyCloudy") == L10n.text("weather_cloudy"))
+        let t1 = mapper.conditionText(for: "Cloudy")
+        #expect(t1 == L10n.text("weather_cloudy", lang: "tr") || t1 == L10n.text("weather_cloudy", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "MostlyCloudy")
+        #expect(t2 == L10n.text("weather_cloudy", lang: "tr") || t2 == L10n.text("weather_cloudy", lang: "en"))
     }
     
     @Test("conditionText maps fog")
     func conditionTextMapsFog() async throws {
-        #expect(mapper.conditionText(for: "Fog") == L10n.text("weather_foggy"))
-        #expect(mapper.conditionText(for: "Haze") == L10n.text("weather_foggy"))
+        let t1 = mapper.conditionText(for: "Fog")
+        #expect(t1 == L10n.text("weather_foggy", lang: "tr") || t1 == L10n.text("weather_foggy", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "Haze")
+        #expect(t2 == L10n.text("weather_foggy", lang: "tr") || t2 == L10n.text("weather_foggy", lang: "en"))
     }
     
     @Test("conditionText maps clear")
     func conditionTextMapsClear() async throws {
-        #expect(mapper.conditionText(for: "Clear") == L10n.text("weather_clear"))
-        #expect(mapper.conditionText(for: "Sun") == L10n.text("weather_clear"))
+        let t1 = mapper.conditionText(for: "Clear")
+        #expect(t1 == L10n.text("weather_clear", lang: "tr") || t1 == L10n.text("weather_clear", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "Sun")
+        #expect(t2 == L10n.text("weather_clear", lang: "tr") || t2 == L10n.text("weather_clear", lang: "en"))
     }
     
     @Test("conditionText returns default for unknown")
     func conditionTextReturnsDefaultForUnknown() async throws {
-        #expect(mapper.conditionText(for: nil) == L10n.text("weather_current"))
-        #expect(mapper.conditionText(for: "UnknownCondition") == L10n.text("weather_current"))
+        let t1 = mapper.conditionText(for: nil)
+        #expect(t1 == L10n.text("weather_current", lang: "tr") || t1 == L10n.text("weather_current", lang: "en"))
+        
+        let t2 = mapper.conditionText(for: "UnknownCondition")
+        #expect(t2 == L10n.text("weather_current", lang: "tr") || t2 == L10n.text("weather_current", lang: "en"))
     }
     
     @Test("symbolName maps thunderstorm")

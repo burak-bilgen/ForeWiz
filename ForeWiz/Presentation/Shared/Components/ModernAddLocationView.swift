@@ -19,7 +19,7 @@ struct ModernAddLocationView: View {
         ZStack {
             Map(position: $cameraPosition, interactionModes: [.pan, .zoom]) {
                 if let item = selectedMapItem {
-                    Marker(item.name ?? "", coordinate: item.location.coordinate)
+                    Marker(item.name ?? "", coordinate: item.placemark.coordinate)
                         .tint(Color(red: 0.4, green: 0.7, blue: 1.0))
                 }
             }
@@ -110,7 +110,7 @@ struct ModernAddLocationView: View {
                                         .foregroundStyle(.white)
                                         .lineLimit(1)
 
-                                    if let addr = item.address?.fullAddress {
+                                    if let addr = addressText(for: item) {
                                         Text(addr)
                                             .font(.system(size: 13))
                                             .foregroundStyle(Color.white.opacity(0.5))
@@ -152,7 +152,7 @@ struct ModernAddLocationView: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
 
-                if let addr = item.address?.fullAddress {
+                if let addr = addressText(for: item) {
                     Text(addr)
                         .font(.system(size: 14))
                         .foregroundStyle(Color.white.opacity(0.55))
@@ -223,7 +223,7 @@ struct ModernAddLocationView: View {
 
         withAnimation(AppTheme.cardSpring) {
             cameraPosition = .region(MKCoordinateRegion(
-                center: item.location.coordinate,
+                center: item.placemark.coordinate,
                 latitudinalMeters: 1500,
                 longitudinalMeters: 1500
             ))
@@ -233,12 +233,31 @@ struct ModernAddLocationView: View {
     private func addLocation(_ item: MKMapItem) {
         let location = SavedLocation(
             name: item.name ?? L10n.text("location.picker.fallback_name"),
-            latitude: item.location.coordinate.latitude,
-            longitude: item.location.coordinate.longitude,
-            address: item.address?.fullAddress ?? ""
+            latitude: item.placemark.coordinate.latitude,
+            longitude: item.placemark.coordinate.longitude,
+            address: addressText(for: item) ?? ""
         )
         onAdd(location)
         HapticEngine.shared.success()
         dismiss()
+    }
+
+    private func addressText(for item: MKMapItem) -> String? {
+        let placemark = item.placemark
+        let parts = [
+            placemark.thoroughfare,
+            placemark.subThoroughfare,
+            placemark.locality,
+            placemark.administrativeArea,
+            placemark.country
+        ]
+        .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+        .filter { !$0.isEmpty }
+
+        if !parts.isEmpty {
+            return parts.joined(separator: ", ")
+        }
+
+        return placemark.title
     }
 }

@@ -368,7 +368,7 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 | **Localized strings** | ~200 keys (EN + TR) — formal Turkish tone |
 | **Build errors/warnings** | 0 error, 0 warning (production target) |
 | **Force unwraps in production code** | **0** — fully eliminated |
-| **External dependencies** | **Google AdMob** (monetization) — everything else Apple-first-party |
+| **External dependencies** | **Google AdMob + UMP** (monetization/consent) — everything else Apple-first-party |
 | **Deployment target** | iOS 17+ |
 
 ### File Size Management
@@ -391,10 +391,10 @@ Large files systematically refactored into focused modules:
 
 ## 🔒 Privacy
 
-- **Location**: Used only for local weather - no background tracking, no sharing
-- **Preferences**: All stored **on-device** via SwiftData - never transmitted
-- **Analytics**: **Zero** - no telemetry, no analytics SDKs, no third-party code
-- **Network**: Only connects to Apple WeatherKit - no data leaves your device
+- **Location**: Used for local weather, route weather, and MapKit search - no background tracking
+- **Preferences**: Stored **on-device** via SwiftData/app group; widget payloads are encrypted locally
+- **Analytics**: No third-party analytics SDK; only local app/ad performance counters
+- **Network**: Apple WeatherKit/MapKit plus Google AdMob/UMP for ads and consent
 
 ---
 

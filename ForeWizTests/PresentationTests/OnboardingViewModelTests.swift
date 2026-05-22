@@ -3,7 +3,7 @@ import Testing
 @testable import ForeWiz
 
 @MainActor
-@Suite("OnboardingViewModel Tests")
+@Suite("OnboardingViewModel Tests", .serialized)
 struct OnboardingViewModelTests {
     
     @Test("initial language is english")
@@ -118,6 +118,34 @@ struct OnboardingViewModelTests {
         let profile = viewModel.makeProfile()
         
         #expect(profile.language == .turkish)
+    }
+
+    @Test("canContinue is true when location is denied but manual city is added")
+    func canContinueIsTrueWhenLocationDeniedButManualCityAdded() async throws {
+        L10n.configure(language: .english)
+        let mockLocation = MockLocationRepository()
+        let mockNotification = MockNotificationRepository()
+        let viewModel = OnboardingViewModel(
+            locationRepository: mockLocation,
+            notificationRepository: mockNotification
+        )
+        
+        // Initially, cannot continue
+        #expect(viewModel.canContinue == false)
+        
+        // Add manual city
+        let location = SavedLocation(
+            name: "Istanbul",
+            latitude: 41.0082,
+            longitude: 28.9784,
+            address: "Istanbul, Turkey"
+        )
+        viewModel.addManualLocation(location)
+        
+        // Now can continue
+        #expect(viewModel.canContinue == true)
+        #expect(viewModel.profile.selectedLocationID == location.id)
+        #expect(viewModel.profile.savedLocations.contains(where: { $0.id == location.id }))
     }
 }
 

@@ -8,6 +8,7 @@ struct OnboardingView: View {
 
     @State private var isCompleting = false
     @State private var pageAppeared = false
+    @State private var showCitySearchSheet = false
 
     var body: some View {
         ZStack {
@@ -43,6 +44,11 @@ struct OnboardingView: View {
             }
         } message: {
             Text(L10n.text("tracking_settings_disabled_message"))
+        }
+        .sheet(isPresented: $showCitySearchSheet) {
+            ModernAddLocationView { location in
+                viewModel.addManualLocation(location)
+            }
         }
     }
 
@@ -143,7 +149,7 @@ struct OnboardingView: View {
                     title: L10n.text("location"),
                     subtitle: L10n.text("required_for_local_weather"),
                     isGranted: viewModel.locationStatus == .authorized,
-                    isDenied: false,
+                    isDenied: viewModel.locationStatus == .denied || viewModel.locationStatus == .restricted,
                     isRequired: true
                 ) {
                     viewModel.requestLocationPermission()
@@ -177,6 +183,94 @@ struct OnboardingView: View {
         }
         .staggerEntrance(index: 4, appeared: pageAppeared)
 
+        if viewModel.locationStatus == .denied || viewModel.locationStatus == .restricted {
+            LiquidGlassCard(accentColor: AppTheme.ember, innerPadding: 16) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(AppTheme.ember.opacity(0.12))
+                                .frame(width: 38, height: 38)
+                            Image(systemName: "mappin.slash.circle.fill")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(AppTheme.ember)
+                        }
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(L10n.text("onboarding_fallback_city_title"))
+                                .font(.system(size: 15, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text(L10n.text("onboarding_fallback_city_subtitle"))
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.55))
+                                .lineLimit(3)
+                        }
+                    }
+
+                    Divider()
+                        .background(Color.white.opacity(0.06))
+
+                    let chosenCities = viewModel.profile.savedLocations.filter { $0.id != "current-location" }
+                    if let firstCity = chosenCities.first {
+                        HStack {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.system(size: 15))
+                                .foregroundStyle(AppTheme.success)
+                            Text(firstCity.name)
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                            if !firstCity.address.isEmpty {
+                                Text("(\(firstCity.address))")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(.white.opacity(0.4))
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                            Button {
+                                HapticEngine.shared.medium()
+                                showCitySearchSheet = true
+                            } label: {
+                                Text(L10n.text("action_change"))
+                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .foregroundStyle(AppTheme.liquidAccent)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(AppTheme.liquidAccent.opacity(0.1), in: Capsule())
+                                    .overlay(Capsule().stroke(AppTheme.liquidAccent.opacity(0.25), lineWidth: 1))
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } else {
+                        Button {
+                            HapticEngine.shared.medium()
+                            showCitySearchSheet = true
+                        } label: {
+                            HStack {
+                                Spacer()
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 14, weight: .semibold))
+                                Text(L10n.text("onboarding_select_city_btn"))
+                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                                Spacer()
+                            }
+                            .foregroundStyle(.white)
+                            .frame(height: 44)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(AppTheme.liquidAccent.opacity(0.12))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(AppTheme.liquidAccent.opacity(0.35), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+                    }
+                }
+            }
+            .staggerEntrance(index: 5, appeared: pageAppeared)
+        }
+
         if let error = viewModel.errorMessage {
             Text(error)
                 .font(.system(size: 14, weight: .medium, design: .rounded))
@@ -195,7 +289,7 @@ struct OnboardingView: View {
             isCompleting = true
             Task {
                 do {
-                    try await onCompleted(viewModel.makeProfile(inheriting: existingProfile))
+                    try await onCompleted(viewModel.makeProfile())
                 } catch {
                     viewModel.setErrorMessage(AppError.persistenceFailed.userMessage)
                     isCompleting = false
@@ -224,12 +318,13 @@ struct OnboardingView: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(AppTheme.liquidAccent.opacity(0.35), lineWidth: 1)
+                    .stroke(viewModel.canContinue ? AppTheme.liquidAccent.opacity(0.35) : Color.white.opacity(0.08), lineWidth: 1)
             )
-            .pulseGlow(color: AppTheme.liquidAccent, radius: 14)
+            .pulseGlow(color: viewModel.canContinue ? AppTheme.liquidAccent : Color.clear, radius: 14)
         }
         .buttonStyle(PressScaleButtonStyle(scale: 0.97))
-        .disabled(isCompleting)
+        .disabled(isCompleting || !viewModel.canContinue)
+        .opacity(viewModel.canContinue ? 1.0 : 0.5)
         .staggerEntrance(index: 6, appeared: pageAppeared)
     }
 

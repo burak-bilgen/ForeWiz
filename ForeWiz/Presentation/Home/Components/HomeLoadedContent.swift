@@ -1,4 +1,5 @@
 import SwiftUI
+import WizPathKit
 
 // MARK: - Loaded Content
 
@@ -8,6 +9,7 @@ struct HomeLoadedContent: View {
     let refresh: () async -> Void
     let onFeedback: (UserWeatherFeedback) async -> Void
     let onDismissFeedback: () -> Void
+    let onWizPathTap: () -> Void
     @State private var showFeedbackCard = true
     
     @State private var showNativeAd = false
@@ -30,6 +32,13 @@ struct HomeLoadedContent: View {
                     recommendation: state.recommendation
                 )
                 .cardEntrance(appeared: contentReady, baseDelay: 0.08)
+                
+                // WizPath HUD Card - Center entry point
+                WizPathHUDCard(
+                    routeStatus: WizPathHUDStatus.shared.currentStatus,
+                    onTap: onWizPathTap
+                )
+                .cardEntrance(appeared: contentReady, baseDelay: 0.12)
                 
                 // Ad insertion point: after hero (rare)
                 if let idx = insertionPoints.firstIndex(of: .afterHero) {
