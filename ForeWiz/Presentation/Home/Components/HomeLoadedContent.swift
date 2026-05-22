@@ -8,6 +8,7 @@ struct HomeLoadedContent: View {
     let refresh: () async -> Void
     let onFeedback: (UserWeatherFeedback) async -> Void
     let onDismissFeedback: () -> Void
+    @State private var showFeedbackCard = true
     
     @State private var showNativeAd = false
     @State private var showBannerAd = false
@@ -83,14 +84,22 @@ struct HomeLoadedContent: View {
                 }
                 
                 // Feedback card — let users personalize forecast recommendations
-                WeatherFeedbackCard(
-                    onFeedback: { feedback in
-                        Task { await onFeedback(feedback) }
-                    },
-                    onDismiss: { onDismissFeedback() }
-                )
-                .padding(.top, 4)
-                .cardEntrance(appeared: contentReady, baseDelay: 0.56)
+                if showFeedbackCard {
+                    WeatherFeedbackCard(
+                        onFeedback: { feedback in
+                            Task { await onFeedback(feedback) }
+                        },
+                        onDismiss: {
+                            withAnimation(AppTheme.cardSpring) {
+                                showFeedbackCard = false
+                            }
+                            onDismissFeedback()
+                        }
+                    )
+                    .padding(.top, 4)
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.56)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
