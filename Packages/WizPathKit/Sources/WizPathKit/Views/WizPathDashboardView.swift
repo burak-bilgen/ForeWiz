@@ -12,8 +12,9 @@ public struct WizPathDashboardView: View {
     @State private var showChargingStationDetail = false
     @Namespace private var travelModeNamespace
     private let wizPathService: WizPathService
-
     private let departureOptimizerService: DepartureOptimizerService?
+    
+    @State private var rotationAngle: Double = 0
 
     public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil) {
         self.wizPathService = wizPathService
@@ -24,14 +25,62 @@ public struct WizPathDashboardView: View {
         NavigationStack {
             ZStack {
                 AppBackground().ignoresSafeArea()
-                if let viewModel { contentView(viewModel: viewModel) }
-                else { ProgressView().task {
-                    guard viewModel == nil else { return }
-                    viewModel = WizPathViewModel(
-                        wizPathService: wizPathService,
-                        departureOptimizerService: departureOptimizerService
-                    )
-                }}
+                if let viewModel {
+                    contentView(viewModel: viewModel)
+                    
+                    // Global Glassmorphic Loading Overlay
+                    if !viewModel.didLoadInitialLocation || viewModel.isCalculating {
+                        ZStack {
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .environment(\.colorScheme, .dark)
+                                .ignoresSafeArea()
+                            
+                            VStack(spacing: 20) {
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color.liquidAccent.opacity(0.15), lineWidth: 6)
+                                        .frame(width: 64, height: 64)
+                                    
+                                    Circle()
+                                        .trim(from: 0, to: 0.3)
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [Color.liquidAccent, Color.liquidAccentSoft],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                                        )
+                                        .frame(width: 64, height: 64)
+                                        .rotationEffect(.degrees(rotationAngle))
+                                        .onAppear {
+                                            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                                                rotationAngle = 360
+                                            }
+                                        }
+                                }
+                                
+                                Text(loadingText(viewModel: viewModel))
+                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(.white)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 40)
+                                    .transition(.opacity)
+                            }
+                        }
+                        .transition(.opacity)
+                        .zIndex(999)
+                    }
+                } else {
+                    ProgressView().task {
+                        guard viewModel == nil else { return }
+                        viewModel = WizPathViewModel(
+                            wizPathService: wizPathService,
+                            departureOptimizerService: departureOptimizerService
+                        )
+                    }
+                }
             }
             .navigationTitle(WizPathKitL10n.text("wizpath_route_planner"))
             .navigationBarTitleDisplayMode(.inline)
@@ -44,6 +93,16 @@ public struct WizPathDashboardView: View {
                 }
             }
             .animation(AppTheme.cardSpring, value: viewModel?.state)
+            .animation(.easeInOut(duration: 0.25), value: viewModel?.didLoadInitialLocation)
+            .animation(.easeInOut(duration: 0.25), value: viewModel?.isCalculating)
+        }
+    }
+
+    private func loadingText(viewModel: WizPathViewModel) -> String {
+        if !viewModel.didLoadInitialLocation {
+            return WizPathKitL10n.text("wizpath_loading_location")
+        } else {
+            return WizPathKitL10n.text("wizpath_planning_route")
         }
     }
 
@@ -67,12 +126,36 @@ public struct WizPathDashboardView: View {
         GeometryReader { geometry in
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 12) {
-                    WizPathMapView(viewModel: viewModel)
-                        .frame(height: min(260, geometry.size.height * 0.35))
-                        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
-                        .padding(.horizontal, 16).padding(.top, 8)
+                    // Map view nested inside ZStack to allow inline map details loader banner
+                    ZStack(alignment: .top) {
+                        WizPathMapView(viewModel: viewModel)
+                            .frame(height: min(260, geometry.size.height * 0.35))
+                            .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                            .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
+                        
+                        if viewModel.isLoadingMapDetails {
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                    .tint(.white)
+                                Text(WizPathKitL10n.text("wizpath_loading_smart_stops"))
+                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                    .foregroundStyle(.white)
+                            }
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .overlay(Capsule().stroke(.white.opacity(0.12), lineWidth: 0.5))
+                            .padding(.top, 12)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.75), value: viewModel.isLoadingMapDetails)
+
                     if viewModel.state.isOffline { OfflineBanner(retry: { Task { await viewModel.calculateRoute() } }).padding(.horizontal, 16) }
+                    
                     // Travel mode picker on active route screen - Premium Sliding Capsule
                     LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 4) {
                         HStack(spacing: 4) {

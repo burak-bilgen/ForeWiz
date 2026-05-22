@@ -11,17 +11,13 @@ public struct ChargingStationDetailSheet: View {
         self.station = station
     }
 
-    private var isTurkish: Bool {
-        let code = Locale.current.language.languageCode?.identifier ?? "en"
-        return code.lowercased().hasPrefix("tr")
-    }
-
     public var body: some View {
         ZStack {
             AppBackground()
             ScrollView {
                 VStack(spacing: 20) {
-                    // Header Card
+                    // Header Card (Full Width)
+                    // Header Card (Full Width)
                     LiquidGlassCard(accentColor: Color(hex: station.category.color), innerPadding: 24) {
                         VStack(spacing: 16) {
                             ZStack {
@@ -52,7 +48,9 @@ public struct ChargingStationDetailSheet: View {
                             .padding(.vertical, 6)
                             .background(Color(hex: station.safetyStatus.color).opacity(0.12), in: Capsule())
                         }
+                        .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity)
 
                     // Weather at Arrival Card (if available)
                     if let weather = station.weatherAtArrival {
@@ -62,7 +60,7 @@ public struct ChargingStationDetailSheet: View {
                                     Image(systemName: "cloud.sun.fill")
                                         .font(.system(size: 14))
                                         .foregroundStyle(Color(hex: weather.severity.colorHex))
-                                    Text(isTurkish ? "Varış Zamanı Hava Durumu" : "Weather at Arrival")
+                                    Text(WizPathKitL10n.text("wizpath_weather_at_arrival"))
                                         .font(.system(size: 13, weight: .bold))
                                         .foregroundStyle(.white)
                                 }
@@ -104,7 +102,9 @@ public struct ChargingStationDetailSheet: View {
                                         .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                                 }
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .frame(maxWidth: .infinity)
                     }
 
                     // Weather Advisor Recommendation Card
@@ -115,14 +115,14 @@ public struct ChargingStationDetailSheet: View {
                                     Image(systemName: "shield.fill")
                                         .font(.system(size: 14))
                                         .foregroundStyle(Color(hex: station.safetyStatus.color))
-                                    Text(isTurkish ? "Akıllı Yol Danışmanı" : "Smart Route Advisor")
+                                    Text(WizPathKitL10n.text("wizpath_smart_route_advisor"))
                                         .font(.system(size: 13, weight: .bold))
                                         .foregroundStyle(.white)
                                     
                                     Spacer()
                                     
                                     if station.safetyStatus.shouldAvoid {
-                                        Text(isTurkish ? "KAÇININ" : "AVOID")
+                                        Text(WizPathKitL10n.text("wizpath_avoid"))
                                             .font(.system(size: 9, weight: .black))
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 6)
@@ -150,40 +150,82 @@ public struct ChargingStationDetailSheet: View {
                                         .fixedSize(horizontal: false, vertical: true)
                                 }
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        .frame(maxWidth: .infinity)
                     }
 
                     // Stop Stats Card
                     let stopMins = Int(station.estimatedStopDuration / 60)
-                    let stopDurationDisplay = isTurkish ? "\(stopMins) dk" : "\(stopMins) mins"
+                    let stopDurationDisplay = WizPathKitL10n.formatted("wizpath_duration_minutes_short", stopMins)
                     LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16) {
                         VStack(spacing: 12) {
-                            detailRow(icon: "arrow.triangle.swap", label: isTurkish ? "Rotaya Uzaklık" : "Distance from Route", value: formattedDistance(station.distanceFromRoute))
-                            detailRow(icon: "clock.fill", label: isTurkish ? "Tahmini Varış (ETA)" : "Estimated Arrival (ETA)", value: station.etaDisplay)
-                            detailRow(icon: "hourglass", label: isTurkish ? "Tahmini Bekleme Süresi" : "Estimated Stop Duration", value: stopDurationDisplay)
+                            detailRow(icon: "arrow.triangle.swap", label: WizPathKitL10n.text("wizpath_distance_from_route"), value: formattedDistance(station.distanceFromRoute))
+                            detailRow(icon: "clock.fill", label: WizPathKitL10n.text("wizpath_estimated_arrival_eta"), value: station.etaDisplay)
+                            detailRow(icon: "hourglass", label: WizPathKitL10n.text("wizpath_estimated_stop_duration"), value: stopDurationDisplay)
                         }
+                        .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity)
+
+                    // Legal Disclaimer Card
+                    LiquidGlassCard(accentColor: .warning, innerPadding: 14) {
+                        HStack(alignment: .top, spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.warning.opacity(0.12))
+                                    .frame(width: 32, height: 32)
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundStyle(Color.warning)
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(WizPathKitL10n.text("wizpath_disclaimer_title"))
+                                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                                    .foregroundStyle(.white)
+                                
+                                Text(WizPathKitL10n.text("wizpath_disclaimer_desc"))
+                                    .font(.system(size: 11, design: .rounded))
+                                    .foregroundStyle(.white.opacity(0.75))
+                                    .lineSpacing(3)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .frame(maxWidth: .infinity)
 
                     // Navigation Action Card
                     LiquidGlassCard(accentColor: Color(hex: station.category.color), innerPadding: 16) {
                         VStack(spacing: 12) {
-                            Text(isTurkish ? "Harita uygulamaları üzerinden kolayca navigasyon başlatabilir ve yol tarifi alabilirsiniz." : "You can easily start navigation and get directions using your preferred map application.")
+                            Text(WizPathKitL10n.text("wizpath_navigation_action_desc"))
                                 .font(.system(size: 12))
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
                                 .fixedSize(horizontal: false, vertical: true)
 
                             HStack(spacing: 12) {
-                                LiquidGlassButton(isTurkish ? "Apple Haritalar" : "Apple Maps", icon: "map.fill", style: .secondary, haptic: .medium) {
+                                PremiumGlassMapButton(
+                                    title: WizPathKitL10n.text("wizpath_apple_maps"),
+                                    icon: "map.fill",
+                                    gradientColors: [.blue, Color(red: 0.1, green: 0.6, blue: 0.95)]
+                                ) {
                                     openInAppleMaps()
                                 }
 
-                                LiquidGlassButton(isTurkish ? "Google Haritalar" : "Google Maps", icon: "arrow.triangle.turn.up.right.diamond.fill", style: .primary, haptic: .medium) {
+                                PremiumGlassMapButton(
+                                    title: WizPathKitL10n.text("wizpath_google_maps"),
+                                    icon: "arrow.triangle.turn.up.right.diamond.fill",
+                                    gradientColors: [Color(red: 0.15, green: 0.65, blue: 0.35), Color(red: 0.25, green: 0.75, blue: 0.55)]
+                                ) {
                                     openInGoogleMaps()
                                 }
                             }
                         }
+                        .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity)
                 }
                 .padding(20)
             }
@@ -228,17 +270,17 @@ public struct ChargingStationDetailSheet: View {
 
     private func weatherConditionDisplay(_ weather: SegmentWeather) -> String {
         switch weather.condition {
-        case .clear: return isTurkish ? "Açık" : "Clear"
-        case .partlyCloudy: return isTurkish ? "Parçalı Bulutlu" : "Partly Cloudy"
-        case .cloudy: return isTurkish ? "Bulutlu" : "Cloudy"
-        case .rain: return isTurkish ? "Yağmurlu" : "Rain"
-        case .heavyRain: return isTurkish ? "Kuvvetli Yağmurlu" : "Heavy Rain"
-        case .snow: return isTurkish ? "Karlı" : "Snow"
-        case .sleet: return isTurkish ? "Sulu Karlı" : "Sleet"
-        case .thunderstorm: return isTurkish ? "Gök Gürültülü" : "Thunderstorm"
-        case .fog: return isTurkish ? "Sisli" : "Fog"
-        case .windy: return isTurkish ? "Rüzgârlı" : "Windy"
-        case .unknown: return isTurkish ? "Bilinmeyen" : "Unknown"
+        case .clear: return WizPathKitL10n.text("wizpath_condition_clear")
+        case .partlyCloudy: return WizPathKitL10n.text("wizpath_condition_partly_cloudy")
+        case .cloudy: return WizPathKitL10n.text("wizpath_condition_cloudy")
+        case .rain: return WizPathKitL10n.text("wizpath_condition_rain")
+        case .heavyRain: return WizPathKitL10n.text("wizpath_condition_heavy_rain")
+        case .snow: return WizPathKitL10n.text("wizpath_condition_snow")
+        case .sleet: return WizPathKitL10n.text("wizpath_condition_sleet")
+        case .thunderstorm: return WizPathKitL10n.text("wizpath_condition_thunderstorm")
+        case .fog: return WizPathKitL10n.text("wizpath_condition_fog")
+        case .windy: return WizPathKitL10n.text("wizpath_condition_windy")
+        case .unknown: return WizPathKitL10n.text("wizpath_condition_unknown")
         }
     }
 
@@ -270,3 +312,79 @@ public struct ChargingStationDetailSheet: View {
         }
     }
 }
+
+// MARK: - Premium Glass Map Button
+
+struct PremiumGlassMapButton: View {
+    let title: String
+    let icon: String
+    let gradientColors: [Color]
+    let action: () -> Void
+
+    @State private var isPressed = false
+
+    var body: some View {
+        Button {
+            WizPathKitHaptics.provider.medium()
+            action()
+        } label: {
+            HStack(spacing: 10) {
+                // Vibrant Gradient Icon Background
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .frame(width: 32, height: 32)
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.white)
+                }
+                .shadow(color: gradientColors.first?.opacity(0.3) ?? .clear, radius: 4, x: 0, y: 2)
+
+                Text(title)
+                    .font(.system(size: 13, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .frame(height: 52)
+            .background(
+                ZStack {
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+                    
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(.white.opacity(0.04))
+                    
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.15), .white.opacity(0.02)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1
+                        )
+                }
+            )
+            .scaleEffect(isPressed ? 0.96 : 1.0)
+        }
+        .contentShape(Rectangle())
+        .buttonStyle(.plain)
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 0)
+                .onChanged { _ in
+                    guard !isPressed else { return }
+                    isPressed = true
+                    WizPathKitHaptics.provider.selectionChanged()
+                }
+                .onEnded { _ in isPressed = false }
+        )
+        .animation(AppTheme.pressSpring, value: isPressed)
+    }
+}
+

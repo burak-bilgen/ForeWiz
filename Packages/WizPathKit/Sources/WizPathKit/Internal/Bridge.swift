@@ -363,16 +363,18 @@ public struct LiquidGlassButton: View {
     let icon: String?
     let style: LiquidGlassButtonStyle
     let haptic: LiquidHapticStyle
+    let isFullWidth: Bool
     let action: () -> Void
 
     @State private var isPressed = false
 
     public init(_ title: String? = nil, icon: String? = nil, style: LiquidGlassButtonStyle = .secondary,
-                haptic: LiquidHapticStyle = .light, action: @escaping () -> Void) {
+                haptic: LiquidHapticStyle = .light, isFullWidth: Bool = false, action: @escaping () -> Void) {
         self.title = title
         self.icon = icon
         self.style = style
         self.haptic = haptic
+        self.isFullWidth = isFullWidth
         self.action = action
     }
 
@@ -394,7 +396,8 @@ public struct LiquidGlassButton: View {
                 }
             }
             .frame(minWidth: 44, minHeight: 44)
-            .padding(.horizontal, title != nil ? 18 : 14)
+            .frame(maxWidth: isFullWidth ? .infinity : nil)
+            .padding(.horizontal, title != nil ? (isFullWidth ? 4 : 18) : 14)
             .padding(.vertical, 12)
             .background(glassBackground)
             .scaleEffect(isPressed ? 0.96 : 1.0)

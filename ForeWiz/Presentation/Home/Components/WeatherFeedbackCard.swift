@@ -98,11 +98,11 @@ struct WeatherFeedbackCard: View {
                     .font(.system(size: 11))
                 Text(label)
                     .font(.system(size: 8, weight: .medium))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .foregroundStyle(selectedFeedback == feedback ? .white : .secondary)
-            .frame(maxWidth: .infinity)
-            .aspectRatio(1, contentMode: .fit)
-            .padding(6)
+            .frame(width: 54, height: 42)
             .background(
                 selectedFeedback == feedback
                     ? Color.liquidAccent.opacity(0.2)
@@ -116,7 +116,6 @@ struct WeatherFeedbackCard: View {
         }
         .contentShape(Rectangle())
         .buttonStyle(.plain)
-        .frame(maxWidth: .infinity)
     }
 }
 

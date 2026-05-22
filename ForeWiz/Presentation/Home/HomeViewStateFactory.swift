@@ -91,16 +91,20 @@ private extension HomeViewStateFactory {
         let prefix = isTomorrow ? L10n.text("tomorrow_prefix") + " " : ""
         
         if criticalAlert != nil {
+            let localizedText = L10n.text("official_weather_alert")
+            let adjustedText = isTomorrow ? localizedText.lowercasedFirst : localizedText
             return (
-                prefix + L10n.text("official_weather_alert"),
+                prefix + adjustedText,
                 "exclamationmark.triangle.fill",
                 .danger
             )
         }
         
         if let risk = topRisk {
+            let localizedText = L10n.text("adjust_the_plan_for_safety")
+            let adjustedText = isTomorrow ? localizedText.lowercasedFirst : localizedText
             return (
-                prefix + L10n.text("adjust_the_plan_for_safety"),
+                prefix + adjustedText,
                 iconName(for: risk.type),
                 .danger
             )
@@ -113,15 +117,29 @@ private extension HomeViewStateFactory {
     func decisionPresentation(for decision: OutdoorDecision, isTomorrow: Bool) -> (String, String, HomeAssistantTone) {
         let prefix = isTomorrow ? L10n.text("tomorrow_prefix") + " " : ""
         
+        let rawHeadline: String
         switch decision {
         case .good:
-            return (prefix + L10n.text("clear_outdoor_day"), "checkmark.seal.fill", .good)
+            rawHeadline = L10n.text("clear_outdoor_day")
         case .moderate:
-            return (prefix + L10n.text("good_to_go_with_light"), "sparkles", .info)
+            rawHeadline = L10n.text("good_to_go_with_light")
         case .risky:
-            return (prefix + L10n.text("plan_carefully"), "exclamationmark.triangle.fill", .caution)
+            rawHeadline = L10n.text("plan_carefully")
         case .avoid:
-            return (prefix + L10n.text("better_to_postpone_outdoor_plans"), "xmark.octagon.fill", .danger)
+            rawHeadline = L10n.text("better_to_postpone_outdoor_plans")
+        }
+        
+        let headline = isTomorrow ? rawHeadline.lowercasedFirst : rawHeadline
+        
+        switch decision {
+        case .good:
+            return (prefix + headline, "checkmark.seal.fill", .good)
+        case .moderate:
+            return (prefix + headline, "sparkles", .info)
+        case .risky:
+            return (prefix + headline, "exclamationmark.triangle.fill", .caution)
+        case .avoid:
+            return (prefix + headline, "xmark.octagon.fill", .danger)
         }
     }
     
@@ -353,5 +371,14 @@ private extension HomeViewStateFactory {
         formatter.locale = .current
         formatter.unitsStyle = .short
         return formatter.localizedString(for: date, relativeTo: dateProvider.now)
+    }
+}
+
+// MARK: - String Helpers
+
+fileprivate extension String {
+    var lowercasedFirst: String {
+        guard !isEmpty else { return self }
+        return prefix(1).lowercased() + dropFirst()
     }
 }

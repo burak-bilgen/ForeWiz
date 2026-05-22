@@ -93,6 +93,7 @@ public final class WizPathViewModel {
     public var isElectricVehicle = false
     public var evRecommendations: [EVRecommendation] = []
     public var chargingStations: [SmartStop] = []
+    public var isLoadingMapDetails = false
 
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
@@ -399,6 +400,7 @@ public final class WizPathViewModel {
     }
 
     private func refreshChargingStations(for route: WizPathRoute) {
+        isLoadingMapDetails = true
         chargingStationsTask?.cancel()
         chargingStations = []
 
@@ -417,6 +419,7 @@ public final class WizPathViewModel {
         let routeID = route.id
         chargingStationsTask = Task { [weak self] in
             guard let self else { return }
+            defer { self.isLoadingMapDetails = false }
             let foundStops = await self.poiSearchService.searchSmartStopsAlongRoute(route: route, categories: categories)
             
             guard !Task.isCancelled,

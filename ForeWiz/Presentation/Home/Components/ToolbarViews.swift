@@ -10,12 +10,10 @@ struct ToolbarLanguageButton: View {
                     L10n.configure(language: lang)
                     NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
                 } label: {
-                    
-                    HStack {
+                    if L10n.currentLanguageCode == lang.localeIdentifier {
+                        Label(lang.localizedTitle, systemImage: "checkmark")
+                    } else {
                         Text(lang.localizedTitle)
-                        if L10n.currentLanguageCode == lang.localeIdentifier {
-                            Image(systemName: "checkmark")
-                        }
                     }
                 }
             }
@@ -24,7 +22,13 @@ struct ToolbarLanguageButton: View {
 
             Button {
                 Task {
-                    await AdConsentManager.shared.presentPrivacyOptions()
+                    if AdConsentManager.shared.privacyOptionsRequired {
+                        await AdConsentManager.shared.presentPrivacyOptions()
+                    } else {
+                        if let url = URL(string: "https://forewiz.app/privacy") {
+                            _ = await UIApplication.shared.open(url)
+                        }
+                    }
                 }
             } label: {
                 Label(L10n.text("settings_privacy_choices"), systemImage: "hand.raised.fill")

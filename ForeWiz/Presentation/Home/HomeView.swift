@@ -99,13 +99,6 @@ struct HomeView: View {
             .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay), value: toolbarAppeared)
         }
 
-        ToolbarItem(placement: .topBarLeading) {
-            ToolbarWizPathButton(action: { showWizPathSheet = true })
-                .opacity(toolbarAppeared ? 1 : 0)
-                .offset(y: toolbarAppeared ? 0 : -4)
-                .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay + 0.05), value: toolbarAppeared)
-        }
-
         ToolbarItem(placement: .topBarTrailing) {
             ToolbarLanguageButton()
                 .opacity(toolbarAppeared ? 1 : 0)
