@@ -364,7 +364,7 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 | **Total Swift files** | ~140 |
 | **Unit tests** | 25+ test suites |
 | **Localized strings** | ~200 keys (EN + TR) — formal Turkish tone |
-| **Build errors/warnings | 0 error, 0 warning (production target) |
+| **Build errors/warnings** | 0 error, 0 warning (production target) |
 | **Force unwraps in production code** | **0** — fully eliminated |
 | **External dependencies** | **Google AdMob** (monetization) — everything else Apple-first-party |
 | **Deployment target** | iOS 17+ |
