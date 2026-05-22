@@ -165,11 +165,15 @@ final class ForeWizNativeAdView: UIView {
         ])
         
         // CTA Button
-        callToActionButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-        callToActionButton.setTitleColor(.white, for: .normal)
-        callToActionButton.backgroundColor = UIColor.systemBlue
+        callToActionButton.configuration = {
+            var config = UIButton.Configuration.filled()
+            config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20)
+            config.baseBackgroundColor = UIColor.systemBlue
+            config.baseForegroundColor = .white
+            config.title = callToActionButton.title(for: .normal)
+            return config
+        }()
         callToActionButton.layer.cornerRadius = 10
-        callToActionButton.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
         gadNativeAdView.addSubview(callToActionButton)
         callToActionButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -297,7 +301,7 @@ struct RewardedAdButton: View {
             
             if success {
                 isShowing = true
-                AdMobRewardedIntegration.shared.showRewardedAd(
+            _ = AdMobRewardedIntegration.shared.showRewardedAd(
                     from: rootViewController,
                     reward: reward,
                     onRewardGranted: { reward in

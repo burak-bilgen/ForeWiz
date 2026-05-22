@@ -65,12 +65,12 @@ struct AdBannerView: View {
             return
         }
         
-        guard let rootVC = UIApplication.shared.connectedScenes
+        guard UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
             .first?
             .windows
             .first?
-            .rootViewController else {
+            .rootViewController != nil else {
             state = .failed
             return
         }

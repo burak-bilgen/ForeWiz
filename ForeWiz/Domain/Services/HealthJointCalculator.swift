@@ -39,7 +39,10 @@ enum HealthJointCalculator {
         }
 
         // Storm front (pressure drop correlate)
-        if hourly.contains(where: { $0.severeWeatherRisk != nil && $0.severeWeatherRisk! >= .low }) {
+        if hourly.contains(where: { point in
+            guard let severeRisk = point.severeWeatherRisk else { return false }
+            return severeRisk >= .low
+        }) {
             painScore += 1
         }
 

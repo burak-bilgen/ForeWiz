@@ -105,7 +105,7 @@ private struct StoredCandidate: Codable {
     func toCandidate() -> RecommendationCandidate {
         RecommendationCandidate(
             id: UUID(),
-            type: CandidateType(rawValue: typeRaw) ?? .goingOutSuggestion,
+            type: CandidateType(rawValue: typeRaw),
             score: score,
             signals: [],
             metadata: metadata,

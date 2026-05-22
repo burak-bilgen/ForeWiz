@@ -77,6 +77,19 @@ final class AdConsentManager {
         AppLogger.app.info("[Consent] Tracking status updated: \(self.trackingStatus.rawValue)")
     }
     
+    // MARK: - System-level ATT Check
+    
+    /// Check if system-level tracking is disabled in Settings > Privacy & Tracking.
+    /// When this is true, `requestTrackingAuthorization()` will silently return `.denied`
+    /// without showing the ATT dialog. Users must re-enable it in system Settings.
+    var isSystemTrackingDisabled: Bool {
+        #if canImport(AppTrackingTransparency)
+        return ATTrackingManager.trackingAuthorizationStatus == .denied
+        #else
+        return true
+        #endif
+    }
+    
     // MARK: - Google Mobile Ads Consent
     
     /// Check if we can serve personalized ads

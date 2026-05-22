@@ -52,10 +52,12 @@ public enum WidgetKeyManager {
 
         // Generate 32 random bytes (256 bits)
         var keyData = Data(count: 32)
-        let result = keyData.withUnsafeMutableBytes { bytes in
-            SecRandomCopyBytes(kSecRandomDefault, 32, bytes.baseAddress!)
+        var randomResult: Int32 = errSecUnimplemented
+        keyData.withUnsafeMutableBytes { bytes in
+            guard let baseAddress = bytes.baseAddress else { return }
+            randomResult = SecRandomCopyBytes(kSecRandomDefault, 32, baseAddress)
         }
-        guard result == errSecSuccess else { return nil }
+        guard randomResult == errSecSuccess else { return nil }
 
         let key = SymmetricKey(data: keyData)
 

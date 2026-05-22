@@ -161,7 +161,7 @@ struct WeatherBriefingService {
         }
 
         // 4. Outfit action
-        if let outfitItem = recommendation.outfit.items.first {
+        if !recommendation.outfit.items.isEmpty {
             items.append(WeatherActionItem(
                 id: "outfit-main",
                 priority: 5,

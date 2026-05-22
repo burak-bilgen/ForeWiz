@@ -34,6 +34,16 @@ struct OnboardingView: View {
         }
         .navigationBarHidden(true)
         .onAppear { animatePage() }
+        .alert(L10n.text("tracking_settings_disabled_title"), isPresented: $viewModel.showTrackingSettingsAlert) {
+            Button(L10n.text("action_open_settings")) {
+                viewModel.openTrackingSettings()
+            }
+            Button(L10n.text("action_cancel"), role: .cancel) {
+                viewModel.dismissTrackingSettingsAlert()
+            }
+        } message: {
+            Text(L10n.text("tracking_settings_disabled_message"))
+        }
     }
 
     private func animatePage() {
@@ -133,6 +143,7 @@ struct OnboardingView: View {
                     title: L10n.text("location"),
                     subtitle: L10n.text("required_for_local_weather"),
                     isGranted: viewModel.locationStatus == .authorized,
+                    isDenied: false,
                     isRequired: true
                 ) {
                     viewModel.requestLocationPermission()
@@ -144,6 +155,7 @@ struct OnboardingView: View {
                     title: L10n.text("notifications"),
                     subtitle: L10n.text("for_timely_reminders"),
                     isGranted: viewModel.notificationStatus == .authorized || viewModel.notificationStatus == .provisional,
+                    isDenied: false,
                     isRequired: false
                 ) {
                     viewModel.requestNotificationPermission()
@@ -156,6 +168,7 @@ struct OnboardingView: View {
                     title: L10n.text("permission_tracking"),
                     subtitle: L10n.text("permission_tracking_subtitle"),
                     isGranted: viewModel.trackingStatus == .granted,
+                    isDenied: viewModel.trackingStatus == .denied,
                     isRequired: false
                 ) {
                     viewModel.requestTrackingPermission()
@@ -246,6 +259,7 @@ private struct PermissionRow: View {
     let title: String
     let subtitle: String
     let isGranted: Bool
+    var isDenied: Bool
     let isRequired: Bool
     let action: () -> Void
 
@@ -286,6 +300,18 @@ private struct PermissionRow: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 18))
                         .foregroundStyle(AppTheme.success)
+                } else if isDenied {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 11))
+                        Text(L10n.text("denied"))
+                            .font(.system(size: 13, weight: .bold, design: .rounded))
+                    }
+                    .foregroundStyle(AppTheme.ember)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(AppTheme.ember.opacity(0.1), in: Capsule())
+                    .overlay(Capsule().stroke(AppTheme.ember.opacity(0.25), lineWidth: 1))
                 } else {
                     Text(L10n.text("allow"))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
@@ -304,9 +330,8 @@ private struct PermissionRow: View {
             )
         }
         .contentShape(Rectangle())
-
         .buttonStyle(.plain)
-        .disabled(isGranted)
+        .disabled(isGranted || isDenied)
     }
 }
 

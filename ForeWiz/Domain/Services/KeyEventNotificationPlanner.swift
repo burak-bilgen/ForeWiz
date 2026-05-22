@@ -48,8 +48,9 @@ enum KeyEventNotificationPlanner {
             let totalMm = sortedRainHours.map { $0.precipitationAmountMm ?? 0 }.reduce(0, +)
             let severity: DayKeyEvent.EventSeverity = maxChance >= 0.8 ? .high : .moderate
             let isHeavy = totalMm >= 10.0 || severity >= .high
-            let startHour = calendar.component(.hour, from: sortedRainHours.first!.date)
-            let endHour = calendar.component(.hour, from: sortedRainHours.last!.date) + 1
+            guard let firstRain = sortedRainHours.first, let lastRain = sortedRainHours.last else { return events }
+            let startHour = calendar.component(.hour, from: firstRain.date)
+            let endHour = calendar.component(.hour, from: lastRain.date) + 1
             let timeRange = timeText(startHour: startHour, endHour: endHour)
 
             let description: String
@@ -79,10 +80,11 @@ enum KeyEventNotificationPlanner {
             return risk >= .high
         }
         for (index, cluster) in stormClusters.enumerated() {
+            guard let first = cluster.first, let last = cluster.last else { continue }
             let maxRisk = cluster.compactMap { $0.severeWeatherRisk }.max() ?? .high
             let severity: DayKeyEvent.EventSeverity = maxRisk == .extreme ? .critical : .high
-            let startHour = calendar.component(.hour, from: cluster.first!.date)
-            let endHour = calendar.component(.hour, from: cluster.last!.date) + 1
+            let startHour = calendar.component(.hour, from: first.date)
+            let endHour = calendar.component(.hour, from: last.date) + 1
             let timeRange = timeText(startHour: startHour, endHour: endHour)
 
             let description: String
@@ -92,7 +94,7 @@ enum KeyEventNotificationPlanner {
                 description = String(format: L10n.text("keyevent_storm_desc"), timeRange)
             }
             events.append(DayKeyEvent(
-                id: "storm-\\(index)",
+                id: "storm-\(index)",
                 type: .storm,
                 startHour: startHour,
                 endHour: endHour,
@@ -106,12 +108,12 @@ enum KeyEventNotificationPlanner {
         // 4. Cold events (temp <= 5°C)
         let coldClusters = clusterHours(todayPoints, where: { $0.temperatureCelsius <= 5 })
         for (index, cluster) in coldClusters.enumerated() {
+            guard let first = cluster.first, let last = cluster.last else { continue }
             let minTemp = cluster.map { $0.temperatureCelsius }.min() ?? 0
             let severity: DayKeyEvent.EventSeverity = minTemp <= -5 ? .high : (minTemp <= 0 ? .moderate : .low)
-            let startHour = calendar.component(.hour, from: cluster.first!.date)
-            let endHour = calendar.component(.hour, from: cluster.last!.date) + 1
+            let startHour = calendar.component(.hour, from: first.date)
+            let endHour = calendar.component(.hour, from: last.date) + 1
             let timeRange = timeText(startHour: startHour, endHour: endHour)
-            let tempText = mapper.temperatureText(minTemp, unitSystem: unitSystem)
 
             let description: String
             if severity >= .high {
@@ -120,7 +122,7 @@ enum KeyEventNotificationPlanner {
                 description = String(format: L10n.text("keyevent_cold_desc"), timeRange)
             }
             events.append(DayKeyEvent(
-                id: "cold-\\(index)",
+                id: "cold-\(index)",
                 type: .cold,
                 startHour: startHour,
                 endHour: endHour,
@@ -164,11 +166,11 @@ enum KeyEventNotificationPlanner {
         // 7. Heat events
         let heatClusters = clusterHours(todayPoints, where: { $0.temperatureCelsius >= 33 })
         for (index, cluster) in heatClusters.enumerated() {
+            guard let first = cluster.first, let last = cluster.last else { continue }
             let maxTemp = cluster.map { $0.temperatureCelsius }.max() ?? 0
             let severity: DayKeyEvent.EventSeverity = maxTemp >= 38 ? .critical : .high
-            let startHour = calendar.component(.hour, from: cluster.first!.date)
-            let endHour = calendar.component(.hour, from: cluster.last!.date)
-            let tempText = mapper.temperatureText(maxTemp, unitSystem: unitSystem)
+            let startHour = calendar.component(.hour, from: first.date)
+            let endHour = calendar.component(.hour, from: last.date)
             let timeRange = timeText(startHour: startHour, endHour: endHour + 1)
             let description: String
             if severity == .critical {
@@ -177,7 +179,7 @@ enum KeyEventNotificationPlanner {
                 description = String(format: L10n.text("keyevent_heat_desc"), timeRange)
             }
             events.append(DayKeyEvent(
-                id: "heat-\\(index)",
+                id: "heat-\(index)",
                 type: .heat,
                 startHour: startHour,
                 endHour: endHour + 1,
@@ -191,10 +193,11 @@ enum KeyEventNotificationPlanner {
         // 8. Strong wind
         let windClusters = clusterHours(todayPoints, where: { $0.windSpeedKph ?? 0 >= 40 })
         for (index, cluster) in windClusters.enumerated() {
+            guard let first = cluster.first, let last = cluster.last else { continue }
             let maxWind = cluster.map { $0.windSpeedKph ?? 0 }.max() ?? 0
             let severity: DayKeyEvent.EventSeverity = maxWind >= 60 ? .high : .moderate
-            let startHour = calendar.component(.hour, from: cluster.first!.date)
-            let endHour = calendar.component(.hour, from: cluster.last!.date)
+            let startHour = calendar.component(.hour, from: first.date)
+            let endHour = calendar.component(.hour, from: last.date)
             let timeRange = timeText(startHour: startHour, endHour: endHour + 1)
             let description: String
             if severity >= .high {
@@ -203,7 +206,7 @@ enum KeyEventNotificationPlanner {
                 description = String(format: L10n.text("keyevent_wind_desc"), timeRange)
             }
             events.append(DayKeyEvent(
-                id: "wind-\\(index)",
+                id: "wind-\(index)",
                 type: .strongWind,
                 startHour: startHour,
                 endHour: endHour + 1,
@@ -217,14 +220,15 @@ enum KeyEventNotificationPlanner {
         // 9. High UV
         let uvClusters = clusterHours(todayPoints, where: { $0.uvIndex ?? 0 >= 7 })
         for (index, cluster) in uvClusters.enumerated() {
+            guard let first = cluster.first, let last = cluster.last else { continue }
             let maxUv = cluster.map { $0.uvIndex ?? 0 }.max() ?? 0
             let severity: DayKeyEvent.EventSeverity = maxUv >= 10 ? .high : .moderate
-            let startHour = calendar.component(.hour, from: cluster.first!.date)
-            let endHour = calendar.component(.hour, from: cluster.last!.date)
+            let startHour = calendar.component(.hour, from: first.date)
+            let endHour = calendar.component(.hour, from: last.date)
             let timeRange = timeText(startHour: startHour, endHour: endHour + 1)
             let description = String(format: L10n.text("keyevent_uv_desc"), timeRange)
             events.append(DayKeyEvent(
-                id: "uv-\\(index)",
+                id: "uv-\(index)",
                 type: .highUV,
                 startHour: startHour,
                 endHour: endHour + 1,
@@ -319,7 +323,7 @@ enum KeyEventNotificationPlanner {
         guard !matching.isEmpty else { return nil }
 
         let cal = Calendar.current
-        let first = matching.first!, last = matching.last!
+        guard let first = matching.first, let last = matching.last else { return nil }
         let startHour = cal.component(.hour, from: first.date)
         let endHour = cal.component(.hour, from: last.date) + 1
         let timeRange = timeText(startHour: startHour, endHour: endHour)
@@ -370,7 +374,8 @@ enum KeyEventNotificationPlanner {
         guard morningHasRain && afternoonClearing else { return nil }
 
         // Find the transition point
-        let lastMorningRainHour = calendar.component(.hour, from: morningRain.last!.date)
+        guard let lastMorningRainPoint = morningRain.last else { return nil }
+        let lastMorningRainHour = calendar.component(.hour, from: lastMorningRainPoint.date)
         let firstClearAfternoon = afternoon.first { !isRainCondition($0.conditionCode) && ($0.precipitationChance ?? 0) < 0.4 }
         guard let clearAfternoon = firstClearAfternoon else { return nil }
         let clearHour = calendar.component(.hour, from: clearAfternoon.date)

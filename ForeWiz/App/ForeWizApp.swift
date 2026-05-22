@@ -79,8 +79,8 @@ struct ForeWizApp: App {
             AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription, privacy: .private)")
             // Last resort: minimal in-memory container with empty schema
             let minimalSchema = Schema([UserPreferencesModel.self])
-            if let minimalConfig = try? ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true),
-               let minimal = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
+            let minimalConfig = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
+            if let minimal = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
                 return minimal
             }
             AppLogger.persistence.critical("Unable to create ANY SwiftData ModelContainer - app cannot function")

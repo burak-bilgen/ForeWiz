@@ -274,7 +274,7 @@ final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
     var onLoadCompletion: ((Bool) -> Void)?
     
     nonisolated func bannerViewDidReceiveAd(_ bannerView: BannerView) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.info("[AdMob] Banner ad received")
             AdManager.shared.recordLoaded(.banner)
             AdManager.shared.onBannerLoaded?()
@@ -284,7 +284,7 @@ final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
     }
     
     nonisolated func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.error("[AdMob] Banner ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.banner, error: error)
             onLoadCompletion?(false)
@@ -293,14 +293,14 @@ final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
     }
     
     nonisolated func bannerViewDidRecordImpression(_ bannerView: BannerView) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AdManager.shared.recordImpression(.banner)
             AdRevenueTracker.shared.recordImpression(unit: .banner)
         }
     }
     
     nonisolated func bannerViewDidRecordClick(_ bannerView: BannerView) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AdManager.shared.recordClick(.banner)
             AdRevenueTracker.shared.recordClick(unit: .banner)
         }
@@ -319,7 +319,7 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
     private var loadedAds: [NativeAd] = []
     
     nonisolated func adLoader(_ adLoader: AdLoader, didReceive nativeAd: NativeAd) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             self.loadedAds.append(nativeAd)
             nativeAd.delegate = self
             AppLogger.app.info("[AdMob] Native ad received")
@@ -327,7 +327,7 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
     }
     
     nonisolated func adLoaderDidFinishLoading(_ adLoader: AdLoader) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.info("[AdMob] Native ads loading finished: \(self.loadedAds.count) ads")
             AdManager.shared.recordLoaded(.native)
             AdManager.shared.onNativeLoaded?()
@@ -344,7 +344,7 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
     }
     
     nonisolated func adLoader(_ adLoader: AdLoader, didFailToReceiveAdWithError error: Error) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.error("[AdMob] Native ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.native, error: error)
             onLoadFailed?()
@@ -360,14 +360,14 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
 
 extension AdMobNativeLoaderDelegate: NativeAdDelegate {
     nonisolated func nativeAdDidRecordImpression(_ nativeAd: NativeAd) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AdManager.shared.recordImpression(.native)
             AdRevenueTracker.shared.recordImpression(unit: .native)
         }
     }
     
     nonisolated func nativeAdDidRecordClick(_ nativeAd: NativeAd) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AdManager.shared.recordClick(.native)
             AdRevenueTracker.shared.recordClick(unit: .native)
         }
@@ -383,14 +383,14 @@ final class AdMobInterstitialDelegate: NSObject, FullScreenContentDelegate {
     var onAdDismissed: (() -> Void)?
     
     nonisolated func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.error("[AdMob] Interstitial failed to present: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.interstitial, error: error)
         }
     }
     
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.info("[AdMob] Interstitial ad dismissed")
             AdManager.shared.recordDismiss(.interstitial)
             self.onAdDismissed?()
@@ -412,14 +412,14 @@ final class AdMobAppOpenDelegate: NSObject, FullScreenContentDelegate {
     var onAdDismissed: (() -> Void)?
     
     nonisolated func ad(_ ad: FullScreenPresentingAd, didFailToPresentFullScreenContentWithError error: Error) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.error("[AdMob] App open failed to present: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.appOpen, error: error)
         }
     }
     
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        Task { @MainActor in
+        Task { @MainActor [self] in
             AppLogger.app.info("[AdMob] App open ad dismissed")
             AdManager.shared.recordDismiss(.appOpen)
             self.onAdDismissed?()

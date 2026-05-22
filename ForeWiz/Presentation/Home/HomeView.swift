@@ -166,7 +166,12 @@ struct HomeView: View {
 // MARK: - Preview
 
 #Preview {
-    let container = try! ModelContainer(for: UserPreferencesModel.self, WeatherSnapshotModel.self)
+    guard let container = try? ModelContainer(for: UserPreferencesModel.self, WeatherSnapshotModel.self) else {
+        return Text("Preview unavailable")
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.black)
+    }
     let modelContext = container.mainContext
     let preferencesRepo = SwiftDataPreferencesRepository(modelContext: modelContext)
     let weatherCacheRepo = SwiftDataWeatherCacheRepository(modelContext: modelContext)
@@ -181,7 +186,7 @@ struct HomeView: View {
         dateProvider: dateProvider,
         activityWindowScoringEngine: activityEngine
     )
-    HomeView(
+    return HomeView(
         viewModel: HomeViewModel(
             loadHomeRecommendationUseCase: DefaultLoadHomeRecommendationUseCase(
                 locationRepository: MockLocationRepository(),

@@ -68,7 +68,10 @@ enum HealthSleepCalculator {
         }
 
         // Storm night
-        if hourly.contains(where: { $0.severeWeatherRisk != nil && $0.severeWeatherRisk! >= .medium }) {
+        if hourly.contains(where: { point in
+            guard let severeRisk = point.severeWeatherRisk else { return false }
+            return severeRisk >= .medium
+        }) {
             sleepScore -= 2
         }
 

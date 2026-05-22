@@ -99,6 +99,7 @@ A premium dark-mode aesthetic with fluid animations:
 
 ### 🌍 Localization & Accessibility
 - **English** and **Turkish** (fully translated via `.xcstrings`)
+- **Formal Turkish tone** — all UI strings use formal "siz" (you) pronoun for corporate/professional voice
 - Dynamic language switching at runtime
 - Accessibility: dynamic type, reduce motion support, VoiceOver labels
 - Biometric and haptic feedback for interactions
@@ -362,8 +363,10 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 |--------|-------|
 | **Total Swift files** | ~140 |
 | **Unit tests** | 25+ test suites |
-| **Localized strings** | 150+ keys (EN + TR) |
-| **External dependencies** | **Google AdMob** (monetization) - everything else Apple-first-party |
+| **Localized strings** | ~200 keys (EN + TR) — formal Turkish tone |
+| **Build errors/warnings | 0 error, 0 warning (production target) |
+| **Force unwraps in production code** | **0** — fully eliminated |
+| **External dependencies** | **Google AdMob** (monetization) — everything else Apple-first-party |
 | **Deployment target** | iOS 17+ |
 
 ### File Size Management
@@ -413,6 +416,21 @@ Large files systematically refactored into focused modules:
 ## 📱 License
 
 Private project. All rights reserved.
+
+---
+
+---
+
+## 📋 Changelog
+
+### v1.1.0 — Code Quality & Localization Polish
+
+| Change | Details |
+|--------|---------|
+| 🇹🇷 **Formal Turkish Tone** | All ~70 Turkish UI strings converted from informal "sen" to formal "siz" (corporate/professional voice). Includes decision messages, health advice, weather instructions, Siri responses, and WizPath strings |
+| 🧹 **Build Error Fixes** | Resolved all compiler errors (2 errors + 9 warnings): OnboardingView memberwise init, ForeWizApp NSURL throws, AdComponents dangling reference, ModelConfiguration non-throwing init |
+| ⚠️ **Warning Cleanup** | Fixed ~15 warnings: unused variables, deprecated `contentEdgeInsets`, unnecessary `try?`, Swift 6 concurrency capture semantics, double-backslash string interpolation |
+| 🔒 **Force Unwrap Elimination** | Removed all 19 force unwraps across 6 files — replaced with `guard let` / `if let` / optional chaining. **Zero force unwraps in production code** |
 
 ---
 

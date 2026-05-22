@@ -37,7 +37,10 @@ enum HealthMigraineCalculator {
         }
 
         // Storm front (rapid pressure drop)
-        let hasStormRisk = hourly.contains { $0.severeWeatherRisk != nil && $0.severeWeatherRisk! >= .medium }
+        let hasStormRisk = hourly.contains { risk in
+            guard let severeRisk = risk.severeWeatherRisk else { return false }
+            return severeRisk >= .medium
+        }
         if hasStormRisk {
             riskScore += 3
         }
