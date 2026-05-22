@@ -8,6 +8,8 @@ struct HomeLoadedContent: View {
     let refresh: () async -> Void
     
     @State private var showNativeAd = false
+    @State private var showBannerAd = false
+    @State private var insertionPoints: [AdPlacementStrategy.InsertionPoint] = []
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -25,6 +27,11 @@ struct HomeLoadedContent: View {
                     recommendation: state.recommendation
                 )
                 .cardEntrance(appeared: contentReady, baseDelay: 0.08)
+                
+                // Ad insertion point: after hero (rare)
+                if let idx = insertionPoints.firstIndex(of: .afterHero) {
+                    adSection(at: idx, baseDelay: 0.16)
+                }
 
                 // 3. Warning banner
                 if let warning = state.warningMessage {
@@ -35,31 +42,42 @@ struct HomeLoadedContent: View {
                 // 4. Key events - today's weather highlights
                 DayKeyEventsView(events: state.keyEvents)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.24)
+                
+                // Ad insertion point: after key events
+                if let idx = insertionPoints.firstIndex(of: .afterKeyEvents) {
+                    adSection(at: idx, baseDelay: 0.32)
+                }
 
                 // 5. Hourly forecast - time-sensitive
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.32)
+                
+                // Ad insertion point: after hourly forecast
+                if let idx = insertionPoints.firstIndex(of: .afterHourly) {
+                    adSection(at: idx, baseDelay: 0.40)
+                }
 
                 // 6. Weekly forecast - planning reference
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
-
-                // 7. Native ad - blends with content (shown after weekly forecast)
-                if showNativeAd {
-                    NativeAdCard()
-                        .cardEntrance(appeared: contentReady, baseDelay: 0.48)
+                
+                // Ad insertion point: after weekly forecast (most common)
+                if let idx = insertionPoints.firstIndex(of: .afterWeekly) {
+                    adSection(at: idx, baseDelay: 0.48)
                 }
 
-                // 8. Banner ad - anchored monetization
-                if AdManager.shared.canShow(.banner) {
-                    AdBannerView()
-                        .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.56 : 0.48)
-                }
-
-                // 9. Footer - attribution + last updated
+                // Footer - attribution + last updated
                 if let attribution = state.attribution {
+                    // Ad insertion point: before footer
+                    if let idx = insertionPoints.firstIndex(of: .beforeFooter) {
+                        adSection(at: idx, baseDelay: 0.48)
+                    }
+                    
                     CompactFooter(attribution: attribution, lastUpdatedText: state.lastUpdatedText)
-                        .cardEntrance(appeared: contentReady, baseDelay: showNativeAd ? 0.64 : 0.56)
+                        .cardEntrance(appeared: contentReady, baseDelay: insertionPoints.contains(.beforeFooter) ? 0.56 : 0.48)
+                } else if let idx = insertionPoints.firstIndex(of: .beforeFooter) {
+                    // No footer but ad placed here — just show the ad
+                    adSection(at: idx, baseDelay: 0.48)
                 }
             }
             .padding(.horizontal, 20)
@@ -73,11 +91,62 @@ struct HomeLoadedContent: View {
         }
     }
     
+    // MARK: - Ad Section
+    
+    /// Renders exactly ONE ad format at the given insertion point index.
+    /// Shows native at index 0, banner at index 1 (never both at the same point).
+    @ViewBuilder
+    private func adSection(at pointIndex: Int, baseDelay: Double) -> some View {
+        let showNativeHere = pointIndex == 0 ? showNativeAd : showBannerAd
+        
+        if showNativeHere && showNativeAd {
+            NativeAdCard()
+                .cardEntrance(appeared: contentReady, baseDelay: baseDelay)
+        } else if showBannerAd {
+            AdBannerView()
+                .cardEntrance(appeared: contentReady, baseDelay: baseDelay)
+        }
+    }
+    
+    // MARK: - Placement Decision
+    
     private func evaluateAdPlacement() {
-        // Native ad: show after content consumption
-        if AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh) {
-            showNativeAd = true
+        // Let the strategy decide IF and WHERE to place ads this time
+        insertionPoints = AdPlacementStrategy.shared.decideHomePlacement()
+        
+        guard !insertionPoints.isEmpty else {
+            showNativeAd = false
+            showBannerAd = false
+            return
+        }
+        
+        // If there are 2 insertion points: native at first, banner at second
+        // If there's 1 insertion point: random choice between native or banner
+        if insertionPoints.count >= 2 {
+            showNativeAd = AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh)
+            showBannerAd = AdPlacementStrategy.shared.shouldShowBanner()
+        } else {
+            // Single insertion point — pick one format, prefer native
+            if AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh) && Bool.random() {
+                showNativeAd = true
+                showBannerAd = false
+            } else {
+                showNativeAd = false
+                showBannerAd = AdPlacementStrategy.shared.shouldShowBanner()
+            }
+        }
+        
+        // Record shown ads
+        if showNativeAd {
             AdPlacementStrategy.shared.recordAdShown(.native)
+        }
+        if showBannerAd {
+            AdPlacementStrategy.shared.recordAdShown(.banner)
+        }
+        
+        // If neither format is available, clear insertion points
+        if !showNativeAd && !showBannerAd {
+            insertionPoints = []
         }
     }
 }

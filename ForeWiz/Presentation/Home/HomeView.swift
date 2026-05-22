@@ -12,6 +12,7 @@ struct HomeView: View {
 
     let onRecommendationLoaded: (DailyRecommendation) -> Void
     let onLocationsChanged: ([SavedLocation], String) -> Void
+    let wizPathService: WizPathService?
 
     @State private var showLocationPicker = false
     @State private var showSplash = true
@@ -74,7 +75,9 @@ struct HomeView: View {
                 )
             }
             .fullScreenCover(isPresented: $showWizPathSheet) {
-                WizPathDashboardView()
+                if let wizService = wizPathService {
+                    WizPathDashboardView(wizPathService: wizService)
+                }
             }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
@@ -167,7 +170,7 @@ struct HomeView: View {
 
 #Preview {
     guard let container = try? ModelContainer(for: UserPreferencesModel.self, WeatherSnapshotModel.self) else {
-        return Text("Preview unavailable")
+        return Text(L10n.text("preview_unavailable"))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.black)
@@ -207,6 +210,7 @@ struct HomeView: View {
         savedLocations: .constant([]),
         selectedLocationID: .constant("current"),
         onRecommendationLoaded: { _ in },
-        onLocationsChanged: { _, _ in }
+        onLocationsChanged: { _, _ in },
+        wizPathService: nil
     )
 }

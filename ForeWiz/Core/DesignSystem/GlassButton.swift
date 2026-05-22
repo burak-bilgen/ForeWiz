@@ -377,7 +377,7 @@ struct CardActionButton: View {
 
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title): \(detail)")
+        .accessibilityLabel(L10n.formatted("%@: %@", title, detail))
     }
 }
 

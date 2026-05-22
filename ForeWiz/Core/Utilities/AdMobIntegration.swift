@@ -55,7 +55,7 @@ final class AdMobIntegration {
             return
         }
         
-        let bannerView = BannerView()
+        let bannerView = BannerView(adSize: AdSizeBanner)
         bannerView.adUnitID = adUnitID
         bannerView.rootViewController = rootVC
         bannerView.delegate = AdMobBannerDelegate.shared
@@ -81,7 +81,7 @@ final class AdMobIntegration {
         adUnitID: String,
         rootViewController: UIViewController
     ) -> BannerView {
-        let bannerView = BannerView()
+        let bannerView = BannerView(adSize: AdSizeBanner)
         bannerView.adUnitID = adUnitID
         bannerView.rootViewController = rootViewController
         bannerView.delegate = AdMobBannerDelegate.shared

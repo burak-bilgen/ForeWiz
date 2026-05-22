@@ -113,7 +113,8 @@ private struct HomeRootView: View {
                         AppLogger.persistence.error("Failed to save locations: \(error.localizedDescription)")
                     }
                 }
-            }
+            },
+            wizPathService: coordinator.container.wizPathService
         )
         .onChange(of: coordinator.profile.language) { _, _ in
             Task { await homeViewModel.reloadForLanguageChange() }

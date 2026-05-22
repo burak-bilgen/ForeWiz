@@ -1,6 +1,7 @@
 import OSLog
 import SwiftData
 import SwiftUI
+import WizPathKit
 
 @main
 struct ForeWizApp: App {
@@ -13,6 +14,9 @@ struct ForeWizApp: App {
     init() {
         modelContainer = Self.makeModelContainer()
         BackgroundRefreshManager.shared.registerTasks()
+        
+        // Set up WizPathKit localization bridge
+        WizPathKitL10n.provider = ForeWizL10nProvider()
         
         // Initialize ad system early
         Task {

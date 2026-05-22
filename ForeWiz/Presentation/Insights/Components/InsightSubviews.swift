@@ -59,7 +59,7 @@ struct StatisticCard: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(value)\(unit)")
+                Text(L10n.formatted("%@%@", value, unit))
                     .font(.title3.bold())
                     .foregroundStyle(.primary)
                     .lineLimit(1)

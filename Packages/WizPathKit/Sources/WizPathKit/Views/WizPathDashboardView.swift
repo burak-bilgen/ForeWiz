@@ -8,8 +8,11 @@ public struct WizPathDashboardView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showDestinationPicker = false
     @State private var showDepartureOptimizer = false
+    private let wizPathService: WizPathService
 
-    public init() {}
+    public init(wizPathService: WizPathService) {
+        self.wizPathService = wizPathService
+    }
 
     public var body: some View {
         NavigationStack {
@@ -17,8 +20,8 @@ public struct WizPathDashboardView: View {
                 AppBackground().ignoresSafeArea()
                 if let viewModel { contentView(viewModel: viewModel) }
                 else { ProgressView().task {
-                    // Note: In production, inject via DependencyContainer
-                    // The container must provide the required repositories
+                    guard viewModel == nil else { return }
+                    viewModel = WizPathViewModel(wizPathService: wizPathService)
                 }}
             }
             .navigationTitle(WizPathKitL10n.text("wizpath_route_planner"))

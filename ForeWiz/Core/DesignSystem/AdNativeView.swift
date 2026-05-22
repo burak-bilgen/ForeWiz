@@ -164,16 +164,12 @@ final class ForeWizNativeAdView: UIView {
             starRatingImageView.heightAnchor.constraint(equalToConstant: 16)
         ])
         
-        // CTA Button
-        callToActionButton.configuration = {
-            var config = UIButton.Configuration.filled()
-            config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 20)
-            config.baseBackgroundColor = UIColor.systemBlue
-            config.baseForegroundColor = .white
-            config.title = callToActionButton.title(for: .normal)
-            return config
-        }()
+        // CTA Button — configuration set in configure() when actual ad data is available
         callToActionButton.layer.cornerRadius = 10
+        callToActionButton.setTitleColor(.white, for: .normal)
+        callToActionButton.backgroundColor = UIColor.systemBlue
+        callToActionButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+        // contentEdgeInsets explicitly not set — UIButtonConfiguration handles layout automatically on iOS 15+
         gadNativeAdView.addSubview(callToActionButton)
         callToActionButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -225,11 +221,12 @@ final class ForeWizNativeAdView: UIView {
             starRatingImageView.isHidden = true
         }
         
-        // CTA
+        // CTA — configure button AFTER registering it with GAD view to ensure proper layout
         if let cta = nativeAd.callToAction {
             callToActionButton.setTitle(cta, for: .normal)
             callToActionButton.isHidden = false
         } else {
+            callToActionButton.setTitle(nil, for: .normal)
             callToActionButton.isHidden = true
         }
         
@@ -264,7 +261,7 @@ struct RewardedAdButton: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
                     
-                    Text("Watch ad to earn \(reward.amount) \(reward.type)")
+                    Text(L10n.formatted("Watch ad to earn %lld %@", reward.amount, reward.type))
                         .font(.system(size: 12))
                         .foregroundStyle(.secondary)
                 }

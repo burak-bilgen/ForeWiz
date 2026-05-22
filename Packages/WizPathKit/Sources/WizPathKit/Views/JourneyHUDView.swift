@@ -16,9 +16,9 @@ public struct JourneyHUDView: View {
                     ZStack { Circle().fill(safetyTint.opacity(0.15)).frame(width: 32, height: 32); Image(systemName: safetyIcon).font(.system(size: 14, weight: .bold)).foregroundStyle(safetyTint) }.padding(.leading, 12)
                     HStack(spacing: 0) {
                         StatItem(value: data.durationDisplay, label: WizPathKitL10n.text("hud_eta"), color: .white)
-                        Divider().frame(height: 20).padding(.horizontal, 8).overlay(Color.white.opacity(0.1))
+                        Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 20).padding(.horizontal, 8)
                         StatItem(value: "\(data.hazardCount)", label: WizPathKitL10n.text("hud_hazards"), color: data.hazardCount > 0 ? .warning : .secondary)
-                        Divider().frame(height: 20).padding(.horizontal, 8).overlay(Color.white.opacity(0.1))
+                        Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 20).padding(.horizontal, 8)
                         StatItem(value: "\(data.safetyScore)", label: WizPathKitL10n.text("hud_safety"), color: safetyTint)
                     }.padding(.horizontal, 8)
                     Spacer(minLength: 0)

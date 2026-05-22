@@ -61,7 +61,7 @@ final class AdManager {
             case .banner: return "ca-app-pub-3940256099942544/2435281174"
             case .native: return "ca-app-pub-3940256099942544/3986624511"
             case .interstitial: return "ca-app-pub-3940256099942544/4411468910"
-            case .appOpen: return "ca-app-pub-3940256099942544/5662855259"
+            case .appOpen: return "ca-app-pub-3940256099942544/5575463023"
             case .rewarded: return "ca-app-pub-3940256099942544/1712485313"
             case .rewardedInterstitial: return "ca-app-pub-3940256099942544/5354046376"
             }
