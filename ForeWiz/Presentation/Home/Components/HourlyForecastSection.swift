@@ -1,4 +1,5 @@
 import SwiftUI
+import WizPathKit
 
 // MARK: - Hourly Forecast Section
 

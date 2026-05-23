@@ -1,7 +1,7 @@
 import Foundation
 
 /// Health-Weather correlation intelligence.
-/// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, and stamina.
+/// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, stamina, and air quality.
 struct HealthWeatherService {
 
     /// Generates a complete health analysis from weather data.
@@ -21,21 +21,21 @@ struct HealthWeatherService {
         let jointPain = HealthJointCalculator.calculate(current: current, hourly: hourly)
         let respiratoryRisk = HealthRespiratoryCalculator.calculate(current: current, hourly: hourly)
         let stamina = HealthStaminaCalculator.calculate(current: current, hourly: hourly)
+        let airQuality = HealthAirQualityCalculator.calculate(airQuality: snapshot.airQuality)
 
         let overallScore = calculateOverallHealthScore(
             migraine: migraineRisk.risk,
             sleep: sleepQuality.quality,
             joint: jointPain.index,
             respiratory: respiratoryRisk.index,
-            stamina: stamina.index
+            stamina: stamina.index,
+            airQuality: airQuality.index
         )
 
         let summary = generateHealthSummary(
-            migraineLabel: migraineRisk.label,
-            sleepLabel: sleepQuality.label,
-            jointLabel: jointPain.label,
-            staminaLabel: stamina.label,
             overallScore: overallScore,
+            airQuality: airQuality,
+            migraineRisk: migraineRisk.risk,
             decision: recommendation.outdoorDecision
         )
 
@@ -55,6 +55,11 @@ struct HealthWeatherService {
             staminaIndex: stamina.index,
             staminaLabel: stamina.label,
             staminaAdvice: stamina.advice,
+            airQualityIndex: airQuality.index,
+            airQualityLabel: airQuality.category.localizedTitle,
+            airQualityAdvice: airQuality.advice,
+            airQualityCategory: airQuality.category,
+            pollenLevel: snapshot.airQuality?.pollenIndex,
             overallHealthScore: overallScore,
             healthSummary: summary
         )
@@ -67,26 +72,36 @@ struct HealthWeatherService {
         sleep: Int,
         joint: Int,
         respiratory: Int,
-        stamina: Int
+        stamina: Int,
+        airQuality: Int
     ) -> Int {
         // Invert scores where higher = worse
         let migraineInverted = 10 - migraine
         let jointInverted = 10 - joint
         let respiratoryInverted = 10 - respiratory
+        let airQualityInverted = 10 - airQuality
 
         // All on 1-10 scale
-        let avg = Double(migraineInverted + sleep + jointInverted + respiratoryInverted + stamina) / 5.0
+        let avg = Double(migraineInverted + sleep + jointInverted + respiratoryInverted + stamina + airQualityInverted) / 6.0
         return Int((avg / 10.0) * 100.0)
     }
 
     private func generateHealthSummary(
-        migraineLabel: String,
-        sleepLabel: String,
-        jointLabel: String,
-        staminaLabel: String,
         overallScore: Int,
+        airQuality: (index: Int, advice: String, category: AirQualityCategory),
+        migraineRisk: Int,
         decision: OutdoorDecision
     ) -> String {
+        // If air quality is bad, mention it first
+        if airQuality.index >= 6 {
+            return String(format: L10n.text("health_summary_aqi_poor"), airQuality.category.localizedTitle)
+        }
+
+        // If migraine risk is high, prioritize that
+        if migraineRisk >= 7 {
+            return L10n.text("health_summary_migraine_risk")
+        }
+
         switch overallScore {
         case 80...100:
             return L10n.text("health_summary_great")

@@ -126,11 +126,23 @@ struct WeatherBriefingService {
             ))
         }
 
+        // 3. Air Quality action
+        if health.airQualityIndex >= 4 {
+            items.append(WeatherActionItem(
+                id: "health-aqi",
+                priority: 3,
+                icon: "lungs.fill",
+                title: health.airQualityLabel,
+                description: health.airQualityAdvice,
+                category: .health
+            ))
+        }
+
         // 3. Health actions
         if health.migraineRisk >= 6 {
             items.append(WeatherActionItem(
                 id: "health-migraine",
-                priority: 3,
+                priority: 4,
                 icon: "brain.head.profile",
                 title: L10n.text("action_migraine"),
                 description: health.migraineAdvice,
@@ -141,7 +153,7 @@ struct WeatherBriefingService {
         if health.staminaIndex <= 4 {
             items.append(WeatherActionItem(
                 id: "health-stamina",
-                priority: 4,
+                priority: 5,
                 icon: "bolt.slash.fill",
                 title: L10n.text("action_stamina"),
                 description: health.staminaAdvice,
@@ -152,7 +164,7 @@ struct WeatherBriefingService {
         if health.sleepQuality <= 4 {
             items.append(WeatherActionItem(
                 id: "health-sleep",
-                priority: 4,
+                priority: 5,
                 icon: "moon.zzz.fill",
                 title: L10n.text("action_sleep"),
                 description: health.sleepAdvice,
@@ -164,7 +176,7 @@ struct WeatherBriefingService {
         if !recommendation.outfit.items.isEmpty {
             items.append(WeatherActionItem(
                 id: "outfit-main",
-                priority: 5,
+                priority: 6,
                 icon: "tshirt.fill",
                 title: L10n.text("action_outfit"),
                 description: recommendation.outfit.title,
@@ -175,7 +187,7 @@ struct WeatherBriefingService {
         // 5. Lifestyle tip from narrative
         items.append(WeatherActionItem(
             id: "lifestyle-tip",
-            priority: 6,
+            priority: 7,
             icon: "sparkles",
             title: L10n.text("action_pro_tip"),
             description: narrative.proTip,

@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 
 @MainActor
 @Observable
@@ -101,12 +100,6 @@ final class OnboardingViewModel {
         showTrackingSettingsAlert = false
     }
     
-    func openTrackingSettings() {
-        showTrackingSettingsAlert = false
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-        UIApplication.shared.open(url)
-    }
-
     func addManualLocation(_ location: SavedLocation) {
         var updatedProfile = profile
         if !updatedProfile.savedLocations.contains(where: { $0.id == location.id }) {

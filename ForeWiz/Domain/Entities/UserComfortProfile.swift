@@ -18,6 +18,17 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var temperatureOffset: Double
     /// Wind sensitivity multiplier: >1 means more sensitive to wind, <1 means less. Range: 0.5 to 2.0.
     var windSensitivityMultiplier: Double
+    /// UV sensitivity: >1 means more sensitive to sun, <1 means less. Range: 0.5 to 2.0.
+    var uvSensitivityMultiplier: Double
+    /// Humidity sensitivity: >1 means more affected by humidity, <1 means less. Range: 0.5 to 2.0.
+    var humiditySensitivityMultiplier: Double
+    /// Preferred activity time: nil = flexible, or user's typical outdoor activity hours
+    var preferredActivityStartHour: Int?
+    var preferredActivityEndHour: Int?
+    /// Whether the user has respiratory conditions (asthma, allergies) — affects AQI weighting
+    var hasRespiratoryCondition: Bool
+    /// Whether the user has joint sensitivity — affects joint pain weighting
+    var hasJointSensitivity: Bool
     /// Simple thumbs feedback: tracks how many times user said "too hot" vs "too cold" vs "just right"
     var feedbackCounts: FeedbackCounts
 
@@ -34,6 +45,12 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         weatherParticleIntensity: Double = 0.15,
         temperatureOffset: Double = 0,
         windSensitivityMultiplier: Double = 1.0,
+        uvSensitivityMultiplier: Double = 1.0,
+        humiditySensitivityMultiplier: Double = 1.0,
+        preferredActivityStartHour: Int? = nil,
+        preferredActivityEndHour: Int? = nil,
+        hasRespiratoryCondition: Bool = false,
+        hasJointSensitivity: Bool = false,
         feedbackCounts: FeedbackCounts = FeedbackCounts()
     ) {
         self.usualWorkoutTime = usualWorkoutTime
@@ -48,6 +65,12 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.weatherParticleIntensity = weatherParticleIntensity.clamped(to: 0...1)
         self.temperatureOffset = temperatureOffset.clamped(to: -5...5)
         self.windSensitivityMultiplier = windSensitivityMultiplier.clamped(to: 0.5...2.0)
+        self.uvSensitivityMultiplier = uvSensitivityMultiplier.clamped(to: 0.5...2.0)
+        self.humiditySensitivityMultiplier = humiditySensitivityMultiplier.clamped(to: 0.5...2.0)
+        self.preferredActivityStartHour = preferredActivityStartHour
+        self.preferredActivityEndHour = preferredActivityEndHour
+        self.hasRespiratoryCondition = hasRespiratoryCondition
+        self.hasJointSensitivity = hasJointSensitivity
         self.feedbackCounts = feedbackCounts
     }
 
@@ -64,15 +87,12 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         switch feedback {
         case .tooHot:
             feedbackCounts.tooHot += 1
-            // User feels hotter than average → cool down offset slightly
             temperatureOffset = (temperatureOffset - 0.5).clamped(to: -5...5)
         case .tooCold:
             feedbackCounts.tooCold += 1
-            // User feels colder than average → warm up offset slightly
             temperatureOffset = (temperatureOffset + 0.5).clamped(to: -5...5)
         case .justRight:
             feedbackCounts.justRight += 1
-            // User agreed → move offset toward zero (converge)
             if temperatureOffset > 0 {
                 temperatureOffset = (temperatureOffset - 0.3).clamped(to: -5...5)
             } else if temperatureOffset < 0 {
@@ -84,6 +104,15 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         case .windSensitive(false):
             feedbackCounts.windSensitive += 1
             windSensitivityMultiplier = (windSensitivityMultiplier - 0.1).clamped(to: 0.5...2.0)
+        case .tooSunny:
+            feedbackCounts.tooSunny += 1
+            uvSensitivityMultiplier = (uvSensitivityMultiplier + 0.15).clamped(to: 0.5...2.0)
+        case .tooHumid:
+            feedbackCounts.tooHumid += 1
+            humiditySensitivityMultiplier = (humiditySensitivityMultiplier + 0.15).clamped(to: 0.5...2.0)
+        case .humidityFine:
+            feedbackCounts.tooHumid = max(0, feedbackCounts.tooHumid - 1)
+            humiditySensitivityMultiplier = (humiditySensitivityMultiplier - 0.1).clamped(to: 0.5...2.0)
         }
     }
     
@@ -91,6 +120,12 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     mutating func resetLearning() {
         temperatureOffset = 0
         windSensitivityMultiplier = 1.0
+        uvSensitivityMultiplier = 1.0
+        humiditySensitivityMultiplier = 1.0
+        preferredActivityStartHour = nil
+        preferredActivityEndHour = nil
+        hasRespiratoryCondition = false
+        hasJointSensitivity = false
         feedbackCounts = FeedbackCounts()
     }
 }
@@ -103,8 +138,10 @@ struct FeedbackCounts: Codable, Equatable, Sendable {
     var tooCold: Int = 0
     var justRight: Int = 0
     var windSensitive: Int = 0
+    var tooSunny: Int = 0
+    var tooHumid: Int = 0
     
-    var total: Int { tooHot + tooCold + justRight + windSensitive }
+    var total: Int { tooHot + tooCold + justRight + windSensitive + tooSunny + tooHumid }
 }
 
 /// Types of feedback a user can give about a weather recommendation.
@@ -113,6 +150,9 @@ enum UserWeatherFeedback: Equatable, Sendable, CustomStringConvertible {
     case tooCold
     case justRight
     case windSensitive(Bool) // true = sensitive, false = not sensitive
+    case tooSunny
+    case tooHumid
+    case humidityFine
 
     var description: String {
         switch self {
@@ -121,6 +161,9 @@ enum UserWeatherFeedback: Equatable, Sendable, CustomStringConvertible {
         case .justRight: return "justRight"
         case .windSensitive(true): return "windSensitive"
         case .windSensitive(false): return "notWindSensitive"
+        case .tooSunny: return "tooSunny"
+        case .tooHumid: return "tooHumid"
+        case .humidityFine: return "humidityFine"
         }
     }
 }

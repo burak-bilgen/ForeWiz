@@ -210,6 +210,7 @@ private extension HomeViewStateFactory {
         case .humidity: return L10n.text("slow_the_pace_and_keep")
         case .cold: return L10n.text("dress_in_layers_and_avoid")
         case .poorComfort: return L10n.text("keeping_outdoor_time_short_is")
+        case .airQuality: return L10n.text("action_air_quality_advice")
         }
     }
     
@@ -223,6 +224,7 @@ private extension HomeViewStateFactory {
         case .cold: return "snowflake"
         case .storm: return "cloud.bolt.rain.fill"
         case .poorComfort: return "exclamationmark.circle.fill"
+        case .airQuality: return "lungs.fill"
         }
     }
 }

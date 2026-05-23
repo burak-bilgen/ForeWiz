@@ -66,6 +66,14 @@ struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
     let staminaLabel: String
     let staminaAdvice: String
 
+    /// Air Quality Index (0=pristine, 10=hazardous)
+    let airQualityIndex: Int
+    let airQualityLabel: String
+    let airQualityAdvice: String
+    let airQualityCategory: AirQualityCategory
+    /// Pollen level (0=none, 6=extreme), nil if unavailable
+    let pollenLevel: Int?
+
     /// Overall health comfort score (0-100)
     let overallHealthScore: Int
 

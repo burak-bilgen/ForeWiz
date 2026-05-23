@@ -355,6 +355,7 @@ struct DetailRiskCard: View {
         case .cold: "snowflake"
         case .storm: "cloud.bolt.rain.fill"
         case .poorComfort: "exclamationmark.circle.fill"
+        case .airQuality: "lungs.fill"
         }
     }
 }

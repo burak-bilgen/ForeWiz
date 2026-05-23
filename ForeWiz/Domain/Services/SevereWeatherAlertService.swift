@@ -99,6 +99,8 @@ final class SevereWeatherAlertService {
             return nil
         case .poorComfort:
             return nil
+        case .airQuality:
+            return nil
         }
 
         return SevereWeatherAlert(

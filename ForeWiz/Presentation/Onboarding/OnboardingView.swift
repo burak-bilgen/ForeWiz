@@ -1,4 +1,5 @@
 import SwiftUI
+import WizPathKit
 
 // MARK: - Liquid Glass Onboarding
 struct OnboardingView: View {
@@ -37,7 +38,7 @@ struct OnboardingView: View {
         .onAppear { animatePage() }
         .alert(L10n.text("tracking_settings_disabled_title"), isPresented: $viewModel.showTrackingSettingsAlert) {
             Button(L10n.text("action_open_settings")) {
-                viewModel.openTrackingSettings()
+                openSystemTrackingSettings()
             }
             Button(L10n.text("action_cancel"), role: .cancel) {
                 viewModel.dismissTrackingSettingsAlert()
@@ -343,6 +344,11 @@ struct OnboardingView: View {
 
     private func activityIcon(for activity: ActivityType) -> String {
         "sun.max.fill"
+    }
+
+    private func openSystemTrackingSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 }
 

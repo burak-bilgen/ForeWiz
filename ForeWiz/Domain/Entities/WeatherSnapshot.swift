@@ -24,6 +24,7 @@ struct WeatherSnapshot: Codable, Equatable, Sendable {
     let availability: WeatherAvailabilityInfo?
     let fetchedAt: Date
     let attribution: WeatherAttributionInfo?
+    let airQuality: AirQualityInfo?
 
     init(
         location: LocationCoordinate,
@@ -34,7 +35,8 @@ struct WeatherSnapshot: Codable, Equatable, Sendable {
         alerts: [WeatherAlertInfo]? = nil,
         availability: WeatherAvailabilityInfo? = nil,
         fetchedAt: Date,
-        attribution: WeatherAttributionInfo?
+        attribution: WeatherAttributionInfo?,
+        airQuality: AirQualityInfo? = nil
     ) {
         self.location = location
         self.current = current
@@ -45,6 +47,7 @@ struct WeatherSnapshot: Codable, Equatable, Sendable {
         self.availability = availability
         self.fetchedAt = fetchedAt
         self.attribution = attribution
+        self.airQuality = airQuality
     }
 }
 

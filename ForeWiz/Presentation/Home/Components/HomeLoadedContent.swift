@@ -18,7 +18,7 @@ struct HomeLoadedContent: View {
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(spacing: 20) {
+            LazyVStack(spacing: 20) {
                 // 1. Critical alerts (safety first)
                 if let alert = state.assistant.criticalAlert {
                     CriticalAlertCard(signal: alert)
@@ -113,6 +113,9 @@ struct HomeLoadedContent: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
         }
+        .onAppear {
+            // LazyVStack: ensure contentReady = true triggers entrance for all lazily-created views
+        }
         .scrollIndicators(.hidden)
         .safeAreaPadding(.bottom, 12)
         .refreshable { await refresh() }
@@ -151,13 +154,14 @@ struct HomeLoadedContent: View {
         }
         
         // If there are 2 insertion points: native at first, banner at second
-        // If there's 1 insertion point: random choice between native or banner
+        // If there are 2+ insertion points: native at first, banner at second
         if insertionPoints.count >= 2 {
             showNativeAd = AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh)
             showBannerAd = AdPlacementStrategy.shared.shouldShowBanner()
         } else {
-            // Single insertion point — pick one format, prefer native
-            if AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh) && Bool.random() {
+            // Single insertion point — strategic format selection, never random.
+            // Prefer native for revenue; fall back to banner if native is cooling down.
+            if AdPlacementStrategy.shared.shouldShowNative(at: .weatherRefresh) {
                 showNativeAd = true
                 showBannerAd = false
             } else {

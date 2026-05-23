@@ -2,6 +2,7 @@ import SwiftUI
 
 struct InsightsView: View {
     let recommendation: DailyRecommendation
+    let onFeedback: () -> Void
 
     var body: some View {
         ZStack {
@@ -24,11 +25,26 @@ struct InsightsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.clear, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack(spacing: 2) {
+                    Button {
+                        HapticEngine.shared.light()
+                        onFeedback()
+                    } label: {
+                        Image(systemName: "bubble.left.and.bubble.right")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                    .accessibilityLabel(L10n.text("feedback_sheet_title"))
+                }
+            }
+        }
     }
 }
 
 #Preview {
     NavigationStack {
-        InsightsView(recommendation: .placeholder)
+        InsightsView(recommendation: .placeholder, onFeedback: {})
     }
 }

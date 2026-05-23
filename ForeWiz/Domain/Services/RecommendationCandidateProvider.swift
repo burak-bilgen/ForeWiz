@@ -11,9 +11,16 @@ protocol RecommendationCandidateProvider {
 
 struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
     private let activityWindowScoringEngine: ActivityWindowScoringEngine
+    private let riskClassifier: DefaultWeatherRiskClassifier
 
-    init(activityWindowScoringEngine: ActivityWindowScoringEngine = DefaultActivityWindowScoringEngine()) {
+    init(
+        activityWindowScoringEngine: ActivityWindowScoringEngine = DefaultActivityWindowScoringEngine(),
+        riskClassifier: DefaultWeatherRiskClassifier? = nil
+    ) {
         self.activityWindowScoringEngine = activityWindowScoringEngine
+        self.riskClassifier = riskClassifier ?? DefaultWeatherRiskClassifier(
+            activityWindowScoringEngine: activityWindowScoringEngine
+        )
     }
 
     func candidates(
@@ -34,8 +41,12 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
 
         candidates.append(avoidCandidate(from: snapshot, hourly: hourly, now: now, calendar: calendar))
 
-        for risk in riskCandidates(from: snapshot, current: current) {
-            candidates.append(risk)
+        // Use the risk classifier instead of duplicating threshold logic
+        let detectedRisks = riskClassifier.uniqueRisks(from: hourly, current: current, calendar: calendar)
+        for risk in detectedRisks {
+            if let candidate = riskCandidate(from: risk, current: current, fetchedAt: snapshot.fetchedAt) {
+                candidates.append(candidate)
+            }
         }
 
         return candidates.sorted { $0.score > $1.score }
@@ -158,49 +169,76 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         )
     }
 
-    private func riskCandidates(from snapshot: WeatherSnapshot, current: CurrentWeatherPoint) -> [RecommendationCandidate] {
-        var risks: [RecommendationCandidate] = []
+    /// Creates a recommendation candidate from a single classified WeatherRisk.
+    /// Uses the classifier's severity and thresholds instead of duplicating logic.
+    private func riskCandidate(
+        from risk: WeatherRisk,
+        current: CurrentWeatherPoint,
+        fetchedAt: Date
+    ) -> RecommendationCandidate? {
+        let signalKind: SignalKind
+        let displayValue: String
 
-        if let precip = current.precipitationChance, precip > 0.5 {
-            risks.append(RecommendationCandidate(
-                id: UUID(),
-                type: .goingOutSuggestion,
-                score: Double(precip) * 100,
-                signals: [
-                    RecommendationSignal(kind: .precipitation, value: "\(Int(precip * 100))%", weight: 0.5, metadata: [:])
-                ],
-                metadata: ["headline": L10n.text("risk_nearby_rain")],
-                generatedAt: snapshot.fetchedAt
-            ))
+        switch risk.type {
+        case .heat, .cold:
+            signalKind = .temperature
+            displayValue = "\(Int(current.apparentTemperatureCelsius))°C"
+        case .rain:
+            signalKind = .precipitation
+            displayValue = current.precipitationChance.map { "\(Int($0 * 100))%" } ?? risk.title
+        case .wind:
+            signalKind = .wind
+            displayValue = current.windSpeedKph.map { "\(Int($0)) km/h" } ?? risk.title
+        case .uv:
+            signalKind = .uvIndex
+            displayValue = current.uvIndex.map { "UV \($0)" } ?? risk.title
+        case .humidity, .poorComfort:
+            signalKind = .riskAvoidance
+            displayValue = risk.message
+        case .storm:
+            signalKind = .riskAvoidance
+            displayValue = risk.title
+        case .airQuality:
+            signalKind = .riskAvoidance
+            displayValue = risk.message
         }
 
-        if let wind = current.windSpeedKph, wind > 30 {
-            risks.append(RecommendationCandidate(
-                id: UUID(),
-                type: .goingOutSuggestion,
-                score: Double(wind) * 1.5,
-                signals: [
-                    RecommendationSignal(kind: .wind, value: "\(Int(wind)) km/h", weight: 0.4, metadata: [:])
-                ],
-                metadata: ["headline": L10n.text("risk_wind_strong")],
-                generatedAt: snapshot.fetchedAt
-            ))
-        }
+        let score: Double = riskSeverityScore(risk.severity)
+        let headline = risk.title
 
-        if let uv = current.uvIndex, uv >= 6 {
-            risks.append(RecommendationCandidate(
-                id: UUID(),
-                type: .goingOutSuggestion,
-                score: Double(uv) * 12,
-                signals: [
-                    RecommendationSignal(kind: .uvIndex, value: "UV \(uv)", weight: 0.3, metadata: [:])
-                ],
-                metadata: ["headline": L10n.text("risk_uv_high")],
-                generatedAt: snapshot.fetchedAt
-            ))
-        }
+        return RecommendationCandidate(
+            id: UUID(),
+            type: .riskAlert,
+            score: score,
+            signals: [
+                RecommendationSignal(
+                    kind: signalKind,
+                    value: displayValue,
+                    weight: riskSeverityWeight(risk.severity),
+                    metadata: [:]
+                )
+            ],
+            metadata: ["headline": headline],
+            generatedAt: fetchedAt
+        )
+    }
 
-        return risks
+    private func riskSeverityScore(_ severity: RiskLevel) -> Double {
+        switch severity {
+        case .extreme: return 95
+        case .high: return 78
+        case .medium: return 55
+        case .low: return 30
+        }
+    }
+
+    private func riskSeverityWeight(_ severity: RiskLevel) -> Double {
+        switch severity {
+        case .extreme: return 0.7
+        case .high: return 0.55
+        case .medium: return 0.35
+        case .low: return 0.2
+        }
     }
 
     private func relevantHours(from hourly: [HourlyWeatherPoint], now: Date, calendar: Calendar) -> [HourlyWeatherPoint] {

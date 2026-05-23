@@ -95,6 +95,7 @@ enum MorningBriefingPlanner {
         case .wind, .storm: return L10n.text("notif_tip_wind")
         case .cold: return L10n.text("notif_tip_cold")
         case .humidity, .poorComfort: return L10n.text("notif_tip_comfort")
+        case .airQuality: return L10n.text("notif_tip_air_quality")
         }
     }
 }

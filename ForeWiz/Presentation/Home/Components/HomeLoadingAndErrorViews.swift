@@ -1,12 +1,37 @@
 import SwiftUI
+import WizPathKit
 
 // MARK: - Loading View
 
 struct HomeLoadingView: View {
+    @State private var rotationAngle: Double = 0
+
     var body: some View {
         VStack(spacing: 20) {
-            PulsingDotsLoader(color: .white.opacity(0.5), dotSize: 10)
-                .floating(amplitude: 6)
+            ZStack {
+                Circle()
+                    .stroke(Color.liquidAccent.opacity(0.12), lineWidth: 4)
+                    .frame(width: 44, height: 44)
+
+                Circle()
+                    .trim(from: 0, to: 0.3)
+                    .stroke(
+                        LinearGradient(
+                            colors: [Color.liquidAccent, Color.liquidAccentSoft],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                    )
+                    .frame(width: 44, height: 44)
+                    .rotationEffect(.degrees(rotationAngle))
+                    .onAppear {
+                        withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                            rotationAngle = 360
+                        }
+                    }
+            }
+            .floating(amplitude: 6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

@@ -211,9 +211,109 @@ struct ComparativeWeatherService {
 
     // MARK: - Microclimate
 
+    /// Generates a microclimate note based on geographic and weather context.
+    /// Detects coastal effects, urban heat island, mountain/shade effects, and seasonal transitions.
     private func generateMicroclimateNote(snapshot: WeatherSnapshot) -> String? {
-        // Simple microclimate detection: compare current location conditions
-        // to typical patterns. Enhanced version would compare multiple locations.
-        return nil
+        let current = snapshot.current
+        let hourly = snapshot.hourly
+        let lat = snapshot.location.latitude
+        let temp = current.apparentTemperatureCelsius
+        let humidity = current.humidity ?? 0.5
+        let wind = current.windSpeedKph ?? 0
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: current.date)
+        let hour = calendar.component(.hour, from: current.date)
+        
+        var notes: [String] = []
+        
+        // 1. Coastal effect detection (latitude-based heuristic for Turkey)
+        // Turkish coastline roughly: Akdeniz 36-37°N, Ege 37-39°N, Karadeniz 41-42°N
+        let isCoastal: Bool = {
+            // Simple coastal band heuristic: within ~0.5° of major sea-level areas
+            let coastalLatBands: [(ClosedRange<Double>, String)] = [
+                (36.0...37.5, "akdeniz"),
+                (37.5...39.5, "ege"),
+                (41.0...42.5, "karadeniz"),
+                (40.0...41.5, "marmara")
+            ]
+            return coastalLatBands.contains { $0.0.contains(lat) }
+        }()
+        
+        if isCoastal {
+            if month >= 5 && month <= 10 {
+                // Summer coastal: sea breeze effect
+                if hour >= 10 && hour <= 16 && wind >= 8 && wind <= 20 {
+                    notes.append(L10n.text("microclimate_coastal_breeze_summer"))
+                } else if temp >= 30 && humidity >= 0.65 {
+                    notes.append(L10n.text("microclimate_coastal_humid_summer"))
+                }
+            } else if month >= 11 || month <= 3 {
+                // Winter coastal: milder than inland
+                if temp >= 12 && temp <= 18 {
+                    notes.append(L10n.text("microclimate_coastal_mild_winter"))
+                }
+            }
+        }
+        
+        // 2. Urban heat island detection
+        // Large Turkish cities: Istanbul (~41°N, 29°E), Ankara (~40°N, 33°E), Izmir (~38°N, 27°E)
+        let isUrban: Bool = {
+            let urbanAreas: [(ClosedRange<Double>, ClosedRange<Double>)] = [
+                (40.8...41.3, 28.6...29.2),   // Istanbul
+                (39.7...40.1, 32.5...33.0),   // Ankara
+                (38.2...38.6, 26.8...27.4),   // Izmir
+                (36.7...37.2, 28.5...29.5),   // Antalya/Mugla coast
+                (36.8...37.2, 35.0...35.6),   // Adana
+                (40.1...40.4, 28.7...29.2),   // Bursa
+            ]
+            let lon = snapshot.location.longitude
+            return urbanAreas.contains { $0.0.contains(lat) && $0.1.contains(lon) }
+        }()
+        
+        if isUrban {
+            // Urban heat island effect is most noticeable at night
+            if !(hour >= 6 && hour <= 20) && temp >= 22 {
+                notes.append(L10n.text("microclimate_urban_heat_night"))
+            } else if temp >= 32 && hour >= 11 && hour <= 17 {
+                notes.append(L10n.text("microclimate_urban_heat_day"))
+            }
+        }
+        
+        // 3. Mountain/shade effect (elevation proxy via lower temps)
+        // For non-coastal areas with lower than expected temps for the season
+        if !isCoastal {
+            let seasonalExpectedTemp: Double = {
+                switch month {
+                case 6...8: return 32.0  // Summer
+                case 3...5: return 22.0  // Spring
+                case 9...11: return 24.0 // Fall
+                default: return 12.0     // Winter
+                }
+            }()
+            
+            let diff = seasonalExpectedTemp - temp
+            if diff >= 6 && !isUrban {
+                notes.append(L10n.text("microclimate_elevation_cool"))
+            } else if diff <= -6 && isUrban == false {
+                notes.append(L10n.text("microclimate_inland_heat"))
+            }
+        }
+        
+        // 4. Seasonal transition detection
+        if month == 4 || month == 5 {
+            // Spring transition: unstable weather typical
+            let tempSwing = hourly.map { $0.apparentTemperatureCelsius }
+            if let maxT = tempSwing.max(), let minT = tempSwing.min(), (maxT - minT) >= 10 {
+                notes.append(L10n.text("microclimate_spring_transition"))
+            }
+        } else if month == 10 || month == 11 {
+            // Fall transition
+            if temp <= 15 && humidity >= 0.7 {
+                notes.append(L10n.text("microclimate_fall_chill"))
+            }
+        }
+        
+        guard !notes.isEmpty else { return nil }
+        return notes.joined(separator: " ")
     }
 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import WizPathKit
 
 // MARK: - Hero Card
 
