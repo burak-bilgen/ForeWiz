@@ -7,10 +7,7 @@ struct HomeLoadedContent: View {
     let state: HomeViewState
     let contentReady: Bool
     let refresh: () async -> Void
-    let onFeedback: (UserWeatherFeedback) async -> Void
-    let onDismissFeedback: () -> Void
     let onWizPathTap: () -> Void
-    @State private var showFeedbackCard = true
     
     @State private var showNativeAd = false
     @State private var showBannerAd = false
@@ -90,24 +87,6 @@ struct HomeLoadedContent: View {
                 } else if let idx = insertionPoints.firstIndex(of: .beforeFooter) {
                     // No footer but ad placed here — just show the ad
                     adSection(at: idx, baseDelay: 0.48)
-                }
-                
-                // Feedback card — let users personalize forecast recommendations
-                if showFeedbackCard {
-                    WeatherFeedbackCard(
-                        onFeedback: { feedback in
-                            Task { await onFeedback(feedback) }
-                        },
-                        onDismiss: {
-                            withAnimation(AppTheme.cardSpring) {
-                                showFeedbackCard = false
-                            }
-                            onDismissFeedback()
-                        }
-                    )
-                    .padding(.top, 4)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.56)
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
                 }
             }
             .padding(.horizontal, 20)
