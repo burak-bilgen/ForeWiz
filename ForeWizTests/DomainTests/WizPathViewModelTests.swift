@@ -240,8 +240,208 @@ struct WizPathViewModelTests {
         }
     }
 
+    // MARK: - EV Mode
+
+    @Test("EV mode initial state is disabled")
+    func evModeInitialStateIsDisabled() async throws {
+        let vm = makeViewModel()
+        #expect(vm.isElectricVehicle == false)
+        #expect(vm.evRecommendations.isEmpty)
+    }
+
+    @Test("EV mode enable triggers recommendations for car mode")
+    func evModeEnableTriggersRecommendationsForCarMode() async throws {
+        let vm = makeViewModel()
+        vm.climateAnalysis = ClimateAnalysis(
+            maxTemperature: 40,
+            totalMultiplier: 1.0,
+            multipliers: [],
+            alerts: [],
+            heatSegments: [],
+            requiresClimateAdjustment: false
+        )
+        vm.setElectricVehicleEnabled(true)
+        #expect(vm.isElectricVehicle == true)
+    }
+
+    @Test("EV mode sets recommendations to empty for non-car")
+    func evModeDisabledForNonCar() async throws {
+        let vm = makeViewModel()
+        vm.switchTravelMode(to: .walking)
+        vm.setElectricVehicleEnabled(true)
+        #expect(vm.isElectricVehicle == false)
+    }
+
+    // MARK: - Toll Road Toggle
+
+    @Test("Toll road toggle flips state")
+    func tollRoadToggleFlipsState() async throws {
+        let vm = makeViewModel()
+        #expect(vm.avoidTollRoads == false)
+        vm.toggleAvoidTollRoads()
+        #expect(vm.avoidTollRoads == true)
+        vm.toggleAvoidTollRoads()
+        #expect(vm.avoidTollRoads == false)
+    }
+
+    // MARK: - Dismiss Error
+
+    @Test("Dismiss error sets state to idle")
+    func dismissErrorSetsStateToIdle() async throws {
+        let vm = makeViewModel()
+        vm.state = .error("Test error")
+        #expect(vm.errorMessage == "Test error")
+        vm.dismissError()
+        #expect(vm.state == .idle)
+        #expect(vm.errorMessage == nil)
+    }
+
+    // MARK: - Maps URL Builders
+
+    @Test("Apple Maps URL returns nil when no route")
+    func appleMapsURLReturnsNilWhenNoRoute() async throws {
+        let vm = makeViewModel()
+        #expect(vm.appleMapsURLString() == nil)
+    }
+
+    @Test("Apple Maps URL builds correctly with origin and destination")
+    func appleMapsURLBuildsCorrectly() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        // Set a route to pass guard check
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+
+        let url = vm.appleMapsURLString()
+        #expect(url != nil)
+        #expect(url!.contains("maps://"))
+        #expect(url!.contains("saddr=41.0082,28.9784"))
+        #expect(url!.contains("daddr=42.0,30.0"))
+    }
+
+    @Test("Apple Maps Web URL builds without route requirement")
+    func appleMapsWebURLBuildsWithoutRoute() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let url = vm.appleMapsWebURLString()
+        #expect(url != nil)
+        #expect(url!.contains("maps.apple.com"))
+    }
+
+    @Test("Google Maps URL returns nil when no route")
+    func googleMapsURLReturnsNilWhenNoRoute() async throws {
+        let vm = makeViewModel()
+        #expect(vm.googleMapsURLString() == nil)
+    }
+
+    @Test("Google Maps URL builds correctly")
+    func googleMapsURLBuildsCorrectly() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+
+        let url = vm.googleMapsURLString()
+        #expect(url != nil)
+        #expect(url!.contains("comgooglemaps://"))
+    }
+
+    @Test("Google Maps Web URL builds correctly")
+    func googleMapsWebURLBuildsCorrectly() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let url = vm.googleMapsWebURLString()
+        #expect(url != nil)
+        #expect(url!.contains("google.com/maps"))
+    }
+
+    @Test("Toll avoidance reflected in Apple Maps URL")
+    func tollAvoidanceInAppleMapsURL() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+
+        vm.avoidTollRoads = true
+        let webURL = vm.appleMapsWebURLString()
+        #expect(webURL?.contains("dirflg=d") == true)
+    }
+
+    // MARK: - Route Candidates
+
+    @Test("Route candidates initialize empty")
+    func routeCandidatesInitializeEmpty() async throws {
+        let vm = makeViewModel()
+        #expect(vm.routeCandidates.isEmpty)
+        #expect(vm.selectedRouteIndex == 0)
+        #expect(vm.showRouteComparison == false)
+        #expect(vm.hasTollRoads == false)
+        #expect(vm.currentTrafficCongestion == .unknown)
+    }
+
+    @Test("Select route candidate out of bounds is no-op")
+    func selectRouteCandidateOutOfBounds() async throws {
+        let vm = makeViewModel()
+        vm.selectRouteCandidate(at: -1)
+        #expect(vm.selectedRouteIndex == 0)
+        vm.selectRouteCandidate(at: 5)
+        #expect(vm.selectedRouteIndex == 0)
+    }
+
+    @Test("isShowingRoute toggle")
+    func isShowingRouteToggle() async throws {
+        let vm = makeViewModel()
+        #expect(vm.isShowingRoute == true)
+        vm.isShowingRoute = false
+        #expect(vm.isShowingRoute == false)
+        vm.isShowingRoute = true
+        #expect(vm.isShowingRoute == true)
+    }
+
+    @Test("Segment place names default empty")
+    func segmentPlaceNamesDefaultEmpty() async throws {
+        let vm = makeViewModel()
+        #expect(vm.segmentPlaceNames.isEmpty)
+    }
+
+    @Test("CyclingSafetyAnalysis access after mode switch")
+    func cyclingSafetyAnalysisAfterModeSwitch() async throws {
+        let vm = makeViewModel()
+        vm.switchTravelMode(to: .cycling)
+        #expect(vm.travelMode == .cycling)
+        #expect(vm.cyclingSafetyAnalysis == nil)
+    }
+
+    // MARK: - Sentinel Alert Management
+
+    @Test("Add sentinel alert")
+    func addSentinelAlert() async throws {
+        let vm = makeViewModel()
+        let alert = SentinelAlert(
+            id: "test",
+            signature: "sig",
+            title: "Test",
+            body: "Body",
+            severity: .high,
+            originalDuration: 1800,
+            updatedDuration: 3600,
+            weatherContext: WeatherContext(primaryHazard: .extremeHeat, temperature: 42, conditions: [.clear], isExtreme: true),
+            timestamp: Date()
+        )
+        vm.sentinelAlerts = [alert]
+        #expect(vm.sentinelAlerts.count == 1)
+        #expect(vm.sentinelAlerts.first?.severity == .high)
+    }
+
     @Test("CyclingSafety effort level computation")
-    func cyclingSafetyEffortLevel() async throws {
+    func cyclingSafetyEffortLevelComputation() async throws {
         let route = WizPathRoute.testRoute(
             travelMode: .cycling,
             segments: [

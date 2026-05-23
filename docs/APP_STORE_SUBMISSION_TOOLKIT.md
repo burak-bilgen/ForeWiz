@@ -157,6 +157,73 @@ ForeWiz, odağınızı bozmayan, kullanıcı deneyimine saygılı ve tamamen üc
 
 ---
 
+## 🗺️ WizPath V3 — Advanced Climate-Aware Routing
+
+WizPath has evolved into a comprehensive journey intelligence system with the following production-ready features:
+
+### 🚴 Cycling Safety Analysis
+* **Crosswind Hazard Detection**: Real-time wind speed analysis with configurable thresholds (25 km/h hazard, 40 km/h dangerous)
+* **Effort Level Computation**: 1-10 scale factoring wind speed, direction, temperature, and distance
+* **Extra Time Estimation**: Dynamic headwind penalties for accurate ETA calculation
+* **Wet Road & Heat Advisories**: Proactive safety recommendations for adverse cycling conditions
+
+### 🔋 EV Mode & Smart Charging
+* **Temperature-Aware Range Prediction**: Automatic recommendations when temps exceed 38°C
+* **Smart Stop Search**: Integrated POI search for EV chargers, gas stations, rest stops, and restaurants along the route
+* **Weather-Enriched Stops**: Each stop includes arrival weather, safety status, and contextual recommendations
+* **Dual Maps Integration**: One-tap navigation to Apple Maps or Google Maps with waypoints
+
+### ⚡ Sentinel Alerts
+* **Route Change Monitoring**: Automatic detection of significant ETA changes (>30 min or >40% increase)
+* **Severity-Based Notifications**: Low/Medium/High/Critical with iOS interruption levels
+* **Rate Limiting & Cooldown**: Max 3 notifications per hour, 15-minute cooldown per route
+* **Weather Contextual Alerts**: Heat, snow, storm, and gridlock-specific alert messages
+
+### 🕐 Departure Optimizer
+* **Multi-Window Scoring**: Evaluates 12 departure windows (30-min intervals) within a 6-hour range
+* **Triple-Factor Scoring**: Weather (40-50%), Traffic (20-35%), Climate (25-30%) weighted by travel mode
+* **Cycling-Optimized Weights**: Weather weighted 50% for cyclists, early morning bonus, midday heat penalty
+* **Actionable Recommendations**: Optimal → Good → Moderate → Caution → Poor with color-coded UI
+
+### 🛣️ Route Comparison Engine
+* **Multi-Route Scoring**: Up to 4 alternate routes scored on weather fitness (0-100 scale)
+* **Severe Segment Penalties**: 30 pts per severe segment, 15 per caution, 5 per fair
+* **Toll Road Detection**: Automatic toll road identification with 40-pt scoring penalty
+* **Traffic Congestion Detection**: Free-flow → Moderate → Heavy → Gridlock with penalties
+* **Winter Closure Risk**: Extra penalties for snow/ice at sub-zero temperatures
+
+### 🌡️ Climate-Aware Routing
+* **Heat Multipliers**: ETA adjustments based on temperature thresholds (36°C+ pedestrian risk, 40°C+ extreme)
+* **Weather Condition Multipliers**: Snow/Blizzard (2.2x), Heavy Rain (1.6x), Storm (1.4x), Extreme Heat (1.25x)
+* **Health Recommendations**: Hydration, shade, and timing advice for pedestrians and cyclists
+* **EV Battery Efficiency**: Precooling and speed recommendations for high-temperature driving
+
+---
+
+## 🔬 Technology Stack
+
+### Architecture
+* **Swift 6 Concurrency**: Full async/await throughout the entire codebase
+* **Swift Testing Framework**: Modern @Suite/@Test macros replacing XCTest
+* **Liquid Glass Design System**: Custom glassmorphism components with animated sheen effects
+* **Bridge Pattern**: WizPathKit as a standalone Swift Package with DI adapters
+
+### Key Technologies
+* **Apple WeatherKit**: Real-time weather data for route segments
+* **MapKit MKDirections**: Multi-route calculation with alternate routes
+* **MapKit MKLocalSearch**: POI discovery (EV chargers, gas stations, restaurants)
+* **UserNotifications**: Sentinel push alerts with interruption levels
+* **OSLog**: Structured logging for debugging and analytics
+* **CoreLocation**: Reverse geocoding for place name resolution
+
+### Design Tokens
+* **Dark Glass Background**: Ultra-thin material with ambient gradient
+* **Accent Colors**: Liquid cyan (#00F2FE→#4FACFE), Warning gold (#FFB300→#F77737), Danger crimson (#FF3366→#FF003C)
+* **Animation Springs**: Press (0.22/0.72), Card (0.38/0.82), Sheet (0.6/0.8)
+* **Haptic Feedback**: Integrated UIImpactFeedbackGenerator for all interactions
+
+---
+
 ## 🎨 Asset Check & Color Codes for Graphic Designers
 If you or your designer are building custom banners or App Store assets, use these exact visual tokens from the ForeWiz **Liquid Glass Design System** to keep the branding consistent:
 

@@ -346,4 +346,216 @@ struct WizPathServiceTests {
         #expect(SegmentWeatherCondition.thunderstorm.severity == .severe)
         #expect(SegmentWeatherCondition.snow.severity == .severe)
     }
+
+    // MARK: - Route Risk Enum Tests
+
+    @Test("RouteRisk enum values and colors")
+    func routeRiskEnumValuesAndColors() async throws {
+        #expect(RouteRisk.good.rawValue == "good")
+        #expect(RouteRisk.caution.rawValue == "caution")
+        #expect(RouteRisk.severe.rawValue == "severe")
+
+        #expect(RouteRisk.good.color == "#34C759")
+        #expect(RouteRisk.caution.color == "#FF9500")
+        #expect(RouteRisk.severe.color == "#FF3B30")
+    }
+
+    @Test("RouteRisk localized titles are non-empty")
+    func routeRiskLocalizedTitles() async throws {
+        #expect(!RouteRisk.good.localizedTitle.isEmpty)
+        #expect(!RouteRisk.caution.localizedTitle.isEmpty)
+        #expect(!RouteRisk.severe.localizedTitle.isEmpty)
+    }
+
+    @Test("RouteRisk safety score mapping")
+    func routeRiskSafetyScoreMapping() async throws {
+        #expect(RouteRisk.good.safetyScore == 85)
+        #expect(RouteRisk.caution.safetyScore == 60)
+        #expect(RouteRisk.severe.safetyScore == 30)
+    }
+
+    // MARK: - ScoredRouteCandidate Tests
+
+    @Test("ScoredRouteCandidate computed properties")
+    func scoredRouteCandidateComputedProperties() async throws {
+        let route = WizPathRoute.testRoute(segments: [])
+
+        let bestCandidate = ScoredRouteCandidate(route: route, score: 85)
+        #expect(bestCandidate.isBest == true)
+        #expect(bestCandidate.isGood == false)
+        #expect(bestCandidate.scoreLabel == "Best" || !bestCandidate.scoreLabel.isEmpty)
+        #expect(bestCandidate.scoreColorHex == "#34C759")
+
+        let goodCandidate = ScoredRouteCandidate(route: route, score: 70)
+        #expect(goodCandidate.isBest == false)
+        #expect(goodCandidate.isGood == true)
+        #expect(goodCandidate.isModerate == false)
+
+        let moderateCandidate = ScoredRouteCandidate(route: route, score: 50)
+        #expect(moderateCandidate.isModerate == true)
+        #expect(moderateCandidate.isPoor == false)
+        #expect(goodCandidate.scoreColorHex == "#30D158")
+
+        let poorCandidate = ScoredRouteCandidate(route: route, score: 20)
+        #expect(poorCandidate.isPoor == true)
+        #expect(poorCandidate.scoreColorHex == "#FF3B30")
+    }
+
+    @Test("ScoredRouteCandidate formatted distance")
+    func scoredRouteCandidateFormattedDistance() async throws {
+        let shortRoute = WizPathRoute(
+            id: UUID(),
+            origin: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
+            destination: CLLocationCoordinate2D(latitude: 41.5, longitude: 29.5),
+            travelMode: .car,
+            departureTime: Date(),
+            segments: [],
+            totalDuration: 600,
+            totalDistance: 5000,
+            polyline: nil
+        )
+        let candidate = ScoredRouteCandidate(route: shortRoute, score: 90)
+        #expect(!candidate.formattedDistance.isEmpty)
+    }
+
+    // MARK: - Segment Tests
+
+    @Test("WizPathSegment eta display format")
+    func wizPathSegmentEtaDisplay() async throws {
+        let segment = WizPathSegment(
+            id: UUID(),
+            coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
+            estimatedArrival: Date(),
+            distanceFromStart: 1000,
+            travelTime: 120,
+            weather: nil
+        )
+        #expect(!segment.etaDisplay.isEmpty)
+    }
+
+    @Test("WizPathSegment weather condition icons")
+    func weatherConditionIcons() async throws {
+        #expect(SegmentWeatherCondition.clear.iconName == "sun.max.fill")
+        #expect(SegmentWeatherCondition.thunderstorm.iconName == "cloud.bolt.rain.fill")
+        #expect(SegmentWeatherCondition.fog.iconName == "cloud.fog.fill")
+        #expect(SegmentWeatherCondition.windy.iconName == "wind")
+    }
+
+    @Test("SegmentWeatherSeverity severity order")
+    func segmentWeatherSeverityOrder() async throws {
+        #expect(SegmentWeatherSeverity.good.severityOrder == 0)
+        #expect(SegmentWeatherSeverity.fair.severityOrder == 1)
+        #expect(SegmentWeatherSeverity.caution.severityOrder == 2)
+        #expect(SegmentWeatherSeverity.severe.severityOrder == 3)
+    }
+
+    // MARK: - TravelMode Tests
+
+    @Test("TravelMode all properties")
+    func travelModeAllProperties() async throws {
+        #expect(TravelMode.allCases.count == 3)
+        #expect(TravelMode.walking.icon == "figure.walk")
+        #expect(TravelMode.walking.averageSpeedKph == 5)
+        #expect(TravelMode.cycling.averageSpeedKph == 15)
+        #expect(TravelMode.car.averageSpeedKph == 40)
+    }
+
+    @Test("TravelMode wind sensitivity")
+    func travelModeWindSensitivity() async throws {
+        #expect(TravelMode.car.isWindSensitive == false)
+        #expect(TravelMode.walking.isWindSensitive == false)
+        #expect(TravelMode.cycling.isWindSensitive == true)
+    }
+
+    // MARK: - WizPathError Tests
+
+    @Test("WizPathError localized descriptions")
+    func wizPathErrorLocalizedDescriptions() async throws {
+        #expect(WizPathError.routeUnavailable.errorDescription?.isEmpty == false)
+        #expect(WizPathError.noWalkingPath.errorDescription?.isEmpty == false)
+        #expect(WizPathError.weatherAPIFailed.errorDescription?.isEmpty == false)
+        #expect(WizPathError.destinationUnreachable.errorDescription?.isEmpty == false)
+        #expect(WizPathError.invalidDepartureTime.errorDescription?.isEmpty == false)
+    }
+
+    // MARK: - Traffic Congestion Tests
+
+    @Test("TrafficCongestionLevel order")
+    func trafficCongestionLevelOrder() async throws {
+        #expect(TrafficCongestionLevel.unknown < TrafficCongestionLevel.freeFlow)
+        #expect(TrafficCongestionLevel.freeFlow < TrafficCongestionLevel.moderate)
+        #expect(TrafficCongestionLevel.moderate < TrafficCongestionLevel.heavy)
+        #expect(TrafficCongestionLevel.heavy < TrafficCongestionLevel.gridlock)
+    }
+
+    @Test("TrafficCongestionLevel colors")
+    func trafficCongestionLevelColors() async throws {
+        #expect(TrafficCongestionLevel.freeFlow.colorHex == "#34C759")
+        #expect(TrafficCongestionLevel.moderate.colorHex == "#FFCC00")
+        #expect(TrafficCongestionLevel.heavy.colorHex == "#FF9500")
+        #expect(TrafficCongestionLevel.gridlock.colorHex == "#FF3B30")
+    }
+
+    @Test("TrafficCongestionLevel localized titles")
+    func trafficCongestionLevelLocalizedTitles() async throws {
+        #expect(!TrafficCongestionLevel.unknown.localizedTitle.isEmpty)
+        #expect(!TrafficCongestionLevel.freeFlow.localizedTitle.isEmpty)
+        #expect(!TrafficCongestionLevel.moderate.localizedTitle.isEmpty)
+        #expect(!TrafficCongestionLevel.heavy.localizedTitle.isEmpty)
+        #expect(!TrafficCongestionLevel.gridlock.localizedTitle.isEmpty)
+    }
+
+    // MARK: - WizPathRoute JourneyHUD Tests
+
+    @Test("WizPathRoute journeyHUDData generation")
+    func wizPathRouteJourneyHUDData() async throws {
+        let segments = [
+            WizPathSegment(
+                id: UUID(),
+                coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
+                estimatedArrival: Date(),
+                distanceFromStart: 0,
+                travelTime: 0,
+                weather: SegmentWeather(
+                    condition: .clear,
+                    temperature: 25,
+                    precipitationChance: 0,
+                    windSpeed: 5,
+                    visibility: 15,
+                    severity: .good
+                )
+            )
+        ]
+        let route = WizPathRoute.testRoute(segments: segments)
+        let hud = route.journeyHUDData
+        #expect(hud.totalDuration == route.totalDuration)
+        #expect(hud.safetyScore == 85)
+        #expect(hud.durationDisplay.isEmpty == false)
+    }
+
+    @Test("WizPathRoute journeyHUDData with hazards")
+    func wizPathRouteJourneyHUDDataWithHazards() async throws {
+        let segments = [
+            WizPathSegment(
+                id: UUID(),
+                coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
+                estimatedArrival: Date(),
+                distanceFromStart: 0,
+                travelTime: 0,
+                weather: SegmentWeather(
+                    condition: .thunderstorm,
+                    temperature: 18,
+                    precipitationChance: 0.9,
+                    windSpeed: 60,
+                    visibility: 2,
+                    severity: .severe
+                )
+            )
+        ]
+        let route = WizPathRoute.testRoute(segments: segments)
+        let hud = route.journeyHUDData
+        #expect(hud.hazardCount > 0)
+        #expect(hud.activeHazards.count > 0)
+        #expect(hud.safetyScore == 30) // severe risk
+    }
 }
