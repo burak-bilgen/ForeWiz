@@ -13,6 +13,8 @@
   <img src="https://img.shields.io/badge/Swift-6.0-orange?style=flat-square&logo=swift" alt="Swift 6.0">
   <img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-blue?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/Monetization-AdMob-purple?style=flat-square" alt="AdMob">
+  <img src="https://img.shields.io/badge/SPM-WizPathKit-brightgreen?style=flat-square" alt="SPM">
+  <img src="https://img.shields.io/badge/localization-EN%20%2B%20TR-red?style=flat-square" alt="Localization">
 </p>
 
 ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It doesn't just tell you it's raining - it tells you *when* to go out, *what* to wear, *where* the weather is safest on your route, and *how* it might affect your health.
@@ -31,10 +33,10 @@ ForeWiz processes weather data through a chain of specialized engines to produce
 | **WeatherDecisionEngine** | Computes overall outdoor score (0–100), classifies into good/moderate/risky/avoid, identifies optimal time windows |
 | **ActivityWindowScoringEngine** | Scores each hour (0–100) based on temperature, precipitation, UV, wind, humidity, and time-of-day bonuses |
 | **OutfitDecisionEngine** | Recommends clothing combinations from 10+ categories with natural-language advice |
-| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina - 5 independent calculators |
-| **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes (energetic, melancholic, serene, dramatic, cozy, etc.) — now dynamically context-aware, referencing actual temperature, wind, humidity, and time of day |
+| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina — 5 independent calculators |
+| **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes — dynamically context-aware |
 | **ComparativeWeatherService** | Compares today against seasonal norms, yesterday, and weekly trends with anomaly detection |
-| **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable daily briefing with prioritized action items |
+| **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable daily briefing |
 | **DefaultWeatherRiskClassifier** | Classifies 8 risk types: heat, UV, rain, wind, storm, humidity, cold, poorComfort |
 
 ### 🌡️ Health-Weather Correlation
@@ -50,16 +52,72 @@ ForeWiz goes beyond basic weather by showing **how weather affects your body**:
 
 → **Overall Health Score** (0–100) with a one-sentence summary.
 
-### 🗺️ WizPath - Climate-Aware Route Planning
-Plan your journey with **weather-aware routing**. WizPath calculates weather conditions at every segment of your route based on estimated arrival time:
+### 🗺️ WizPath — Climate-Aware Route Planning Engine
 
-- **Multi-modal**: Driving (15-min segments) or Walking (30-min segments)
-- **Color-coded map**: Neon Green (good) → Orange (caution) → Red (dangerous)
-- **Place Name Annotations**: Weather change points now show real location names (e.g. "Kadıköy", "Levent") via reverse geocoding, so you know exactly where conditions shift
-- **Sentinel Alerts**: High-value notifications only when delays exceed 30 min or 40%
-- **Extreme Heat Module**: EV battery warnings at 38°C+, pedestrian heat stroke alerts at 36°C+, climate multipliers for ETA
-- **Departure Optimizer**: Finds the best time to leave based on weather + traffic
-- **Journey HUD**: Real-time safety score, active hazards, next safe stop
+WizPath is a **local Swift Package (SPM)** that powers climate-aware route planning with an advanced multi-engine architecture. It calculates weather conditions at every segment of your route based on estimated arrival time and provides real-time safety intelligence:
+
+#### 🚗 Multi-Modal Routing
+- **Driving** — 15-min segment granularity with weather-adaptive routing
+- **Cycling** — Full cycling safety analysis: crosswind risk, wet roads, effort level (1–10) with ETA multipliers
+- **Walking** — 30-min segment granularity with pedestrian safety alerts
+- **Electric Vehicle Mode** — Battery efficiency warnings at 38°C+, charging station recommendations along route
+
+#### 🗺️ Interactive Map Experience
+- **Weather-coded polylines** — Neon green (good) → orange (caution) → red (dangerous) per segment
+- **Expandable/collapsible map** — Compact preview (220pt) ↔ expanded half-screen with smooth spring animation
+- **Smart Stop Markers** — POI-based gas stations, EV chargers, rest stops, restaurants with weather at arrival
+- **Weather Change Markers** — Animated markers at every condition shift with temperature, ETA, and place name annotations
+- **Traffic Overlay** — Real-time congestion overlay (green → yellow → red) with toggle control
+- **Full-Screen Mode** — Immersive map experience with weather legend and all controls
+- **Origin/Destination Markers** — Pulsing origin marker, destination flag with route polyline
+
+#### 🌡️ Climate Intelligence
+- **WizPathClimateService** — Analyzes route segments for extreme heat, snow/blizzard, heavy rain, severe storms with climate multiplier scoring
+- **Heat stroke risk alerts** at 36°C+ for pedestrians
+- **EV battery efficiency** warnings and charging recommendations
+- **Infrastructure stress** alerts during extreme weather
+- **Multiplier system** — Adds weighted penalty scores to segments based on climate severity
+
+#### 🚴 Cycling Safety Engine
+- **Crosswind risk detection** — Analyzes wind direction vs. route heading, flags dangerous segments
+- **Wet road analysis** — Combines precipitation + temperature to detect icy/slippery conditions
+- **Effort level scoring** (1–10) — Based on headwind, temperature, terrain gradient
+- **Extra time calculation** — Estimates delay percentage from adverse conditions
+- **Safety status** — Safe / Caution / Not Recommended with localized explanations
+
+#### 🚨 Sentinel Alerts
+- Monitors route changes and dispatches **push notifications** when:
+  - Weather delays exceed 30 minutes or 40%
+  - New severe weather hazards appear on the route
+  - Route conditions degrade significantly
+- **Smart deduplication** — Only triggers when condition thresholds are crossed
+- **Context-aware** — Considers temperature, precipitation, wind speed, visibility
+
+#### ⏰ Departure Optimizer
+- **WizPathDepartureOptimizerService** — Analyzes 6-hour window for optimal departure time
+- Scores each time slot (0–100) based on weather severity + traffic congestion
+- Recommends best time with natural language explanation
+- **Interactive time picker** — Scrollable hour/minute columns with quick-select chips (06:00–20:00)
+
+#### 📊 Route Comparison
+- Scores multiple route candidates (0–100) with Best / Good / Moderate labels
+- Compares duration, distance, traffic congestion, toll roads, severe weather segments
+- Visual ranking with animated selection and color-coded score badges
+- **Toll avoidance toggle** with intelligent routing
+
+#### 🎛️ Journey HUD
+- **Real-time safety score** (0–100) with animated progress bar
+- Active hazard list with severity badges and ETA at location
+- Next safe stop recommendation with weather conditions
+- Expandable detail panel with confidence rating (Excellent → Dangerous)
+- **Confidence Tip** — Educational TipKit popover explaining safety scoring
+
+#### 🧩 Smart Stops (POI Search)
+- Searches for points of interest along the route within a corridor
+- Enriches stops with **weather at arrival**, safety status, and weather recommendations
+- Category-based search: gas stations, EV chargers, rest stops, restaurants
+- **Weather-aware recommendations** — "Seek shelter during thunderstorm", "Take a rain break", "Watch for high heat"
+- Direct navigation to stops via Apple Maps or Google Maps
 
 ### 🔔 Smart Notifications
 Five notification planners work together to keep you informed without noise:
@@ -73,14 +131,16 @@ Five notification planners work together to keep you informed without noise:
 → Deduplication, quiet hours, configurable daily limits.
 
 ### 🎨 Liquid Glass Design System
-A premium dark-mode aesthetic with fluid animations:
+A premium dark-mode aesthetic with fluid animations — now powered by **WizPathKit's shared design tokens**:
 
-- **LiquidOrbBackground** - Animated gradient orbs that change with weather conditions
-- **GlassCard** - Ultra-thin material cards with neon accents
-- **Micro-interactions** - Haptic feedback, spring animations, staggered entrances
-- **Weather-responsive palettes** - Clear sky, stormy, snowy, rainy, night modes
-- **Scene transitions** - CardEntrance, StaggerEntrance, Float, PulseGlow modifiers
-- **Enhanced Splash** - Weather-conditioned animated splash screen
+- **LiquidGlassCard** — Ultra-thin material cards with animated diagonal sheen (like Apple Wallet)
+- **LiquidGlassButton** — Premium glass buttons with press-scale spring physics, haptic feedback, and animated sheen on primary variants
+- **LiquidOrbBackground** — Animated gradient orbs that change with weather conditions
+- **Micro-interactions** — Haptic feedback (light/medium/heavy/success/warning/error), spring animations, staggered entrances
+- **Weather-responsive palettes** — Clear sky, stormy, snowy, rainy, night modes
+- **Scene transitions** — CardEntrance, StaggerEntrance, Float, PulseGlow modifiers
+- **Enhanced Splash** — Weather-conditioned animated splash screen
+- **Design tokens** — Centralized in WizPathKit for cross-target consistency (colors, typography, animation curves)
 
 ### 📱 Home Screen & Widgets
 
@@ -363,9 +423,10 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift files** | ~140 |
-| **Unit tests** | 25+ test suites |
-| **Localized strings** | ~200 keys (EN + TR) — formal Turkish tone |
+| **Total Swift files** | ~150+ |
+| **WizPathKit Swift files** | ~30+ (local SPM package) |
+| **Unit tests** | 30+ test suites |
+| **Localized strings** | ~1,000 keys (EN + TR) — formal Turkish tone |
 | **Build errors/warnings** | 0 error, 0 warning (production target) |
 | **Force unwraps in production code** | **0** — fully eliminated |
 | **External dependencies** | **Google AdMob + UMP** (monetization/consent) — everything else Apple-first-party |
@@ -463,5 +524,5 @@ Private project. All rights reserved.
 ---
 
 <p align="center">
-  <sub>Built with ☀️ + 🧊 by Bilgen Works</sub>
+  <sub>Built with ☀️ + 🧊 + Swift 6 + SwiftUI + MapKit + TipKit by Bilgen Works</sub>
 </p>

@@ -41,10 +41,8 @@ struct AppSplashView: View {
                     Text(L10n.text("splash_app_name"))
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
-
-                    PulsingDotsLoader(color: .white.opacity(0.6), dotSize: 7)
+                        .opacity(textOpacity)
                 }
-                .opacity(textOpacity)
             }
         }
         .onAppear {

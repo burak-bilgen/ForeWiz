@@ -319,6 +319,7 @@ extension WeatherRiskType {
         case .wind: return L10n.text("risk_type_wind")
         case .humidity: return L10n.text("risk_type_humidity")
         case .poorComfort: return L10n.text("risk_type_poor_comfort")
+        case .airQuality: return L10n.text("risk_type_air_quality")
         }
     }
 }

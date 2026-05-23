@@ -13,3 +13,4 @@ fastlane/
 Screenshots/
 Snapfile
 fastlane/**/*
+build_log.txt
