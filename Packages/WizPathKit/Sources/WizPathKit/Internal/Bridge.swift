@@ -294,17 +294,23 @@ public final class MockWizPathLocationSource: WizPathLocationSource, @unchecked 
     }
 }
 
-// MARK: - Liquid Glass Card (used by views)
+// MARK: - Liquid Glass Card (premium glass morphism)
 
 public struct LiquidGlassCard<Content: View>: View {
     let accentColor: Color
+    let isInteractive: Bool
     let innerPadding: CGFloat
     let cornerRadius: CGFloat
     let content: Content
 
-    public init(accentColor: Color = .liquidAccent, innerPadding: CGFloat = 14, cornerRadius: CGFloat = 20,
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var sheenOffset: CGFloat = -1.5
+
+    public init(accentColor: Color = .liquidAccent, isInteractive: Bool = false, innerPadding: CGFloat = 16, cornerRadius: CGFloat = 22,
                 @ViewBuilder content: () -> Content) {
         self.accentColor = accentColor
+        self.isInteractive = isInteractive
         self.innerPadding = innerPadding
         self.cornerRadius = cornerRadius
         self.content = content()
@@ -314,18 +320,93 @@ public struct LiquidGlassCard<Content: View>: View {
         content
             .padding(innerPadding)
             .background(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .environment(\.colorScheme, .dark)
+                ZStack {
+                    // 1. Base glass layer
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+
+                    // 2. Neutral gradient overlay
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: colorScheme == .dark
+                                    ? [.white.opacity(0.03), .clear, .white.opacity(0.01), .clear]
+                                    : [.white.opacity(0.06), .clear, .white.opacity(0.02), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+
+                    // 3. Animated sheen
+                    if !reduceMotion {
+                        LiquidCardSheen(cornerRadius: cornerRadius, accentColor: accentColor, offset: sheenOffset)
+                            .onAppear {
+                                withAnimation(.easeInOut(duration: 6.0).repeatForever(autoreverses: true).delay(1.0)) {
+                                    sheenOffset = 1.5
+                                }
+                            }
+                    }
+
+                    // 3b. Static shimmer for reduced motion
+                    if reduceMotion {
+                        LiquidCardSheen(cornerRadius: cornerRadius, accentColor: accentColor, offset: 0.5)
+                    }
+
+                    // 4. Cool border
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(
+                            LinearGradient(
+                                colors: colorScheme == .dark
+                                    ? [.white.opacity(0.10), .white.opacity(0.02), .white.opacity(0.05), .clear, .white.opacity(0.03), .white.opacity(0.07)]
+                                    : [.white.opacity(0.20), .white.opacity(0.04), .white.opacity(0.10), .clear, .white.opacity(0.05), .white.opacity(0.15)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 0.8
+                        )
+
+                    // 5. Accent rim
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(accentColor.opacity(colorScheme == .dark ? 0.08 : 0.12), lineWidth: 0.5)
+
+                    // 6. Depth shadow
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(.black.opacity(0.20), lineWidth: 1.5)
+                        .blur(radius: 0.5)
+                        .offset(x: 0, y: 1.5)
+                }
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(accentColor.opacity(0.15), lineWidth: 1)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+}
+
+// MARK: - Card Sheen Layer
+
+private struct LiquidCardSheen: View {
+    let cornerRadius: CGFloat
+    let accentColor: Color
+    let offset: CGFloat
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        GeometryReader { geo in
+            LinearGradient(
+                colors: [
+                    .clear,
+                    .white.opacity(colorScheme == .dark ? 0.03 : 0.06),
+                    accentColor.opacity(colorScheme == .dark ? 0.04 : 0.06),
+                    .white.opacity(colorScheme == .dark ? 0.02 : 0.04),
+                    .clear
+                ],
+                startPoint: .leading,
+                endPoint: .trailing
             )
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(.white.opacity(0.06), lineWidth: 1)
-            )
+            .frame(width: geo.size.width * 1.6)
+            .offset(x: offset * geo.size.width * 0.8)
+            .blendMode(.plusLighter)
+        }
     }
 }
 
@@ -356,7 +437,7 @@ public struct AppBackground: View {
     }
 }
 
-// MARK: - Liquid Glass Button (used by route info panel)
+// MARK: - Liquid Glass Button (premium glass button with haptics)
 
 public struct LiquidGlassButton: View {
     let title: String?
@@ -367,6 +448,8 @@ public struct LiquidGlassButton: View {
     let action: () -> Void
 
     @State private var isPressed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.isEnabled) private var isEnabled
 
     public init(_ title: String? = nil, icon: String? = nil, style: LiquidGlassButtonStyle = .secondary,
                 haptic: LiquidHapticStyle = .light, isFullWidth: Bool = false, action: @escaping () -> Void) {
@@ -380,8 +463,10 @@ public struct LiquidGlassButton: View {
 
     public var body: some View {
         Button {
-            haptic.trigger()
-            action()
+            if isEnabled {
+                haptic.trigger()
+                action()
+            }
         } label: {
             HStack(spacing: 8) {
                 if let icon = icon {
@@ -401,6 +486,7 @@ public struct LiquidGlassButton: View {
             .padding(.vertical, 12)
             .background(glassBackground)
             .scaleEffect(isPressed ? 0.96 : 1.0)
+            .opacity(isEnabled ? 1.0 : 0.4)
         }
         .contentShape(Rectangle())
         .buttonStyle(.plain)
@@ -409,11 +495,14 @@ public struct LiquidGlassButton: View {
                 .onChanged { _ in
                     guard !isPressed else { return }
                     isPressed = true
-                    HapticEngine.shared.selectionChanged()
+                    if !reduceMotion {
+                        HapticEngine.shared.selectionChanged()
+                    }
                 }
                 .onEnded { _ in isPressed = false }
         )
         .animation(AppTheme.pressSpring, value: isPressed)
+        .accessibilityLabel(accessibilityLabel)
     }
 
     @ViewBuilder
@@ -430,11 +519,15 @@ public struct LiquidGlassButton: View {
                                    startPoint: .top, endPoint: .bottom),
                     lineWidth: 1
                 )
-            if style.hasSheen {
+            if style.hasSheen && !reduceMotion {
                 LiquidButtonSheen(accent: style.accentColor)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var accessibilityLabel: String {
+        [title, icon].compactMap { $0 }.joined(separator: ", ")
     }
 }
 
@@ -468,7 +561,7 @@ public enum LiquidGlassButtonStyle {
 public enum LiquidHapticStyle {
     case light, medium, heavy, selection, success, none
 
-    func trigger() {
+    public func trigger() {
         switch self {
         case .light: HapticEngine.shared.light()
         case .medium: HapticEngine.shared.medium()
@@ -503,46 +596,4 @@ private struct LiquidButtonSheen: View {
     }
 }
 
-// MARK: - Flow Layout (used by some views)
 
-public struct FlowLayout: Layout {
-    public let spacing: CGFloat
-
-    public init(spacing: CGFloat = 8) {
-        self.spacing = spacing
-    }
-
-    public func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let maxWidth = proposal.width ?? 0
-        var height: CGFloat = 0
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x + size.width > maxWidth {
-                y += size.height + spacing
-                x = 0
-            }
-            x += size.width + spacing
-            height = max(height, y + size.height)
-        }
-
-        return CGSize(width: maxWidth, height: height)
-    }
-
-    public func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
-        var y = bounds.minY
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x + size.width > bounds.maxX {
-                y += size.height + spacing
-                x = bounds.minX
-            }
-            subview.place(at: CGPoint(x: x, y: y), proposal: .unspecified)
-            x += size.width + spacing
-        }
-    }
-}

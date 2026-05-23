@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreLocation
+import TipKit
 
 // MARK: - Journey HUD View
 
@@ -19,7 +20,7 @@ public struct JourneyHUDView: View {
                         Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 20).padding(.horizontal, 8)
                         StatItem(value: "\(data.hazardCount)", label: WizPathKitL10n.text("hud_hazards"), color: data.hazardCount > 0 ? .warning : .secondary)
                         Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 20).padding(.horizontal, 8)
-                        StatItem(value: "\(data.safetyScore)", label: WizPathKitL10n.text("hud_safety"), color: safetyTint)
+                        StatItem(value: "\(data.safetyScore)", label: WizPathKitL10n.text("hud_confidence"), color: safetyTint)
                     }.padding(.horizontal, 8)
                     Spacer(minLength: 0)
                     Button { withAnimation(AppTheme.cardSpring) { isExpanded.toggle(); HapticEngine.shared.light() } } label: {
@@ -102,25 +103,70 @@ public struct HUDDetailPanel: View {
     private var safetyScoreBar: some View {
         VStack(spacing: 6) {
             HStack {
-                Label(WizPathKitL10n.text("hud_journey_safety"), systemImage: "shield.checkered").font(.system(size: 12, weight: .semibold)).foregroundStyle(.secondary)
+                Label(WizPathKitL10n.text("hud_journey_confidence"), systemImage: "chart.bar.fill")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                
+                // Info tooltip button
+                Button {
+                    HapticEngine.shared.light()
+                } label: {
+                    Image(systemName: "questionmark.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.tertiary)
+                }
+                .buttonStyle(.plain)
+                .popoverTip(ConfidenceTip())
+                
                 Spacer()
-                Text(safetyRatingText).font(.system(size: 11, weight: .bold)).foregroundStyle(safetyScoreColor)
+                Text(confidenceRatingText).font(.system(size: 11, weight: .bold)).foregroundStyle(confidenceScoreColor)
             }
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3).fill(Color.white.opacity(0.06)).frame(height: 6)
-                    RoundedRectangle(cornerRadius: 3).fill(safetyScoreColor).frame(width: geometry.size.width * (Double(safetyScore) / 100.0), height: 6).animation(AppTheme.sheetSpring, value: safetyScore)
+                    RoundedRectangle(cornerRadius: 3).fill(confidenceScoreColor)
+                        .frame(width: geometry.size.width * (Double(safetyScore) / 100.0), height: 6)
+                        .animation(AppTheme.sheetSpring, value: safetyScore)
                 }
             }.frame(height: 6)
         }
     }
 
-    private var safetyRatingText: String {
-        switch safetyScore { case 80...100: return WizPathKitL10n.text("hud_rating_excellent"); case 60..<80: return WizPathKitL10n.text("hud_rating_good"); case 40..<60: return WizPathKitL10n.text("hud_rating_moderate"); case 20..<40: return WizPathKitL10n.text("hud_rating_poor"); default: return WizPathKitL10n.text("hud_rating_dangerous") }
+    // MARK: - Confidence Rating
+
+    private var confidenceRatingText: String {
+        switch safetyScore {
+        case 80...100: return WizPathKitL10n.text("hud_rating_excellent")
+        case 60..<80: return WizPathKitL10n.text("hud_rating_good")
+        case 40..<60: return WizPathKitL10n.text("hud_rating_moderate")
+        case 20..<40: return WizPathKitL10n.text("hud_rating_poor")
+        default: return WizPathKitL10n.text("hud_rating_dangerous")
+        }
     }
 
-    private var safetyScoreColor: Color {
-        switch safetyScore { case 80...100: return .success; case 60..<80: return .liquidAccent; case 40..<60: return .warning; default: return .danger }
+    private var confidenceScoreColor: Color {
+        switch safetyScore {
+        case 80...100: return .success
+        case 60..<80: return .liquidAccent
+        case 40..<60: return .warning
+        default: return .danger
+        }
+    }
+}
+
+// MARK: - Confidence Tip
+
+struct ConfidenceTip: Tip {
+    var title: Text {
+        Text(WizPathKitL10n.text("hud_confidence_title"))
+    }
+
+    var message: Text? {
+        Text(WizPathKitL10n.text("hud_confidence_explanation"))
+    }
+
+    var image: Image? {
+        Image(systemName: "chart.bar.fill")
     }
 }
 

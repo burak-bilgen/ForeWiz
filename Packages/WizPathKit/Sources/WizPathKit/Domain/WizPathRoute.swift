@@ -246,6 +246,35 @@ public enum SegmentWeatherCondition: String, Sendable, CaseIterable {
         case .unknown: return .caution
         }
     }
+
+    /// Map route polyline color — colors the route by predicted weather condition
+    public var mapRouteColor: String {
+        switch self {
+        case .clear, .partlyCloudy: return "#34C759"     // green
+        case .cloudy: return "#AEAEB2"                     // gray
+        case .rain: return "#007AFF"                        // blue
+        case .heavyRain: return "#003EFF"                   // dark blue
+        case .snow: return "#C7C7E5"                        // periwinkle
+        case .sleet: return "#8E8EE6"                       // slate
+        case .thunderstorm: return "#AF52DE"                // purple
+        case .fog: return "#636366"                         // dark gray
+        case .windy: return "#FF9500"                       // orange
+        case .unknown: return "#8E8E93"
+        }
+    }
+
+    /// Marker accent color on the map
+    public var mapMarkerColor: String {
+        switch self {
+        case .clear, .partlyCloudy: return "#34C759"
+        case .cloudy: return "#8E8E93"
+        case .rain, .heavyRain, .snow, .sleet: return "#5AC8FA"
+        case .thunderstorm: return "#AF52DE"
+        case .fog: return "#8E8E93"
+        case .windy: return "#FF9500"
+        case .unknown: return "#8E8E93"
+        }
+    }
 }
 
 // MARK: - Weather Severity
@@ -268,6 +297,102 @@ public enum SegmentWeatherSeverity: String, Sendable {
         case .caution: return "#FF9500"
         case .severe: return "#FF3B30"
         }
+    }
+}
+
+// MARK: - Traffic Congestion Level
+public enum TrafficCongestionLevel: String, Sendable, Comparable {
+    case unknown = "unknown"
+    case freeFlow = "free_flow"
+    case moderate = "moderate"
+    case heavy = "heavy"
+    case gridlock = "gridlock"
+
+    public var severityOrder: Int {
+        switch self {
+        case .unknown: return 0
+        case .freeFlow: return 1
+        case .moderate: return 2
+        case .heavy: return 3
+        case .gridlock: return 4
+        }
+    }
+
+    public static func < (lhs: TrafficCongestionLevel, rhs: TrafficCongestionLevel) -> Bool {
+        lhs.severityOrder < rhs.severityOrder
+    }
+
+    public var colorHex: String {
+        switch self {
+        case .unknown: return "#8E8E93"
+        case .freeFlow: return "#34C759"
+        case .moderate: return "#FFCC00"
+        case .heavy: return "#FF9500"
+        case .gridlock: return "#FF3B30"
+        }
+    }
+
+    public var localizedTitle: String {
+        switch self {
+        case .unknown: return WizPathKitL10n.text("traffic_unknown")
+        case .freeFlow: return WizPathKitL10n.text("traffic_free_flow")
+        case .moderate: return WizPathKitL10n.text("traffic_moderate")
+        case .heavy: return WizPathKitL10n.text("traffic_heavy")
+        case .gridlock: return WizPathKitL10n.text("traffic_gridlock")
+        }
+    }
+}
+
+// MARK: - Scored Route Candidate (for comparison)
+public struct ScoredRouteCandidate: Identifiable, Sendable {
+    public let id: UUID
+    public let route: WizPathRoute
+    public let score: Int
+    public let trafficCongestion: TrafficCongestionLevel
+    public let hasTollRoads: Bool
+    public let severeSegmentCount: Int
+    public let cautionSegmentCount: Int
+
+    public init(route: WizPathRoute, score: Int, trafficCongestion: TrafficCongestionLevel = .unknown,
+                hasTollRoads: Bool = false, severeSegmentCount: Int = 0, cautionSegmentCount: Int = 0) {
+        self.id = route.id
+        self.route = route
+        self.score = score
+        self.trafficCongestion = trafficCongestion
+        self.hasTollRoads = hasTollRoads
+        self.severeSegmentCount = severeSegmentCount
+        self.cautionSegmentCount = cautionSegmentCount
+    }
+
+    public var isBest: Bool { score >= 80 }
+    public var isGood: Bool { score >= 60 && score < 80 }
+    public var isModerate: Bool { score >= 40 && score < 60 }
+    public var isPoor: Bool { score < 40 }
+
+    public var scoreLabel: String {
+        if isBest { return WizPathKitL10n.text("route_score_best") }
+        if isGood { return WizPathKitL10n.text("route_score_good") }
+        if isModerate { return WizPathKitL10n.text("route_score_moderate") }
+        return WizPathKitL10n.text("route_score_poor")
+    }
+
+    public var scoreColorHex: String {
+        if isBest { return "#34C759" }
+        if isGood { return "#30D158" }
+        if isModerate { return "#FFCC00" }
+        return "#FF3B30"
+    }
+
+    public var formattedDuration: String {
+        let h = Int(route.totalDuration) / 3600
+        let m = (Int(route.totalDuration) % 3600) / 60
+        if h > 0 { return WizPathKitL10n.formatted("format_duration_hours_minutes", h, m) }
+        return WizPathKitL10n.formatted("format_duration_minutes_only", m)
+    }
+
+    public var formattedDistance: String {
+        let km = route.totalDistance / 1000
+        return km >= 10 ? "\(Int(km)) km" : String(format: "%.1f km", km)
     }
 }
 

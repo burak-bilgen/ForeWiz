@@ -265,7 +265,8 @@ public struct ChargingStationDetailSheet: View {
 
     private func formattedDistance(_ dist: CLLocationDistance) -> String {
         let km = dist / 1000
-        return km >= 10 ? "\(Int(km)) km" : String(format: "%.1f km", km)
+        let unit = WizPathKitL10n.text("unit_km")
+        return km >= 10 ? "\(Int(km)) \(unit)" : String(format: "%.1f \(unit)", km)
     }
 
     private func weatherConditionDisplay(_ weather: SegmentWeather) -> String {

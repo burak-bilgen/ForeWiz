@@ -3,7 +3,8 @@ import WizPathKit
 
 // MARK: - WizPathLocationSource Adapter
 
-final class WizPathLocationServiceAdapter: WizPathLocationSource, @unchecked Sendable {
+@MainActor
+final class WizPathLocationServiceAdapter: WizPathLocationSource {
     private let locationService: LocationService
 
     init(locationService: LocationService) {
@@ -18,7 +19,8 @@ final class WizPathLocationServiceAdapter: WizPathLocationSource, @unchecked Sen
 
 // MARK: - WizPathWeatherSource Adapter
 
-final class WizPathWeatherServiceAdapter: WizPathWeatherSource, @unchecked Sendable {
+@MainActor
+final class WizPathWeatherServiceAdapter: WizPathWeatherSource {
     private let weatherRepository: WeatherRepository
     private let dateProvider: DateProvider
 

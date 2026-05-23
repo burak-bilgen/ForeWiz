@@ -95,6 +95,23 @@ public final class WizPathViewModel {
     public var chargingStations: [SmartStop] = []
     public var isLoadingMapDetails = false
 
+    // MARK: - Route Comparison & Preferences
+    /// All scored route candidates from the latest calculation
+    public var routeCandidates: [ScoredRouteCandidate] = []
+    /// Index into routeCandidates for the currently selected route
+    public var selectedRouteIndex: Int = 0
+    /// Whether to avoid toll roads in route calculation
+    public var avoidTollRoads = false
+    /// Traffic congestion info for the current route
+    public var currentTrafficCongestion: TrafficCongestionLevel = .unknown
+    public var hasTollRoads: Bool = false
+    /// Whether the route comparison panel is expanded
+    public var showRouteComparison = false
+    /// Map presentation: compact (small preview) vs expanded (half screen)
+    public var mapExpanded = false
+    /// Whether traffic overlay is shown on the map
+    public var showTrafficOnMap = false
+
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
     public var didLoadInitialLocation = false
@@ -166,6 +183,27 @@ public final class WizPathViewModel {
 
     // MARK: - Route Calculation
 
+    public func selectRouteCandidate(at index: Int) {
+        guard index >= 0, index < routeCandidates.count else { return }
+        selectedRouteIndex = index
+        let candidate = routeCandidates[index]
+        state = .routeReady(candidate.route)
+        lastCalculatedRoute = candidate.route
+        currentTrafficCongestion = candidate.trafficCongestion
+        hasTollRoads = candidate.hasTollRoads
+        showRouteComparison = false
+        updateRouteStatus(for: candidate.route)
+        showJourneyHUD = true
+        HapticEngine.shared.selectionChanged()
+        AppLogger.wizPath.info("Switched to route candidate #\(index): score=\(candidate.score)")
+    }
+
+    public func toggleAvoidTollRoads() {
+        avoidTollRoads.toggle()
+        HapticEngine.shared.selectionChanged()
+        if currentRoute != nil { Task { await calculateRoute() } }
+    }
+
     public func calculateRoute() async {
         guard isOnline else {
             if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
@@ -188,7 +226,25 @@ public final class WizPathViewModel {
         state = .calculating
         if !isAutoRefreshing { HapticEngine.shared.medium() }
         do {
-            let route = try await wizPathService.calculateRoute(origin: origin, destination: destination, mode: travelMode, departureTime: departureTime)
+            let result = try await wizPathService.calculateRouteWithCandidates(
+                origin: origin,
+                destination: destination,
+                mode: travelMode,
+                departureTime: departureTime,
+                avoidTollRoads: avoidTollRoads
+            )
+            let route = result.best
+            routeCandidates = result.candidates
+            selectedRouteIndex = 0
+
+            // Extract traffic/toll info from the best candidate
+            if let bestCandidate = result.candidates.first {
+                currentTrafficCongestion = bestCandidate.trafficCongestion
+                hasTollRoads = bestCandidate.hasTollRoads
+            } else {
+                currentTrafficCongestion = .unknown
+                hasTollRoads = false
+            }
             climateAnalysis = climateService.analyzeRouteClimate(route, travelMode: travelMode)
                 // Analyze cycling safety if applicable
             if travelMode == .cycling {
@@ -376,6 +432,13 @@ public final class WizPathViewModel {
         evRecommendations = []
         chargingStations = []
         segmentPlaceNames = [:]
+        routeCandidates = []
+        selectedRouteIndex = 0
+        currentTrafficCongestion = .unknown
+        hasTollRoads = false
+        showRouteComparison = false
+        mapExpanded = false
+        showTrafficOnMap = false
         HapticEngine.shared.light()
     }
 
@@ -479,40 +542,24 @@ public final class WizPathViewModel {
 
     private func generateWeatherRecommendation(category: POICategory, weather: SegmentWeather?, mode: TravelMode) -> String? {
         guard let weather = weather else { return nil }
-        let isTurkish = Locale.current.language.languageCode?.identifier.lowercased().hasPrefix("tr") ?? false
         
         switch weather.condition {
         case .thunderstorm, .heavyRain, .snow, .sleet:
-            if isTurkish {
-                switch category {
-                case .restStop, .restaurant:
-                    return "Kötü hava şartları (yağış/fırtına) nedeniyle bu noktada durup sığınmanızı öneririz."
-                default:
-                    return "Hava şartları zorlu; seyahat güvenliği için korunaklı bir alanda bekleyin."
-                }
-            } else {
-                switch category {
-                case .restStop, .restaurant:
-                    return "Heavy precipitation or storm ahead. We highly recommend resting here to seek shelter."
-                default:
-                    return "Challenging weather conditions. Consider taking a break for your travel safety."
-                }
+            switch category {
+            case .restStop, .restaurant:
+                return WizPathKitL10n.text("wizpath_rec_severe_shelter")
+            default:
+                return WizPathKitL10n.text("wizpath_rec_severe_wait")
             }
         case .windy:
             if mode == .cycling || mode == .walking {
-                return isTurkish
-                    ? "Kuvvetli rüzgar bekleniyor. Rüzgar direncinden kaçınmak için ideal bir dinlenme noktası."
-                    : "Strong winds expected along the route. An excellent stop to catch your breath and find wind shadow."
+                return WizPathKitL10n.text("wizpath_rec_strong_wind_stop")
             }
         case .rain:
-            return isTurkish
-                ? "Bölgede yağış var. Sıcak bir mola verip yola öyle devam edebilirsiniz."
-                : "Rain is present at this stop. Take a dry break before continuing."
+            return WizPathKitL10n.text("wizpath_rec_rain_break")
         default:
             if weather.temperature >= 28.0 {
-                return isTurkish
-                    ? "Hava sıcaklığı yüksek (\(Int(weather.temperature))°C). Sıvı tüketimi ve serinleme için durabilirsiniz."
-                    : "High temperature alert (\(Int(weather.temperature))°C). Highly recommended stop for hydration and cooling down."
+                return WizPathKitL10n.formatted("wizpath_rec_high_temp", Int(weather.temperature))
             }
         }
         return nil
@@ -531,6 +578,56 @@ public final class WizPathViewModel {
                   self.currentRoute?.id == routeID else { return }
             self.segmentPlaceNames = names
         }
+    }
+
+    // MARK: - Maps URL Builders
+    /// Builds the Apple Maps URL string with waypoints for the current route.
+    /// The View layer is responsible for opening the URL via UIApplication.
+    public func appleMapsURLString() -> String? {
+        guard currentRoute != nil,
+              let origin = originCoordinate,
+              let destination = destinationCoordinate else { return nil }
+
+        var urlString = "maps://?saddr=\(origin.latitude),\(origin.longitude)"
+        let waypoints = chargingStations.filter { !$0.safetyStatus.shouldAvoid }
+        for stop in waypoints {
+            urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
+        }
+        urlString += "&daddr=\(destination.latitude),\(destination.longitude)"
+        if avoidTollRoads { urlString += "&no_tolls=true" }
+        return urlString
+    }
+
+    public func appleMapsWebURLString() -> String? {
+        guard let origin = originCoordinate,
+              let destination = destinationCoordinate else { return nil }
+        var webString = "https://maps.apple.com/?saddr=\(origin.latitude),\(origin.longitude)&daddr=\(destination.latitude),\(destination.longitude)"
+        if avoidTollRoads { webString += "&dirflg=d" }
+        return webString
+    }
+
+    /// Builds the Google Maps URL string with waypoints for the current route.
+    public func googleMapsURLString() -> String? {
+        guard currentRoute != nil,
+              let origin = originCoordinate,
+              let destination = destinationCoordinate else { return nil }
+
+        var urlString = "comgooglemaps://?saddr=\(origin.latitude),\(origin.longitude)"
+        let waypoints = chargingStations.filter { !$0.safetyStatus.shouldAvoid }
+        for stop in waypoints {
+            urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
+        }
+        urlString += "&daddr=\(destination.latitude),\(destination.longitude)&directionsmode=driving"
+        if avoidTollRoads { urlString += "&avoid=tolls" }
+        return urlString
+    }
+
+    public func googleMapsWebURLString() -> String? {
+        guard let origin = originCoordinate,
+              let destination = destinationCoordinate else { return nil }
+        var webString = "https://www.google.com/maps/dir/?api=1&origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)&travelmode=driving"
+        if avoidTollRoads { webString += "&avoid=tolls" }
+        return webString
     }
 
     public func dismissError() { state = .idle }

@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreLocation
+import UIKit
 
 // MARK: - WizPath Dashboard View
 
@@ -16,9 +17,20 @@ public struct WizPathDashboardView: View {
     
     @State private var rotationAngle: Double = 0
 
-    public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil) {
+    /// Closure that handles maps export (e.g. showing a rewarded ad first).
+    /// Default implementation proceeds directly to the maps action.
+    /// The closure receives the actual maps-open action and must call it when ready.
+    private let onMapsExport: (@escaping () -> Void) -> Void
+    /// Closure that presents the feedback sheet.
+    private let onFeedback: () -> Void
+
+    public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil,
+                onMapsExport: @escaping (@escaping () -> Void) -> Void = { $0() },
+                onFeedback: @escaping () -> Void = {}) {
         self.wizPathService = wizPathService
         self.departureOptimizerService = departureOptimizerService
+        self.onMapsExport = onMapsExport
+        self.onFeedback = onFeedback
     }
 
     public var body: some View {
@@ -86,10 +98,26 @@ public struct WizPathDashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    // WizPath logo placeholder
+                    Image(systemName: "map.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color.liquidAccent)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button { HapticEngine.shared.light(); dismiss() } label: {
-                        Image(systemName: "xmark.circle.fill").font(.system(size: 22)).foregroundStyle(.secondary).symbolRenderingMode(.hierarchical)
-                    }.accessibilityLabel(WizPathKitL10n.text("wizpath_close"))
+                    HStack(spacing: 2) {
+                        Button {
+                            HapticEngine.shared.light()
+                            onFeedback()
+                        } label: {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.5))
+                        }
+                        Button { HapticEngine.shared.light(); dismiss() } label: {
+                            Image(systemName: "xmark.circle.fill").font(.system(size: 22)).foregroundStyle(.secondary).symbolRenderingMode(.hierarchical)
+                        }.accessibilityLabel(WizPathKitL10n.text("wizpath_close"))
+                    }
                 }
             }
             .animation(AppTheme.cardSpring, value: viewModel?.state)
@@ -126,12 +154,39 @@ public struct WizPathDashboardView: View {
         GeometryReader { geometry in
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 12) {
-                    // Map view nested inside ZStack to allow inline map details loader banner
+                    // ── Expandable map ──
+                    let mapHeight: CGFloat = viewModel.mapExpanded
+                        ? geometry.size.height * 0.55
+                        : min(220, geometry.size.height * 0.30)
+                    
                     ZStack(alignment: .top) {
                         WizPathMapView(viewModel: viewModel)
-                            .frame(height: min(260, geometry.size.height * 0.35))
+                            .frame(height: mapHeight)
                             .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
                             .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
+                            .overlay(alignment: .bottomTrailing) {
+                                // Expand/collapse hint label
+                                HStack(spacing: 4) {
+                                    Image(systemName: viewModel.mapExpanded ? "chevron.down" : "chevron.up")
+                                        .font(.system(size: 8, weight: .bold))
+                                    Text(viewModel.mapExpanded
+                                         ? WizPathKitL10n.text("wizpath_map_collapse")
+                                         : WizPathKitL10n.text("wizpath_map_expand"))
+                                        .font(.system(size: 8, weight: .semibold))
+                                }
+                                .foregroundStyle(.white.opacity(0.6))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(.ultraThinMaterial, in: Capsule())
+                                .environment(\.colorScheme, .dark)
+                                .padding(10)
+                                .onTapGesture {
+                                    withAnimation(AppTheme.cardSpring) {
+                                        viewModel.mapExpanded.toggle()
+                                        HapticEngine.shared.light()
+                                    }
+                                }
+                            }
                         
                         if viewModel.isLoadingMapDetails {
                             HStack(spacing: 8) {
@@ -152,7 +207,6 @@ public struct WizPathDashboardView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.75), value: viewModel.isLoadingMapDetails)
 
                     if viewModel.state.isOffline { OfflineBanner(retry: { Task { await viewModel.calculateRoute() } }).padding(.horizontal, 16) }
                     
@@ -203,10 +257,25 @@ public struct WizPathDashboardView: View {
                     .padding(.horizontal, 16)
 
                     if viewModel.travelMode == .car {
-                        electricVehicleToggle(viewModel: viewModel)
-                            .padding(.horizontal, 16)
+                        VStack(spacing: 6) {
+                            electricVehicleToggle(viewModel: viewModel)
+                            tollRoadToggle(viewModel: viewModel)
+                        }
+                        .padding(.horizontal, 16)
                     }
                     
+                    // Route Comparison
+                    if viewModel.showRouteComparison && viewModel.routeCandidates.count > 1 {
+                        RouteComparisonCard(
+                            candidates: viewModel.routeCandidates,
+                            selectedIndex: viewModel.selectedRouteIndex,
+                            onSelect: { viewModel.selectRouteCandidate(at: $0) },
+                            onClose: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison = false } }
+                        )
+                        .padding(.horizontal, 16)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+
                     if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
                         JourneyHUDView(data: route.journeyHUDData).padding(.horizontal, 16)
                     }
@@ -220,8 +289,45 @@ public struct WizPathDashboardView: View {
                         EVRecommendationsPanel(recommendations: viewModel.evRecommendations).padding(.horizontal, 16)
                     }
                     if let route = viewModel.currentRoute {
-                        WizPathRouteInfoPanel(route: route, destinationName: viewModel.destinationName, bestDepartureTime: viewModel.bestDepartureTime, departureTimeReason: viewModel.departureTimeReason, showDepartureOptimizer: { showDepartureOptimizer = true }, onReset: { viewModel.reset() }, onUpdateDepartureTime: { viewModel.updateDepartureTime($0) })
-                            .padding(.horizontal, 16)
+                        WizPathRouteInfoPanel(
+                            route: route,
+                            destinationName: viewModel.destinationName,
+                            bestDepartureTime: viewModel.bestDepartureTime,
+                            departureTimeReason: viewModel.departureTimeReason,
+                            showDepartureOptimizer: { showDepartureOptimizer = true },
+                            onReset: { viewModel.reset() },
+                            onUpdateDepartureTime: { viewModel.updateDepartureTime($0) },
+                            onOpenInAppleMaps: {
+                                onMapsExport {
+                                    guard let urlStr = viewModel.appleMapsURLString(),
+                                          let url = URL(string: urlStr) else { return }
+                                    if UIApplication.shared.canOpenURL(url) {
+                                        UIApplication.shared.open(url, options: [:])
+                                    } else if let webStr = viewModel.appleMapsWebURLString(),
+                                              let webURL = URL(string: webStr) {
+                                        UIApplication.shared.open(webURL, options: [:])
+                                    }
+                                }
+                            },
+                            onOpenInGoogleMaps: {
+                                onMapsExport {
+                                    guard let urlStr = viewModel.googleMapsURLString(),
+                                          let url = URL(string: urlStr) else { return }
+                                    if UIApplication.shared.canOpenURL(url) {
+                                        UIApplication.shared.open(url, options: [:])
+                                    } else if let webStr = viewModel.googleMapsWebURLString(),
+                                              let webURL = URL(string: webStr) {
+                                        UIApplication.shared.open(webURL, options: [:])
+                                    }
+                                }
+                            },
+                            trafficCongestion: viewModel.currentTrafficCongestion,
+                            hasTollRoads: viewModel.hasTollRoads,
+                            avoidTollRoads: viewModel.avoidTollRoads,
+                            candidateCount: viewModel.routeCandidates.count,
+                            onShowRouteComparison: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison.toggle() } }
+                        )
+                        .padding(.horizontal, 16)
                     }
                     Text(WizPathKitL10n.text("wizpath_powered_by_apple_maps")).font(.caption2).foregroundStyle(.tertiary).padding(.top, 4).padding(.bottom, 24)
                 }
@@ -261,55 +367,69 @@ public struct WizPathDashboardView: View {
             }
         }
         .alert(WizPathKitL10n.text("wizpath_route_error"), isPresented: .init(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.dismissError() } })) {
-            Button(WizPathKitL10n.text("wizpath_ok")) { viewModel.dismissError() }
+            Button(WizPathKitL10n.text("wizpath_retry")) {
+                viewModel.dismissError()
+                Task { await viewModel.refreshRoute() }
+            }
+            Button(WizPathKitL10n.text("wizpath_cancel")) { viewModel.dismissError() }
         } message: { Text(viewModel.errorMessage ?? "") }
     }
 
-    private func electricVehicleToggle(viewModel: WizPathViewModel) -> some View {
-        Button {
-            viewModel.setElectricVehicleEnabled(!viewModel.isElectricVehicle)
-        } label: {
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(Color(hex: POICategory.evCharger.color).opacity(viewModel.isElectricVehicle ? 0.18 : 0.08))
-                        .frame(width: 34, height: 34)
-                    Image(systemName: "bolt.car.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(viewModel.isElectricVehicle ? Color(hex: POICategory.evCharger.color) : .secondary)
-                }
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(WizPathKitL10n.text("wizpath_ev_mode_title"))
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(.white)
-                    Text(WizPathKitL10n.text("wizpath_ev_mode_subtitle"))
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                Image(systemName: viewModel.isElectricVehicle ? "checkmark.circle.fill" : "circle")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(viewModel.isElectricVehicle ? Color(hex: POICategory.evCharger.color) : .secondary)
-                    .frame(width: 24, height: 24)
-            }
+    private func tollRoadToggle(viewModel: WizPathViewModel) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "dollarsign.circle")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(viewModel.avoidTollRoads ? Color(hex: "#FF9500") : .secondary)
+            
+            Text(WizPathKitL10n.text("wizpath_avoid_tolls_title"))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+            
+            Spacer()
+            
+            Toggle(isOn: Binding(get: { viewModel.avoidTollRoads }, set: { _ in viewModel.toggleAvoidTollRoads() })) {}
+                .tint(Color(hex: "#FF9500"))
+                .scaleEffect(0.85)
+                .labelsHidden()
+                .accessibilityLabel(WizPathKitL10n.text("wizpath_avoid_tolls_title"))
         }
-        .contentShape(Rectangle())
-        .buttonStyle(.plain)
-        .accessibilityLabel(WizPathKitL10n.text("wizpath_ev_mode_title"))
-        .accessibilityAddTraits(viewModel.isElectricVehicle ? .isSelected : [])
-        .padding(12)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(.ultraThinMaterial)
                 .environment(\.colorScheme, .dark)
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color(hex: POICategory.evCharger.color).opacity(viewModel.isElectricVehicle ? 0.35 : 0.12), lineWidth: 1)
+        .accessibilityAddTraits(viewModel.avoidTollRoads ? .isSelected : [])
+    }
+
+    private func electricVehicleToggle(viewModel: WizPathViewModel) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "bolt.car.fill")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(viewModel.isElectricVehicle ? Color(hex: POICategory.evCharger.color) : .secondary)
+            
+            Text(WizPathKitL10n.text("wizpath_ev_mode_title"))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.white)
+            
+            Spacer()
+            
+            Toggle(isOn: Binding(get: { viewModel.isElectricVehicle }, set: { enabled in viewModel.setElectricVehicleEnabled(enabled) })) {}
+                .tint(Color(hex: POICategory.evCharger.color))
+                .scaleEffect(0.85)
+                .labelsHidden()
+                .accessibilityLabel(WizPathKitL10n.text("wizpath_ev_mode_title"))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
         )
+        .accessibilityAddTraits(viewModel.isElectricVehicle ? .isSelected : [])
     }
 }
+
+

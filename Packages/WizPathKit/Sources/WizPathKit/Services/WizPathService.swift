@@ -24,55 +24,122 @@ public final class WizPathService {
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
         mode: TravelMode,
-        departureTime: Date
+        departureTime: Date,
+        avoidTollRoads: Bool = false
     ) async throws -> WizPathRoute {
-        if let cached = cache.route(origin: origin, destination: destination, mode: mode) {
+        let (route, _) = try await calculateRouteWithCandidates(
+            origin: origin,
+            destination: destination,
+            mode: mode,
+            departureTime: departureTime,
+            avoidTollRoads: avoidTollRoads
+        )
+        return route
+    }
+
+    /// Calculate route and return all scored candidates for comparison.
+    /// Returns (bestRoute, allCandidates).
+    public func calculateRouteWithCandidates(
+        origin: CLLocationCoordinate2D,
+        destination: CLLocationCoordinate2D,
+        mode: TravelMode,
+        departureTime: Date,
+        avoidTollRoads: Bool = false
+    ) async throws -> (best: WizPathRoute, candidates: [ScoredRouteCandidate]) {
+        if !avoidTollRoads, let cached = cache.route(origin: origin, destination: destination, mode: mode) {
             AppLogger.wizPath.info("Using cached route")
-            return cached
+            return (cached, [])
+        }
+        if avoidTollRoads {
+            AppLogger.wizPath.info("Toll avoidance enabled — bypassing cache for fresh calculation")
         }
 
         AppLogger.wizPath.info("Calculating route from (\(origin.latitude, privacy: .private),\(origin.longitude, privacy: .private)) to (\(destination.latitude, privacy: .private),\(destination.longitude, privacy: .private))")
 
-        let mkRoute = try await calculateMKRoute(
+        let mkRoutes = try await calculateAllMKRoutes(
             origin: origin,
             destination: destination,
             mode: mode,
             departureTime: departureTime
         )
 
-        let segments = interpolateSegments(
-            route: mkRoute,
-            mode: mode,
-            departureTime: departureTime
-        )
+        AppLogger.wizPath.info("Found \(mkRoutes.count) alternate route(s) — scoring each for weather fitness...")
 
-        let segmentsWithWeather = try await attachWeatherDataToSegments(segments: segments)
+        // Build a ScoredRouteCandidate for each MKRoute
+        var candidates: [ScoredRouteCandidate] = []
 
-        let route = WizPathRoute(
-            id: UUID(),
-            origin: origin,
-            destination: destination,
-            travelMode: mode,
-            departureTime: departureTime,
-            segments: segmentsWithWeather,
-            totalDuration: mkRoute.expectedTravelTime,
-            totalDistance: mkRoute.distance,
-            polyline: mkRoute.polyline
-        )
+        for mkRoute in mkRoutes {
+            let segments = interpolateSegments(
+                route: mkRoute,
+                mode: mode,
+                departureTime: departureTime
+            )
+            let segmentsWithWeather = try await attachWeatherDataToSegments(segments: segments)
 
-        cache.store(route: route)
-        AppLogger.wizPath.info("Route calculated successfully: \(route.segments.count) segments, \(route.totalDuration) seconds")
-        return route
+            // Detect toll roads from advisory notices
+            let hasTollRoads = detectTollRoad(from: mkRoute)
+
+            // If avoiding tolls, penalize heavily
+            let tollPenalty = (avoidTollRoads && hasTollRoads) ? 40 : 0
+
+            let candidate = WizPathRoute(
+                id: UUID(),
+                origin: origin,
+                destination: destination,
+                travelMode: mode,
+                departureTime: departureTime,
+                segments: segmentsWithWeather,
+                totalDuration: mkRoute.expectedTravelTime,
+                totalDistance: mkRoute.distance,
+                polyline: mkRoute.polyline
+            )
+
+            // Detect traffic congestion level
+            let congestion = detectTrafficCongestion(from: mkRoute)
+
+            let severeCount = segmentsWithWeather.filter { $0.weather?.severity == .severe }.count
+            let cautionCount = segmentsWithWeather.filter { $0.weather?.severity == .caution }.count
+
+            let baseScore = scoreRoute(candidate)
+            let finalScore = max(0, baseScore - tollPenalty - congestion.trafficPenalty)
+
+            let scored = ScoredRouteCandidate(
+                route: candidate,
+                score: finalScore,
+                trafficCongestion: congestion.level,
+                hasTollRoads: hasTollRoads,
+                severeSegmentCount: severeCount,
+                cautionSegmentCount: cautionCount
+            )
+
+            candidates.append(scored)
+            AppLogger.wizPath.info("  Route #\(candidates.count): score=\(finalScore), duration=\(Int(mkRoute.expectedTravelTime / 60))min, risk=\(candidate.overallRisk.rawValue), toll=\(hasTollRoads), traffic=\(congestion.level.rawValue)")
+        }
+
+        // Sort: higher score first, ties broken by shorter duration
+        candidates.sort { lhs, rhs in
+            if lhs.score != rhs.score { return lhs.score > rhs.score }
+            return lhs.route.totalDuration < rhs.route.totalDuration
+        }
+
+        guard let best = candidates.first else {
+            throw WizPathError.routeUnavailable
+        }
+
+        cache.store(route: best.route, avoidTollRoads: avoidTollRoads)
+        AppLogger.wizPath.info("Best route selected: score=\(best.score), \(best.route.segments.count) segments, \(Int(best.route.totalDuration / 60)) min")
+        return (best.route, candidates)
     }
 
     // MARK: - Route Calculation via MKDirections
 
-    private func calculateMKRoute(
+    /// Returns all alternate routes from MKDirections, up to a sensible limit.
+    private func calculateAllMKRoutes(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
         mode: TravelMode,
         departureTime: Date
-    ) async throws -> MKRoute {
+    ) async throws -> [MKRoute] {
         let request = MKDirections.Request()
         request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
         request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
@@ -84,10 +151,10 @@ public final class WizPathService {
 
         do {
             let response = try await directions.calculate()
-            guard let route = response.routes.first else {
+            guard !response.routes.isEmpty else {
                 throw WizPathError.routeUnavailable
             }
-            return route
+            return Array(response.routes.prefix(4)) // Mercy limit — 4 is plenty
         } catch let error as MKError {
             let nsError = error as NSError
             switch nsError.code {
@@ -99,6 +166,117 @@ public final class WizPathService {
                 throw WizPathError.routeUnavailable
             }
         }
+    }
+
+    /// Score a fully-built WizPathRoute so we can compare alternatives.
+    /// Lower is worse. 100 = perfect, 0 = impassable.
+    private func scoreRoute(_ route: WizPathRoute) -> Int {
+        var score = 100
+
+        // Severe segments are dangerous — heavy penalty per segment
+        // Winter: snow/ice at sub-zero temps gets extra penalty (road closure risk)
+        let severeSegments = route.segments.filter { $0.weather?.severity == .severe }
+        for segment in severeSegments {
+            let basePenalty = 30
+            // Winter closure risk: snow/sleet + sub-zero temps = potential road closure
+            if let weather = segment.weather, weather.temperature < -2 {
+                if weather.condition == .snow || weather.condition == .sleet {
+                    score -= basePenalty + 25 // Heavy penalty — roads may be closed
+                } else {
+                    score -= basePenalty + 10 // Ice risk
+                }
+            } else if let weather = segment.weather, weather.condition == .thunderstorm {
+                score -= basePenalty + 15 // Storm — reduced visibility + danger
+            } else {
+                score -= basePenalty
+            }
+        }
+
+        // Caution segments degrade the trip
+        let cautionCount = route.segments.filter { $0.weather?.severity == .caution }.count
+        score -= cautionCount * 15
+
+        // Fair segments are mild but still not ideal
+        let fairCount = route.segments.filter { $0.weather?.severity == .fair }.count
+        score -= fairCount * 5
+
+        // Duration penalty — prefer quicker routes when weather is equal
+        let durationMinutes = Int(route.totalDuration / 60)
+        score -= min(20, durationMinutes)
+
+        // Cycling-specific wind penalty
+        if route.travelMode == .cycling {
+            let windSpeeds = route.segments.compactMap { $0.weather?.windSpeed }
+            let avgWind = windSpeeds.reduce(0.0, +) / max(1.0, Double(windSpeeds.count))
+            if avgWind > 20 {
+                score -= Int(avgWind - 20) * 3
+            }
+            // Winter cycling gets extra penalty (unsafe)
+            let minTemp = route.segments.compactMap { $0.weather?.temperature }.min() ?? 20
+            if minTemp < 0 {
+                score -= 35 // Cycling below freezing = high risk
+            } else if minTemp < 5 {
+                score -= 15
+            }
+        }
+
+        return max(0, score)
+    }
+
+    /// Detect if an MKRoute includes toll roads by checking advisory notices.
+    private func detectTollRoad(from route: MKRoute) -> Bool {
+        for notice in route.advisoryNotices {
+            let lower = notice.lowercased()
+            if lower.contains("toll") || lower.contains("ücretli") || lower.contains("paralı") {
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Detect traffic congestion from MKRoute data.
+    /// Returns level and a penalty for scoring.
+    private func detectTrafficCongestion(from route: MKRoute) -> (level: TrafficCongestionLevel, trafficPenalty: Int) {
+        // Calculate a traffic factor: actual travel time vs free-flow estimate
+        // Free-flow speed estimate: highway ~90km/h, mixed ~50km/h
+        let distanceKm = route.distance / 1000.0
+        let estimatedFreeFlowTime: TimeInterval
+        if distanceKm > 50 {
+            estimatedFreeFlowTime = (distanceKm / 80.0) * 3600 // Highway speeds
+        } else {
+            estimatedFreeFlowTime = (distanceKm / 50.0) * 3600 // City speeds
+        }
+
+        let actualTime = route.expectedTravelTime
+        guard estimatedFreeFlowTime > 0 else { return (.unknown, 0) }
+
+        let ratio = actualTime / estimatedFreeFlowTime
+
+        // Check advisory notices for traffic-related messages
+        let hasTrafficNotice = route.advisoryNotices.contains { notice in
+            let lower = notice.lowercased()
+            return lower.contains("traffic") || lower.contains("congestion") ||
+                   lower.contains("delay") || lower.contains("heavy")
+        }
+
+        let level: TrafficCongestionLevel
+        let trafficPenalty: Int
+
+        if ratio >= 2.5 || (hasTrafficNotice && ratio >= 1.8) {
+            level = .gridlock
+            trafficPenalty = 35
+        } else if ratio >= 1.8 || (hasTrafficNotice && ratio >= 1.4) {
+            level = .heavy
+            trafficPenalty = 20
+        } else if ratio >= 1.4 {
+            level = .moderate
+            trafficPenalty = 8
+        } else {
+            level = .freeFlow
+            trafficPenalty = 0
+        }
+
+        return (level, trafficPenalty)
     }
 
     // MARK: - Segment Interpolation
@@ -256,12 +434,13 @@ public final class WizPathService {
 
     // MARK: - Traffic Update
 
-    public func updateWithCurrentTraffic(route: WizPathRoute) async throws -> WizPathRoute {
+    public func updateWithCurrentTraffic(route: WizPathRoute, avoidTollRoads: Bool = false) async throws -> WizPathRoute {
         try await calculateRoute(
             origin: route.origin,
             destination: route.destination,
             mode: route.travelMode,
-            departureTime: Date()
+            departureTime: Date(),
+            avoidTollRoads: avoidTollRoads
         )
     }
 
@@ -328,9 +507,10 @@ final class WizPathCache {
 
     fileprivate init() {}
 
-    func store(route: WizPathRoute) {
+    func store(route: WizPathRoute, avoidTollRoads: Bool = false) {
         queue.async {
-            let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)"
+            let tollSuffix = avoidTollRoads ? "|no_tolls" : ""
+            let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)\(tollSuffix)"
             self.routeCache[key] = CacheEntry(route: route, timestamp: Date())
             // Periodic cleanup: remove expired entries
             if self.routeCache.count > 20 {

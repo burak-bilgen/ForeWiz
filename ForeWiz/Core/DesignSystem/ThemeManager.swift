@@ -1,4 +1,5 @@
 import SwiftUI
+import WizPathKit
 
 /// Manages the visual theme for ForeWiz - always uses Liquid Glass dark aesthetic.
 @available(iOS 17.0, *)
@@ -62,7 +63,7 @@ struct AdaptiveColor {
 struct AdaptiveCard<Content: View>: View {
     @ViewBuilder let content: Content
     var body: some View {
-        LiquidGlassCard {
+        LiquidGlassCard(accentColor: .liquidAccent) {
             content
         }
     }
