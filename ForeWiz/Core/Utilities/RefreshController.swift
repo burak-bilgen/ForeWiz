@@ -2,16 +2,18 @@ import Foundation
 import UIKit
 import OSLog
 
+/// Manages manual and scheduled data refreshes with throttling.
+/// @MainActor ensures all state mutations are serialized on the main actor,
+/// eliminating the need for a separate NSLock.
+@MainActor
 final class RefreshController {
     static let shared = RefreshController()
-    private let logger = AppLogger.lifecycle
 
-    private var lastRefreshTime: Date?
+    private let logger = AppLogger.lifecycle
     private let minimumRefreshInterval: TimeInterval = 300
 
+    private var lastRefreshTime: Date?
     private var isRefreshing = false
-    private let refreshLock = NSLock()
-
     private var scheduledRefreshWorkItem: DispatchWorkItem?
 
     private init() {}
@@ -67,9 +69,6 @@ final class RefreshController {
     }
 
     private func beginRefresh(force: Bool) -> RefreshStartDecision {
-        refreshLock.lock()
-        defer { refreshLock.unlock() }
-
         guard !isRefreshing else {
             return .alreadyRefreshing
         }
@@ -83,17 +82,15 @@ final class RefreshController {
     }
 
     private func finishRefresh() {
-        refreshLock.lock()
         isRefreshing = false
         lastRefreshTime = Date()
-        refreshLock.unlock()
     }
 
     func scheduleRefresh(after delay: TimeInterval) {
         scheduledRefreshWorkItem?.cancel()
 
         let workItem = DispatchWorkItem { [weak self] in
-            Task {
+            Task { [weak self] in
                 _ = await self?.performRefresh()
             }
         }

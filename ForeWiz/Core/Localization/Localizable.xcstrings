@@ -380,6 +380,23 @@
         }
       }
     },
+    "action_air_quality_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air quality alert — check the health briefing"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi uyarısı — sağlık raporunu kontrol edin"
+          }
+        }
+      }
+    },
     "action_avoid": {
       "extractionState": "manual",
       "localizations": {
@@ -585,24 +602,7 @@
         }
       }
     },
-    "Activity": {
-      "comment": "Siri intent parameter name for activity selection",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Activity"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aktivite"
-          }
-        }
-      }
-    },
+    "Activity": {},
     "activity_outside": {
       "extractionState": "manual",
       "localizations": {
@@ -892,19 +892,206 @@
         }
       }
     },
-    "at %@": {
+    "aqi_advice_good": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "at %@"
+            "value": "Air quality is excellent. Enjoy the fresh air!"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ saatinde"
+            "value": "Hava kalitesi mükemmel. Temiz havanın tadını çıkarın!"
+          }
+        }
+      }
+    },
+    "aqi_advice_hazardous": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emergency conditions. Stay indoors with windows closed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acil durum koşulları. Kapalı alanda kalın, pencereleri kapatın."
+          }
+        }
+      }
+    },
+    "aqi_advice_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air quality is acceptable. Sensitive individuals should limit prolonged outdoor exertion."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi kabul edilebilir. Hassas bireyler uzun süreli dış mekan aktivitelerini sınırlamalı."
+          }
+        }
+      }
+    },
+    "aqi_advice_sensitive": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sensitive groups should reduce outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hassas gruplar dış mekan aktivitelerini azaltmalı."
+          }
+        }
+      }
+    },
+    "aqi_advice_unhealthy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everyone should reduce outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herkes dış mekan aktivitelerini azaltmalı."
+          }
+        }
+      }
+    },
+    "aqi_advice_very_unhealthy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avoid all outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm dış mekan aktivitelerinden kaçının."
+          }
+        }
+      }
+    },
+    "aqi_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İyi"
+          }
+        }
+      }
+    },
+    "aqi_hazardous": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazardous"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tehlikeli"
+          }
+        }
+      }
+    },
+    "aqi_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "aqi_unhealthy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unhealthy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlıksız"
+          }
+        }
+      }
+    },
+    "aqi_unhealthy_sensitive": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unhealthy for Sensitive Groups"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hassas Gruplar İçin Sağlıksız"
+          }
+        }
+      }
+    },
+    "aqi_very_unhealthy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Very Unhealthy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çok Sağlıksız"
           }
         }
       }
@@ -926,20 +1113,21 @@
         }
       }
     },
-    "Best Exercise Time": {
-      "comment": "Recommended time window for exercising outside",
+    "Best Exercise Time": {},
+    "beta_badge_label": {
+      "comment": "Beta badge label",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Best Exercise Time"
+            "value": "BETA"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Egzersiz İçin En İyi Zaman"
+            "value": "BETA"
           }
         }
       }
@@ -1114,42 +1302,8 @@
         }
       }
     },
-    "Check for any weather warnings or risks for today": {
-      "comment": "Guidance text for checking warnings",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check for any weather warnings or risks for today"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugün için herhangi bir hava uyarısı veya risk olup olmadığını kontrol edin."
-          }
-        }
-      }
-    },
-    "Check Weather Risks": {
-      "comment": "Weather risks control title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check Weather Risks"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Risklerini İncele"
-          }
-        }
-      }
-    },
+    "Check for any weather warnings or risks for today": {},
+    "Check Weather Risks": {},
     "clear_outdoor_day": {
       "extractionState": "manual",
       "localizations": {
@@ -1983,41 +2137,7 @@
         }
       }
     },
-    "Critical Alert: %@. %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Critical Alert: %1$@. %2$@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kritik Uyarı: %1$@. %2$@"
-          }
-        }
-      }
-    },
-    "Current Temperature": {
-      "comment": "Current temperature indicator label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Current Temperature"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Sıcaklık"
-          }
-        }
-      }
-    },
+    "Current Temperature": {},
     "current_location": {
       "extractionState": "manual",
       "localizations": {
@@ -2031,23 +2151,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bulunduğum Konum"
-          }
-        }
-      }
-    },
-    "Data provided by %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Data provided by %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Veri kaynağı: %@"
           }
         }
       }
@@ -2656,6 +2759,186 @@
         }
       }
     },
+    "feedback_dashboard_clear": {
+      "comment": "Clear all feedback button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear All"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temizle"
+          }
+        }
+      }
+    },
+    "feedback_dashboard_empty": {
+      "comment": "Empty state title for feedback dashboard",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Feedback Yet"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz Geri Bildirim Yok"
+          }
+        }
+      }
+    },
+    "feedback_dashboard_empty_desc": {
+      "comment": "Empty state description for feedback dashboard",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your submitted feedback will appear here after you send it."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gönderdiğiniz geri bildirimler burada görünecek."
+          }
+        }
+      }
+    },
+    "feedback_dashboard_failed": {
+      "comment": "Failed delivery status label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başarısız"
+          }
+        }
+      }
+    },
+    "feedback_dashboard_title": {
+      "comment": "Feedback dashboard navigation title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My Feedback"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri Bildirimlerim"
+          }
+        }
+      }
+    },
+    "feedback_dashboard_view": {
+      "comment": "Button to view feedback history",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View My Feedback"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri Bildirimlerimi Gör"
+          }
+        }
+      }
+    },
+    "feedback_email_hint": {
+      "comment": "Email hint text",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We'll only use this to follow up if needed"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sadece gerektiğinde iletişim kurmak için kullanılır"
+          }
+        }
+      }
+    },
+    "feedback_email_label": {
+      "comment": "Email field label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email (optional)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E-posta (isteğe bağlı)"
+          }
+        }
+      }
+    },
+    "feedback_email_placeholder": {
+      "comment": "Email placeholder",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "your@email.com"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ornek@email.com"
+          }
+        }
+      }
+    },
+    "feedback_error_config": {
+      "comment": "Error message when Formspree endpoint is not configured",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback service is being set up. Please try again later."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri bildirim servisi ayarlanıyor. Lütfen daha sonra tekrar deneyin."
+          }
+        }
+      }
+    },
     "feedback_hot": {
       "comment": "Too hot feedback button",
       "extractionState": "manual",
@@ -2692,6 +2975,42 @@
         }
       }
     },
+    "feedback_message_label": {
+      "comment": "Feedback message field label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesaj"
+          }
+        }
+      }
+    },
+    "feedback_message_placeholder": {
+      "comment": "Feedback message placeholder",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Describe your feedback in detail..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görüşünüzü detaylıca açıklayın..."
+          }
+        }
+      }
+    },
     "feedback_question": {
       "comment": "Feedback card question",
       "extractionState": "manual",
@@ -2706,6 +3025,150 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bugün hava nasıldı?"
+          }
+        }
+      }
+    },
+    "feedback_screenshot_add": {
+      "comment": "Add screenshot button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Screenshot"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran Görüntüsü Ekle"
+          }
+        }
+      }
+    },
+    "feedback_screenshot_added": {
+      "comment": "Screenshot added label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screenshot Added"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran Görüntüsü Eklendi"
+          }
+        }
+      }
+    },
+    "feedback_screenshot_hint": {
+      "comment": "Screenshot hint text",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Helps us understand the issue better. Max 10MB."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorunu daha iyi anlamamıza yardımcı olur. Maks. 10MB."
+          }
+        }
+      }
+    },
+    "feedback_screenshot_label": {
+      "comment": "Screenshot attachment label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Screenshot (Optional)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekran Görüntüsü (İsteğe Bağlı)"
+          }
+        }
+      }
+    },
+    "feedback_send": {
+      "comment": "Send button label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send Feedback"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gönder"
+          }
+        }
+      }
+    },
+    "feedback_sending": {
+      "comment": "Sending state label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gönderiliyor..."
+          }
+        }
+      }
+    },
+    "feedback_sheet_subtitle": {
+      "comment": "Feedback sheet subtitle",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help us improve ForeWiz! Bug reports, feature requests, and general feedback are all welcome."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz'i geliştirmemize yardımcı olun! Hata raporları, özellik talepleri ve genel görüşleriniz bizim için değerli."
+          }
+        }
+      }
+    },
+    "feedback_sheet_title": {
+      "comment": "Feedback sheet title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send Feedback"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri Bildirim Gönder"
           }
         }
       }
@@ -2728,6 +3191,24 @@
         }
       }
     },
+    "feedback_success_detail": {
+      "comment": "Success message detail",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your feedback has been sent. We read every submission!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Görüşünüz gönderildi. Her gönderiyi okuyoruz!"
+          }
+        }
+      }
+    },
     "feedback_thanks": {
       "comment": "Feedback thanks message",
       "extractionState": "manual",
@@ -2746,42 +3227,116 @@
         }
       }
     },
-    "Fetch the latest weather data for your location": {
-      "comment": "Fetch details description",
+    "feedback_title_label": {
+      "comment": "Feedback title field label",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fetch the latest weather data for your location"
+            "value": "Title"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bulunduğunuz konum için en güncel hava durumu verilerini alın."
+            "value": "Başlık"
           }
         }
       }
     },
-    "Find the best time window for outdoor activities today": {
-      "comment": "Description of finding activity window",
+    "feedback_title_placeholder": {
+      "comment": "Feedback title placeholder",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Find the best time window for outdoor activities today"
+            "value": "Brief summary of your feedback"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün dışarı aktiviteleri için en uygun saat aralığını bulun."
+            "value": "Görüşünüzün kısa özeti"
           }
         }
       }
     },
+    "feedback_type_bug": {
+      "comment": "Bug report type",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bug"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hata"
+          }
+        }
+      }
+    },
+    "feedback_type_feature": {
+      "comment": "Feature request type",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feature"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Özellik"
+          }
+        }
+      }
+    },
+    "feedback_type_general": {
+      "comment": "General feedback type",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genel"
+          }
+        }
+      }
+    },
+    "feedback_type_label": {
+      "comment": "Feedback type picker label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tür"
+          }
+        }
+      }
+    },
+    "Fetch the latest weather data for your location": {},
+    "Find the best time window for outdoor activities today": {},
     "for_timely_reminders": {
       "extractionState": "manual",
       "localizations": {
@@ -2850,132 +3405,13 @@
         }
       }
     },
-    "Get Best Activity Window": {
-      "comment": "Action button to query optimal time window",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get Best Activity Window"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En Uygun Aktivite Zamanını Gör"
-          }
-        }
-      }
-    },
-    "Get clothing recommendations based on current weather": {
-      "comment": "Outfit recommendation tool tip",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get clothing recommendations based on current weather"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut hava durumuna göre giyim önerileri alın."
-          }
-        }
-      }
-    },
-    "Get Current Temperature": {
-      "comment": "Action to fetch current temperature",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get Current Temperature"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mevcut Sıcaklığı Öğren"
-          }
-        }
-      }
-    },
-    "Get Outfit Recommendation": {
-      "comment": "Action to query outfit recommendations",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get Outfit Recommendation"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Giyim Önerisi Al"
-          }
-        }
-      }
-    },
-    "Get personalized weather recommendation for your current location": {
-      "comment": "Hyperlocal recommendation label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get personalized weather recommendation for your current location"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bulunduğunuz konum için kişiselleştirilmiş hava durumu önerileri alın."
-          }
-        }
-      }
-    },
-    "Get the current temperature for your location": {
-      "comment": "Current temp check tool tip",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get the current temperature for your location"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bulunduğunuz konum için mevcut sıcaklığı öğrenin."
-          }
-        }
-      }
-    },
-    "Get Weather Recommendation": {
-      "comment": "Action to query weather recommendations",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Get Weather Recommendation"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Durumu Önerisi Al"
-          }
-        }
-      }
-    },
+    "Get Best Activity Window": {},
+    "Get clothing recommendations based on current weather": {},
+    "Get Current Temperature": {},
+    "Get Outfit Recommendation": {},
+    "Get personalized weather recommendation for your current location": {},
+    "Get the current temperature for your location": {},
+    "Get Weather Recommendation": {},
     "good_to_go_with_light": {
       "extractionState": "manual",
       "localizations": {
@@ -3176,6 +3612,244 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gök Gürültülü Fırtına"
+          }
+        }
+      }
+    },
+    "health_aqi_good_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air quality is excellent. Enjoy the fresh air!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi mükemmel. Temiz havanın tadını çıkarın!"
+          }
+        }
+      }
+    },
+    "health_aqi_hazardous_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI hazardous. Emergency conditions — stay indoors with windows closed."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI tehlikeli. Acil durum koşulları — kapalı alanda kalın, pencereleri kapatın."
+          }
+        }
+      }
+    },
+    "health_aqi_moderate_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air quality is acceptable. If you're sensitive, consider limiting prolonged outdoor exertion."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi kabul edilebilir. Hassassanız uzun süreli dış mekan eforunu sınırlayın."
+          }
+        }
+      }
+    },
+    "health_aqi_no_data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No air quality data available."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi verisi mevcut değil."
+          }
+        }
+      }
+    },
+    "health_aqi_pollen_note": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pollen: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Polen: %@"
+          }
+        }
+      }
+    },
+    "health_aqi_sensitive_default": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Unhealthy for sensitive groups. Reduce prolonged outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Hassas gruplar için sağlıksız. Uzun süreli dış mekan aktivitelerini azaltın."
+          }
+        }
+      }
+    },
+    "health_aqi_sensitive_pollen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Unhealthy for sensitive groups. Pollen level: %d. Limit outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Hassas gruplar için sağlıksız. Polen seviyesi: %d. Dış mekan aktivitelerini sınırlayın."
+          }
+        }
+      }
+    },
+    "health_aqi_sensitive_pollutant": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Unhealthy for sensitive groups. Main pollutant: %@. Reduce outdoor exposure."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Hassas gruplar için sağlıksız. Ana kirletici: %@. Dış mekan maruziyetini azaltın."
+          }
+        }
+      }
+    },
+    "health_aqi_summary": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d · %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d · %@"
+          }
+        }
+      }
+    },
+    "health_aqi_summary_pollen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d · %@ · %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d · %@ · %@"
+          }
+        }
+      }
+    },
+    "health_aqi_unavailable_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No air quality data available."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi verisi mevcut değil."
+          }
+        }
+      }
+    },
+    "health_aqi_unhealthy_default": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Unhealthy. Reduce outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Sağlıksız. Dış mekan aktivitelerini azaltın."
+          }
+        }
+      }
+    },
+    "health_aqi_unhealthy_pollutant": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Unhealthy. Main pollutant: %@. Everyone should reduce outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Sağlıksız. Ana kirletici: %@. Herkes dış mekan aktivitelerini azaltmalı."
+          }
+        }
+      }
+    },
+    "health_aqi_very_unhealthy_advice": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Very Unhealthy. Avoid all outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AQI %d — Çok Sağlıksız. Tüm dış mekan aktivitelerinden kaçının."
           }
         }
       }
@@ -3860,6 +4534,23 @@
         }
       }
     },
+    "health_summary_aqi_poor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air quality is %@. Limit outdoor activity."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi: %@. Dış mekan aktivitelerini sınırlayın."
+          }
+        }
+      }
+    },
     "health_summary_fair": {
       "extractionState": "manual",
       "localizations": {
@@ -3907,6 +4598,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bugün hava sağlığın için harika."
+          }
+        }
+      }
+    },
+    "health_summary_migraine_risk": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's weather may trigger migraines"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugünkü hava migreni tetikleyebilir"
           }
         }
       }
@@ -4026,23 +4734,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "En İyi Zaman"
-          }
-        }
-      }
-    },
-    "home_assistant_badge": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz Assistant"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz Asistanı"
           }
         }
       }
@@ -4353,40 +5044,6 @@
         }
       }
     },
-    "home_score_out_of_100": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/100"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "/100"
-          }
-        }
-      }
-    },
-    "home_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz Hava"
-          }
-        }
-      }
-    },
     "hud_active_hazard_plural": {
       "extractionState": "manual",
       "localizations": {
@@ -4438,6 +5095,60 @@
         }
       }
     },
+    "hud_confidence": {
+      "comment": "HUD: Confidence score label (replaces 'Safety')",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confidence"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güven"
+          }
+        }
+      }
+    },
+    "hud_confidence_explanation": {
+      "comment": "HUD: Confidence tooltip explanation",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route Confidence combines weather conditions, road hazards, and traffic data to rate how safe and comfortable your journey will be."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota Güveni, hava koşullarını, yol tehlikelerini ve trafik verilerini birleştirerek yolculuğunuzun ne kadar güvenli ve konforlu olacağını derecelendirir."
+          }
+        }
+      }
+    },
+    "hud_confidence_title": {
+      "comment": "HUD: Confidence info tooltip title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What is Route Confidence?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota Güveni Nedir?"
+          }
+        }
+      }
+    },
     "hud_eta": {
       "extractionState": "manual",
       "localizations": {
@@ -4468,6 +5179,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tehlikeler"
+          }
+        }
+      }
+    },
+    "hud_journey_confidence": {
+      "comment": "HUD: Journey Confidence section header",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Journey Confidence"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota Güveni"
           }
         }
       }
@@ -5237,40 +5966,6 @@
         }
       }
     },
-    "keyevent_fog_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fog's rolling in around %@ - visibility's gonna be low. Take it slow if you're driving 🌫️"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ civarı sis basıyor - görüş mesafesi düşecek. Araç kullanıyorsan yavaş git 🌫️"
-          }
-        }
-      }
-    },
-    "keyevent_fog_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌫 Foggy Morning"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌫 Sisli Hava"
-          }
-        }
-      }
-    },
     "keyevent_header": {
       "extractionState": "manual",
       "localizations": {
@@ -5335,23 +6030,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "🌡 Kavurucu Sıcak"
-          }
-        }
-      }
-    },
-    "keyevent_heavyrain_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌊 Pouring Rain"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌊 Sağanak Yağmur"
           }
         }
       }
@@ -5458,23 +6136,6 @@
         }
       }
     },
-    "keyevent_rain_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌧 Rain on the Way"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌧 Yağmur Geliyor"
-          }
-        }
-      }
-    },
     "keyevent_show_less": {
       "extractionState": "manual",
       "localizations": {
@@ -5505,40 +6166,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld tane daha göster"
-          }
-        }
-      }
-    },
-    "keyevent_snow_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Snow's on the way around %@ - roads could get slick. Take it easy out there! ❄️"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ civarı kar bekliyoruz - yollar kayganlaşabilir. Dikkatli ol! ❄️"
-          }
-        }
-      }
-    },
-    "keyevent_snow_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌨 Snowy Weather"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "🌨 Karlı Hava"
           }
         }
       }
@@ -5951,6 +6578,132 @@
         }
       }
     },
+    "maps_export_complete": {
+      "comment": "Maps export completed successfully",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redirecting to Maps..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haritalar'a yönlendiriliyor..."
+          }
+        }
+      }
+    },
+    "maps_export_description": {
+      "comment": "Description for watching an ad to unlock maps",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Watch a quick ad to unlock maps export. This helps keep ForeWiz free!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Harita dışa aktarmayı açmak için kısa bir reklam izleyin. Bu, ForeWiz'in ücretsiz kalmasına yardımcı olur!"
+          }
+        }
+      }
+    },
+    "maps_export_error": {
+      "comment": "General error for ad loading",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load ad. Opening maps directly."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reklam yüklenemedi. Harita doğrudan açılıyor."
+          }
+        }
+      }
+    },
+    "maps_export_loading": {
+      "comment": "Loading state for ad",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading ad..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reklam yükleniyor..."
+          }
+        }
+      }
+    },
+    "maps_export_skip": {
+      "comment": "Skip button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip & Open Maps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atla ve Haritayı Aç"
+          }
+        }
+      }
+    },
+    "maps_export_timeout": {
+      "comment": "Timeout error message",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ad took too long. Opening maps directly."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reklam çok uzun sürdü. Harita doğrudan açılıyor."
+          }
+        }
+      }
+    },
+    "maps_export_title": {
+      "comment": "Maps export reward ad sheet title",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock Maps Export"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Harita Dışa Aktarmayı Aç"
+          }
+        }
+      }
+    },
     "metric_humidity": {
       "comment": "Humidity metric label",
       "extractionState": "manual",
@@ -6037,6 +6790,159 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rüzgâr"
+          }
+        }
+      }
+    },
+    "microclimate_coastal_breeze_summer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coastal breeze keeps the heat in check"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahil esintisi sıcağı dengeliyor"
+          }
+        }
+      }
+    },
+    "microclimate_coastal_humid_summer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coastal humidity makes it feel muggier"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahil nemi havayı daha bunaltıcı yapıyor"
+          }
+        }
+      }
+    },
+    "microclimate_coastal_mild_winter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coastal climate keeps the winter mild"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahil iklimi kışı ılıman geçiriyor"
+          }
+        }
+      }
+    },
+    "microclimate_elevation_cool": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Higher elevation brings cooler air"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek rakım serin hava getiriyor"
+          }
+        }
+      }
+    },
+    "microclimate_fall_chill": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chilly fall air is settling in"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soğuk sonbahar havası iyice yerleşiyor"
+          }
+        }
+      }
+    },
+    "microclimate_inland_heat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inland areas are heating up more"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İç kesimler daha fazla ısınıyor"
+          }
+        }
+      }
+    },
+    "microclimate_spring_transition": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spring transition brings temperature swings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İlkbahar geçişi sıcaklık dalgalanmaları getiriyor"
+          }
+        }
+      }
+    },
+    "microclimate_urban_heat_day": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urban heat island makes city centres hotter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şehir ısı adası merkezleri daha da ısıtıyor"
+          }
+        }
+      }
+    },
+    "microclimate_urban_heat_night": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urban areas stay warmer through the night"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şehirler gece boyunca daha sıcak kalıyor"
           }
         }
       }
@@ -6316,168 +7222,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Açık hava puanı %lld/100 — belki de evde kalmak iyi fikir."
-          }
-        }
-      }
-    },
-    "narrative_dynamic_temp_cold": {
-      "comment": "Dynamic narrative opener for cold temperature",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A chilly %lld°C"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Soğuk %lld°C ile"
-          }
-        }
-      }
-    },
-    "narrative_dynamic_temp_cool": {
-      "comment": "Dynamic narrative opener for cool temperature",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A crisp %lld°C"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Serin %lld°C ile"
-          }
-        }
-      }
-    },
-    "narrative_dynamic_temp_hot": {
-      "comment": "Dynamic narrative opener for hot temperature",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scorching %lld°C out there"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kavurucu %lld°C ile"
-          }
-        }
-      }
-    },
-    "narrative_dynamic_temp_ideal": {
-      "comment": "Dynamic narrative opener for ideal temperature",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "At a perfect %lld°C"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İdeal %lld°C ile"
-          }
-        }
-      }
-    },
-    "narrative_dynamic_temp_warm": {
-      "comment": "Dynamic narrative opener for warm temperature",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "With a warm %lld°C"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ilık %lld°C'lik havayla"
-          }
-        }
-      }
-    },
-    "narrative_dynamic_wind_calm": {
-      "comment": "Dynamic narrative wind context - calm",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "with barely a whisper of wind."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "rüzgâr neredeyse hiç yok."
-          }
-        }
-      }
-    },
-    "narrative_dynamic_wind_light": {
-      "comment": "Dynamic narrative wind context - light breeze",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "with a gentle breeze to keep things fresh."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "hafif bir meltem serinletiyor."
-          }
-        }
-      }
-    },
-    "narrative_dynamic_wind_moderate": {
-      "comment": "Dynamic narrative wind context - moderate wind",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "with a noticeable wind picking up."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "rüzgâr iyiden iyiye hissediliyor."
-          }
-        }
-      }
-    },
-    "narrative_dynamic_wind_strong": {
-      "comment": "Dynamic narrative wind context - strong wind",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "with strong gusts to watch out for."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "kuvvetli rüzgâra dikkat!"
           }
         }
       }
@@ -7230,6 +7974,23 @@
         }
       }
     },
+    "notif_tip_air_quality": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air quality alert"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava kalitesi uyarısı"
+          }
+        }
+      }
+    },
     "notif_tip_cold": {
       "extractionState": "manual",
       "localizations": {
@@ -7624,24 +8385,7 @@
         }
       }
     },
-    "Outfit Recommendation": {
-      "comment": "Outfit recommendation section header",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Outfit Recommendation"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Giyim Önerisi"
-          }
-        }
-      }
-    },
+    "Outfit Recommendation": {},
     "outfit_advice_cold": {
       "extractionState": "manual",
       "localizations": {
@@ -8662,6 +9406,244 @@
         }
       }
     },
+    "pollen_extreme": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extreme"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aşırı"
+          }
+        }
+      }
+    },
+    "pollen_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek"
+          }
+        }
+      }
+    },
+    "pollen_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük"
+          }
+        }
+      }
+    },
+    "pollen_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "pollen_none": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yok"
+          }
+        }
+      }
+    },
+    "pollen_very_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Very High"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çok Yüksek"
+          }
+        }
+      }
+    },
+    "pollen_very_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Very Low"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çok Düşük"
+          }
+        }
+      }
+    },
+    "pollutant_carbon": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Carbon Monoxide"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karbon Monoksit"
+          }
+        }
+      }
+    },
+    "pollutant_nitrogen": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nitrogen Dioxide"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Azot Dioksit"
+          }
+        }
+      }
+    },
+    "pollutant_ozone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ozone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ozon"
+          }
+        }
+      }
+    },
+    "pollutant_pm10": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PM10"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PM10"
+          }
+        }
+      }
+    },
+    "pollutant_pm25": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PM2.5"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PM2.5"
+          }
+        }
+      }
+    },
+    "pollutant_sulfur": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sulfur Dioxide"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kükürt Dioksit"
+          }
+        }
+      }
+    },
+    "pollutant_unknown": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown Pollutant"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilinmeyen Kirletici"
+          }
+        }
+      }
+    },
     "preview_legacy_glass": {
       "extractionState": "manual",
       "localizations": {
@@ -9432,42 +10414,8 @@
         }
       }
     },
-    "Refresh Weather": {
-      "comment": "Refresh weather action title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Refresh Weather"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Durumunu Güncelle"
-          }
-        }
-      }
-    },
-    "Refresh Weather Data": {
-      "comment": "Refresh action long title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Refresh Weather Data"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Durumu Verilerini Yenile"
-          }
-        }
-      }
-    },
+    "Refresh Weather": {},
+    "Refresh Weather Data": {},
     "required": {
       "extractionState": "manual",
       "localizations": {
@@ -10086,6 +11034,23 @@
         }
       }
     },
+    "risk_type_air_quality": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Air Quality"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava Kalitesi"
+          }
+        }
+      }
+    },
     "risk_type_cold": {
       "extractionState": "manual",
       "localizations": {
@@ -10273,6 +11238,132 @@
         }
       }
     },
+    "route_label_avoiding": {
+      "comment": "WizPath: label shown when toll roads are being avoided",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avoiding"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaçınılıyor"
+          }
+        }
+      }
+    },
+    "route_label_free": {
+      "comment": "WizPath: label for free roads",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ücretsiz"
+          }
+        }
+      }
+    },
+    "route_label_toll": {
+      "comment": "WizPath: label for toll roads",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toll"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ücretli"
+          }
+        }
+      }
+    },
+    "route_score_best": {
+      "comment": "WizPath: route score label - best",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En İyi"
+          }
+        }
+      }
+    },
+    "route_score_good": {
+      "comment": "WizPath: route score label - good",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İyi"
+          }
+        }
+      }
+    },
+    "route_score_moderate": {
+      "comment": "WizPath: route score label - moderate",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "route_score_poor": {
+      "comment": "WizPath: route score label - poor",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poor"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kötü"
+          }
+        }
+      }
+    },
     "saturday": {
       "extractionState": "manual",
       "localizations": {
@@ -10303,57 +11394,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Puan"
-          }
-        }
-      }
-    },
-    "sensitivity_cold": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cold Sensitive"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Üşümeye Duyarlı"
-          }
-        }
-      }
-    },
-    "sensitivity_hot": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heat Sensitive"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklığa Duyarlı"
-          }
-        }
-      }
-    },
-    "sensitivity_normal": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normal"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Normal"
           }
         }
       }
@@ -11091,40 +12131,6 @@
         }
       }
     },
-    "Sunrise at %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sunrise at %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gün doğumu: %@"
-          }
-        }
-      }
-    },
-    "Sunset at %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sunset at %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gün batımı: %@"
-          }
-        }
-      }
-    },
     "tap_to_change_location": {
       "extractionState": "manual",
       "localizations": {
@@ -11138,25 +12144,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Konumu değiştirmek için dokun"
-          }
-        }
-      }
-    },
-    "Temperature %lld degrees %@": {
-      "comment": "A label that describes the temperature with a numerical value and a unit of measurement. The argument is the temperature value, the second argument is the unit of measurement.",
-      "extractionState": "manual",
-      "isCommentAutoGenerated": true,
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Temperature %1$lld degrees %2$@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıcaklık %1$lld derece %2$@"
           }
         }
       }
@@ -11332,6 +12319,96 @@
         }
       }
     },
+    "traffic_free_flow": {
+      "comment": "WizPath: free flowing traffic",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free Flow"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akıcı"
+          }
+        }
+      }
+    },
+    "traffic_gridlock": {
+      "comment": "WizPath: gridlock traffic",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gridlock"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kilitli"
+          }
+        }
+      }
+    },
+    "traffic_heavy": {
+      "comment": "WizPath: heavy traffic",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heavy"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yoğun"
+          }
+        }
+      }
+    },
+    "traffic_moderate": {
+      "comment": "WizPath: moderate traffic",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta"
+          }
+        }
+      }
+    },
+    "traffic_unknown": {
+      "comment": "WizPath: traffic congestion level unknown",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bilinmiyor"
+          }
+        }
+      }
+    },
     "trend_decreasing": {
       "extractionState": "manual",
       "localizations": {
@@ -11383,25 +12460,6 @@
         }
       }
     },
-    "Try: \"%@\"": {
-      "comment": "A description of how to use a Siri shortcut. The argument is the name of the shortcut.",
-      "extractionState": "manual",
-      "isCommentAutoGenerated": true,
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try: \"%@\""
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dene: \"%@\""
-          }
-        }
-      }
-    },
     "tuesday": {
       "extractionState": "manual",
       "localizations": {
@@ -11419,24 +12477,7 @@
         }
       }
     },
-    "Type of activity you're planning": {
-      "comment": "Activity planner input label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Type of activity you're planning"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Planladığınız aktivite türü"
-          }
-        }
-      }
-    },
+    "Type of activity you're planning": {},
     "unit_celsius": {
       "extractionState": "manual",
       "localizations": {
@@ -11624,23 +12665,6 @@
         }
       }
     },
-    "Warning: %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Warning: %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyarı: %@"
-          }
-        }
-      }
-    },
     "Watch ad to earn %lld %@": {
       "extractionState": "stale",
       "localizations": {
@@ -11658,24 +12682,7 @@
         }
       }
     },
-    "Weather Recommendation": {
-      "comment": "Weather recommendation title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weather Recommendation"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Durumu Önerisi"
-          }
-        }
-      }
-    },
+    "Weather Recommendation": {},
     "weather_clear": {
       "extractionState": "manual",
       "localizations": {
@@ -12328,6 +13335,23 @@
         }
       }
     },
+    "wizpath_apple_maps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Maps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Haritalar"
+          }
+        }
+      }
+    },
     "wizpath_avg_temp": {
       "comment": "Average temperature metric label",
       "extractionState": "manual",
@@ -12346,6 +13370,41 @@
         }
       }
     },
+    "wizpath_avoid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AVOID"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KAÇININ"
+          }
+        }
+      }
+    },
+    "wizpath_avoid_tolls_title": {
+      "comment": "WizPath: toggle to avoid toll roads",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avoid Toll Roads"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paralı Yollardan Kaçın"
+          }
+        }
+      }
+    },
     "wizpath_best_time_to_leave": {
       "comment": "Label for the best departure time suggestion.",
       "extractionState": "manual",
@@ -12360,6 +13419,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Çıkmak İçin En İyi Zaman"
+          }
+        }
+      }
+    },
+    "wizpath_cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İptal"
           }
         }
       }
@@ -12534,6 +13610,24 @@
         }
       }
     },
+    "wizpath_condition_storm": {
+      "comment": "WizPath map: thunderstorm condition label",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thunderstorm"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fırtına"
+          }
+        }
+      }
+    },
     "wizpath_condition_thunderstorm": {
       "extractionState": "manual",
       "localizations": {
@@ -12700,40 +13794,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@'da kuvvetli yan rüzgâr — rüzgâr hızı %lld km/saate kadar. Bisiklet sürmek tehlikeli olabilir."
-          }
-        }
-      }
-    },
-    "wizpath_cycling_crosswind_segments_plural": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Strong crosswinds on %lld segments"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld bölümde kuvvetli yan rüzgâr"
-          }
-        }
-      }
-    },
-    "wizpath_cycling_crosswind_segments_singular": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Strong crosswinds on %lld segment"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld bölümde kuvvetli yan rüzgâr"
           }
         }
       }
@@ -13081,6 +14141,40 @@
         }
       }
     },
+    "wizpath_disclaimer_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Charging station locations and details are sourced from public mapping services. Availability and status are not guaranteed. Please verify the station's status before departure to avoid any travel disruptions."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj istasyonu konum ve bilgileri halka açık harita servislerinden sağlanmaktadır. İstasyonların aktifliği ve doğruluğu garanti edilmemektedir. Yolda kalmamak için lütfen yola çıkmadan önce istasyon durumunu kendiniz kontrol ediniz."
+          }
+        }
+      }
+    },
+    "wizpath_disclaimer_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disclaimer"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önemli Uyarı"
+          }
+        }
+      }
+    },
     "wizpath_distance": {
       "extractionState": "manual",
       "localizations": {
@@ -13098,6 +14192,23 @@
         }
       }
     },
+    "wizpath_distance_from_route": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distance from Route"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotaya Uzaklık"
+          }
+        }
+      }
+    },
     "wizpath_done": {
       "extractionState": "manual",
       "localizations": {
@@ -13111,6 +14222,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tamam"
+          }
+        }
+      }
+    },
+    "wizpath_duration_minutes_short": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld mins"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld dk"
           }
         }
       }
@@ -13234,19 +14362,36 @@
         }
       }
     },
-    "wizpath_ev_mode_subtitle": {
+    "wizpath_estimated_arrival_eta": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Show chargers and EV heat tips"
+            "value": "Estimated Arrival (ETA)"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şarj noktalarını ve sıcaklık ipuçlarını göster"
+            "value": "Tahmini Varış (ETA)"
+          }
+        }
+      }
+    },
+    "wizpath_estimated_stop_duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estimated Stop Duration"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tahmini Bekleme Süresi"
           }
         }
       }
@@ -13298,6 +14443,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bilinmeyen Konum"
+          }
+        }
+      }
+    },
+    "wizpath_google_maps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Maps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Haritalar"
           }
         }
       }
@@ -13574,6 +14736,112 @@
         }
       }
     },
+    "wizpath_loading_location": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting your location..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konumunuz alınıyor..."
+          }
+        }
+      }
+    },
+    "wizpath_loading_smart_stops": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyzing route for smart stops..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotadaki akıllı duraklar analiz ediliyor..."
+          }
+        }
+      }
+    },
+    "wizpath_map_collapse": {
+      "comment": "WizPath: collapse map button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daralt"
+          }
+        }
+      }
+    },
+    "wizpath_map_expand": {
+      "comment": "WizPath: expand map button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genişlet"
+          }
+        }
+      }
+    },
+    "wizpath_map_fullscreen": {
+      "comment": "WizPath: full-screen map button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Full Screen"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tam Ekran"
+          }
+        }
+      }
+    },
+    "wizpath_map_traffic": {
+      "comment": "WizPath: toggle traffic overlay on map",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traffic"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trafik"
+          }
+        }
+      }
+    },
     "wizpath_minute": {
       "extractionState": "manual",
       "localizations": {
@@ -13655,6 +14923,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yürüyüş"
+          }
+        }
+      }
+    },
+    "wizpath_navigate_route": {
+      "comment": "WizPath: section header for navigating the full route in Maps",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navigate Route"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotada Git"
+          }
+        }
+      }
+    },
+    "wizpath_navigation_action_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can easily start navigation and get directions using your preferred map application."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Harita uygulamaları üzerinden kolayca navigasyon başlatabilir ve yol tarifi alabilirsiniz."
           }
         }
       }
@@ -13815,6 +15118,23 @@
         }
       }
     },
+    "wizpath_planning_route": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planning your route and analyzing weather..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotanız planlanıyor ve hava durumu analiz ediliyor..."
+          }
+        }
+      }
+    },
     "wizpath_powered_by_apple_maps": {
       "extractionState": "manual",
       "localizations": {
@@ -13917,6 +15237,24 @@
         }
       }
     },
+    "wizpath_rec_high_temp": {
+      "comment": "WizPath: recommendation to stop due to high temperature (format: %d for Celsius)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High temperature (%d°C) — stop for hydration and cooling."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek sıcaklık (%d°C) — sıvı tüketimi ve serinleme için mola verin."
+          }
+        }
+      }
+    },
     "wizpath_rec_high_wind": {
       "extractionState": "manual",
       "localizations": {
@@ -13968,6 +15306,60 @@
         }
       }
     },
+    "wizpath_rec_rain_break": {
+      "comment": "WizPath: recommendation to take a dry break during rain",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rain at this stop — take a dry break before continuing."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu noktada yağmur var — kuru bir mola verin."
+          }
+        }
+      }
+    },
+    "wizpath_rec_severe_shelter": {
+      "comment": "WizPath: recommendation to find shelter during severe weather",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Find shelter — severe weather expected."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barınak bulun — şiddetli hava bekleniyor."
+          }
+        }
+      }
+    },
+    "wizpath_rec_severe_wait": {
+      "comment": "WizPath: recommendation to wait out severe weather",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Severe weather — wait for conditions to improve."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şiddetli hava — koşullar düzelene kadar bekleyin."
+          }
+        }
+      }
+    },
     "wizpath_rec_snow": {
       "extractionState": "manual",
       "localizations": {
@@ -13981,6 +15373,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aşırı dikkatli sürün. Uygun lastikleri kullanın ve yavaşlayın. Yolculuğunuz için ek süre ayırın."
+          }
+        }
+      }
+    },
+    "wizpath_rec_strong_wind_stop": {
+      "comment": "WizPath: recommendation to stop due to strong winds (cycling/walking)",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strong winds expected — ideal stop to catch your breath and find wind shadow."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuvvetli rüzgar bekleniyor — nefes almak ve rüzgardan korunmak için ideal mola."
           }
         }
       }
@@ -14015,6 +15425,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Son Hedefler"
+          }
+        }
+      }
+    },
+    "wizpath_retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tekrar Dene"
           }
         }
       }
@@ -14066,6 +15493,60 @@
           "stringUnit": {
             "state": "translated",
             "value": "Şiddetli"
+          }
+        }
+      }
+    },
+    "wizpath_route_alternatives": {
+      "comment": "WizPath: alternative routes button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Alternative Routes"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d Alternatif Rota"
+          }
+        }
+      }
+    },
+    "wizpath_route_comparison": {
+      "comment": "WizPath: route comparison section header",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route Comparison"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota Karşılaştırması"
+          }
+        }
+      }
+    },
+    "wizpath_route_comparison_footer": {
+      "comment": "WizPath: footer text for route comparison",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compare weather, traffic, and tolls across routes"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotadaki hava durumunu, trafiği ve ücretleri karşılaştırın"
           }
         }
       }
@@ -14292,6 +15773,23 @@
         }
       }
     },
+    "wizpath_smart_route_advisor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smart Route Advisor"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akıllı Yol Danışmanı"
+          }
+        }
+      }
+    },
     "wizpath_smart_route_planner": {
       "extractionState": "manual",
       "localizations": {
@@ -14445,6 +15943,23 @@
         }
       }
     },
+    "wizpath_weather_at_arrival": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weather at Arrival"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varış Noktası Hava Durumu"
+          }
+        }
+      }
+    },
     "wizpath_weather_caution": {
       "extractionState": "manual",
       "localizations": {
@@ -14548,19 +16063,20 @@
         }
       }
     },
-    "wizpath_weather_improving": {
+    "wizpath_weather_legend": {
+      "comment": "WizPath: weather legend title on map",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Weather improves at %@"
+            "value": "Weather Legend"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@'da hava iyileşiyor"
+            "value": "Hava Lejantı"
           }
         }
       }
@@ -14667,2449 +16183,38 @@
         }
       }
     },
-    "wizpath_loading_location": {
+    "wizpath_navigating_to_maps": {
+      "comment": "WizPath: loading text shown when redirecting to Apple/Google Maps",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Getting your location..."
+            "value": "Opening Maps…"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Konumunuz alınıyor..."
+            "value": "Harita açılıyor…"
           }
         }
       }
     },
-    "wizpath_planning_route": {
+    "wizpath_maps_unavailable": {
+      "comment": "WizPath: error shown when no maps app is available to open navigation",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Planning your route and analyzing weather..."
+            "value": "Maps app is not available"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rotanız planlanıyor ve hava durumu analiz ediliyor..."
-          }
-        }
-      }
-    },
-    "wizpath_loading_smart_stops": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Analyzing route for smart stops..."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rotadaki akıllı duraklar analiz ediliyor..."
-          }
-        }
-      }
-    },
-    "wizpath_weather_at_arrival": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weather at Arrival"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Varış Noktası Hava Durumu"
-          }
-        }
-      }
-    },
-    "wizpath_smart_route_advisor": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Smart Route Advisor"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akıllı Yol Danışmanı"
-          }
-        }
-      }
-    },
-    "wizpath_avoid": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AVOID"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "KAÇININ"
-          }
-        }
-      }
-    },
-    "wizpath_duration_minutes_short": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld mins"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld dk"
-          }
-        }
-      }
-    },
-    "wizpath_distance_from_route": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Distance from Route"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rotaya Uzaklık"
-          }
-        }
-      }
-    },
-    "wizpath_estimated_arrival_eta": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Estimated Arrival (ETA)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tahmini Varış (ETA)"
-          }
-        }
-      }
-    },
-    "wizpath_estimated_stop_duration": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Estimated Stop Duration"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tahmini Bekleme Süresi"
-          }
-        }
-      }
-    },
-    "wizpath_navigation_action_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You can easily start navigation and get directions using your preferred map application."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Harita uygulamaları üzerinden kolayca navigasyon başlatabilir ve yol tarifi alabilirsiniz."
-          }
-        }
-      }
-    },
-    "wizpath_apple_maps": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Maps"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apple Haritalar"
-          }
-        }
-      }
-    },
-    "wizpath_google_maps": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Google Maps"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Google Haritalar"
-          }
-        }
-      }
-    },
-    "current_language_code": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "en"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "tr"
-          }
-        }
-      }
-    },
-    "wizpath_disclaimer_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disclaimer"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Önemli Uyarı"
-          }
-        }
-      }
-    },
-    "wizpath_disclaimer_desc": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Charging station locations and details are sourced from public mapping services. Availability and status are not guaranteed. Please verify the station's status before departure to avoid any travel disruptions."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şarj istasyonu konum ve bilgileri halka açık harita servislerinden sağlanmaktadır. İstasyonların aktifliği ve doğruluğu garanti edilmemektedir. Yolda kalmamak için lütfen yola çıkmadan önce istasyon durumunu kendiniz kontrol ediniz."
-          }
-        }
-      }
-    },
-    "aqi_good": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İyi"
-          }
-        }
-      }
-    },
-    "aqi_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "aqi_unhealthy_sensitive": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unhealthy for Sensitive Groups"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hassas Gruplar İçin Sağlıksız"
-          }
-        }
-      }
-    },
-    "aqi_unhealthy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unhealthy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlıksız"
-          }
-        }
-      }
-    },
-    "aqi_very_unhealthy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Very Unhealthy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çok Sağlıksız"
-          }
-        }
-      }
-    },
-    "aqi_hazardous": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hazardous"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tehlikeli"
-          }
-        }
-      }
-    },
-    "aqi_advice_good": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality is excellent. Enjoy the fresh air!"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi mükemmel. Temiz havanın tadını çıkarın!"
-          }
-        }
-      }
-    },
-    "aqi_advice_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality is acceptable. Sensitive individuals should limit prolonged outdoor exertion."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi kabul edilebilir. Hassas bireyler uzun süreli dış mekan aktivitelerini sınırlamalı."
-          }
-        }
-      }
-    },
-    "aqi_advice_sensitive": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sensitive groups should reduce outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hassas gruplar dış mekan aktivitelerini azaltmalı."
-          }
-        }
-      }
-    },
-    "aqi_advice_unhealthy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Everyone should reduce outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Herkes dış mekan aktivitelerini azaltmalı."
-          }
-        }
-      }
-    },
-    "aqi_advice_very_unhealthy": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avoid all outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tüm dış mekan aktivitelerinden kaçının."
-          }
-        }
-      }
-    },
-    "aqi_advice_hazardous": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emergency conditions. Stay indoors with windows closed."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Acil durum koşulları. Kapalı alanda kalın, pencereleri kapatın."
-          }
-        }
-      }
-    },
-    "pollutant_pm25": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PM2.5"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PM2.5"
-          }
-        }
-      }
-    },
-    "pollutant_pm10": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PM10"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "PM10"
-          }
-        }
-      }
-    },
-    "pollutant_ozone": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ozone"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ozon"
-          }
-        }
-      }
-    },
-    "pollutant_nitrogen": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nitrogen Dioxide"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Azot Dioksit"
-          }
-        }
-      }
-    },
-    "pollutant_sulfur": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sulfur Dioxide"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kükürt Dioksit"
-          }
-        }
-      }
-    },
-    "pollutant_carbon": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Carbon Monoxide"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Karbon Monoksit"
-          }
-        }
-      }
-    },
-    "pollutant_unknown": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unknown Pollutant"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bilinmeyen Kirletici"
-          }
-        }
-      }
-    },
-    "pollen_none": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "None"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yok"
-          }
-        }
-      }
-    },
-    "pollen_very_low": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Very Low"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çok Düşük"
-          }
-        }
-      }
-    },
-    "pollen_low": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Low"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Düşük"
-          }
-        }
-      }
-    },
-    "pollen_moderate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "pollen_high": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yüksek"
-          }
-        }
-      }
-    },
-    "pollen_very_high": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Very High"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çok Yüksek"
-          }
-        }
-      }
-    },
-    "pollen_extreme": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Extreme"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aşırı"
-          }
-        }
-      }
-    },
-    "health_aqi_unavailable_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No air quality data available."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi verisi mevcut değil."
-          }
-        }
-      }
-    },
-    "health_aqi_good_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality is excellent. Enjoy the fresh air!"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi mükemmel. Temiz havanın tadını çıkarın!"
-          }
-        }
-      }
-    },
-    "health_aqi_moderate_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality is acceptable. If you're sensitive, consider limiting prolonged outdoor exertion."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi kabul edilebilir. Hassassanız uzun süreli dış mekan eforunu sınırlayın."
-          }
-        }
-      }
-    },
-    "health_aqi_sensitive_pollen": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Unhealthy for sensitive groups. Pollen level: %d. Limit outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Hassas gruplar için sağlıksız. Polen seviyesi: %d. Dış mekan aktivitelerini sınırlayın."
-          }
-        }
-      }
-    },
-    "health_aqi_sensitive_pollutant": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Unhealthy for sensitive groups. Main pollutant: %@. Reduce outdoor exposure."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Hassas gruplar için sağlıksız. Ana kirletici: %@. Dış mekan maruziyetini azaltın."
-          }
-        }
-      }
-    },
-    "health_aqi_sensitive_default": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Unhealthy for sensitive groups. Reduce prolonged outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Hassas gruplar için sağlıksız. Uzun süreli dış mekan aktivitelerini azaltın."
-          }
-        }
-      }
-    },
-    "health_aqi_unhealthy_pollutant": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Unhealthy. Main pollutant: %@. Everyone should reduce outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Sağlıksız. Ana kirletici: %@. Herkes dış mekan aktivitelerini azaltmalı."
-          }
-        }
-      }
-    },
-    "health_aqi_unhealthy_default": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Unhealthy. Reduce outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Sağlıksız. Dış mekan aktivitelerini azaltın."
-          }
-        }
-      }
-    },
-    "health_aqi_very_unhealthy_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Very Unhealthy. Avoid all outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d — Çok Sağlıksız. Tüm dış mekan aktivitelerinden kaçının."
-          }
-        }
-      }
-    },
-    "health_aqi_hazardous_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI hazardous. Emergency conditions — stay indoors with windows closed."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI tehlikeli. Acil durum koşulları — kapalı alanda kalın, pencereleri kapatın."
-          }
-        }
-      }
-    },
-    "health_aqi_no_data": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No air quality data available."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi verisi mevcut değil."
-          }
-        }
-      }
-    },
-    "health_aqi_pollen_note": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pollen: %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Polen: %@"
-          }
-        }
-      }
-    },
-    "health_aqi_summary": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d · %@"
-          }
-        }
-      }
-    },
-    "health_aqi_summary_pollen": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d · %@ · %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AQI %d · %@ · %@"
-          }
-        }
-      }
-    },
-    "health_summary_aqi_poor": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality is %@. Limit outdoor activity."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi: %@. Dış mekan aktivitelerini sınırlayın."
-          }
-        }
-      }
-    },
-    "risk_type_air_quality": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air Quality"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Kalitesi"
-          }
-        }
-      }
-    },
-    "action_air_quality_advice": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality alert — check the health briefing"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi uyarısı — sağlık raporunu kontrol edin"
-          }
-        }
-      }
-    },
-    "wizpath_rec_severe_shelter": {
-      "comment": "WizPath: recommendation to find shelter during severe weather",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Find shelter — severe weather expected."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Barınak bulun — şiddetli hava bekleniyor."
-          }
-        }
-      }
-    },
-    "wizpath_rec_severe_wait": {
-      "comment": "WizPath: recommendation to wait out severe weather",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Severe weather — wait for conditions to improve."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şiddetli hava — koşullar düzelene kadar bekleyin."
-          }
-        }
-      }
-    },
-    "wizpath_rec_strong_wind_stop": {
-      "comment": "WizPath: recommendation to stop due to strong winds (cycling/walking)",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Strong winds expected — ideal stop to catch your breath and find wind shadow."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kuvvetli rüzgar bekleniyor — nefes almak ve rüzgardan korunmak için ideal mola."
-          }
-        }
-      }
-    },
-    "wizpath_rec_rain_break": {
-      "comment": "WizPath: recommendation to take a dry break during rain",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rain at this stop — take a dry break before continuing."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu noktada yağmur var — kuru bir mola verin."
-          }
-        }
-      }
-    },
-    "wizpath_rec_high_temp": {
-      "comment": "WizPath: recommendation to stop due to high temperature (format: %d for Celsius)",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "High temperature (%d°C) — stop for hydration and cooling."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yüksek sıcaklık (%d°C) — sıvı tüketimi ve serinleme için mola verin."
-          }
-        }
-      }
-    },
-    "wizpath_navigate_route": {
-      "comment": "WizPath: section header for navigating the full route in Maps",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Navigate Route"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rotada Git"
-          }
-        }
-      }
-    },
-    "traffic_unknown": {
-      "comment": "WizPath: traffic congestion level unknown",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unknown"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bilinmiyor"
-          }
-        }
-      }
-    },
-    "traffic_free_flow": {
-      "comment": "WizPath: free flowing traffic",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Free Flow"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Akıcı"
-          }
-        }
-      }
-    },
-    "traffic_moderate": {
-      "comment": "WizPath: moderate traffic",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "traffic_heavy": {
-      "comment": "WizPath: heavy traffic",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heavy"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yoğun"
-          }
-        }
-      }
-    },
-    "traffic_gridlock": {
-      "comment": "WizPath: gridlock traffic",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gridlock"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kilitli"
-          }
-        }
-      }
-    },
-    "route_score_best": {
-      "comment": "WizPath: route score label - best",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En İyi"
-          }
-        }
-      }
-    },
-    "route_score_good": {
-      "comment": "WizPath: route score label - good",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İyi"
-          }
-        }
-      }
-    },
-    "route_score_moderate": {
-      "comment": "WizPath: route score label - moderate",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moderate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orta"
-          }
-        }
-      }
-    },
-    "route_score_poor": {
-      "comment": "WizPath: route score label - poor",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Poor"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kötü"
-          }
-        }
-      }
-    },
-    "route_label_toll": {
-      "comment": "WizPath: label for toll roads",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toll"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ücretli"
-          }
-        }
-      }
-    },
-    "route_label_free": {
-      "comment": "WizPath: label for free roads",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Free"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ücretsiz"
-          }
-        }
-      }
-    },
-    "route_label_avoiding": {
-      "comment": "WizPath: label shown when toll roads are being avoided",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avoiding"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kaçınılıyor"
-          }
-        }
-      }
-    },
-    "wizpath_route_comparison": {
-      "comment": "WizPath: route comparison section header",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Route Comparison"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rota Karşılaştırması"
-          }
-        }
-      }
-    },
-    "wizpath_route_comparison_footer": {
-      "comment": "WizPath: footer text for route comparison",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Compare weather, traffic, and tolls across routes"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rotadaki hava durumunu, trafiği ve ücretleri karşılaştırın"
-          }
-        }
-      }
-    },
-    "wizpath_route_alternatives": {
-      "comment": "WizPath: alternative routes button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d Alternative Routes"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%d Alternatif Rota"
-          }
-        }
-      }
-    },
-    "wizpath_avoid_tolls_title": {
-      "comment": "WizPath: toggle to avoid toll roads",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Avoid Toll Roads"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Paralı Yollardan Kaçın"
-          }
-        }
-      }
-    },
-    "wizpath_avoid_tolls_subtitle": {
-      "comment": "WizPath: subtitle for toll road avoidance toggle",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Find free route alternatives"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ücretsiz rota alternatifleri bul"
-          }
-        }
-      }
-    },
-    "wizpath_map_traffic": {
-      "comment": "WizPath: toggle traffic overlay on map",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Traffic"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trafik"
-          }
-        }
-      }
-    },
-    "wizpath_map_expand": {
-      "comment": "WizPath: expand map button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Expand"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genişlet"
-          }
-        }
-      }
-    },
-    "wizpath_map_collapse": {
-      "comment": "WizPath: collapse map button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Collapse"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Daralt"
-          }
-        }
-      }
-    },
-    "wizpath_map_fullscreen": {
-      "comment": "WizPath: full-screen map button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Full Screen"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tam Ekran"
-          }
-        }
-      }
-    },
-    "wizpath_weather_legend": {
-      "comment": "WizPath: weather legend title on map",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weather Legend"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava Lejantı"
-          }
-        }
-      }
-    },
-    "wizpath_condition_storm": {
-      "comment": "WizPath map: thunderstorm condition label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thunderstorm"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fırtına"
-          }
-        }
-      }
-    },
-    "hud_confidence": {
-      "comment": "HUD: Confidence score label (replaces 'Safety')",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Confidence"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güven"
-          }
-        }
-      }
-    },
-    "hud_journey_confidence": {
-      "comment": "HUD: Journey Confidence section header",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Journey Confidence"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rota Güveni"
-          }
-        }
-      }
-    },
-    "hud_confidence_title": {
-      "comment": "HUD: Confidence info tooltip title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "What is Route Confidence?"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rota Güveni Nedir?"
-          }
-        }
-      }
-    },
-    "hud_confidence_explanation": {
-      "comment": "HUD: Confidence tooltip explanation",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Route Confidence combines weather conditions, road hazards, and traffic data to rate how safe and comfortable your journey will be."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rota Güveni, hava koşullarını, yol tehlikelerini ve trafik verilerini birleştirerek yolculuğunuzun ne kadar güvenli ve konforlu olacağını derecelendirir."
-          }
-        }
-      }
-    },
-    "feedback_sheet_title": {
-      "comment": "Feedback sheet title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Send Feedback"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geri Bildirim Gönder"
-          }
-        }
-      }
-    },
-    "feedback_sheet_subtitle": {
-      "comment": "Feedback sheet subtitle",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Help us improve ForeWiz! Bug reports, feature requests, and general feedback are all welcome."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz'i geliştirmemize yardımcı olun! Hata raporları, özellik talepleri ve genel görüşleriniz bizim için değerli."
-          }
-        }
-      }
-    },
-    "feedback_type_label": {
-      "comment": "Feedback type picker label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Type"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tür"
-          }
-        }
-      }
-    },
-    "feedback_type_bug": {
-      "comment": "Bug report type",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bug"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hata"
-          }
-        }
-      }
-    },
-    "feedback_type_feature": {
-      "comment": "Feature request type",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Feature"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Özellik"
-          }
-        }
-      }
-    },
-    "feedback_type_general": {
-      "comment": "General feedback type",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "General"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Genel"
-          }
-        }
-      }
-    },
-    "feedback_title_label": {
-      "comment": "Feedback title field label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Title"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başlık"
-          }
-        }
-      }
-    },
-    "feedback_title_placeholder": {
-      "comment": "Feedback title placeholder",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Brief summary of your feedback"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görüşünüzün kısa özeti"
-          }
-        }
-      }
-    },
-    "feedback_message_label": {
-      "comment": "Feedback message field label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Message"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mesaj"
-          }
-        }
-      }
-    },
-    "feedback_message_placeholder": {
-      "comment": "Feedback message placeholder",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Describe your feedback in detail..."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görüşünüzü detaylıca açıklayın..."
-          }
-        }
-      }
-    },
-    "feedback_email_label": {
-      "comment": "Email field label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Email (optional)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "E-posta (isteğe bağlı)"
-          }
-        }
-      }
-    },
-    "feedback_email_placeholder": {
-      "comment": "Email placeholder",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "your@email.com"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ornek@email.com"
-          }
-        }
-      }
-    },
-    "feedback_email_hint": {
-      "comment": "Email hint text",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "We'll only use this to follow up if needed"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sadece gerektiğinde iletişim kurmak için kullanılır"
-          }
-        }
-      }
-    },
-    "feedback_send": {
-      "comment": "Send button label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Send Feedback"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gönder"
-          }
-        }
-      }
-    },
-    "feedback_sending": {
-      "comment": "Sending state label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sending..."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gönderiliyor..."
-          }
-        }
-      }
-    },
-    "feedback_success_detail": {
-      "comment": "Success message detail",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your feedback has been sent. We read every submission!"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Görüşünüz gönderildi. Her gönderiyi okuyoruz!"
-          }
-        }
-      }
-    },
-    "feedback_error_config": {
-      "comment": "Error message when Formspree endpoint is not configured",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Feedback service is being set up. Please try again later."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geri bildirim servisi ayarlanıyor. Lütfen daha sonra tekrar deneyin."
-          }
-        }
-      }
-    },
-    "feedback_screenshot_label": {
-      "comment": "Screenshot attachment label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screenshot (Optional)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran Görüntüsü (İsteğe Bağlı)"
-          }
-        }
-      }
-    },
-    "feedback_screenshot_add": {
-      "comment": "Add screenshot button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add Screenshot"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran Görüntüsü Ekle"
-          }
-        }
-      }
-    },
-    "feedback_screenshot_added": {
-      "comment": "Screenshot added label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Screenshot Added"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ekran Görüntüsü Eklendi"
-          }
-        }
-      }
-    },
-    "feedback_screenshot_hint": {
-      "comment": "Screenshot hint text",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Helps us understand the issue better. Max 10MB."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sorunu daha iyi anlamamıza yardımcı olur. Maks. 10MB."
-          }
-        }
-      }
-    },
-    "beta_badge_label": {
-      "comment": "Beta badge label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "BETA"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "BETA"
-          }
-        }
-      }
-    },
-    "feedback_dashboard_title": {
-      "comment": "Feedback dashboard navigation title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "My Feedback"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geri Bildirimlerim"
-          }
-        }
-      }
-    },
-    "feedback_dashboard_empty": {
-      "comment": "Empty state title for feedback dashboard",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Feedback Yet"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Henüz Geri Bildirim Yok"
-          }
-        }
-      }
-    },
-    "feedback_dashboard_empty_desc": {
-      "comment": "Empty state description for feedback dashboard",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your submitted feedback will appear here after you send it."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gönderdiğiniz geri bildirimler burada görünecek."
-          }
-        }
-      }
-    },
-    "feedback_dashboard_clear": {
-      "comment": "Clear all feedback button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Clear All"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temizle"
-          }
-        }
-      }
-    },
-    "feedback_dashboard_failed": {
-      "comment": "Failed delivery status label",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Failed"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başarısız"
-          }
-        }
-      }
-    },
-    "feedback_dashboard_view": {
-      "comment": "Button to view feedback history",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "View My Feedback"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geri Bildirimlerimi Gör"
-          }
-        }
-      }
-    },
-    "maps_export_title": {
-      "comment": "Maps export reward ad sheet title",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Unlock Maps Export"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Harita Dışa Aktarmayı Aç"
-          }
-        }
-      }
-    },
-    "maps_export_description": {
-      "comment": "Description for watching an ad to unlock maps",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Watch a quick ad to unlock maps export. This helps keep ForeWiz free!"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Harita dışa aktarmayı açmak için kısa bir reklam izleyin. Bu, ForeWiz'in ücretsiz kalmasına yardımcı olur!"
-          }
-        }
-      }
-    },
-    "maps_export_loading": {
-      "comment": "Loading state for ad",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading ad..."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reklam yükleniyor..."
-          }
-        }
-      }
-    },
-    "maps_export_timeout": {
-      "comment": "Timeout error message",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ad took too long. Opening maps directly."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reklam çok uzun sürdü. Harita doğrudan açılıyor."
-          }
-        }
-      }
-    },
-    "maps_export_error": {
-      "comment": "General error for ad loading",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not load ad. Opening maps directly."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reklam yüklenemedi. Harita doğrudan açılıyor."
-          }
-        }
-      }
-    },
-    "maps_export_skip": {
-      "comment": "Skip button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Skip & Open Maps"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Atla ve Haritayı Aç"
-          }
-        }
-      }
-    },
-    "health_summary_migraine_risk": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today's weather may trigger migraines"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bugünkü hava migreni tetikleyebilir"
-          }
-        }
-      }
-    },
-    "microclimate_coastal_breeze_summer": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coastal breeze keeps the heat in check"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sahil esintisi sıcağı dengeliyor"
-          }
-        }
-      }
-    },
-    "microclimate_coastal_humid_summer": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coastal humidity makes it feel muggier"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sahil nemi havayı daha bunaltıcı yapıyor"
-          }
-        }
-      }
-    },
-    "microclimate_coastal_mild_winter": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coastal climate keeps the winter mild"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sahil iklimi kışı ılıman geçiriyor"
-          }
-        }
-      }
-    },
-    "microclimate_elevation_cool": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Higher elevation brings cooler air"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yüksek rakım serin hava getiriyor"
-          }
-        }
-      }
-    },
-    "microclimate_fall_chill": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chilly fall air is settling in"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Soğuk sonbahar havası iyice yerleşiyor"
-          }
-        }
-      }
-    },
-    "microclimate_inland_heat": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inland areas are heating up more"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İç kesimler daha fazla ısınıyor"
-          }
-        }
-      }
-    },
-    "microclimate_spring_transition": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spring transition brings temperature swings"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İlkbahar geçişi sıcaklık dalgalanmaları getiriyor"
-          }
-        }
-      }
-    },
-    "microclimate_urban_heat_day": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Urban heat island makes city centres hotter"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şehir ısı adası merkezleri daha da ısıtıyor"
-          }
-        }
-      }
-    },
-    "microclimate_urban_heat_night": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Urban areas stay warmer through the night"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Şehirler gece boyunca daha sıcak kalıyor"
-          }
-        }
-      }
-    },
-    "notif_tip_air_quality": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Air quality alert"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hava kalitesi uyarısı"
-          }
-        }
-      }
-    },
-    "wizpath_best_score": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best score: %lld/10"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En iyi puan: %lld/10"
-          }
-        }
-      }
-    },
-    "wizpath_retry": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retry"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tekrar Dene"
-          }
-        }
-      }
-    },
-    "wizpath_cancel": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İptal"
+            "value": "Harita uygulaması bulunamadı"
           }
         }
       }

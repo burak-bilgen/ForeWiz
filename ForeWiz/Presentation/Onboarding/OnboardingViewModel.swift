@@ -22,8 +22,10 @@ final class OnboardingViewModel {
         self.locationRepository = locationRepository
         self.notificationRepository = notificationRepository
         self.profile = profile
-        let code = L10n.currentLanguageCode
-        selectedLanguage = code == "tr" ? .turkish : .english
+        // Use the persisted profile language — this is the single source of truth
+        // and avoids depending on L10n's global mutable state (which can be
+        // mutated by other code or tests running in parallel).
+        selectedLanguage = profile.language
         
         // Sync tracking status with actual ATT system state
         AdConsentManager.shared.updateConsentStatus()

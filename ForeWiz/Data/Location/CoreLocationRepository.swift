@@ -15,6 +15,13 @@ final class CoreLocationRepository: NSObject, LocationRepository {
 
     deinit {
         manager.delegate = nil
+        // Resume any dangling continuations to prevent task leaks.
+        // If a location request is in-flight when deinit runs, the continuation
+        // must be resumed so the awaiting task doesn't hang forever.
+        authorizationContinuation?.resume(returning: .notDetermined)
+        authorizationContinuation = nil
+        locationContinuation?.resume(throwing: AppError.locationUnavailable)
+        locationContinuation = nil
     }
 
     func requestAuthorization() async -> LocationAuthorizationStatus {
@@ -25,9 +32,10 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
 
         return await withCheckedContinuation { continuation in
-            guard authorizationContinuation == nil else {
-                continuation.resume(returning: .notDetermined)
-                return
+            // If a previous request is still in-flight, resume it first
+            // (with a fallback value) before overwriting.
+            if let oldContinuation = authorizationContinuation {
+                oldContinuation.resume(returning: .notDetermined)
             }
             authorizationContinuation = continuation
             manager.requestWhenInUseAuthorization()
@@ -47,9 +55,10 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
 
         return try await withCheckedThrowingContinuation { continuation in
-            guard locationContinuation == nil else {
-                continuation.resume(throwing: AppError.locationUnavailable)
-                return
+            // If a previous location request is still in-flight, resume it first
+            // (with an error) before overwriting.
+            if let oldContinuation = locationContinuation {
+                oldContinuation.resume(throwing: AppError.locationUnavailable)
             }
             locationContinuation = continuation
             manager.requestLocation()

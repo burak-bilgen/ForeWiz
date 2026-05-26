@@ -78,8 +78,16 @@ extension LocationService {
             throw AppError.locationUnavailable
         }
         
-        // Request location with timeout
-        return try await withTimeout(seconds: timeout) {
+        // Request location with timeout.
+        // onCancel safely nils out the continuation so that if the timeout fires
+        // before the delegate responds, a subsequent call won't double-resume.
+        // We also resume the continuation so the orphaned cancelled child task
+        // doesn't hang indefinitely — the resumed value is discarded by the group.
+        return try await withTimeout(seconds: timeout, onCancel: { [weak self] in
+            guard let self else { return }
+            self.locationContinuation?.resume(throwing: AppError.locationUnavailable)
+            self.locationContinuation = nil
+        }) {
             try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<LocationCoordinate, Error>) in
                 self.locationContinuation = continuation
                 self.manager.requestLocation()
@@ -87,7 +95,14 @@ extension LocationService {
         }
     }
     
-    private func withTimeout<T>(seconds: Double, operation: @escaping () async throws -> T) async throws -> T {
+    /// Runs an async operation with a timeout. If the timeout fires before the
+    /// operation completes, `onCancel` is called (on the MainActor) to allow
+    /// cleanup of any captured continuations before the error propagates.
+    private func withTimeout<T>(
+        seconds: Double,
+        onCancel: (@MainActor @Sendable () -> Void)? = nil,
+        operation: @escaping () async throws -> T
+    ) async throws -> T {
         try await withThrowingTaskGroup(of: T.self) { group in
             group.addTask {
                 try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
@@ -98,6 +113,7 @@ extension LocationService {
             }
             guard let result = try await group.next() else {
                 group.cancelAll()
+                await MainActor.run { onCancel?() }
                 throw AppError.locationUnavailable
             }
             group.cancelAll()

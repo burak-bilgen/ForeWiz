@@ -196,10 +196,17 @@ public struct DestinationPickerView: View {
         let search = MKLocalSearch(request: searchRequest)
         Task {
             do {
-                let response = try await withCheckedThrowingContinuation { continuation in
+                let response = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<MKLocalSearch.Response, any Error>) in
                     search.start { response, error in
-                        if let response = response { continuation.resume(returning: response) }
-                        else { continuation.resume(throwing: error ?? URLError(.unknown)) }
+                        if let response = response {
+                            continuation.resume(returning: response)
+                            return
+                        }
+                        if let error = error {
+                            continuation.resume(throwing: error)
+                        } else {
+                            continuation.resume(throwing: URLError(.unknown))
+                        }
                     }
                 }
                 if let mapItem = response.mapItems.first {

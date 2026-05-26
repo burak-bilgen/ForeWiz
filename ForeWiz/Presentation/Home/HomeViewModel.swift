@@ -6,7 +6,7 @@ import OSLog
 @Observable
 final class HomeViewModel {
     private(set) var state: LoadableState<HomeViewState> = .idle
-    private(set) var selectedLocationName: String = L10n.text( "home_current_location")
+    private(set) var selectedLocationName: String = L10n.text("home_current_location")
     private(set) var particleIntensity: Double = 0.15
 
     private let loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase
@@ -23,7 +23,7 @@ final class HomeViewModel {
         scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
         preferencesRepository: PreferencesRepository,
         homeViewStateFactory: HomeViewStateFactory,
-        selectedLocationName: String = L10n.text( "home_current_location")
+        selectedLocationName: String = L10n.text("home_current_location")
     ) {
         self.loadHomeRecommendationUseCase = loadHomeRecommendationUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
@@ -190,9 +190,8 @@ final class HomeViewModel {
                     placemark?.administrativeArea ??
                     placemark?.name ??
                     L10n.text("home_current_location")
-                Task { @MainActor in
-                    self.selectedLocationName = locationName
-                }
+                // Already on @MainActor — outer Task inherits class actor context
+                self.selectedLocationName = locationName
             } catch {
                 AppLogger.app.error("Reverse geocoding failed: \(error.localizedDescription)")
             }

@@ -29,6 +29,11 @@ final class AdMobRewardedIntegration {
     private var pendingReward: RewardConfig?
     var onRewardGranted: ((RewardConfig) -> Void)?
     var onRewardFailed: (() -> Void)?
+    /// Guards against double-firing: once a callback fires, both are cleared.
+    func clearCallbacks() {
+        onRewardGranted = nil
+        onRewardFailed = nil
+    }
     
     // MARK: - Init
     
@@ -92,12 +97,13 @@ final class AdMobRewardedIntegration {
         self.onRewardFailed = onRewardFailed
         
         rewardedAd.fullScreenContentDelegate = AdMobRewardedDelegate.shared
-        rewardedAd.present(from: viewController) {
-            Task { @MainActor in
-                if let reward = self.pendingReward {
-                    AppLogger.app.info("[AdMob] Rewarded ad granted: \(reward.type) x\(reward.amount)")
-                    self.onRewardGranted?(reward)
-                }
+        rewardedAd.present(from: viewController) { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                guard let reward = self.pendingReward else { return }
+                AppLogger.app.info("[AdMob] Rewarded ad granted: \(reward.type) x\(reward.amount)")
+                self.onRewardGranted?(reward)
+                self.clearCallbacks()
             }
         }
         
@@ -185,11 +191,13 @@ final class AdMobRewardedIntegration {
         rewardedInterstitialAd.fullScreenContentDelegate = AdMobRewardedInterstitialDelegate.shared
         rewardedInterstitialAd.present(
             from: viewController,
-            userDidEarnRewardHandler: {
-                Task { @MainActor in
+            userDidEarnRewardHandler: { [weak self] in
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
                     if let reward = self.pendingReward {
                         AppLogger.app.info("[AdMob] Rewarded interstitial granted: \(reward.type) x\(reward.amount)")
                         self.onRewardGranted?(reward)
+                        self.clearCallbacks()
                     }
                 }
             }
@@ -270,12 +278,19 @@ final class AdMobRewardedDelegate: NSObject, FullScreenContentDelegate {
         Task { @MainActor in
             AppLogger.app.error("[AdMob] Rewarded ad failed: \(error.localizedDescription)")
             AdMobRewardedIntegration.shared.onRewardFailed?()
+            AdMobRewardedIntegration.shared.clearCallbacks()
         }
     }
     
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         Task { @MainActor in
             AppLogger.app.info("[AdMob] Rewarded ad dismissed")
+            // If reward was already granted via userDidEarnRewardHandler, callbacks are nil already.
+            // If neither reward nor failure fired, treat dismissal as failure so the UI doesn't hang.
+            if AdMobRewardedIntegration.shared.onRewardFailed != nil {
+                AdMobRewardedIntegration.shared.onRewardFailed?()
+                AdMobRewardedIntegration.shared.clearCallbacks()
+            }
             AdManager.shared.recordDismiss(.rewarded)
             AdAnalyticsEngine.shared.recordEvent(.dismissed, unit: .rewarded)
         }
@@ -292,12 +307,17 @@ final class AdMobRewardedInterstitialDelegate: NSObject, FullScreenContentDelega
         Task { @MainActor in
             AppLogger.app.error("[AdMob] Rewarded interstitial failed: \(error.localizedDescription)")
             AdMobRewardedIntegration.shared.onRewardFailed?()
+            AdMobRewardedIntegration.shared.clearCallbacks()
         }
     }
     
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
         Task { @MainActor in
             AppLogger.app.info("[AdMob] Rewarded interstitial dismissed")
+            if AdMobRewardedIntegration.shared.onRewardFailed != nil {
+                AdMobRewardedIntegration.shared.onRewardFailed?()
+                AdMobRewardedIntegration.shared.clearCallbacks()
+            }
             AdManager.shared.recordDismiss(.rewardedInterstitial)
             AdAnalyticsEngine.shared.recordEvent(.dismissed, unit: .rewardedInterstitial)
         }

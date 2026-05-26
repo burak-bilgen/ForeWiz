@@ -249,15 +249,19 @@ struct HomeView: View {
                 }
             }
 
+            // Track whether the reward flow completed (ad shown or failed)
+            var rewardFlowCompleted = false
+            
             AdMobRewardedIntegration.shared.loadRewardedAd(adUnitID: adUnitID) { success in
                 timeoutTask.cancel()
                 Task { @MainActor in
                     if success {
                         mapsExportStatus = .ready
-                        _ = AdMobRewardedIntegration.shared.showRewardedAd(
+                        let presented = AdMobRewardedIntegration.shared.showRewardedAd(
                             from: rootVC,
                             reward: .default,
                             onRewardGranted: { _ in
+                                rewardFlowCompleted = true
                                 Task { @MainActor in
                                     AdManager.shared.recordReward(.rewarded, amount: 1.0)
                                     showMapsExportSheet = false
@@ -267,6 +271,7 @@ struct HomeView: View {
                                 }
                             },
                             onRewardFailed: {
+                                rewardFlowCompleted = true
                                 Task { @MainActor in
                                     showMapsExportSheet = false
                                     HapticEngine.shared.warning()
@@ -275,6 +280,28 @@ struct HomeView: View {
                                 }
                             }
                         )
+                        
+                        // If ad couldn't be presented, proceed directly
+                        if !presented {
+                            showMapsExportSheet = false
+                            HapticEngine.shared.warning()
+                            proceedToMaps()
+                            mapsExportProceed = nil
+                        } else {
+                            // Presentation safety timeout: if ad doesn't play within 5s, auto-proceed
+                            Task {
+                                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                                guard !Task.isCancelled else { return }
+                                await MainActor.run {
+                                    // Only proceed if the reward flow hasn't completed yet
+                                    guard !rewardFlowCompleted, mapsExportProceed != nil else { return }
+                                    showMapsExportSheet = false
+                                    HapticEngine.shared.warning()
+                                    proceedToMaps()
+                                    mapsExportProceed = nil
+                                }
+                            }
+                        }
                     } else {
                         mapsExportStatus = .error(L10n.text("maps_export_error"))
                         HapticEngine.shared.warning()
@@ -344,7 +371,7 @@ struct HomeView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 18))
                             .foregroundStyle(Color(hex: "#30D158"))
-                        Text(L10n.text("feedback_thanks"))
+                        Text(L10n.text("maps_export_complete"))
                             .font(.system(size: 14, weight: .medium, design: .rounded))
                             .foregroundStyle(Color(hex: "#30D158"))
                     }
@@ -381,24 +408,16 @@ struct HomeView: View {
 
 struct HomeBetaBadge: View {
     var body: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 2) {
             Circle()
                 .fill(Color(hex: "#FFD60A"))
-                .frame(width: 5, height: 5)
+                .frame(width: 4, height: 4)
             Text(L10n.text("beta_badge_label"))
-                .font(.system(size: 8, weight: .heavy, design: .rounded))
-                .foregroundStyle(Color(hex: "#FFD60A"))
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.4))
+                .fixedSize()
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 3)
-        .background(
-            Capsule()
-                .fill(Color(hex: "#FFD60A").opacity(0.10))
-        )
-        .overlay(
-            Capsule()
-                .stroke(Color(hex: "#FFD60A").opacity(0.20), lineWidth: 0.5)
-        )
+        .padding(.horizontal, 4)
     }
 }
 

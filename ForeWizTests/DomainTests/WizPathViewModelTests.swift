@@ -320,15 +320,20 @@ struct WizPathViewModelTests {
         #expect(url!.contains("daddr=42.0,30.0"))
     }
 
-    @Test("Apple Maps Web URL builds without route requirement")
-    func appleMapsWebURLBuildsWithoutRoute() async throws {
+    @Test("Apple Maps Web URL builds with origin and destination and route")
+    func appleMapsWebURLBuildsWithRoute() async throws {
         let vm = makeViewModel()
         vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        // Web URL now includes waypoints, requires a route
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
 
         let url = vm.appleMapsWebURLString()
         #expect(url != nil)
         #expect(url!.contains("maps.apple.com"))
+        #expect(url!.contains("saddr=41.0,29.0"))
+        #expect(url!.contains("daddr=42.0,30.0"))
     }
 
     @Test("Google Maps URL returns nil when no route")
@@ -355,10 +360,440 @@ struct WizPathViewModelTests {
         let vm = makeViewModel()
         vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
 
         let url = vm.googleMapsWebURLString()
         #expect(url != nil)
         #expect(url!.contains("google.com/maps"))
+    }
+
+    // MARK: - Offline Maps Navigation
+
+    @Test("mapsNavigationRoute returns currentRoute when state is routeReady")
+    func mapsNavigationRouteReturnsCurrentRouteWhenReady() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+        #expect(vm.mapsNavigationRoute?.id == route.id)
+    }
+
+    @Test("mapsNavigationRoute falls back to cached route when offline")
+    func mapsNavigationRouteFallsBackToCachedWhenOffline() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        // Simulate a successful route calculation by selecting a candidate
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        #expect(vm.currentRoute != nil) // Should be routeReady after selection
+
+        // Now go offline — currentRoute becomes nil
+        vm.state = .offline
+        #expect(vm.currentRoute == nil)
+        #expect(vm.mapsNavigationRoute?.id == route.id) // Falls back to cached route
+    }
+
+    @Test("mapsNavigationRoute returns nil when never calculated and offline")
+    func mapsNavigationRouteReturnsNilWhenNeverCalculated() async throws {
+        let vm = makeViewModel()
+        vm.state = .offline
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    @Test("mapsNavigationRoute returns nil when cached route is not set")
+    func mapsNavigationRouteReturnsNilWhenNoCache() async throws {
+        let vm = makeViewModel()
+        vm.state = .error("Some error")
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    @Test("Apple Maps URL works with cached route when offline")
+    func appleMapsURLWorksWithCachedRouteOffline() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Go offline
+        vm.state = .offline
+
+        let url = vm.appleMapsURLString()
+        #expect(url != nil)
+        #expect(url!.contains("maps://"))
+        #expect(url!.contains("saddr=41.0082,28.9784"))
+    }
+
+    @Test("Apple Maps Web URL works with cached route when offline")
+    func appleMapsWebURLWorksWithCachedRouteOffline() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+
+        let url = vm.appleMapsWebURLString()
+        #expect(url != nil)
+        #expect(url!.contains("maps.apple.com"))
+    }
+
+    @Test("Google Maps URL works with cached route when offline")
+    func googleMapsURLWorksWithCachedRouteOffline() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+
+        let url = vm.googleMapsURLString()
+        #expect(url != nil)
+        #expect(url!.contains("comgooglemaps://"))
+    }
+
+    @Test("Google Maps Web URL works with cached route when offline")
+    func googleMapsWebURLWorksWithCachedRouteOffline() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+
+        let url = vm.googleMapsWebURLString()
+        #expect(url != nil)
+        #expect(url!.contains("google.com/maps"))
+    }
+
+    @Test("All 4 Maps URLs return nil when offline with no cached route")
+    func allMapsURLsReturnNilWhenOfflineWithoutCache() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        vm.state = .offline
+
+        #expect(vm.appleMapsURLString() == nil)
+        #expect(vm.appleMapsWebURLString() == nil)
+        #expect(vm.googleMapsURLString() == nil)
+        #expect(vm.googleMapsWebURLString() == nil)
+    }
+
+    @Test("reset clears cached route so offline URLs return nil")
+    func resetClearsCachedRoute() async throws {
+        let vm = makeViewModel()
+        vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
+        vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.reset()
+
+        // After reset, cache is cleared
+        #expect(vm.state == .idle)
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    @Test("mapsWaypoints sorts by etaArrival")
+    func mapsWaypointsSortedByEtaArrival() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+
+        let now = Date()
+        let later = now.addingTimeInterval(3600)
+        let muchLater = now.addingTimeInterval(7200)
+        let dummyMapItem = MKMapItem()
+
+        let stop1 = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Gas 1", category: .gasStation, etaArrival: muchLater, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
+        let stop2 = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Rest 1", category: .restStop, etaArrival: later, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 200, estimatedStopDuration: 600, weatherRecommendation: nil)
+
+        vm.chargingStations = [stop1, stop2]
+
+        let waypoints = vm.mapsWaypoints
+        #expect(waypoints.count == 2)
+        #expect(waypoints[0].id == stop2.id) // earlier arrival first
+        #expect(waypoints[1].id == stop1.id) // later arrival second
+    }
+
+    @Test("mapsWaypoints excludes unsafe stops")
+    func mapsWaypointsExcludesUnsafeStops() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+
+        let now = Date()
+        let dummyMapItem = MKMapItem()
+        let safe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Safe Stop", category: .restStop, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
+        let unsafe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Unsafe Stop", category: .evCharger, etaArrival: now, weatherAtArrival: nil, safetyStatus: .unsafe, distanceFromRoute: 200, estimatedStopDuration: 300, weatherRecommendation: nil)
+        let caution = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.3, longitude: 29.3), name: "Caution Stop", category: .gasStation, etaArrival: now, weatherAtArrival: nil, safetyStatus: .caution, distanceFromRoute: 150, estimatedStopDuration: 300, weatherRecommendation: nil)
+
+        vm.chargingStations = [safe, unsafe, caution]
+
+        let waypoints = vm.mapsWaypoints
+        #expect(waypoints.count == 2) // safe + caution (unsafe's shouldAvoid should be true)
+        #expect(waypoints.allSatisfy { $0.safetyStatus != .unsafe })
+    }
+
+    @Test("mapsWaypoints returns empty when no charging stations")
+    func mapsWaypointsEmptyWhenNoStations() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        vm.state = .routeReady(route)
+        #expect(vm.mapsWaypoints.isEmpty)
+    }
+
+    @Test("mapsWaypoints preserved when going offline")
+    func mapsWaypointsPreservedWhenOffline() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let dummyMapItem = MKMapItem()
+        let now = Date()
+        let stop = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "EV Charger", category: .evCharger, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
+
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+        vm.chargingStations = [stop]
+
+        // Go offline — stations should persist
+        vm.state = .offline
+        #expect(vm.chargingStations.count == 1)
+        #expect(vm.mapsWaypoints.count == 1)
+        #expect(vm.mapsWaypoints.first?.name == "EV Charger")
+    }
+
+    @Test("Offline state preserves routeSegments and weatherChangePoints from cached route")
+    func offlinePreservesRouteProperties() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+        // mapsNavigationRoute should return the cached route with its properties
+        #expect(vm.mapsNavigationRoute != nil)
+        #expect(vm.mapsNavigationRoute?.id == route.id)
+    }
+
+    @Test("State transitions: idle → loading → error → idle clears cache")
+    func stateTransitionErrorClearsCache() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        #expect(vm.mapsNavigationRoute != nil) // Cache is set
+
+        // Error state does NOT clear lastCalculatedRoute (state machine handles this)
+        vm.state = .error("Network error")
+        #expect(vm.mapsNavigationRoute?.id == route.id) // Cache preserved
+
+        // Only reset() clears cache
+        vm.reset()
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    // MARK: - Cache Expiration
+
+    @Test("mapsNavigationRoute uses fresh cache when route is recent (< 30 min)")
+    func mapsNavigationRouteUsesFreshCache() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Cache is fresh (just set)
+        vm.state = .offline
+        #expect(vm.mapsNavigationRoute != nil)
+        #expect(vm.mapsNavigationRoute?.id == route.id)
+    }
+
+    @Test("mapsNavigationRoute returns nil when cache is expired (> 30 min)")
+    func mapsNavigationRouteReturnsNilWhenCacheExpired() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Manipulate timestamp to be expired (cacheExpirationInterval = 1800)
+        vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-1801)
+
+        vm.state = .offline
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    @Test("mapsNavigationRoute returns nil when cache expired in error state")
+    func mapsNavigationRouteReturnsNilWhenCacheExpiredInError() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-1801)
+
+        vm.state = .error("Something broke")
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    @Test("mapsNavigationRoute returns route at expiration boundary (just under 30 min)")
+    func mapsNavigationRouteReturnsRouteAtExpirationBoundary() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Set timestamp to just under expiration (1799 seconds ago)
+        vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-1799)
+
+        vm.state = .offline
+        #expect(vm.mapsNavigationRoute != nil)
+        #expect(vm.mapsNavigationRoute?.id == route.id)
+    }
+
+    @Test("New route candidate selection refreshes cache timestamp")
+    func newRouteCandidateRefreshesCacheTimestamp() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Simulate old cache
+        vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-3600)
+
+        // Select a new candidate — refreshes timestamp
+        let newRoute = WizPathRoute.testRoute(id: UUID())
+        let newCandidate = ScoredRouteCandidate(route: newRoute, score: 90, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [newCandidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Timestamp should be refreshed to now
+        let cachedAt = try #require(vm.lastCalculatedRouteTimestamp)
+        #expect(Date().timeIntervalSince(cachedAt) < 2) // Just set
+
+        vm.state = .offline
+        #expect(vm.mapsNavigationRoute?.id == newRoute.id)
+    }
+
+    @Test("reset clears cache timestamp")
+    func resetClearsCacheTimestamp() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        #expect(vm.lastCalculatedRouteTimestamp != nil)
+
+        vm.reset()
+
+        #expect(vm.lastCalculatedRouteTimestamp == nil)
+        #expect(vm.mapsNavigationRoute == nil)
+    }
+
+    // MARK: - Offline State Preservation
+
+    @Test("State transitions: idle → loading → offline preserves cache")
+    func stateTransitionOfflinePreservesCache() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        #expect(vm.mapsNavigationRoute != nil)
+
+        vm.state = .offline
+        #expect(vm.mapsNavigationRoute != nil)
+        #expect(vm.mapsNavigationRoute?.id == route.id)
+    }
+
+    @Test("Offline with cached route — EV mode state is preserved")
+    func offlinePreservesEVModeState() async throws {
+        let vm = makeViewModel()
+        vm.isElectricVehicle = true
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+        #expect(vm.isElectricVehicle == true)
+        #expect(vm.mapsNavigationRoute != nil)
+    }
+
+    @Test("Offline with cached route — toll road preference is preserved")
+    func offlinePreservesTollPreference() async throws {
+        let vm = makeViewModel()
+        vm.avoidTollRoads = true
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+        #expect(vm.avoidTollRoads == true)
+        #expect(vm.mapsNavigationRoute != nil)
+    }
+
+    @Test("Offline with cached route — travel mode is preserved")
+    func offlinePreservesTravelMode() async throws {
+        let vm = makeViewModel()
+        vm.switchTravelMode(to: .walking)
+        let route = WizPathRoute.testRoute(travelMode: .walking)
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        vm.state = .offline
+        #expect(vm.travelMode == .walking)
+        #expect(vm.mapsNavigationRoute != nil)
+    }
+
+    @Test("mapsNavigationRoute returns lastCalculatedRoute in error state")
+    func errorStateUsesCachedRoute() async throws {
+        let vm = makeViewModel()
+        let route = WizPathRoute.testRoute()
+        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
+        vm.routeCandidates = [candidate]
+        vm.selectRouteCandidate(at: 0)
+
+        // Simulate going to error state after having a route
+        vm.state = .error("API failure")
+        #expect(vm.currentRoute == nil)
+        #expect(vm.mapsNavigationRoute?.id == route.id) // Falls back
     }
 
     @Test("Toll avoidance reflected in Apple Maps URL")

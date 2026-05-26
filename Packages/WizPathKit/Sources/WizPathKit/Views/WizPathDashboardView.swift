@@ -16,6 +16,9 @@ public struct WizPathDashboardView: View {
     private let departureOptimizerService: DepartureOptimizerService?
     
     @State private var rotationAngle: Double = 0
+    @State private var isNavigatingToMaps = false
+    @State private var navigationRotationAngle: Double = 0
+    @State private var mapsError: String?
 
     /// Closure that handles maps export (e.g. showing a rewarded ad first).
     /// Default implementation proceeds directly to the maps action.
@@ -84,6 +87,71 @@ public struct WizPathDashboardView: View {
                         .transition(.opacity)
                         .zIndex(999)
                     }
+                    
+                    // Maps Navigation Loading Overlay
+                    if isNavigatingToMaps {
+                        ZStack {
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .environment(\.colorScheme, .dark)
+                                .ignoresSafeArea()
+                            
+                            VStack(spacing: 24) {
+                                Image(systemName: "map.fill")
+                                    .font(.system(size: 36))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [Color(hex: "#FFD60A"), Color(hex: "#FF9F0A")],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color(hex: "#FFD60A").opacity(0.15), lineWidth: 6)
+                                        .frame(width: 64, height: 64)
+                                    
+                                    Circle()
+                                        .trim(from: 0, to: 0.3)
+                                        .stroke(
+                                            LinearGradient(
+                                                colors: [Color(hex: "#FFD60A"), Color(hex: "#FF9F0A")],
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                                        )
+                                        .frame(width: 64, height: 64)
+                                        .rotationEffect(.degrees(navigationRotationAngle))
+                                }
+                                
+                                if let error = mapsError {
+                                    VStack(spacing: 8) {
+                                        Text(error)
+                                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                            .foregroundStyle(Color(hex: "#FF453A"))
+                                            .multilineTextAlignment(.center)
+                                        
+                                        Button(WizPathKitL10n.text("wizpath_ok")) {
+                                            isNavigatingToMaps = false
+                                        }
+                                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                                        .foregroundStyle(Color(hex: "#FFD60A"))
+                                    }
+                                } else {
+                                    Text(WizPathKitL10n.text("wizpath_navigating_to_maps"))
+                                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                        .foregroundStyle(.white)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 40)
+                                }
+                            }
+                            .padding(.horizontal, 40)
+                        }
+                        .transition(.opacity.animation(.easeInOut(duration: 0.3)))
+                        .zIndex(998)
+                    }
                 } else {
                     ProgressView().task {
                         guard viewModel == nil else { return }
@@ -134,9 +202,42 @@ public struct WizPathDashboardView: View {
         }
     }
 
+    /// Opens the given maps URL with a loading overlay.
+    /// Falls back to the web URL if the native app is not installed.
+    /// Dismisses the overlay immediately if neither URL can be opened,
+    /// or after a short delay to allow the app switch animation to play.
+    private func openMapsURL(
+        nativeURL: @escaping () -> String?,
+        webURL: @escaping () -> String?
+    ) {
+        isNavigatingToMaps = true
+        mapsError = nil
+        navigationRotationAngle = 0
+        withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+            navigationRotationAngle = 360
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let urlStr = nativeURL(), let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url, options: [:])
+                // Auto-dismiss after app switch
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    isNavigatingToMaps = false
+                }
+            } else if let webStr = webURL(), let webURL = URL(string: webStr) {
+                UIApplication.shared.open(webURL, options: [:])
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    isNavigatingToMaps = false
+                }
+            } else {
+                // No maps app available — show error, let user dismiss
+                mapsError = WizPathKitL10n.text("wizpath_maps_unavailable")
+            }
+        }
+    }
+
     @ViewBuilder
     private func contentView(viewModel: WizPathViewModel) -> some View {
-        if viewModel.currentRoute != nil { activeRouteContent(viewModel: viewModel) }
+        if viewModel.mapsNavigationRoute != nil { activeRouteContent(viewModel: viewModel) }
         else { destinationSelectionContent(viewModel: viewModel) }
     }
 
@@ -276,7 +377,7 @@ public struct WizPathDashboardView: View {
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
 
-                    if viewModel.showJourneyHUD, let route = viewModel.currentRoute {
+                    if viewModel.showJourneyHUD, let route = viewModel.mapsNavigationRoute {
                         JourneyHUDView(data: route.journeyHUDData).padding(.horizontal, 16)
                     }
                     
@@ -288,7 +389,7 @@ public struct WizPathDashboardView: View {
                     if viewModel.travelMode == .car, viewModel.isElectricVehicle, !viewModel.evRecommendations.isEmpty {
                         EVRecommendationsPanel(recommendations: viewModel.evRecommendations).padding(.horizontal, 16)
                     }
-                    if let route = viewModel.currentRoute {
+                    if let route = viewModel.mapsNavigationRoute {
                         WizPathRouteInfoPanel(
                             route: route,
                             destinationName: viewModel.destinationName,
@@ -298,28 +399,10 @@ public struct WizPathDashboardView: View {
                             onReset: { viewModel.reset() },
                             onUpdateDepartureTime: { viewModel.updateDepartureTime($0) },
                             onOpenInAppleMaps: {
-                                onMapsExport {
-                                    guard let urlStr = viewModel.appleMapsURLString(),
-                                          let url = URL(string: urlStr) else { return }
-                                    if UIApplication.shared.canOpenURL(url) {
-                                        UIApplication.shared.open(url, options: [:])
-                                    } else if let webStr = viewModel.appleMapsWebURLString(),
-                                              let webURL = URL(string: webStr) {
-                                        UIApplication.shared.open(webURL, options: [:])
-                                    }
-                                }
+                                onMapsExport { openMapsURL(nativeURL: { viewModel.appleMapsURLString() }, webURL: { viewModel.appleMapsWebURLString() }) }
                             },
                             onOpenInGoogleMaps: {
-                                onMapsExport {
-                                    guard let urlStr = viewModel.googleMapsURLString(),
-                                          let url = URL(string: urlStr) else { return }
-                                    if UIApplication.shared.canOpenURL(url) {
-                                        UIApplication.shared.open(url, options: [:])
-                                    } else if let webStr = viewModel.googleMapsWebURLString(),
-                                              let webURL = URL(string: webStr) {
-                                        UIApplication.shared.open(webURL, options: [:])
-                                    }
-                                }
+                                onMapsExport { openMapsURL(nativeURL: { viewModel.googleMapsURLString() }, webURL: { viewModel.googleMapsWebURLString() }) }
                             },
                             trafficCongestion: viewModel.currentTrafficCongestion,
                             hasTollRoads: viewModel.hasTollRoads,
@@ -334,7 +417,7 @@ public struct WizPathDashboardView: View {
             }.safeAreaPadding(.bottom, 8)
         }
         .sheet(isPresented: $showDepartureOptimizer) {
-            if let route = viewModel.currentRoute {
+            if let route = viewModel.mapsNavigationRoute {
                 WizPathDepartureOptimizerSheet(route: route, onSelectTime: { date in viewModel.updateDepartureTime(date); showDepartureOptimizer = false })
             }
         }

@@ -391,6 +391,11 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
                 onAdsLoaded?(loadedAds)
             }
             
+            // Nil all callbacks to prevent any hypothetical double-fire from
+            // both adLoaderDidFinishLoading and adLoader(_:didFailToReceiveAdWithError:).
+            onSingleAdLoaded = nil
+            onLoadFailed = nil
+            
             loadedAds.removeAll()
         }
     }
@@ -399,10 +404,25 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
         Task { @MainActor [self] in
             AppLogger.app.error("[AdMob] Native ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.native, error: error)
-            onLoadFailed?()
-            onSingleAdLoaded?(nil)
+
+            // IMPORTANT: Capture and nil both callbacks BEFORE calling either one.
+            // loadNativeAd() sets both onSingleAdLoaded and onLoadFailed to the same
+            // completion closure. Calling both would cause a double-resume crash on the
+            // CheckedContinuation, producing a SIGTRAP / EXC_BREAKPOINT.
+            let singleCompletion = onSingleAdLoaded
+            let loadFailedCompletion = onLoadFailed
             onSingleAdLoaded = nil
             onLoadFailed = nil
+
+            // Only call the callback that matches the loading path used.
+            // If loadNativeAd was used, onSingleAdLoaded is non-nil.
+            // If loadNativeAds was used (bulk), onAdsLoaded is set instead.
+            if singleCompletion != nil {
+                singleCompletion?(nil)
+            } else {
+                loadFailedCompletion?()
+            }
+
             loadedAds.removeAll()
         }
     }

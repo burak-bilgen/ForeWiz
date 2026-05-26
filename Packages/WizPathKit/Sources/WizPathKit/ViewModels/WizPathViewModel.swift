@@ -114,6 +114,11 @@ public final class WizPathViewModel {
 
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
+    /// Timestamp when lastCalculatedRoute was saved, used for cache expiration.
+    /// Internal for test access.
+    var lastCalculatedRouteTimestamp: Date?
+    /// Routes older than this interval are considered stale and won't be used offline.
+    let cacheExpirationInterval: TimeInterval = 1800 // 30 minutes
     public var didLoadInitialLocation = false
     // Auto-refresh timer for traffic updates
     private var refreshTimer: Task<Void, Never>?
@@ -135,6 +140,34 @@ public final class WizPathViewModel {
     public var routeSegments: [WizPathSegment] { currentRoute?.segments ?? [] }
     public var weatherChangePoints: [WizPathSegment] { currentRoute?.weatherChangePoints ?? [] }
     public var overallRisk: RouteRisk { currentRoute?.overallRisk ?? .good }
+
+    /// The route to use for maps navigation — falls back to the last
+    /// successfully calculated route when offline or in error state.
+    /// This ensures users can always navigate to their destination
+    /// in Apple/Google Maps even without an active connection.
+    /// If the cached route is older than cacheExpirationInterval,
+    /// it is considered stale and returns nil to avoid showing outdated data.
+    public var mapsNavigationRoute: WizPathRoute? {
+        if let route = currentRoute { return route }
+        guard let cached = lastCalculatedRoute,
+              let timestamp = lastCalculatedRouteTimestamp else { return nil }
+        // Cache is fresh enough — use it
+        if Date().timeIntervalSince(timestamp) < cacheExpirationInterval {
+            return cached
+        }
+        // Cache expired — treat as no route
+        return nil
+    }
+
+    /// Waypoints for maps navigation, filtered by safety and sorted by
+    /// estimated arrival time so stops appear in logical route order.
+    /// This provides a seamless navigation experience with relevant
+    /// charging stations, gas stations, and rest stops along the way.
+    public var mapsWaypoints: [SmartStop] {
+        chargingStations
+            .filter { !$0.safetyStatus.shouldAvoid }
+            .sorted { $0.etaArrival < $1.etaArrival }
+    }
 
     // MARK: - Init
     public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil) {
@@ -189,6 +222,7 @@ public final class WizPathViewModel {
         let candidate = routeCandidates[index]
         state = .routeReady(candidate.route)
         lastCalculatedRoute = candidate.route
+        lastCalculatedRouteTimestamp = Date()
         currentTrafficCongestion = candidate.trafficCongestion
         hasTollRoads = candidate.hasTollRoads
         showRouteComparison = false
@@ -206,7 +240,11 @@ public final class WizPathViewModel {
 
     public func calculateRoute() async {
         guard isOnline else {
-            if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
+            // During auto-refresh, only keep the cached route if it's still fresh
+            if isAutoRefreshing,
+               let lastRoute = lastCalculatedRoute,
+               let timestamp = lastCalculatedRouteTimestamp,
+               Date().timeIntervalSince(timestamp) < cacheExpirationInterval {
                 state = .routeReady(lastRoute)
             } else {
                 state = .offline
@@ -296,6 +334,7 @@ public final class WizPathViewModel {
                 }
             }
             lastCalculatedRoute = route
+            lastCalculatedRouteTimestamp = Date()
             updateRouteStatus(for: route)
             await analyzeBestDepartureTime(route: route)
             state = .routeReady(route)
@@ -420,6 +459,8 @@ public final class WizPathViewModel {
         chargingStationsTask = nil
         placeNameTask?.cancel()
         placeNameTask = nil
+        lastCalculatedRoute = nil
+        lastCalculatedRouteTimestamp = nil
         state = .idle
         destinationCoordinate = nil
         destinationName = ""
@@ -444,6 +485,8 @@ public final class WizPathViewModel {
 
     public func setElectricVehicleEnabled(_ enabled: Bool) {
         guard isElectricVehicle != enabled else { return }
+        // EV mode is only valid for car travel — reject enable for other modes
+        guard travelMode == .car || !enabled else { return }
         isElectricVehicle = enabled
         updateElectricVehicleContent()
         HapticEngine.shared.selectionChanged()
@@ -582,15 +625,15 @@ public final class WizPathViewModel {
 
     // MARK: - Maps URL Builders
     /// Builds the Apple Maps URL string with waypoints for the current route.
+    /// Falls back to the last calculated route when offline.
     /// The View layer is responsible for opening the URL via UIApplication.
     public func appleMapsURLString() -> String? {
-        guard currentRoute != nil,
+        guard mapsNavigationRoute != nil,
               let origin = originCoordinate,
               let destination = destinationCoordinate else { return nil }
 
         var urlString = "maps://?saddr=\(origin.latitude),\(origin.longitude)"
-        let waypoints = chargingStations.filter { !$0.safetyStatus.shouldAvoid }
-        for stop in waypoints {
+        for stop in mapsWaypoints {
             urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
         }
         urlString += "&daddr=\(destination.latitude),\(destination.longitude)"
@@ -599,22 +642,27 @@ public final class WizPathViewModel {
     }
 
     public func appleMapsWebURLString() -> String? {
-        guard let origin = originCoordinate,
+        guard mapsNavigationRoute != nil,
+              let origin = originCoordinate,
               let destination = destinationCoordinate else { return nil }
-        var webString = "https://maps.apple.com/?saddr=\(origin.latitude),\(origin.longitude)&daddr=\(destination.latitude),\(destination.longitude)"
+        var webString = "https://maps.apple.com/?saddr=\(origin.latitude),\(origin.longitude)"
+        for stop in mapsWaypoints {
+            webString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
+        }
+        webString += "&daddr=\(destination.latitude),\(destination.longitude)"
         if avoidTollRoads { webString += "&dirflg=d" }
         return webString
     }
 
     /// Builds the Google Maps URL string with waypoints for the current route.
+    /// Falls back to the last calculated route when offline.
     public func googleMapsURLString() -> String? {
-        guard currentRoute != nil,
+        guard mapsNavigationRoute != nil,
               let origin = originCoordinate,
               let destination = destinationCoordinate else { return nil }
 
         var urlString = "comgooglemaps://?saddr=\(origin.latitude),\(origin.longitude)"
-        let waypoints = chargingStations.filter { !$0.safetyStatus.shouldAvoid }
-        for stop in waypoints {
+        for stop in mapsWaypoints {
             urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
         }
         urlString += "&daddr=\(destination.latitude),\(destination.longitude)&directionsmode=driving"
@@ -622,10 +670,18 @@ public final class WizPathViewModel {
         return urlString
     }
 
+    /// Builds the Google Maps web URL string with waypoints for the current route.
+    /// Falls back to the last calculated route when offline.
     public func googleMapsWebURLString() -> String? {
-        guard let origin = originCoordinate,
+        guard mapsNavigationRoute != nil,
+              let origin = originCoordinate,
               let destination = destinationCoordinate else { return nil }
-        var webString = "https://www.google.com/maps/dir/?api=1&origin=\(origin.latitude),\(origin.longitude)&destination=\(destination.latitude),\(destination.longitude)&travelmode=driving"
+        var webString = "https://www.google.com/maps/dir/?api=1&origin=\(origin.latitude),\(origin.longitude)"
+        if !mapsWaypoints.isEmpty {
+            let waypointsStr = mapsWaypoints.map { "\($0.coordinate.latitude),\($0.coordinate.longitude)" }.joined(separator: "%7C")
+            webString += "&waypoints=\(waypointsStr)"
+        }
+        webString += "&destination=\(destination.latitude),\(destination.longitude)&travelmode=driving"
         if avoidTollRoads { webString += "&avoid=tolls" }
         return webString
     }

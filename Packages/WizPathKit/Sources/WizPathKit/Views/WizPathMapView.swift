@@ -18,7 +18,7 @@ public struct WizPathMapView: View {
         ZStack(alignment: .topTrailing) {
             Map(position: $position, selection: $selectedAnnotation) {
                 UserAnnotation()
-                if let route = viewModel.currentRoute, viewModel.isShowingRoute {
+                if let route = viewModel.mapsNavigationRoute, viewModel.isShowingRoute {
                     weatherCodedPolylines(route: route)
                     trafficOverlay(route: route)
 
@@ -59,7 +59,7 @@ public struct WizPathMapView: View {
                     }
                 }
 
-                if let dest = viewModel.destinationCoordinate, viewModel.currentRoute == nil {
+                if let dest = viewModel.destinationCoordinate, viewModel.mapsNavigationRoute == nil {
                     Annotation(coordinate: dest) {
                         DestinationFlag()
                     } label: {
@@ -80,7 +80,9 @@ public struct WizPathMapView: View {
                 }
             }
             .onAppear {
-                if let origin = viewModel.originCoordinate, viewModel.currentRoute == nil {
+                if let route = viewModel.mapsNavigationRoute, viewModel.currentRoute == nil {
+                    withAnimation(AppTheme.slowEaseOut) { position = .region(routeRegion(route)) }
+                } else if let origin = viewModel.originCoordinate, viewModel.mapsNavigationRoute == nil {
                     position = .region(MKCoordinateRegion(
                         center: origin,
                         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -88,12 +90,16 @@ public struct WizPathMapView: View {
                 }
             }
             .onChange(of: viewModel.didLoadInitialLocation) { _, loaded in
-                guard loaded, let coord = viewModel.originCoordinate, viewModel.currentRoute == nil else { return }
-                withAnimation(AppTheme.slowEaseOut) {
-                    position = .region(MKCoordinateRegion(
-                        center: coord,
-                        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                    ))
+                guard loaded, let coord = viewModel.originCoordinate else { return }
+                if let route = viewModel.mapsNavigationRoute, viewModel.currentRoute == nil {
+                    withAnimation(AppTheme.slowEaseOut) { position = .region(routeRegion(route)) }
+                } else if viewModel.mapsNavigationRoute == nil {
+                    withAnimation(AppTheme.slowEaseOut) {
+                        position = .region(MKCoordinateRegion(
+                            center: coord,
+                            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                        ))
+                    }
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
@@ -104,7 +110,7 @@ public struct WizPathMapView: View {
                 }
             }
 
-            if viewModel.currentRoute != nil {
+            if viewModel.mapsNavigationRoute != nil {
                 VStack(spacing: 6) {
                     trafficToggleButton
                     toggleRouteButton
@@ -128,53 +134,31 @@ public struct WizPathMapView: View {
 
     @MapContentBuilder
     private func weatherCodedPolylines(route: WizPathRoute) -> some MapContent {
-        let segs = route.segments
-        if segs.count > 1 {
-            ForEach(Array(segs.dropLast().enumerated()), id: \.offset) { i, seg in
-                let nextSeg = segs[i + 1]
-                let weather = seg.weather
-                let colorHex = weather?.condition.mapRouteColor ?? "#34C759"
-                let lineWidth = viewModel.mapExpanded ? 4.0 : 3.0
-                MapPolyline(coordinates: [seg.coordinate, nextSeg.coordinate])
-                    .stroke(Color(hex: colorHex).opacity(0.85), lineWidth: lineWidth)
-            }
-        }
+        RouteMapContent.weatherPolylines(route: route, lineWidth: viewModel.mapExpanded ? 4.0 : 3.0)
     }
 
     @MapContentBuilder
     private func trafficOverlay(route: WizPathRoute) -> some MapContent {
-        if viewModel.showTrafficOnMap, viewModel.currentTrafficCongestion != .unknown {
-            let c = viewModel.currentTrafficCongestion
-            MapPolyline(coordinates: route.routeCoordinates)
-                .stroke(Color(hex: c.colorHex).opacity(0.45), lineWidth: viewModel.mapExpanded ? 7 : 5)
-        }
+        RouteMapContent.trafficOverlay(
+            route: route,
+            lineWidth: viewModel.mapExpanded ? 7 : 5,
+            showTraffic: viewModel.showTrafficOnMap,
+            congestion: viewModel.currentTrafficCongestion
+        )
     }
 
     @MapContentBuilder
     private func weatherChangeMarkers(route: WizPathRoute) -> some MapContent {
-        let changePoints = Array(route.weatherChangePoints.prefix(viewModel.mapExpanded ? 12 : 6))
-        ForEach(changePoints) { segment in
-            if let weather = segment.weather {
-                let placeName = viewModel.segmentPlaceNames[segment.id]
-                Annotation(coordinate: segment.coordinate) {
-                    Button {
-                        viewModel.selectedWeatherSegment = segment
-                        viewModel.showWeatherDetail = true
-                        HapticEngine.shared.light()
-                    } label: {
-                        EnhancedWeatherMarker(weather: weather, eta: segment.etaDisplay)
-                    }
-                    .contentShape(Rectangle())
-                    .buttonStyle(.plain)
-                } label: {
-                    if let placeName {
-                        Text(placeName)
-                            .font(.system(size: 9, weight: .medium))
-                            .lineLimit(1)
-                    }
-                }
+        RouteMapContent.weatherChangeMarkers(
+            route: route,
+            maxCount: viewModel.mapExpanded ? 12 : 6,
+            placeNames: viewModel.segmentPlaceNames,
+            onSelect: { segment in
+                viewModel.selectedWeatherSegment = segment
+                viewModel.showWeatherDetail = true
+                HapticEngine.shared.light()
             }
-        }
+        )
     }
 
     // MARK: - Control Buttons
@@ -269,9 +253,15 @@ struct FullScreenMapView: View {
         ZStack(alignment: .topTrailing) {
             Map(position: $position, selection: .constant(nil)) {
                 UserAnnotation()
-                if let route = viewModel.currentRoute, viewModel.isShowingRoute {
-                    fullScreenWeatherPolylines(route: route)
-                    fullScreenTrafficOverlay(route: route)
+                if let route = viewModel.mapsNavigationRoute, viewModel.isShowingRoute {
+                    RouteMapContent.weatherPolylines(route: route, lineWidth: 5)
+                    RouteMapContent.trafficOverlay(
+                        route: route,
+                        lineWidth: 9,
+                        opacity: 0.35,
+                        showTraffic: viewModel.showTrafficOnMap,
+                        congestion: viewModel.currentTrafficCongestion
+                    )
 
                     Annotation(coordinate: route.destination) {
                         DestinationFlag()
@@ -287,21 +277,28 @@ struct FullScreenMapView: View {
                         }
                     }
 
-                    let changePoints = Array(route.weatherChangePoints.prefix(12))
-                    ForEach(changePoints) { segment in
-                        if let weather = segment.weather {
-                            Annotation(coordinate: segment.coordinate) {
-                                EnhancedWeatherMarker(weather: weather, eta: segment.etaDisplay)
-                            } label: {
-                                Text(viewModel.segmentPlaceNames[segment.id] ?? "")
-                                    .font(.system(size: 9, weight: .medium)).lineLimit(1)
-                            }
+                    RouteMapContent.weatherChangeMarkers(
+                        route: route,
+                        maxCount: 12,
+                        placeNames: viewModel.segmentPlaceNames,
+                        onSelect: { segment in
+                            viewModel.selectedWeatherSegment = segment
+                            viewModel.showWeatherDetail = true
+                            HapticEngine.shared.light()
                         }
-                    }
+                    )
 
                     ForEach(viewModel.chargingStations) { station in
                         Annotation(coordinate: station.coordinate) {
-                            SmartStopMarker(category: station.category)
+                            Button {
+                                viewModel.selectedChargingStation = station
+                                viewModel.showChargingStationDetail = true
+                                HapticEngine.shared.light()
+                            } label: {
+                                SmartStopMarker(category: station.category)
+                            }
+                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
                         } label: {
                             Text(station.displayTitle).font(.system(size: 8, weight: .medium)).lineLimit(1)
                         }
@@ -378,31 +375,74 @@ struct FullScreenMapView: View {
         .statusBarHidden()
     }
 
+    private func legendRow(color: Color, label: String) -> some View {
+        HStack(spacing: 4) {
+            Circle().fill(color).frame(width: 6, height: 6).shadow(color: color.opacity(0.3), radius: 1)
+            Text(label).foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Shared Route Map Content Builders
+
+/// Shared `@MapContentBuilder` helpers used by both `WizPathMapView` and `FullScreenMapView`.
+/// Eliminates duplication of weather-coded polylines, traffic overlay, and weather change markers.
+@MainActor
+enum RouteMapContent {
     @MapContentBuilder
-    private func fullScreenWeatherPolylines(route: WizPathRoute) -> some MapContent {
+    static func weatherPolylines(route: WizPathRoute, lineWidth: CGFloat) -> some MapContent {
         let segs = route.segments
         if segs.count > 1 {
             ForEach(Array(segs.dropLast().enumerated()), id: \.offset) { i, seg in
                 let nextSeg = segs[i + 1]
                 let weather = seg.weather
                 MapPolyline(coordinates: [seg.coordinate, nextSeg.coordinate])
-                    .stroke(Color(hex: weather?.condition.mapRouteColor ?? "#34C759").opacity(0.85), lineWidth: 5)
+                    .stroke(Color(hex: weather?.condition.mapRouteColor ?? "#34C759").opacity(0.85), lineWidth: lineWidth)
             }
         }
     }
 
     @MapContentBuilder
-    private func fullScreenTrafficOverlay(route: WizPathRoute) -> some MapContent {                if viewModel.showTrafficOnMap, viewModel.currentTrafficCongestion != .unknown {
-                    let c = viewModel.currentTrafficCongestion
-                    MapPolyline(coordinates: route.routeCoordinates)
-                        .stroke(Color(hex: c.colorHex).opacity(0.35), lineWidth: 9)
-                }
+    static func trafficOverlay(
+        route: WizPathRoute,
+        lineWidth: CGFloat,
+        opacity: CGFloat = 0.45,
+        showTraffic: Bool,
+        congestion: TrafficCongestionLevel
+    ) -> some MapContent {
+        if showTraffic, congestion != .unknown {
+            MapPolyline(coordinates: route.routeCoordinates)
+                .stroke(Color(hex: congestion.colorHex).opacity(opacity), lineWidth: lineWidth)
+        }
     }
 
-    private func legendRow(color: Color, label: String) -> some View {
-        HStack(spacing: 4) {
-            Circle().fill(color).frame(width: 6, height: 6).shadow(color: color.opacity(0.3), radius: 1)
-            Text(label).foregroundStyle(.secondary)
+    @MapContentBuilder
+    static func weatherChangeMarkers(
+        route: WizPathRoute,
+        maxCount: Int,
+        placeNames: [UUID: String],
+        onSelect: @escaping (WizPathSegment) -> Void
+    ) -> some MapContent {
+        let changePoints = Array(route.weatherChangePoints.prefix(maxCount))
+        ForEach(changePoints) { segment in
+            if let weather = segment.weather {
+                let placeName = placeNames[segment.id]
+                Annotation(coordinate: segment.coordinate) {
+                    Button {
+                        onSelect(segment)
+                    } label: {
+                        EnhancedWeatherMarker(weather: weather, eta: segment.etaDisplay)
+                    }
+                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                } label: {
+                    if let placeName {
+                        Text(placeName)
+                            .font(.system(size: 9, weight: .medium))
+                            .lineLimit(1)
+                    }
+                }
+            }
         }
     }
 }

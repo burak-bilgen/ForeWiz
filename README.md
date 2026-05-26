@@ -11,6 +11,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/iOS-17%2B-blue?style=flat-square&logo=apple" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-6.0-orange?style=flat-square&logo=swift" alt="Swift 6.0">
+  <img src="https://img.shields.io/badge/Version-2.0-brightgreen?style=flat-square" alt="Version 2.0">
   <img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-blue?style=flat-square" alt="Architecture">
   <img src="https://img.shields.io/badge/Monetization-AdMob-purple?style=flat-square" alt="AdMob">
   <img src="https://img.shields.io/badge/SPM-WizPathKit-brightgreen?style=flat-square" alt="SPM">
@@ -413,9 +414,12 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 
 **CI Pipeline (`.github/workflows/ci.yml`):**
 1. SwiftLint linting (`--strict`)
-2. Build all targets
-3. Run unit tests
-4. Localization completeness check
+2. Hardcoded strings check
+3. Localization completeness check
+4. Lazy TR translation check
+5. Build all targets
+6. Run unit tests (simulator)
+7. Build for release validation
 
 ---
 
@@ -486,7 +490,21 @@ Private project. All rights reserved.
 
 ## 📋 Changelog
 
-### v1.3.0 — Premium UX Polish, Map Overlays & Localization Audits (Latest)
+### v2.0.0 — WizPath V3: Offline Navigation, Cache Expiration & Continuation Safety (Latest)
+
+| Change | Details |
+|--------|---------|
+| 🗺️ **Offline Maps Navigation** | New `mapsNavigationRoute` computed property (`currentRoute ?? lastCalculatedRoute`) enables route viewing and Maps URL generation even when offline. Charging waypoints preserved and sorted by ETA. 4 URL builders (Apple Maps, Google Maps — native + web) unified with shared waypoints. |
+| ⏳ **Cache Expiration** | `lastCalculatedRouteTimestamp` with 30-minute `cacheExpirationInterval`. Expired caches return `nil` from `mapsNavigationRoute`. Auto-refresh also respects freshness — prevents stale route display. |
+| 📐 **DRY Refactor** | `RouteMapContent` enum with 3 shared `@MapContentBuilder` static methods eliminated `fullScreenWeatherPolylines`/`fullScreenTrafficOverlay` (~50 lines duplicated code removed). Traffic overlay opacity parameterized (0.45 WizPathMap, 0.35 FullScreen). |
+| 🧪 **Offline Test Suite** | 23 new tests covering `mapsNavigationRoute` behavior, offline URL generation, waypoint sorting, cache expiration (fresh/expired/boundary/reset), and 9 state preservation scenarios. |
+| 🛡️ **Continuation Safety** | Comprehensive test suite (7 patterns) verifying double-resume guards, stale continuation handling, timeout cleanup, deinit cleanup, weak self, and Sendable closure safety. |
+| 🔒 **Continuation Hardening** | `LocationService`, `CoreLocationRepository`, and `AdMobIntegration` updated with nil-out-after-use patterns to prevent `SIGTRAP` crashes from `CheckedContinuation` double-resume. |
+| 🎨 **FullScreen Map Enhancement** | Smart stop markers now respond to taps with haptic feedback and charging station detail sheet — matching WizPathMapView behavior. |
+| 📸 **Offline Camera** | `onAppear` and `didLoadInitialLocation` now check for cached route first — zooms to route region when opening offline, falls back to origin pin view. |
+| 🔄 **Loading Overlay** | Maps loading overlay with error state UI; `openMapsURL` helper with 0.5s delay and `navigationRotationAngle` reset. |
+
+### v1.3.0 — Premium UX Polish, Map Overlays & Localization Audits
 
 | Change | Details |
 |--------|---------|
