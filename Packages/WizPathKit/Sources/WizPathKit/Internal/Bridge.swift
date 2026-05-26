@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 import OSLog
 import SwiftUI
 
@@ -93,6 +94,22 @@ public enum WizPathKitFormatters {
         f.locale = Locale(identifier: "en_US_POSIX")
         return f
     }()
+
+    /// Formats a distance in meters to a localized human-readable string.
+    /// - Distances >= 1 km: "2.5 km" or "10 km"
+    /// - Distances < 1 km: "800m"
+    public static func formattedDistance(_ dist: CLLocationDistance) -> String {
+        let km = dist / 1000
+        if km >= 1 {
+            let unit = WizPathKitL10n.text("unit_km")
+            if km >= 10 {
+                return "\(Int(km)) \(unit)"
+            }
+            return String(format: "%.1f %@", locale: Locale.current, km as CVarArg, unit)
+        }
+        let unit = WizPathKitL10n.text("unit_m")
+        return "\(Int(dist))\(unit)"
+    }
 }
 
 typealias SharedFormatters = WizPathKitFormatters

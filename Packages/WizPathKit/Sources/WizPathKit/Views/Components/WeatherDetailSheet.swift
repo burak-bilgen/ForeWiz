@@ -26,7 +26,7 @@ public struct WeatherDetailSheet: View {
                                 .shadow(color: severityColor.opacity(0.3), radius: 8)
                                 .symbolRenderingMode(.multicolor)
 
-                            Text(weatherConditionDisplay)
+                            Text(weather.condition.localizedTitle)
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundStyle(.white)
 
@@ -43,7 +43,7 @@ public struct WeatherDetailSheet: View {
                     LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16) {
                         VStack(spacing: 12) {
                             detailRow(icon: "clock.fill", label: WizPathKitL10n.text("wizpath_weather_eta"), value: segment.etaDisplay)
-                            detailRow(icon: "drop.fill", label: WizPathKitL10n.text("wizpath_weather_precipitation"), value: "\\(Int(weather.precipitationChance * 100))%")
+                            detailRow(icon: "drop.fill", label: WizPathKitL10n.text("wizpath_weather_precipitation"), value: "\(Int(weather.precipitationChance * 100))%")
                             detailRow(icon: "eye.fill", label: WizPathKitL10n.text("wizpath_weather_visibility"), value: visibilityDisplay)
                             detailRow(icon: "exclamationmark.triangle.fill", label: WizPathKitL10n.text("wizpath_weather_severity"), value: severityDisplay)
                         }
@@ -104,22 +104,6 @@ public struct WeatherDetailSheet: View {
 
     private var severityColor: Color {
         Color(hex: weather.severity.colorHex)
-    }
-
-    private var weatherConditionDisplay: String {
-        switch weather.condition {
-        case .clear: return WizPathKitL10n.text("wizpath_condition_clear")
-        case .partlyCloudy: return WizPathKitL10n.text("wizpath_condition_partly_cloudy")
-        case .cloudy: return WizPathKitL10n.text("wizpath_condition_cloudy")
-        case .rain: return WizPathKitL10n.text("wizpath_condition_rain")
-        case .heavyRain: return WizPathKitL10n.text("wizpath_condition_heavy_rain")
-        case .snow: return WizPathKitL10n.text("wizpath_condition_snow")
-        case .sleet: return WizPathKitL10n.text("wizpath_condition_sleet")
-        case .thunderstorm: return WizPathKitL10n.text("wizpath_condition_thunderstorm")
-        case .fog: return WizPathKitL10n.text("wizpath_condition_fog")
-        case .windy: return WizPathKitL10n.text("wizpath_condition_windy")
-        case .unknown: return WizPathKitL10n.text("wizpath_condition_unknown")
-        }
     }
 
     private var visibilityDisplay: String {

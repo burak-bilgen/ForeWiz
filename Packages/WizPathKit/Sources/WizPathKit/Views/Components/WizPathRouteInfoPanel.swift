@@ -51,10 +51,10 @@ public struct WizPathRouteInfoPanel: View {
                     }
                 }
                 HStack(spacing: 0) {
-                    RouteStatItem(icon: "arrow.triangle.swap", value: formattedDistance(route.totalDistance), label: WizPathKitL10n.text("wizpath_distance"))
+                    RouteStatItem(icon: "arrow.triangle.swap", value: WizPathKitFormatters.formattedDistance(route.totalDistance), label: WizPathKitL10n.text("wizpath_distance"))
                     Spacer()
                     if let temp = route.segments.first?.weather?.temperature {
-                        RouteStatItem(icon: "thermometer.medium", value: "\(Int(temp))°", label: WizPathKitL10n.text("wizpath_avg_temp"))
+                        RouteStatItem(icon: "thermometer.medium", value: WizPathKitL10n.formatted("wizpath_temperature_format", Int(temp)), label: WizPathKitL10n.text("wizpath_avg_temp"))
                         Spacer()
                     }
                     RouteStatItem(icon: "exclamationmark.triangle.fill", value: "\(route.weatherChangePoints.count)", label: WizPathKitL10n.text("wizpath_weather_changes"))
@@ -171,11 +171,6 @@ public struct WizPathRouteInfoPanel: View {
         return "\(m) \(WizPathKitL10n.text("wizpath_minutes"))"
     }
 
-    private func formattedDistance(_ dist: CLLocationDistance) -> String {
-        let km = dist / 1000
-        let unit = WizPathKitL10n.text("unit_km")
-        return km >= 10 ? "\(Int(km)) \(unit)" : String(format: "%.1f \(unit)", km)
-    }
 }
 
 // MARK: - Route Risk Badge
@@ -210,8 +205,6 @@ public struct WizPathBestDepartureRow: View {
         }
     }
 }
-
-// MARK: - Route Stat Item
 
 // MARK: - Premium Glass Map Button (Compact)
 

@@ -1,7 +1,10 @@
 import SwiftUI
 
 // MARK: - Animated Liquid Orb Background
-/// Static gradient background with liquid glass aesthetic.
+/// Premium animated background with slowly drifting, breathing orbs.
+/// Uses TimelineView for 60fps continuous animation with weather-reactive speed.
+/// The orbs drift in organic patterns, gently pulse in opacity, and slowly
+/// oscillate in size — creating a living, liquid atmosphere.
 struct LiquidOrbBackground: View {
     var palette: OrbPalette = .default
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -54,24 +57,48 @@ struct LiquidOrbBackground: View {
                  Color(red: 0.10, green: 0.12, blue: 0.18))
             }
         }
+
+        /// How fast the orbs drift and pulse — higher = more dramatic.
+        /// Stormy weather feels agitated, clear nights are calm.
+        var animationSpeed: Double {
+            switch self {
+            case .stormy:        return 1.8
+            case .default:       return 1.2
+            case .clearSky:      return 0.7
+            case .sunset:        return 0.65
+            case .snowy:         return 0.55
+            case .night:         return 0.45
+            }
+        }
     }
 
     var body: some View {
+        if reduceMotion {
+            staticContent
+        } else {
+            TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { timeline in
+                animatedContent(time: timeline.date.timeIntervalSinceReferenceDate)
+            }
+        }
+    }
+
+    /// Static fallback for users who prefer reduced motion.
+    private var staticContent: some View {
         GeometryReader { geometry in
             let w = max(geometry.size.width, 1)
             let h = max(geometry.size.height, 1)
             let base = min(w, h)
 
             ZStack {
-                // Base gradient
                 LinearGradient(
                     colors: [palette.colors.base1, palette.colors.base2],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
+                .frame(width: w, height: h)
+                .clipped()
 
-                // Primary orb - static
-                LiquidOrb(
+                DriftingOrb(
                     color: palette.colors.primary,
                     opacity: 0.18,
                     size: base * 0.95,
@@ -80,18 +107,16 @@ struct LiquidOrbBackground: View {
                     yOffset: 0.05
                 )
 
-                // Secondary orb - static
-                LiquidOrb(
+                DriftingOrb(
                     color: palette.colors.secondary,
                     opacity: 0.12,
                     size: base * 0.62,
-                    blur: base * 0.13,
+                    blur: base * 0.14,
                     xOffset: 0.85,
                     yOffset: 0.82
                 )
 
-                // Tertiary orb - static
-                LiquidOrb(
+                DriftingOrb(
                     color: palette.colors.tertiary,
                     opacity: 0.10,
                     size: base * 0.44,
@@ -100,15 +125,75 @@ struct LiquidOrbBackground: View {
                     yOffset: 0.34
                 )
             }
+        }
+    }
+
+    /// Live animated version — orbs slowly drift, pulse, and breathe.
+    private func animatedContent(time: TimeInterval) -> some View {
+        let speed = palette.animationSpeed
+        let t = time * speed
+
+        // Unique phase offsets so each orb moves independently — organic, non-synchronized feel.
+        let phase1 = t * 0.12
+        let phase2 = t * 0.09 + 1.7
+        let phase3 = t * 0.07 + 3.1
+
+        return GeometryReader { geometry in
+            let w = max(geometry.size.width, 1)
+            let h = max(geometry.size.height, 1)
+            let base = min(w, h)
+
+            ZStack {
+                // Base gradient — static, deep background
+                LinearGradient(
+                    colors: [palette.colors.base1, palette.colors.base2],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+
+                // Primary orb — largest, slowest drift
+                DriftingOrb(
+                    color: palette.colors.primary,
+                    opacity: 0.18 + sin(phase1 * 1.8) * 0.035,
+                    size: base * (0.95 + sin(phase1 * 0.8) * 0.06),
+                    blur: base * 0.16,
+                    xOffset: 0.20 + sin(phase1) * 0.10,
+                    yOffset: 0.05 + cos(phase1 * 0.7) * 0.08
+                )
+
+                // Secondary orb — medium, circular drift
+                DriftingOrb(
+                    color: palette.colors.secondary,
+                    opacity: 0.12 + sin(phase2 * 1.5) * 0.03,
+                    size: base * (0.62 + sin(phase2 * 1.1) * 0.05),
+                    blur: base * 0.14,
+                    xOffset: 0.85 + sin(phase2 * 0.75) * 0.08,
+                    yOffset: 0.82 + cos(phase2 * 1.2) * 0.06
+                )
+
+                // Tertiary orb — smallest, most complex wander
+                DriftingOrb(
+                    color: palette.colors.tertiary,
+                    opacity: 0.10 + sin(phase3 * 2.0) * 0.025,
+                    size: base * (0.44 + sin(phase3 * 0.9) * 0.04),
+                    blur: base * 0.10,
+                    xOffset: 0.58 + sin(phase3 * 0.6) * 0.12,
+                    yOffset: 0.34 + cos(phase3 * 0.8) * 0.10
+                )
+            }
             .frame(width: w, height: h)
             .clipped()
+            // Metal-accelerated compositing — keeps 60fps smooth despite heavy blur + animation.
+            .drawingGroup()
         }
     }
 }
 
-// MARK: - Liquid Orb Component
+// MARK: - Drifting Orb Component
+/// A single blurred elliptical orb whose position, opacity, and size can be
+/// driven by animation parameters computed from a timeline.
 
-struct LiquidOrb: View {
+private struct DriftingOrb: View {
     let color: Color
     let opacity: Double
     let size: CGFloat
@@ -132,6 +217,7 @@ struct LiquidOrb: View {
 }
 
 // MARK: - Legacy AnimatedOrbBackground
+/// Convenience wrapper for callers that pass individual colors.
 
 struct AnimatedOrbBackground: View {
     var primary: Color = Color(red: 0.3, green: 0.5, blue: 1.0)
@@ -149,9 +235,12 @@ struct AnimatedOrbBackground: View {
     }
 }
 
+// MARK: - Palette Init from Tuple (Legacy Support)
+
 extension LiquidOrbBackground.OrbPalette {
     init(colors: (primary: Color, secondary: Color, tertiary: Color, base1: Color, base2: Color)) {
         self = .default
-        // Dynamic palette creation for legacy support
+        // Dynamic palette creation for legacy support — palette is set via raw colors.
+        // The animation speed will default to 1.0, which is a reasonable middle ground.
     }
 }

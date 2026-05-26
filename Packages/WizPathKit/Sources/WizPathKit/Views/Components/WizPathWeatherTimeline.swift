@@ -30,7 +30,7 @@ public struct WizPathWeatherSegmentCard: View {
         return VStack(spacing: 4) {
             if let weather = segment.weather {
                 Image(systemName: weather.iconName).font(.system(size: 16)).foregroundStyle(severityColor).shadow(color: severityColor.opacity(0.3), radius: 3)
-                Text("\(Int(weather.temperature))°").font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
+                Text(WizPathKitL10n.formatted("wizpath_temperature_format", Int(weather.temperature))).font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
                 Text(segment.etaDisplay).font(.system(size: 8, weight: .medium)).foregroundStyle(.tertiary)
             }
         }

@@ -92,7 +92,7 @@ public struct HUDDetailPanel: View {
                 Text(stop.displayTitle).font(.system(size: 13, weight: .semibold)).foregroundStyle(.white).lineLimit(1)
                 HStack(spacing: 8) {
                     Label(stop.etaDisplay, systemImage: "clock").font(.caption).foregroundStyle(.tertiary)
-                    if let weather = stop.weatherAtArrival { Label("\(Int(weather.temperature))°", systemImage: weather.iconName).font(.caption).foregroundStyle(.tertiary) }
+                    if let weather = stop.weatherAtArrival { Label(WizPathKitL10n.formatted("wizpath_temperature_format", Int(weather.temperature)), systemImage: weather.iconName).font(.caption).foregroundStyle(.tertiary) }
                 }
             }
             Spacer()

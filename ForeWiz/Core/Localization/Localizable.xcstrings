@@ -1144,7 +1144,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mümkünse planınızı içeri alın"
+            "value": "Mümkünse planlarını ertelemeyi düşün"
           }
         }
       }
@@ -1229,7 +1229,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şemsiye al ya da planı daha kuru bir saate taşı."
+            "value": "Şemsiye al ya da planı yağmursuz bir saate kaydır"
           }
         }
       }
@@ -2184,7 +2184,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün kapalı alanda kalmak daha iyi olacak. Hava koşulları pek uygun değil."
+            "value": "Açıkçası bugün evde kalmak daha iyi. Hava pek yardımcı olmuyor."
           }
         }
       }
@@ -2303,7 +2303,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Endişelenmenizi gerektirecek bir risk bulunmuyor"
+            "value": "Endişelenecek bir şey yok, hava güzel"
           }
         }
       }
@@ -2514,7 +2514,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kat kat giyin ve gerekmedikçe dışarıda uzun kalma."
+            "value": "Kat kat giyin ve dışarıda fazla oyalanmayın"
           }
         }
       }
@@ -4699,7 +4699,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Evde kalın"
+            "value": "Evde kal"
           }
         }
       }
@@ -4750,7 +4750,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün dışarı planları için uygun değil."
+            "value": "Bugün dışarı planları pek uygun değil, kısa tutun."
           }
         }
       }
@@ -4767,7 +4767,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "En rahat zaman %1$@ civarı."
+            "value": "Gün dışarı için oldukça uygun. %1$@ civarı harika bir zaman."
           }
         }
       }
@@ -4801,7 +4801,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "En uygun aralık %1$@."
+            "value": "Çıkılabilir, en iyi zaman %1$@ civarı."
           }
         }
       }
@@ -4852,7 +4852,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dikkatli olmakta fayda var. En uygun zaman %1$@."
+            "value": "Hava dikkat istiyor. Çıkman gerekiyorsa %1$@ en güvenli aralık."
           }
         }
       }
@@ -4869,7 +4869,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Planını dikkatli yap, hava koşulları değişken."
+            "value": "Hava değişken, kısa plan yapıp dikkatli olmakta fayda var."
           }
         }
       }
@@ -5859,7 +5859,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarıda kısa süre kalmanızı öneririm."
+            "value": "Dışarıda kısa kalın, daha güvenli"
           }
         }
       }
@@ -7850,7 +7850,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın. Bugün kapalı alanda kalmak daha iyi, hava pek yardımsever değil."
+            "value": "Günaydın. Bugün evde kalmak daha iyi, hava pek iyi değil."
           }
         }
       }
@@ -7884,7 +7884,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın. Bugün hava idare eder, dışarı çıkılır ama detaylara göz atın."
+            "value": "Günaydın. Bugün hava ortalama, dışarı çıkılır ama detaylara göz atın."
           }
         }
       }
@@ -8003,7 +8003,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "kalın giyin, katmanlı ol"
+            "value": "kalın giyin, üst üste giyin"
           }
         }
       }
@@ -9265,7 +9265,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dikkatli planla"
+            "value": "Çıkılır ama zamanlamaya dikkat et"
           }
         }
       }
@@ -10462,7 +10462,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Soğuk hissedilecek"
+            "value": "Hava soğuk, üşütebilir"
           }
         }
       }
@@ -10479,7 +10479,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava soğuk olacak. Dışarıda uzun kalacaksan ekstra katman ve kapalı ayakkabı çok fark ettirir."
+            "value": "Hava soğuk. Uzun süre dışarıda kalacaksan kalın giyin ve kapalı ayakkabı tercih edin, çok fark eder."
           }
         }
       }
@@ -10515,7 +10515,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hayati tehlike - içeride kalın, bol su için ve risk altındaki kişileri kontrol edin."
+            "value": "Hayati tehlike - içeride kalın, bol su için ve yaşlıları, hassas kişileri gözetleyin."
           }
         }
       }
@@ -10585,7 +10585,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarısı oldukça sıcak hissedilecek. Dışarıda geçirdiğiniz süreyi kısa tutun, bol su için ve gölgede mola verin."
+            "value": "Dışarısı oldukça sıcak olacak. Dışarıda geçirdiğiniz süreyi kısa tutun, bol su için ve gölgede mola verin."
           }
         }
       }
@@ -10789,7 +10789,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Öğle saatlerinde sıcaklık konforu düşürüyor. Efor gerektiren işleri sabah veya akşama almak daha iyi."
+            "value": "Öğlen sıcak, zorlayıcı işleri sabah ya da akşama bırakın."
           }
         }
       }
@@ -11233,7 +11233,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güneş koruması gerekecek"
+            "value": "Güneş kremi şart"
           }
         }
       }
@@ -16351,6 +16351,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Durakları atla, doğrudan yol tarifi al"
+          }
+        }
+      }
+    },
+    "unit_m": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "m"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "m"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No waypoints available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durak bulunamadı"
           }
         }
       }

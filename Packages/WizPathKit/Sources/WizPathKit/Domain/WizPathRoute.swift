@@ -263,6 +263,23 @@ public enum SegmentWeatherCondition: String, Sendable, CaseIterable {
         }
     }
 
+    /// Human-readable localized display title for this weather condition.
+    public var localizedTitle: String {
+        switch self {
+        case .clear: return WizPathKitL10n.text("wizpath_condition_clear")
+        case .partlyCloudy: return WizPathKitL10n.text("wizpath_condition_partly_cloudy")
+        case .cloudy: return WizPathKitL10n.text("wizpath_condition_cloudy")
+        case .rain: return WizPathKitL10n.text("wizpath_condition_rain")
+        case .heavyRain: return WizPathKitL10n.text("wizpath_condition_heavy_rain")
+        case .snow: return WizPathKitL10n.text("wizpath_condition_snow")
+        case .sleet: return WizPathKitL10n.text("wizpath_condition_sleet")
+        case .thunderstorm: return WizPathKitL10n.text("wizpath_condition_thunderstorm")
+        case .fog: return WizPathKitL10n.text("wizpath_condition_fog")
+        case .windy: return WizPathKitL10n.text("wizpath_condition_windy")
+        case .unknown: return WizPathKitL10n.text("wizpath_condition_unknown")
+        }
+    }
+
     /// Marker accent color on the map
     public var mapMarkerColor: String {
         switch self {
@@ -392,7 +409,11 @@ public struct ScoredRouteCandidate: Identifiable, Sendable {
 
     public var formattedDistance: String {
         let km = route.totalDistance / 1000
-        return km >= 10 ? "\(Int(km)) km" : String(format: "%.1f km", km)
+        let unit = WizPathKitL10n.text("unit_km")
+        if km >= 10 {
+            return "\(Int(km)) \(unit)"
+        }
+        return String(format: "%.1f %@", locale: Locale.current, km as CVarArg, unit)
     }
 }
 

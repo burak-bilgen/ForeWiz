@@ -550,21 +550,22 @@ public final class WizPathViewModel {
                   
             var enrichedStops: [SmartStop] = []
             for stop in foundStops {
-                let weatherAtArrival = self.findArrivalWeather(for: stop.coordinate, in: route)
+                let arrivalSegment = self.closestSegment(for: stop.coordinate, in: route)
+                let weatherAtArrival = arrivalSegment?.weather
                 let safetyStatus = self.computeStopSafetyStatus(weather: weatherAtArrival)
                 let recommendation = self.generateWeatherRecommendation(
                     category: stop.category,
                     weather: weatherAtArrival,
                     mode: self.travelMode
                 )
-                
+
                 let enriched = SmartStop(
                     id: stop.id,
                     mapItem: stop.mapItem,
                     coordinate: stop.coordinate,
                     name: stop.name,
                     category: stop.category,
-                    etaArrival: stop.etaArrival,
+                    etaArrival: arrivalSegment?.estimatedArrival ?? stop.etaArrival,
                     weatherAtArrival: weatherAtArrival,
                     safetyStatus: safetyStatus,
                     distanceFromRoute: stop.distanceFromRoute,
@@ -580,14 +581,14 @@ public final class WizPathViewModel {
 
     // MARK: - Smart Stop Helpers
 
-    private func findArrivalWeather(for coordinate: CLLocationCoordinate2D, in route: WizPathRoute) -> SegmentWeather? {
+    /// Finds the route segment closest to a given coordinate.
+    private func closestSegment(for coordinate: CLLocationCoordinate2D, in route: WizPathRoute) -> WizPathSegment? {
         let stopLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        let closestSegment = route.segments.min(by: {
+        return route.segments.min(by: {
             let locA = CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
             let locB = CLLocation(latitude: $1.coordinate.latitude, longitude: $1.coordinate.longitude)
             return stopLocation.distance(from: locA) < stopLocation.distance(from: locB)
         })
-        return closestSegment?.weather
     }
 
     private func computeStopSafetyStatus(weather: SegmentWeather?) -> POISafetyStatus {

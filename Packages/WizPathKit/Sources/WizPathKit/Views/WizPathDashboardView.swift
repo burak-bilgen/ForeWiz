@@ -483,10 +483,6 @@ public struct WizPathDashboardView: View {
             NavigationStack {
                 WizPathWaypointPickerSheet(
                     waypoints: viewModel.mapsWaypoints,
-                    selectedIds: viewModel.selectedWaypointIds ?? Set(viewModel.mapsWaypoints.map(\.id)),
-                    onSelectionChanged: { ids in
-                        viewModel.selectedWaypointIds = ids
-                    },
                     onNavigate: { ids in
                         viewModel.selectedWaypointIds = ids
                         pendingMapsAction?()

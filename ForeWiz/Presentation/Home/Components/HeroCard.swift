@@ -15,27 +15,29 @@ struct HeroCard: View {
             VStack(alignment: .leading, spacing: 16) {
                 // MARK: Headline + Temperature
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    // Headline
+                    // Headline — line limit + no layout priority so temperature always fits
                     Text(assistant.headline)
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
                         .fixedSize(horizontal: false, vertical: true)
-                        .minimumScaleFactor(0.85)
-                        .layoutPriority(1)
 
                     Spacer(minLength: 4)
 
-                    // Temperature + condition
+                    // Temperature + condition — pinned right, always visible
                     VStack(alignment: .trailing, spacing: 0) {
                         Text(weather.temperatureText)
                             .font(.system(size: 28, weight: .semibold, design: .rounded))
                             .foregroundStyle(.white)
                             .lineLimit(1)
+                            .layoutPriority(1)
                         Text(weather.conditionText)
                             .font(.system(size: 12, weight: .medium, design: .rounded))
                             .foregroundStyle(.white.opacity(0.5))
                             .lineLimit(1)
                     }
+                    .fixedSize()
                 }
 
                 // MARK: Summary

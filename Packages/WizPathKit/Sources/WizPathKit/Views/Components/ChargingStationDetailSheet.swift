@@ -17,7 +17,6 @@ public struct ChargingStationDetailSheet: View {
             ScrollView {
                 VStack(spacing: 20) {
                     // Header Card (Full Width)
-                    // Header Card (Full Width)
                     LiquidGlassCard(accentColor: Color(hex: station.category.color), innerPadding: 24) {
                         VStack(spacing: 16) {
                             ZStack {
@@ -94,7 +93,7 @@ public struct ChargingStationDetailSheet: View {
 
                                     Spacer()
 
-                                    Text(weatherConditionDisplay(weather))
+                                    Text(weather.condition.localizedTitle)
                                         .font(.system(size: 12, weight: .semibold))
                                         .foregroundStyle(.secondary)
                                         .padding(.horizontal, 10)
@@ -160,7 +159,7 @@ public struct ChargingStationDetailSheet: View {
                     let stopDurationDisplay = WizPathKitL10n.formatted("wizpath_duration_minutes_short", stopMins)
                     LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16) {
                         VStack(spacing: 12) {
-                            detailRow(icon: "arrow.triangle.swap", label: WizPathKitL10n.text("wizpath_distance_from_route"), value: formattedDistance(station.distanceFromRoute))
+                            detailRow(icon: "arrow.triangle.swap", label: WizPathKitL10n.text("wizpath_distance_from_route"), value: WizPathKitFormatters.formattedDistance(station.distanceFromRoute))
                             detailRow(icon: "clock.fill", label: WizPathKitL10n.text("wizpath_estimated_arrival_eta"), value: station.etaDisplay)
                             detailRow(icon: "hourglass", label: WizPathKitL10n.text("wizpath_estimated_stop_duration"), value: stopDurationDisplay)
                         }
@@ -260,28 +259,6 @@ public struct ChargingStationDetailSheet: View {
             Text(value)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
-        }
-    }
-
-    private func formattedDistance(_ dist: CLLocationDistance) -> String {
-        let km = dist / 1000
-        let unit = WizPathKitL10n.text("unit_km")
-        return km >= 10 ? "\(Int(km)) \(unit)" : String(format: "%.1f \(unit)", km)
-    }
-
-    private func weatherConditionDisplay(_ weather: SegmentWeather) -> String {
-        switch weather.condition {
-        case .clear: return WizPathKitL10n.text("wizpath_condition_clear")
-        case .partlyCloudy: return WizPathKitL10n.text("wizpath_condition_partly_cloudy")
-        case .cloudy: return WizPathKitL10n.text("wizpath_condition_cloudy")
-        case .rain: return WizPathKitL10n.text("wizpath_condition_rain")
-        case .heavyRain: return WizPathKitL10n.text("wizpath_condition_heavy_rain")
-        case .snow: return WizPathKitL10n.text("wizpath_condition_snow")
-        case .sleet: return WizPathKitL10n.text("wizpath_condition_sleet")
-        case .thunderstorm: return WizPathKitL10n.text("wizpath_condition_thunderstorm")
-        case .fog: return WizPathKitL10n.text("wizpath_condition_fog")
-        case .windy: return WizPathKitL10n.text("wizpath_condition_windy")
-        case .unknown: return WizPathKitL10n.text("wizpath_condition_unknown")
         }
     }
 

@@ -54,7 +54,6 @@ struct HomeView: View {
             ZStack {
                 LiquidOrbBackground(palette: orbPalette)
                     .ignoresSafeArea()
-                    .animation(AppTheme.slowEaseOut, value: currentSymbol)
 
                 // Weather particle background - günün hava durumuna göre animasyon
                 EnhancedWeatherParticles(kind: splashKind, progress: viewModel.particleIntensity)

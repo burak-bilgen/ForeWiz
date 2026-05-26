@@ -7,8 +7,6 @@ public struct WizPathWaypointPickerSheet: View {
     @Environment(\.dismiss) private var dismiss
 
     let waypoints: [SmartStop]
-    let selectedIds: Set<UUID>
-    let onSelectionChanged: (Set<UUID>) -> Void
     let onNavigate: (Set<UUID>) -> Void
     let onNavigateWithoutStops: () -> Void
 
@@ -16,17 +14,13 @@ public struct WizPathWaypointPickerSheet: View {
 
     public init(
         waypoints: [SmartStop],
-        selectedIds: Set<UUID>,
-        onSelectionChanged: @escaping (Set<UUID>) -> Void,
         onNavigate: @escaping (Set<UUID>) -> Void,
         onNavigateWithoutStops: @escaping () -> Void
     ) {
         self.waypoints = waypoints
-        self.selectedIds = selectedIds
-        self.onSelectionChanged = onSelectionChanged
         self.onNavigate = onNavigate
         self.onNavigateWithoutStops = onNavigateWithoutStops
-        self._localSelectedIds = State(initialValue: selectedIds)
+        self._localSelectedIds = State(initialValue: Set(waypoints.map(\.id)))
     }
 
     public var body: some View {
@@ -114,20 +108,35 @@ public struct WizPathWaypointPickerSheet: View {
                     }
                     .padding(.horizontal, 16)
 
-                    // Waypoint List
-                    LazyVStack(spacing: 10) {
-                        ForEach(waypoints) { stop in
-                            waypointRow(stop: stop)
+                    // Waypoint List or Empty State
+                    if waypoints.isEmpty {
+                        VStack(spacing: 12) {
+                            Image(systemName: "mappin.slash")
+                                .font(.system(size: 36))
+                                .foregroundStyle(.secondary.opacity(0.4))
+                            Text(WizPathKitL10n.text("wizpath_waypoint_picker_empty"))
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 40)
+                        .padding(.horizontal, 16)
+                    } else {
+                        LazyVStack(spacing: 10) {
+                            ForEach(waypoints) { stop in
+                                waypointRow(stop: stop)
+                            }
+                        }
+                        .padding(.horizontal, 16)
                     }
-                    .padding(.horizontal, 16)
 
                     // Action Buttons
                     VStack(spacing: 10) {
                         // Primary: Navigate with selected stops
                         LiquidGlassButton(
                             navigateButtonTitle,
-                            icon: localSelectedIds.isEmpty ? "map.fill" : "map.fill",
+                            icon: "map.fill",
                             style: .primary,
                             haptic: .medium,
                             isFullWidth: true
@@ -158,14 +167,12 @@ public struct WizPathWaypointPickerSheet: View {
                 .padding(.vertical, 8)
             }
         }
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { dismiss() } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 22))
+                        .font(.system(size: 20))
                         .foregroundStyle(.secondary)
                         .symbolRenderingMode(.hierarchical)
                 }
@@ -178,6 +185,7 @@ public struct WizPathWaypointPickerSheet: View {
     @ViewBuilder
     private func waypointRow(stop: SmartStop) -> some View {
         let isSelected = localSelectedIds.contains(stop.id)
+        let accentColor = Color(hex: stop.category.color)
 
         Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -193,22 +201,22 @@ public struct WizPathWaypointPickerSheet: View {
                 // Selection Indicator
                 ZStack {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(isSelected ? Color(hex: stop.category.color).opacity(0.2) : .white.opacity(0.04))
+                        .fill(isSelected ? accentColor.opacity(0.2) : .white.opacity(0.04))
                         .frame(width: 44, height: 44)
 
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .font(.system(size: 18))
-                        .foregroundStyle(isSelected ? Color(hex: stop.category.color) : .white.opacity(0.3))
+                        .foregroundStyle(isSelected ? accentColor : .white.opacity(0.3))
                 }
 
                 // Category Icon
                 ZStack {
                     Circle()
-                        .fill(Color(hex: stop.category.color).opacity(0.15))
+                        .fill(accentColor.opacity(0.15))
                         .frame(width: 40, height: 40)
                     Image(systemName: stop.category.iconName)
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(Color(hex: stop.category.color))
+                        .foregroundStyle(accentColor)
                 }
 
                 // Info
@@ -245,7 +253,7 @@ public struct WizPathWaypointPickerSheet: View {
                                 .fill(.white.opacity(0.2))
                                 .frame(width: 3, height: 3)
 
-                            Text(formattedDistance(stop.distanceFromRoute))
+                            Text(WizPathKitFormatters.formattedDistance(stop.distanceFromRoute))
                                 .font(.system(size: 10))
                                 .foregroundStyle(.tertiary)
                         }
@@ -261,39 +269,30 @@ public struct WizPathWaypointPickerSheet: View {
                             .font(.system(size: 12))
                             .foregroundStyle(Color(hex: weather.severity.colorHex))
                             .symbolRenderingMode(.multicolor)
-                        Text("\(Int(weather.temperature))°")
+                        Text(WizPathKitL10n.formatted("wizpath_temperature_format", Int(weather.temperature)))
                             .font(.system(size: 10, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
-                    .frame(width: 32)
+                    .frame(width: 36)
                 }
             }
             .padding(12)
             .background(
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(.ultraThinMaterial)
-                        .environment(\.colorScheme, .dark)
-
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color(hex: stop.category.color).opacity(0.25), lineWidth: 1)
-                    }
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .overlay(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .stroke(
-                        isSelected
-                            ? Color(hex: stop.category.color).opacity(0.25)
-                            : .white.opacity(0.05),
-                        lineWidth: isSelected ? 1 : 0.5
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(
+                                isSelected ? accentColor.opacity(0.3) : .white.opacity(0.06),
+                                lineWidth: isSelected ? 1.5 : 0.5
+                            )
                     )
             )
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .buttonStyle(.plain)
-        .scaleEffect(isSelected ? 1.0 : 0.98)
+        .contentShape(Rectangle())
         .animation(.spring(response: 0.3, dampingFraction: 0.75), value: isSelected)
     }
 
@@ -306,11 +305,6 @@ public struct WizPathWaypointPickerSheet: View {
         return WizPathKitL10n.formatted(formatKey, count)
     }
 
-    private func formattedDistance(_ dist: CLLocationDistance) -> String {
-        let km = dist / 1000
-        let unit = WizPathKitL10n.text("unit_km")
-        return km >= 1 ? String(format: "%.1f \\(unit)", km) : "\\(Int(dist))m"
-    }
 }
 
 
