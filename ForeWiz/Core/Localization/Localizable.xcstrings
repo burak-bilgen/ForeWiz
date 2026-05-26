@@ -16218,6 +16218,142 @@
           }
         }
       }
+    },
+    "wizpath_waypoint_picker_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select Stops to Include"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durakları Seç"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which stops to include in your navigation route"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navigasyon rotana dahil etmek istediğin durakları seç"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_select_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select All"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümünü Seç"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_deselect_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deselect All"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümünü Kaldır"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_navigate_singular": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navigate with %lld Stop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Durakla Yol Tarifi Al"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_navigate_plural": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navigate with %lld Stops"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Durakla Yol Tarifi Al"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_navigate_direct": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navigate Directly"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doğrudan Yol Tarifi Al"
+          }
+        }
+      }
+    },
+    "wizpath_waypoint_picker_navigate_without": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip stops, navigate directly"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durakları atla, doğrudan yol tarifi al"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

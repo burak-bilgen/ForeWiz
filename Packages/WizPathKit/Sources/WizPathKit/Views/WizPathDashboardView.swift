@@ -11,6 +11,8 @@ public struct WizPathDashboardView: View {
     @State private var showDepartureOptimizer = false
     @State private var showWeatherDetail = false
     @State private var showChargingStationDetail = false
+    @State private var showWaypointPicker = false
+    @State private var pendingMapsAction: (() -> Void)?
     @Namespace private var travelModeNamespace
     private let wizPathService: WizPathService
     private let departureOptimizerService: DepartureOptimizerService?
@@ -399,10 +401,30 @@ public struct WizPathDashboardView: View {
                             onReset: { viewModel.reset() },
                             onUpdateDepartureTime: { viewModel.updateDepartureTime($0) },
                             onOpenInAppleMaps: {
-                                onMapsExport { openMapsURL(nativeURL: { viewModel.appleMapsURLString() }, webURL: { viewModel.appleMapsWebURLString() }) }
+                                let waypoints = viewModel.mapsWaypoints
+                                if waypoints.isEmpty {
+                                    onMapsExport { openMapsURL(nativeURL: { viewModel.appleMapsURLString() }, webURL: { viewModel.appleMapsWebURLString() }) }
+                                } else {
+                                    viewModel.selectedWaypointIds = Set(waypoints.map(\.id))
+                                    pendingMapsAction = { [weak viewModel] in
+                                        guard let vm = viewModel else { return }
+                                        onMapsExport { openMapsURL(nativeURL: { vm.appleMapsURLString() }, webURL: { vm.appleMapsWebURLString() }) }
+                                    }
+                                    showWaypointPicker = true
+                                }
                             },
                             onOpenInGoogleMaps: {
-                                onMapsExport { openMapsURL(nativeURL: { viewModel.googleMapsURLString() }, webURL: { viewModel.googleMapsWebURLString() }) }
+                                let waypoints = viewModel.mapsWaypoints
+                                if waypoints.isEmpty {
+                                    onMapsExport { openMapsURL(nativeURL: { viewModel.googleMapsURLString() }, webURL: { viewModel.googleMapsWebURLString() }) }
+                                } else {
+                                    viewModel.selectedWaypointIds = Set(waypoints.map(\.id))
+                                    pendingMapsAction = { [weak viewModel] in
+                                        guard let vm = viewModel else { return }
+                                        onMapsExport { openMapsURL(nativeURL: { vm.googleMapsURLString() }, webURL: { vm.googleMapsWebURLString() }) }
+                                    }
+                                    showWaypointPicker = true
+                                }
                             },
                             trafficCongestion: viewModel.currentTrafficCongestion,
                             hasTollRoads: viewModel.hasTollRoads,
@@ -456,6 +478,28 @@ public struct WizPathDashboardView: View {
             }
             Button(WizPathKitL10n.text("wizpath_cancel")) { viewModel.dismissError() }
         } message: { Text(viewModel.errorMessage ?? "") }
+        // Waypoint Picker
+        .sheet(isPresented: $showWaypointPicker) {
+            NavigationStack {
+                WizPathWaypointPickerSheet(
+                    waypoints: viewModel.mapsWaypoints,
+                    selectedIds: viewModel.selectedWaypointIds ?? Set(viewModel.mapsWaypoints.map(\.id)),
+                    onSelectionChanged: { ids in
+                        viewModel.selectedWaypointIds = ids
+                    },
+                    onNavigate: { ids in
+                        viewModel.selectedWaypointIds = ids
+                        pendingMapsAction?()
+                        pendingMapsAction = nil
+                    },
+                    onNavigateWithoutStops: {
+                        viewModel.selectedWaypointIds = []
+                        pendingMapsAction?()
+                        pendingMapsAction = nil
+                    }
+                )
+            }
+        }
     }
 
     private func tollRoadToggle(viewModel: WizPathViewModel) -> some View {

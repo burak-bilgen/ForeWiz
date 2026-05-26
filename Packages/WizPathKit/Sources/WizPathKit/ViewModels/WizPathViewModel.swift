@@ -112,6 +112,22 @@ public final class WizPathViewModel {
     /// Whether traffic overlay is shown on the map
     public var showTrafficOnMap = false
 
+    // MARK: - Waypoint Selection
+    /// IDs of waypoints the user wants to include when navigating to Maps.
+    /// - `nil`: include all available waypoints (default for backward compat)
+    /// - `[]` (empty): include no waypoints (navigate directly)
+    /// - Non-empty: include only the specified waypoints
+    public var selectedWaypointIds: Set<UUID>? = nil
+
+    /// Waypoints filtered by user selection.
+    /// Returns all available waypoints when selectedWaypointIds is nil (= all selected).
+    /// Returns empty when selectedWaypointIds is empty (navigate directly).
+    public var selectedMapsWaypoints: [SmartStop] {
+        let all = mapsWaypoints
+        guard let ids = selectedWaypointIds else { return all }
+        return all.filter { ids.contains($0.id) }
+    }
+
     // MARK: - Internal State
     private var lastCalculatedRoute: WizPathRoute?
     /// Timestamp when lastCalculatedRoute was saved, used for cache expiration.
@@ -461,6 +477,7 @@ public final class WizPathViewModel {
         placeNameTask = nil
         lastCalculatedRoute = nil
         lastCalculatedRouteTimestamp = nil
+        selectedWaypointIds = nil
         state = .idle
         destinationCoordinate = nil
         destinationName = ""
@@ -633,7 +650,7 @@ public final class WizPathViewModel {
               let destination = destinationCoordinate else { return nil }
 
         var urlString = "maps://?saddr=\(origin.latitude),\(origin.longitude)"
-        for stop in mapsWaypoints {
+        for stop in selectedMapsWaypoints {
             urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
         }
         urlString += "&daddr=\(destination.latitude),\(destination.longitude)"
@@ -646,7 +663,7 @@ public final class WizPathViewModel {
               let origin = originCoordinate,
               let destination = destinationCoordinate else { return nil }
         var webString = "https://maps.apple.com/?saddr=\(origin.latitude),\(origin.longitude)"
-        for stop in mapsWaypoints {
+        for stop in selectedMapsWaypoints {
             webString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
         }
         webString += "&daddr=\(destination.latitude),\(destination.longitude)"
@@ -662,7 +679,7 @@ public final class WizPathViewModel {
               let destination = destinationCoordinate else { return nil }
 
         var urlString = "comgooglemaps://?saddr=\(origin.latitude),\(origin.longitude)"
-        for stop in mapsWaypoints {
+        for stop in selectedMapsWaypoints {
             urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
         }
         urlString += "&daddr=\(destination.latitude),\(destination.longitude)&directionsmode=driving"
@@ -677,8 +694,8 @@ public final class WizPathViewModel {
               let origin = originCoordinate,
               let destination = destinationCoordinate else { return nil }
         var webString = "https://www.google.com/maps/dir/?api=1&origin=\(origin.latitude),\(origin.longitude)"
-        if !mapsWaypoints.isEmpty {
-            let waypointsStr = mapsWaypoints.map { "\($0.coordinate.latitude),\($0.coordinate.longitude)" }.joined(separator: "%7C")
+        if !selectedMapsWaypoints.isEmpty {
+            let waypointsStr = selectedMapsWaypoints.map { "\($0.coordinate.latitude),\($0.coordinate.longitude)" }.joined(separator: "%7C")
             webString += "&waypoints=\(waypointsStr)"
         }
         webString += "&destination=\(destination.latitude),\(destination.longitude)&travelmode=driving"
