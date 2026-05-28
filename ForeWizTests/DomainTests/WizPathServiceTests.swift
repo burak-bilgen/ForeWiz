@@ -104,9 +104,7 @@ struct WizPathServiceTests {
     
     @Test("WizPathCache stores and retrieves routes")
     func wizPathCacheStoresAndRetrievesRoutes() async throws {
-        let cache = WizPathCache.shared
-        
-        cache.clear()
+        let cache = WizPathCache()
         
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
@@ -123,31 +121,30 @@ struct WizPathServiceTests {
             polyline: nil
         )
         
-        cache.store(route: testRoute)
+        await cache.store(route: testRoute)
         
-        let retrieved = cache.route(origin: origin, destination: destination, mode: .car)
+        let retrieved = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(retrieved != nil)
         #expect(retrieved?.totalDuration == 1800)
     }
     
     @Test("WizPathCache returns nil for missing routes")
     func wizPathCacheReturnsNilForMissingRoutes() async throws {
-        let cache = WizPathCache.shared
-        cache.clear()
+        let cache = WizPathCache()
         
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 50.0, longitude: 40.0)
         
-        let retrieved = cache.route(origin: origin, destination: destination, mode: .car)
+        let retrieved = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(retrieved == nil)
     }
     
     @Test("WizPathCache clear removes all routes")
     func wizPathCacheClearRemovesAllRoutes() async throws {
-        let cache = WizPathCache.shared
+        let cache = WizPathCache()
         
-        let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
-        let destination = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
+        let origin = CLLocationCoordinate2D(latitude: 55.123, longitude: 37.456)
+        let destination = CLLocationCoordinate2D(latitude: 56.789, longitude: 38.012)
         
         let testRoute = WizPathRoute(
             id: UUID(),
@@ -161,10 +158,15 @@ struct WizPathServiceTests {
             polyline: nil
         )
         
-        cache.store(route: testRoute)
-        cache.clear()
+        await cache.store(route: testRoute)
         
-        let retrieved = cache.route(origin: origin, destination: destination, mode: .car)
+        // Verify it was stored
+        let storedRoute = await cache.route(origin: origin, destination: destination, mode: .car)
+        #expect(storedRoute != nil)
+        
+        await cache.clear()
+        
+        let retrieved = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(retrieved == nil)
     }
     

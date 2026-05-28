@@ -8,6 +8,11 @@ import MapKit
 // MARK: - Test Helpers
 
 @MainActor
+private func makeMapItem() -> MKMapItem {
+    MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)))
+}
+
+@MainActor
 private func makeViewModel() -> WizPathViewModel {
     let mockWeather = MockWizPathWeatherSource()
     let mockLocation = MockWizPathLocationSource()
@@ -528,7 +533,7 @@ struct WizPathViewModelTests {
         let now = Date()
         let later = now.addingTimeInterval(3600)
         let muchLater = now.addingTimeInterval(7200)
-        let dummyMapItem = MKMapItem()
+        let dummyMapItem = makeMapItem()
 
         let stop1 = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Gas 1", category: .gasStation, etaArrival: muchLater, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
         let stop2 = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Rest 1", category: .restStop, etaArrival: later, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 200, estimatedStopDuration: 600, weatherRecommendation: nil)
@@ -548,7 +553,7 @@ struct WizPathViewModelTests {
         vm.state = .routeReady(route)
 
         let now = Date()
-        let dummyMapItem = MKMapItem()
+        let dummyMapItem = makeMapItem()
         let safe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Safe Stop", category: .restStop, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
         let unsafe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Unsafe Stop", category: .evCharger, etaArrival: now, weatherAtArrival: nil, safetyStatus: .unsafe, distanceFromRoute: 200, estimatedStopDuration: 300, weatherRecommendation: nil)
         let caution = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.3, longitude: 29.3), name: "Caution Stop", category: .gasStation, etaArrival: now, weatherAtArrival: nil, safetyStatus: .caution, distanceFromRoute: 150, estimatedStopDuration: 300, weatherRecommendation: nil)
@@ -572,7 +577,7 @@ struct WizPathViewModelTests {
     func mapsWaypointsPreservedWhenOffline() async throws {
         let vm = makeViewModel()
         let route = WizPathRoute.testRoute()
-        let dummyMapItem = MKMapItem()
+        let dummyMapItem = makeMapItem()
         let now = Date()
         let stop = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "EV Charger", category: .evCharger, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
 

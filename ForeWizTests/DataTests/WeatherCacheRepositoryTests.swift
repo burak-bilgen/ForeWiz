@@ -3,6 +3,7 @@ import Foundation
 import SwiftData
 @testable import ForeWiz
 
+@MainActor
 @Suite("Weather Cache Repository Tests")
 struct WeatherCacheRepositoryTests {
 
@@ -192,6 +193,7 @@ struct WeatherCachePolicyTests {
     }
 }
 
+@MainActor
 @Suite("Preferences Repository Tests")
 struct PreferencesRepositoryTests {
 

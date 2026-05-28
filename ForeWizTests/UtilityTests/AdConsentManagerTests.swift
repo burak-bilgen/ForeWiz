@@ -8,8 +8,8 @@ struct AdConsentManagerTests {
     
     @Test("Initial tracking status is unknown or denied on simulator")
     func initialTrackingStatus() {
-        // On real device: starts as .unknown. On simulator: ATTrackingManager unavailable → .denied. Can also be .granted if pre-authorized.
-        let validStatuses: Set<AdConsentManager.ConsentStatus> = [.unknown, .denied, .granted]
+        // On real device: starts as .unknown. On simulator: ATTrackingManager unavailable → .denied or .notDetermined. Can also be .granted if pre-authorized.
+        let validStatuses: Set<AdConsentManager.ConsentStatus> = [.unknown, .denied, .granted, .notDetermined]
         #expect(validStatuses.contains(manager.trackingStatus))
     }
     

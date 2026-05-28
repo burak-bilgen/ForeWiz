@@ -71,9 +71,13 @@ struct WizPathPOITests {
 
     // MARK: - SmartStop Tests
 
+    private func makeMapItem() -> MKMapItem {
+        MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)))
+    }
+
     @Test("SmartStop displayTitle uses name when available")
     func smartStopDisplayTitleUsesName() async throws {
-        let mapItem = MKMapItem()
+        let mapItem = makeMapItem()
         let stop = SmartStop(
             id: UUID(),
             mapItem: mapItem,
@@ -91,7 +95,7 @@ struct WizPathPOITests {
 
     @Test("SmartStop displayTitle falls back to category default")
     func smartStopDisplayTitleFallsBackToCategoryDefault() async throws {
-        let mapItem = MKMapItem()
+        let mapItem = makeMapItem()
         let stop = SmartStop(
             id: UUID(),
             mapItem: mapItem,
@@ -109,7 +113,7 @@ struct WizPathPOITests {
 
     @Test("SmartStop isRecommended for safe/caution")
     func smartStopIsRecommended() async throws {
-        let mapItem = MKMapItem()
+        let mapItem = makeMapItem()
         let safe = SmartStop(id: UUID(), mapItem: mapItem, coordinate: .init(latitude: 41, longitude: 29), name: "Safe", category: .restStop, etaArrival: Date(), weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 0, estimatedStopDuration: 1800)
         let unsafe = SmartStop(id: UUID(), mapItem: mapItem, coordinate: .init(latitude: 41, longitude: 29), name: "Unsafe", category: .restStop, etaArrival: Date(), weatherAtArrival: nil, safetyStatus: .unsafe, distanceFromRoute: 0, estimatedStopDuration: 1800)
         #expect(safe.isRecommended == true)
@@ -118,7 +122,7 @@ struct WizPathPOITests {
 
     @Test("SmartStop etaDisplay format")
     func smartStopEtaDisplay() async throws {
-        let mapItem = MKMapItem()
+        let mapItem = makeMapItem()
         let stop = SmartStop(id: UUID(), mapItem: mapItem, coordinate: .init(latitude: 41, longitude: 29), name: "Test", category: .restaurant, etaArrival: Date(), weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 0, estimatedStopDuration: 1800)
         #expect(!stop.etaDisplay.isEmpty)
     }

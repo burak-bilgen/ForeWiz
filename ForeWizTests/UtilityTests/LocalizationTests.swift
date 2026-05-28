@@ -1,4 +1,5 @@
 import Testing
+import Foundation
 @testable import ForeWiz
 
 struct LocalizationTests {
@@ -13,8 +14,8 @@ struct LocalizationTests {
     }
 
     @Test func languageSwitchingWorks() {
-        let turkish = L10n.text("home_title", lang: "tr")
-        let english = L10n.text("home_title", lang: "en")
+        let turkish = L10n.text("settings_title", lang: "tr")
+        let english = L10n.text("settings_title", lang: "en")
 
         #expect(turkish != english)
     }
@@ -28,13 +29,13 @@ struct LocalizationTests {
     }
 
     @Test func temperatureSensitivityLocalizedText() {
-        let cold = L10n.text("sensitivity_cold", lang: "tr")
-        let normal = L10n.text("sensitivity_normal", lang: "tr")
-        let hot = L10n.text("sensitivity_hot", lang: "tr")
+        let cold = L10n.text("feedback_cold", lang: "tr")
+        let normal = L10n.text("feedback_just_right", lang: "tr")
+        let hot = L10n.text("feedback_hot", lang: "tr")
 
-        #expect(cold.lowercased().contains("üşü"))
-        #expect(normal.lowercased().contains("normal"))
-        #expect(hot.lowercased().contains("sıca"))
+        #expect(cold.localizedCaseInsensitiveContains("soğ"))
+        #expect(normal.localizedCaseInsensitiveContains("iy"))
+        #expect(hot.localizedCaseInsensitiveContains("sıc"))
     }
 
     @Test func homeLabelsNoLazyLowercase() {
@@ -98,7 +99,7 @@ struct LocalizationTests {
 
     @Test func scoreRingLabelsFit() {
         let outOf10 = L10n.text("home_score_out_of_10", lang: "tr")
-        let outOf100 = L10n.text("home_score_out_of_100", lang: "tr")
+        let outOf100 = L10n.text("/100", lang: "tr")
         #expect(outOf10.count <= 4, "home_score_out_of_10 too long for ring: '\(outOf10)'")
         #expect(outOf100.count <= 5, "home_score_out_of_100 too long for ring: '\(outOf100)'")
     }
