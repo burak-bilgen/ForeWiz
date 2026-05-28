@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 final class SwiftDataWeatherCacheRepository: WeatherCacheRepository {
     private let modelContext: ModelContext
     private let cachePolicy: WeatherCachePolicy

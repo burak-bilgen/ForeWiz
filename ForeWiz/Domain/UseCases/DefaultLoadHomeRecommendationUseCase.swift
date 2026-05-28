@@ -126,8 +126,15 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             } catch {
                 lastError = error
                 guard attempt < liveFetchAttempts else { break }
-                let delay = UInt64(attempt) * 650_000_000
-                try? await Task.sleep(nanoseconds: delay)
+                
+                // Exponential backoff with randomized jitter
+                // attempt 1: base = 600ms, jitter = 0-150ms -> 600-750ms
+                // attempt 2: base = 1200ms, jitter = 0-150ms -> 1200-1350ms
+                let baseDelayMs = Double(1 << attempt) * 300.0
+                let jitterMs = Double.random(in: 0...150.0)
+                let delayNanoseconds = UInt64((baseDelayMs + jitterMs) * 1_000_000.0)
+                
+                try? await Task.sleep(nanoseconds: delayNanoseconds)
             }
         }
 

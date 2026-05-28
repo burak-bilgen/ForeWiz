@@ -7,18 +7,27 @@ struct CompactFooter: View {
     let lastUpdatedText: String
 
     var body: some View {
-        VStack(spacing: 6) {
-            // Attribution / Legal text
-            Group {
-                if let legal = attribution.legalAttributionText, !legal.isEmpty {
-                    Text(legal)
-                } else {
-                    Text(L10n.formatted("home_attribution_powered", attribution.serviceName))
+        VStack(spacing: 8) {
+            // Apple Weather Attribution Link
+            Link(destination: URL(string: attribution.legalPageURLString ?? "https://weatherkit.apple.com/legal-attribution.html")!) {
+                HStack(spacing: 4) {
+                    Text(L10n.text("apple_weather_trademark"))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
                 }
+                .foregroundStyle(.white.opacity(0.40))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(Color.white.opacity(0.04), in: Capsule())
+                .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 0.5))
             }
-            .font(.system(size: 10, weight: .medium, design: .rounded))
-            .foregroundStyle(.white.opacity(0.25))
-            .multilineTextAlignment(.center)
+
+            // Legal text if present
+            if let legal = attribution.legalAttributionText, !legal.isEmpty {
+                Text(legal)
+                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.20))
+                    .multilineTextAlignment(.center)
+            }
 
             if !lastUpdatedText.isEmpty {
                 HStack(spacing: 4) {

@@ -51,6 +51,25 @@ struct OnboardingView: View {
                 viewModel.addManualLocation(location)
             }
         }
+        .onChange(of: viewModel.locationStatus) { old, new in
+            if new == .authorized {
+                HapticEngine.shared.success()
+            } else if new == .denied || new == .restricted {
+                HapticEngine.shared.warning()
+            }
+        }
+        .onChange(of: viewModel.notificationStatus) { old, new in
+            if new == .authorized || new == .provisional {
+                HapticEngine.shared.success()
+            }
+        }
+        .onChange(of: viewModel.trackingStatus) { old, new in
+            if new == .granted {
+                HapticEngine.shared.success()
+            } else if new == .denied {
+                HapticEngine.shared.warning()
+            }
+        }
     }
 
     private func animatePage() {
@@ -180,6 +199,31 @@ struct OnboardingView: View {
                 ) {
                     viewModel.requestTrackingPermission()
                 }
+
+                // Premium Tooltip Tracking Explanation
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.purple.opacity(0.8))
+                        .padding(.top, 1)
+                    
+                    Text(L10n.text("permission_tracking_tooltip"))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.4))
+                        .lineSpacing(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color.purple.opacity(0.04))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Color.purple.opacity(0.12), lineWidth: 0.5)
+                )
+                .padding(.top, 4)
             }
         }
         .staggerEntrance(index: 4, appeared: pageAppeared)
@@ -221,7 +265,7 @@ struct OnboardingView: View {
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
                             if !firstCity.address.isEmpty {
-                                Text("(\(firstCity.address))")
+                                Text(verbatim: "(\(firstCity.address))")
                                     .font(.system(size: 12))
                                     .foregroundStyle(.white.opacity(0.4))
                                     .lineLimit(1)
@@ -313,13 +357,26 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .environment(\.colorScheme, .dark)
+                Group {
+                    if viewModel.canContinue {
+                        AnyView(
+                            LinearGradient(
+                                colors: [AppTheme.liquidAccent, Color(hex: "#00D9FF")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                    } else {
+                        AnyView(
+                            Color.white.opacity(0.04)
+                        )
+                    }
+                }
             )
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(viewModel.canContinue ? AppTheme.liquidAccent.opacity(0.35) : Color.white.opacity(0.08), lineWidth: 1)
+                    .stroke(viewModel.canContinue ? Color.white.opacity(0.25) : Color.white.opacity(0.08), lineWidth: 1)
             )
             .pulseGlow(color: viewModel.canContinue ? AppTheme.liquidAccent : Color.clear, radius: 14)
         }
@@ -414,7 +471,7 @@ private struct PermissionRow: View {
                     .background(AppTheme.ember.opacity(0.1), in: Capsule())
                     .overlay(Capsule().stroke(AppTheme.ember.opacity(0.25), lineWidth: 1))
                 } else {
-                    Text(L10n.text("allow"))
+                    Text(L10n.text("onboarding_permission_btn"))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(color)
                         .padding(.horizontal, 10)

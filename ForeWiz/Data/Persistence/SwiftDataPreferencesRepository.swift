@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 final class SwiftDataPreferencesRepository: PreferencesRepository {
     private let modelContext: ModelContext
 
