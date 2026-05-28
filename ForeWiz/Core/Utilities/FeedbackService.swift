@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import UIKit
 
 // MARK: - Feedback Service
 /// Sends user feedback to a Formspree endpoint.
@@ -75,16 +76,17 @@ enum FeedbackService {
 
         // Validate and compress screenshot
         var screenshotBase64: String? = nil
-        if let data = screenshotData {
-            let imageData: Data
-            if data.count > maxScreenshotSize {
-                // Image too large — skip sending
-                AppLogger.app.warning("[Feedback] Screenshot too large (\(data.count) bytes), skipping attachment")
-                imageData = data
-            } else {
-                imageData = data
+        if var data = screenshotData {
+            if data.count > maxScreenshotSize,
+               let compressed = UIImage(data: data)?.jpegData(compressionQuality: 0.6) {
+                AppLogger.app.warning("[Feedback] Screenshot compressed from \(data.count) to \(compressed.count) bytes")
+                data = compressed
             }
-            screenshotBase64 = imageData.base64EncodedString()
+            if data.count > maxScreenshotSize {
+                AppLogger.app.warning("[Feedback] Screenshot still too large (\(data.count) bytes) after compression, skipping")
+            } else {
+                screenshotBase64 = data.base64EncodedString()
+            }
         }
 
         let payload = FeedbackPayload(

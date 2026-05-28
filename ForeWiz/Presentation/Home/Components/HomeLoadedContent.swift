@@ -8,10 +8,12 @@ struct HomeLoadedContent: View {
     let contentReady: Bool
     let refresh: () async -> Void
     let onWizPathTap: () -> Void
+    let onWeatherFeedback: ((UserWeatherFeedback) async -> Void)?
     
     @State private var showNativeAd = false
     @State private var showBannerAd = false
     @State private var insertionPoints: [AdPlacementStrategy.InsertionPoint] = []
+    @State private var showWeatherFeedback = true
 
     var body: some View {
         ScrollView(showsIndicators: false) {
@@ -48,16 +50,31 @@ struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
-                // 4. Key events - today's weather highlights
+                // 4. Weather feedback card
+                if showWeatherFeedback, let onWeatherFeedback {
+                    WeatherFeedbackCard(
+                        onFeedback: { feedback in
+                            await onWeatherFeedback(feedback)
+                        },
+                        onDismiss: {
+                            withAnimation(AppTheme.pressSpring) {
+                                showWeatherFeedback = false
+                            }
+                        }
+                    )
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.20)
+                }
+
+                // 5. Key events - today's weather highlights
                 DayKeyEventsView(events: state.keyEvents)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.24)
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.28)
                 
                 // Ad insertion point: after key events
                 if let idx = insertionPoints.firstIndex(of: .afterKeyEvents) {
                     adSection(at: idx, baseDelay: 0.32)
                 }
 
-                // 5. Hourly forecast - time-sensitive
+                // 6. Hourly forecast - time-sensitive
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.32)
                 
@@ -66,7 +83,7 @@ struct HomeLoadedContent: View {
                     adSection(at: idx, baseDelay: 0.40)
                 }
 
-                // 6. Weekly forecast - planning reference
+                // 7. Weekly forecast - planning reference
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
                 

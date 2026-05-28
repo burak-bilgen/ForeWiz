@@ -21,7 +21,17 @@ struct FeedbackSheetView: View {
 
     private var isFormValid: Bool {
         !title.trimmingCharacters(in: .whitespaces).isEmpty &&
-        !message.trimmingCharacters(in: .whitespaces).isEmpty
+        !message.trimmingCharacters(in: .whitespaces).isEmpty &&
+        (email.isEmpty || isValidEmail(email))
+    }
+
+    private var isEmailInvalid: Bool {
+        !email.isEmpty && !isValidEmail(email)
+    }
+
+    private func isValidEmail(_ email: String) -> Bool {
+        let pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
+        return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: email)
     }
 
     var body: some View {
@@ -147,10 +157,17 @@ struct FeedbackSheetView: View {
                                     .stroke(.white.opacity(0.08), lineWidth: 0.5)
                             )
 
-                        Text(L10n.text("feedback_email_hint"))
-                            .font(.system(size: 11))
-                            .foregroundStyle(.white.opacity(0.35))
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if isEmailInvalid {
+                            Text(L10n.text("feedback_email_invalid"))
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color(hex: "#FF453A"))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        } else {
+                            Text(L10n.text("feedback_email_hint"))
+                                .font(.system(size: 11))
+                                .foregroundStyle(.white.opacity(0.35))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
 
                     // Screenshot Attachment
@@ -339,12 +356,6 @@ struct FeedbackSheetView: View {
                         success: true
                     )
                 }
-                
-                // Auto-dismiss after showing success overlay
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
-                await MainActor.run {
-                    dismiss()
-                }
             } catch {
                 await MainActor.run {
                     isSubmitting = false
@@ -402,6 +413,17 @@ struct FeedbackSheetView: View {
                 )
             }
             .padding(.top, 4)
+
+            Button {
+                HapticEngine.shared.light()
+                dismiss()
+            } label: {
+                Text(L10n.text("feedback_dismiss"))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .underline()
+            }
+            .padding(.top, 2)
         }
         .padding(.vertical, 60)
         .padding(.horizontal, 20)

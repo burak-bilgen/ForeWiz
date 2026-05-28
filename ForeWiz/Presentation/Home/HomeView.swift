@@ -21,6 +21,8 @@ struct HomeView: View {
     @State private var toolbarAppeared = false
     @State private var showWizPathSheet = false
     @State private var showFeedbackSheet = false
+    @State private var showFeedbackDashboard = false
+    @State private var feedbackStore = FeedbackDashboardStore.shared
     @State private var showMapsExportSheet = false
     @State private var mapsExportStatus: MapsExportStatus = .idle
     @State private var mapsExportProceed: (() -> Void)?
@@ -101,6 +103,9 @@ struct HomeView: View {
             .sheet(isPresented: $showFeedbackSheet) {
                 FeedbackSheetView()
             }
+            .sheet(isPresented: $showFeedbackDashboard) {
+                FeedbackDashboardView()
+            }
             .fullScreenCover(isPresented: $showWizPathSheet) {
                 ZStack {
                     if let wizService = wizPathService {
@@ -146,16 +151,39 @@ struct HomeView: View {
 
         ToolbarItem(placement: .topBarTrailing) {
             HStack(spacing: 2) {
-                Button {
-                    HapticEngine.shared.light()
-                    showFeedbackSheet = true
+                Menu {
+                    Button {
+                        HapticEngine.shared.light()
+                        showFeedbackSheet = true
+                    } label: {
+                        Label(L10n.text("feedback_sheet_title"), systemImage: "paperplane.fill")
+                    }
+
+                    Button {
+                        HapticEngine.shared.light()
+                        showFeedbackDashboard = true
+                    } label: {
+                        Label(L10n.text("feedback_dashboard_title"), systemImage: "list.bullet.rectangle")
+                    }
                 } label: {
-                    Image(systemName: "bubble.left.and.bubble.right")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.5))
+                    HStack(spacing: 4) {
+                        Image(systemName: "bubble.left.and.bubble.right")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.5))
+                        
+                        if feedbackStore.unreadCount > 0 {
+                            Text("\(feedbackStore.unreadCount)")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(.black)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(Color(hex: "#FFD60A"))
+                                .clipShape(Capsule())
+                        }
+                    }
                 }
                 .accessibilityLabel(L10n.text("feedback_sheet_title"))
-                
+
                 ToolbarLanguageButton()
             }
             .opacity(toolbarAppeared ? 1 : 0)
@@ -186,7 +214,8 @@ struct HomeView: View {
                 state: state,
                 contentReady: contentReady,
                 refresh: { await viewModel.refresh() },
-                onWizPathTap: { showWizPathSheet = true }
+                onWizPathTap: { showWizPathSheet = true },
+                onWeatherFeedback: { await viewModel.recordFeedback($0) }
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)),

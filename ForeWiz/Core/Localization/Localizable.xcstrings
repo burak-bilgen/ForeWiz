@@ -3098,6 +3098,24 @@
         }
       }
     },
+    "feedback_email_invalid" : {
+      "comment" : "Invalid email error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a valid email address"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lütfen geçerli bir e-posta adresi girin"
+          }
+        }
+      }
+    },
     "feedback_email_label" : {
       "comment" : "Email field label",
       "extractionState" : "manual",
@@ -3418,6 +3436,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Görüşünüz gönderildi. Her gönderiyi okuyoruz!"
+          }
+        }
+      }
+    },
+    "feedback_dismiss" : {
+      "comment" : "Dismiss button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kapat"
           }
         }
       }
