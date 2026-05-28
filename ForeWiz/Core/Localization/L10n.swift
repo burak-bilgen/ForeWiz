@@ -31,7 +31,70 @@ enum L10n {
     }
 
     static func formatted(_ key: String, _ arguments: CVarArg...) -> String {
-        String(format: text(key), locale: locale, arguments: arguments)
+        let format = text(key)
+        let safeFormat = Self.sanitizedFormat(format)
+        return String(format: safeFormat, locale: locale, arguments: arguments)
+    }
+
+    /// Escapes bare `%` in the format string that aren't part of valid
+    /// format specifiers (`%@`, `%lld`, `%d`, `%f`, etc.), preventing
+    /// `String(format:)` from crashing with EXC_BAD_ACCESS.
+    ///
+    /// For example, `"0%"` becomes `"0%%"` so the `%` renders as literal.
+    /// `"%lld daha"` is left untouched since `%lld` is valid.
+    /// `"%"` becomes `"%%"`.
+    static func sanitizedFormat(_ format: String) -> String {
+        let chars = Array(format)
+        var result = ""
+        var i = 0
+        while i < chars.count {
+            if chars[i] == "%" {
+                if i + 1 < chars.count, chars[i + 1] == "%" {
+                    result += "%%"
+                    i += 2
+                    continue
+                }
+                if i + 1 < chars.count, isValidFormatStart(chars[i + 1]) {
+                    var j = i + 1
+                    while j < chars.count {
+                        let c = chars[j]
+                        if c.isNumber || "-+#0.$ hlLzqtj'*".contains(c) {
+                            j += 1
+                        } else if c == "%" {
+                            // Invalid: specifier with embedded % (like %% inside specifier)
+                            result += "%%"
+                            i = j + 1
+                            break
+                        } else {
+                            // Conversion character or invalid
+                            if "@dDiuUxXoOeEfFgGcCsSpPaA".contains(c) {
+                                result += String(chars[i...j])
+                                i = j + 1
+                            } else {
+                                result += "%%"
+                                i = j
+                            }
+                            break
+                        }
+                    }
+                    if j >= chars.count {
+                        result += "%%"
+                        i = chars.count
+                    }
+                } else {
+                    result += "%%"
+                    i += 1
+                }
+            } else {
+                result.append(chars[i])
+                i += 1
+            }
+        }
+        return result
+    }
+
+    private static func isValidFormatStart(_ c: Character) -> Bool {
+        c.isNumber || "-+#0.$ hlLzqtj'*@dDiuUxXoOeEfFgGcCsSpPaA%".contains(c)
     }
 
     static var locale: Locale {

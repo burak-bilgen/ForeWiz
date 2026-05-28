@@ -2823,13 +2823,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@: Charge for %2$@ (Est. Cost: %3$@)"
+            "value" : "%1$@ (Est. Cost: %2$@)"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@: %2$@ şarj edin (Tahmini Maliyet: %3$@)"
+            "value" : "%1$@ (Tahmini Maliyet: %2$@)"
           }
         }
       }
