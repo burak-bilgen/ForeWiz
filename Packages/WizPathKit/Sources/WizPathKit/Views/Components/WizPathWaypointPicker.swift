@@ -101,7 +101,7 @@ public struct WizPathWaypointPickerSheet: View {
 
                         Spacer()
 
-                        Text("\(localSelectedIds.count)/\(waypoints.count)")
+                        Text(verbatim: "\(localSelectedIds.count)/\(waypoints.count)")
                             .font(.system(size: 13, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .monospacedDigit()

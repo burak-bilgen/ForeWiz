@@ -3,7 +3,10 @@ import CoreLocation
 @preconcurrency import MapKit
 
 // MARK: - Smart Stop (Weather-Aware POI)
-public struct SmartStop: Identifiable, Sendable {
+public struct SmartStop: Identifiable, Sendable, Equatable {
+    public static func == (lhs: SmartStop, rhs: SmartStop) -> Bool {
+        lhs.id == rhs.id
+    }
     public let id: UUID
     public let mapItem: MKMapItem
     public let coordinate: CLLocationCoordinate2D

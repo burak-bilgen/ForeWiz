@@ -387,9 +387,14 @@ public struct WizPathDashboardView: View {
                     if viewModel.travelMode == .cycling, let safety = viewModel.cyclingSafetyAnalysis {
                         CyclingSafetyPanel(safety: safety).padding(.horizontal, 16)
                     }
-                    // EV recommendations panel (only for electric cars with heat)
-                    if viewModel.travelMode == .car, viewModel.isElectricVehicle, !viewModel.evRecommendations.isEmpty {
-                        EVRecommendationsPanel(recommendations: viewModel.evRecommendations).padding(.horizontal, 16)
+                    // EV range, consumption, and smart charging planner panel
+                    if viewModel.travelMode == .car, viewModel.isElectricVehicle {
+                        EvRangePlannerPanel(
+                            rangeEstimate: viewModel.evRangeEstimate,
+                            chargingPlan: viewModel.evChargingPlan,
+                            evRecommendations: viewModel.evRecommendations
+                        )
+                        .padding(.horizontal, 16)
                     }
                     if let route = viewModel.mapsNavigationRoute {
                         WizPathRouteInfoPanel(

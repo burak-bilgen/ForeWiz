@@ -6,7 +6,19 @@ import SwiftUI
 // MARK: - L10n Bridge (same API as main app)
 
 public enum WizPathKitL10n {
-    nonisolated(unsafe) public static var provider: WizPathL10nProvider = DefaultL10nProvider()
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var _provider: WizPathL10nProvider = DefaultL10nProvider()
+
+    public static var provider: WizPathL10nProvider {
+        get {
+            lock.lock(); defer { lock.unlock() }
+            return _provider
+        }
+        set {
+            lock.lock(); defer { lock.unlock() }
+            _provider = newValue
+        }
+    }
 
     public static func text(_ key: String) -> String {
         provider.text(key)
@@ -55,8 +67,8 @@ public protocol WizPathHapticProvider {
     func weatherRefresh()
 }
 
-final class HapticEngine {
-    nonisolated(unsafe) public static let shared = HapticEngine()
+final class HapticEngine: Sendable {
+    public static let shared = HapticEngine()
     private init() {}
 
     public func light() { WizPathKitHaptics.provider.light() }
@@ -70,7 +82,19 @@ final class HapticEngine {
 }
 
 public enum WizPathKitHaptics {
-    nonisolated(unsafe) public static var provider: WizPathHapticProvider = DefaultHapticProvider()
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var _provider: WizPathHapticProvider = DefaultHapticProvider()
+
+    public static var provider: WizPathHapticProvider {
+        get {
+            lock.lock(); defer { lock.unlock() }
+            return _provider
+        }
+        set {
+            lock.lock(); defer { lock.unlock() }
+            _provider = newValue
+        }
+    }
 }
 
 public struct DefaultHapticProvider: WizPathHapticProvider {

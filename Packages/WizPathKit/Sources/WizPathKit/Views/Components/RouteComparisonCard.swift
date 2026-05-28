@@ -109,7 +109,7 @@ public struct RouteCandidateRow: View {
                               candidate.isGood ? Color(hex: candidate.scoreColorHex).opacity(0.15) :
                               Color(hex: candidate.scoreColorHex).opacity(0.1))
                         .frame(width: 32, height: 32)
-                    Text("\(index + 1)")
+                    Text(verbatim: "\(index + 1)")
                         .font(.system(size: 12, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: candidate.scoreColorHex))
                 }
@@ -182,7 +182,7 @@ public struct RouteCandidateRow: View {
                             HStack(spacing: 2) {
                                 Image(systemName: "exclamationmark.triangle.fill")
                                     .font(.system(size: 7))
-                                Text("\\(candidate.severeSegmentCount)")
+                                Text(verbatim: "\(candidate.severeSegmentCount)")
                                     .font(.system(size: 8, weight: .medium))
                             }
                             .foregroundStyle(Color.danger)
@@ -198,7 +198,7 @@ public struct RouteCandidateRow: View {
 
                 // Score
                 VStack(spacing: 1) {
-                    Text("\\(candidate.score)")
+                    Text(verbatim: "\(candidate.score)")
                         .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: candidate.scoreColorHex))
                         .monospacedDigit()

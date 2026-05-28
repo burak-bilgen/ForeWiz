@@ -482,7 +482,7 @@ public struct EnhancedWeatherMarker: View {
                 .background(.black.opacity(0.55))
                 .clipShape(Capsule())
 
-            Text("\u{00B0}\(Int(weather.temperature))")
+            Text(verbatim: "\u{00B0}\(Int(weather.temperature))")
                 .font(.system(size: 8, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.8))
                 .padding(.horizontal, 4)

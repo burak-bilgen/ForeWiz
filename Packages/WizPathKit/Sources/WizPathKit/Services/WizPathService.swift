@@ -46,7 +46,7 @@ public final class WizPathService {
         departureTime: Date,
         avoidTollRoads: Bool = false
     ) async throws -> (best: WizPathRoute, candidates: [ScoredRouteCandidate]) {
-        if !avoidTollRoads, let cached = cache.route(origin: origin, destination: destination, mode: mode) {
+        if let cached = await cache.route(origin: origin, destination: destination, mode: mode, avoidTollRoads: avoidTollRoads) {
             AppLogger.wizPath.info("Using cached route")
             return (cached, [])
         }
@@ -126,7 +126,7 @@ public final class WizPathService {
             throw WizPathError.routeUnavailable
         }
 
-        cache.store(route: best.route, avoidTollRoads: avoidTollRoads)
+        await cache.store(route: best.route, avoidTollRoads: avoidTollRoads)
         AppLogger.wizPath.info("Best route selected: score=\(best.score), \(best.route.segments.count) segments, \(Int(best.route.totalDuration / 60)) min")
         return (best.route, candidates)
     }
@@ -494,8 +494,8 @@ public struct RecentDestination: Codable, Hashable, Identifiable {
 }
 
 // MARK: - WizPath Cache
-final class WizPathCache {
-    nonisolated(unsafe) static let shared = WizPathCache()
+public actor WizPathCache {
+    public static let shared = WizPathCache()
     private struct CacheEntry {
         let route: WizPathRoute
         let timestamp: Date
@@ -503,37 +503,31 @@ final class WizPathCache {
         var isExpired: Bool { Date().timeIntervalSince(timestamp) > Self.ttl }
     }
     private var routeCache: [String: CacheEntry] = [:]
-    private let queue = DispatchQueue(label: "com.forewiz.wizpath.cache", qos: .utility)
 
-    fileprivate init() {}
+    public init() {}
 
-    func store(route: WizPathRoute, avoidTollRoads: Bool = false) {
-        queue.async {
-            let tollSuffix = avoidTollRoads ? "|no_tolls" : ""
-            let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)\(tollSuffix)"
-            self.routeCache[key] = CacheEntry(route: route, timestamp: Date())
-            // Periodic cleanup: remove expired entries
-            if self.routeCache.count > 20 {
-                self.routeCache = self.routeCache.filter { !$0.value.isExpired }
-            }
+    public func store(route: WizPathRoute, avoidTollRoads: Bool = false) {
+        let tollSuffix = avoidTollRoads ? "|no_tolls" : ""
+        let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)\(tollSuffix)"
+        self.routeCache[key] = CacheEntry(route: route, timestamp: Date())
+        // Periodic cleanup: remove expired entries
+        if self.routeCache.count > 20 {
+            self.routeCache = self.routeCache.filter { !$0.value.isExpired }
         }
     }
 
-    func route(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode) -> WizPathRoute? {
-        queue.sync {
-            let key = "\(origin.latitude),\(origin.longitude)|\(destination.latitude),\(destination.longitude)|\(mode.rawValue)"
-            guard let entry = self.routeCache[key], !entry.isExpired else {
-                // Remove expired entry if present
-                self.routeCache.removeValue(forKey: key)
-                return nil
-            }
-            return entry.route
+    public func route(origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D, mode: TravelMode, avoidTollRoads: Bool = false) -> WizPathRoute? {
+        let tollSuffix = avoidTollRoads ? "|no_tolls" : ""
+        let key = "\(origin.latitude),\(origin.longitude)|\(destination.latitude),\(destination.longitude)|\(mode.rawValue)\(tollSuffix)"
+        guard let entry = self.routeCache[key], !entry.isExpired else {
+            // Remove expired entry if present
+            self.routeCache.removeValue(forKey: key)
+            return nil
         }
+        return entry.route
     }
 
-    func clear() {
-        queue.sync {
-            self.routeCache.removeAll()
-        }
+    public func clear() {
+        self.routeCache.removeAll()
     }
 }

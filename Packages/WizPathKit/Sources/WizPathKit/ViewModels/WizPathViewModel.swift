@@ -93,6 +93,8 @@ public final class WizPathViewModel {
     public var isElectricVehicle = false
     public var evRecommendations: [EVRecommendation] = []
     public var chargingStations: [SmartStop] = []
+    public var evRangeEstimate: EvRangeEstimate?
+    public var evChargingPlan: EvChargingPlan?
     public var isLoadingMapDetails = false
 
     // MARK: - Route Comparison & Preferences
@@ -489,6 +491,8 @@ public final class WizPathViewModel {
         isElectricVehicle = false
         evRecommendations = []
         chargingStations = []
+        evRangeEstimate = nil
+        evChargingPlan = nil
         segmentPlaceNames = [:]
         routeCandidates = []
         selectedRouteIndex = 0
@@ -576,6 +580,29 @@ public final class WizPathViewModel {
             }
             
             self.chargingStations = enrichedStops
+            
+            // Calculate EV Range and Charging stops plan if electric vehicle mode is active
+            if self.travelMode == .car, self.isElectricVehicle {
+                let rangeEst = await EvRangeService.shared.estimateRange(
+                    for: route,
+                    baseRangeKm: 400.0,
+                    batteryCapacityKwh: 75.0,
+                    startingChargePercent: 80.0
+                )
+                self.evRangeEstimate = rangeEst
+                
+                let plan = await EvChargingPlannerService.shared.planChargingStops(
+                    for: route,
+                    chargers: enrichedStops.filter { $0.category == .evCharger },
+                    batteryCapacityKwh: 75.0,
+                    startingChargePercent: 80.0,
+                    thresholdPercent: 15.0
+                )
+                self.evChargingPlan = plan
+            } else {
+                self.evRangeEstimate = nil
+                self.evChargingPlan = nil
+            }
         }
     }
 
