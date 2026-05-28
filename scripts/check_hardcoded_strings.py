@@ -12,10 +12,13 @@ SRC_DIR = os.environ.get("SRC_DIR", "ForeWiz")
 fail = 0
 
 swift_files = []
-for root, dirs, files in os.walk(SRC_DIR):
-    for fname in files:
-        if fname.endswith(".swift"):
-            swift_files.append(os.path.join(root, fname))
+search_dirs = [SRC_DIR, "Packages"]
+for s_dir in search_dirs:
+    if os.path.exists(s_dir):
+        for root, dirs, files in os.walk(s_dir):
+            for fname in files:
+                if fname.endswith(".swift"):
+                    swift_files.append(os.path.join(root, fname))
 
 for path in swift_files:
     with open(path) as f:

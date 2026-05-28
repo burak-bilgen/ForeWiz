@@ -40,18 +40,23 @@ def get_localization(key):
     return {}
 
 code_keys = set()
-for root, dirs, files in os.walk(SRC_DIR):
-    for fname in files:
-        if not fname.endswith(".swift"):
-            continue
-        path = os.path.join(root, fname)
-        try:
-            with open(path) as sf:
-                content = sf.read()
-        except Exception:
-            continue
-        code_keys.update(re.findall(r'L10n\.text\(["\']([^"\']+)["\']\)', content))
-        code_keys.update(re.findall(r'L10n\.formatted\(["\']([^"\']+)["\']\)', content))
+search_dirs = [SRC_DIR, "Packages"]
+for s_dir in search_dirs:
+    if os.path.exists(s_dir):
+        for root, dirs, files in os.walk(s_dir):
+            for fname in files:
+                if not fname.endswith(".swift"):
+                    continue
+                path = os.path.join(root, fname)
+                try:
+                    with open(path) as sf:
+                        content = sf.read()
+                except Exception:
+                    continue
+                code_keys.update(re.findall(r'L10n\.text\(["\']([^"\']+)["\']\)', content))
+                code_keys.update(re.findall(r'L10n\.formatted\(["\']([^"\']+)["\']\)', content))
+                code_keys.update(re.findall(r'WizPathKitL10n\.text\(["\']([^"\']+)["\']\)', content))
+                code_keys.update(re.findall(r'WizPathKitL10n\.formatted\(["\']([^"\']+)["\']\)', content))
 
 fail = 0
 
