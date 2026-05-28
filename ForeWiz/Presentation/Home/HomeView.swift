@@ -172,7 +172,7 @@ struct HomeView: View {
                             .foregroundStyle(.white.opacity(0.5))
                         
                         if feedbackStore.unreadCount > 0 {
-                            Text("\(feedbackStore.unreadCount)")
+                            Text(String(feedbackStore.unreadCount))
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundStyle(.black)
                                 .padding(.horizontal, 5)
@@ -214,8 +214,7 @@ struct HomeView: View {
                 state: state,
                 contentReady: contentReady,
                 refresh: { await viewModel.refresh() },
-                onWizPathTap: { showWizPathSheet = true },
-                onWeatherFeedback: { await viewModel.recordFeedback($0) }
+                onWizPathTap: { showWizPathSheet = true }
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)),
