@@ -148,7 +148,9 @@ public final class EvRangeService: Sendable {
         if initialEnergyKwh < energyNeededWithBufferKwh {
             let deficitKwh = energyNeededWithBufferKwh - initialEnergyKwh
             // Assume average charge session adds ~40kWh (approx. 20% to 80% on 75kWh battery)
-            stopsCount = Int(ceil(deficitKwh / (batteryCapacityKwh * 0.60)))
+            let divisor = batteryCapacityKwh * 0.60
+            let rawCount = divisor > 0 ? deficitKwh / divisor : 0
+            stopsCount = rawCount.isFinite ? Int(ceil(rawCount)) : 0
         }
         
         return EvRangeEstimate(
