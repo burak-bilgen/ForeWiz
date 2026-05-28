@@ -20,7 +20,7 @@ public struct WizPathWaypointPickerSheet: View {
         self.waypoints = waypoints
         self.onNavigate = onNavigate
         self.onNavigateWithoutStops = onNavigateWithoutStops
-        self._localSelectedIds = State(initialValue: Set(waypoints.map(\.id)))
+        self._localSelectedIds = State(initialValue: [])
     }
 
     public var body: some View {

@@ -410,7 +410,7 @@ public struct WizPathDashboardView: View {
                                 if waypoints.isEmpty {
                                     onMapsExport { openMapsURL(nativeURL: { viewModel.appleMapsURLString() }, webURL: { viewModel.appleMapsWebURLString() }) }
                                 } else {
-                                    viewModel.selectedWaypointIds = Set(waypoints.map(\.id))
+                                    viewModel.selectedWaypointIds = []
                                     pendingMapsAction = { [weak viewModel] in
                                         guard let vm = viewModel else { return }
                                         onMapsExport { openMapsURL(nativeURL: { vm.appleMapsURLString() }, webURL: { vm.appleMapsWebURLString() }) }
@@ -423,7 +423,7 @@ public struct WizPathDashboardView: View {
                                 if waypoints.isEmpty {
                                     onMapsExport { openMapsURL(nativeURL: { viewModel.googleMapsURLString() }, webURL: { viewModel.googleMapsWebURLString() }) }
                                 } else {
-                                    viewModel.selectedWaypointIds = Set(waypoints.map(\.id))
+                                    viewModel.selectedWaypointIds = []
                                     pendingMapsAction = { [weak viewModel] in
                                         guard let vm = viewModel else { return }
                                         onMapsExport { openMapsURL(nativeURL: { vm.googleMapsURLString() }, webURL: { vm.googleMapsWebURLString() }) }
