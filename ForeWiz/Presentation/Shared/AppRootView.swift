@@ -81,15 +81,16 @@ private struct HomeRootView: View {
 
     init(coordinator: AppCoordinator) {
         self.coordinator = coordinator
-        let name = coordinator.profile.savedLocations
-            .first { $0.id == coordinator.profile.selectedLocationID }?
-            .name ?? L10n.text("home_current_location")
+        let selectedLocation = coordinator.profile.savedLocations
+            .first { $0.id == coordinator.profile.selectedLocationID }
+        let name = selectedLocation?.name ?? L10n.text("home_current_location")
         _homeViewModel = State(wrappedValue: HomeViewModel(
             loadHomeRecommendationUseCase: coordinator.container.loadHomeRecommendationUseCase,
             scheduleSmartNotificationsUseCase: coordinator.container.scheduleSmartNotificationsUseCase,
             preferencesRepository: coordinator.container.preferencesRepository,
             homeViewStateFactory: coordinator.container.homeViewStateFactory,
-            selectedLocationName: name
+            selectedLocationName: name,
+            selectedLocation: selectedLocation
         ))
     }
 

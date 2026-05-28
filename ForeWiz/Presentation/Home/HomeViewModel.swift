@@ -23,13 +23,15 @@ final class HomeViewModel {
         scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase,
         preferencesRepository: PreferencesRepository,
         homeViewStateFactory: HomeViewStateFactory,
-        selectedLocationName: String = L10n.text("home_current_location")
+        selectedLocationName: String = L10n.text("home_current_location"),
+        selectedLocation: SavedLocation? = nil
     ) {
         self.loadHomeRecommendationUseCase = loadHomeRecommendationUseCase
         self.scheduleSmartNotificationsUseCase = scheduleSmartNotificationsUseCase
         self.preferencesRepository = preferencesRepository
         self.homeViewStateFactory = homeViewStateFactory
         self.selectedLocationName = selectedLocationName
+        self.selectedLocation = selectedLocation
     }
 
     deinit {
@@ -48,6 +50,9 @@ final class HomeViewModel {
     }
 
     func reloadForLanguageChange() async {
+        if selectedLocation == nil || selectedLocation?.id == "current-location" {
+            selectedLocationName = L10n.text("home_current_location")
+        }
         didLoad = false
         await load(forceRefresh: true, retryCachedResult: true)
         didLoad = true
@@ -194,6 +199,7 @@ final class HomeViewModel {
                 self.selectedLocationName = locationName
             } catch {
                 AppLogger.app.error("Reverse geocoding failed: \(error.localizedDescription)")
+                self.selectedLocationName = L10n.text("home_current_location")
             }
         }
     }

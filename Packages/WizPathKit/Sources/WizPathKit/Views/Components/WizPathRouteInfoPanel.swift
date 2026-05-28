@@ -36,7 +36,7 @@ public struct WizPathRouteInfoPanel: View {
     }
 
     public var body: some View {
-        LiquidGlassCard(accentColor: AppTheme.routeRiskColor(route.overallRisk), innerPadding: 16) {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 16) {
             VStack(spacing: 14) {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -44,7 +44,6 @@ public struct WizPathRouteInfoPanel: View {
                         HStack(spacing: 6) { Image(systemName: route.travelMode.icon).font(.system(size: 10)); Text(route.travelMode.localizedTitle).font(.system(size: 11, weight: .medium)) }.foregroundStyle(.secondary)
                     }
                     Spacer()
-                    RouteRiskBadge(risk: route.overallRisk)
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(WizPathKitL10n.text("wizpath_total_time")).font(.caption2).foregroundStyle(.tertiary)
                         Text(formattedDuration(route.totalDuration)).font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white).monospacedDigit()
@@ -135,20 +134,20 @@ public struct WizPathRouteInfoPanel: View {
                 Divider().overlay(Color.white.opacity(0.06))
                 
                 // Navigate Route section
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     Text(WizPathKitL10n.text("wizpath_navigate_route"))
-                        .font(.system(size: 11, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(.tertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    HStack(spacing: 10) {
-                        PremiumGlassMapButtonSmall(
+                    HStack(spacing: 12) {
+                        WizPathRouteMapButton(
                             title: WizPathKitL10n.text("wizpath_apple_maps"),
                             icon: "map.fill",
                             gradientColors: [.blue, Color(red: 0.1, green: 0.6, blue: 0.95)]
                         ) { onOpenInAppleMaps() }
                         
-                        PremiumGlassMapButtonSmall(
+                        WizPathRouteMapButton(
                             title: WizPathKitL10n.text("wizpath_google_maps"),
                             icon: "arrow.triangle.turn.up.right.diamond.fill",
                             gradientColors: [Color(red: 0.15, green: 0.65, blue: 0.35), Color(red: 0.25, green: 0.75, blue: 0.55)]
@@ -157,9 +156,9 @@ public struct WizPathRouteInfoPanel: View {
                 }
                 
                 Divider().overlay(Color.white.opacity(0.06))
-                HStack(spacing: 10) {
-                    LiquidGlassButton(WizPathKitL10n.text("wizpath_departure_optimizer"), icon: "clock.badge.checkmark.fill", style: .secondary, haptic: .light) { showDepartureOptimizer(); HapticEngine.shared.medium() }
-                    LiquidGlassButton(WizPathKitL10n.text("wizpath_new_route"), icon: "arrow.clockwise", style: .primary, haptic: .light) { onReset() }
+                HStack(spacing: 12) {
+                    LiquidGlassButton(WizPathKitL10n.text("wizpath_departure_optimizer"), icon: "clock.badge.checkmark.fill", style: .secondary, haptic: .light, isFullWidth: true) { showDepartureOptimizer(); HapticEngine.shared.medium() }
+                    LiquidGlassButton(WizPathKitL10n.text("wizpath_new_route"), icon: "arrow.clockwise", style: .primary, haptic: .light, isFullWidth: true) { onReset() }
                 }
             }
         }
@@ -171,19 +170,6 @@ public struct WizPathRouteInfoPanel: View {
         return "\(m) \(WizPathKitL10n.text("wizpath_minutes"))"
     }
 
-}
-
-// MARK: - Route Risk Badge
-
-public struct RouteRiskBadge: View {
-    let risk: RouteRisk
-    public init(risk: RouteRisk) { self.risk = risk }
-    public var body: some View {
-        HStack(spacing: 6) {
-            Circle().fill(Color(hex: risk.color)).frame(width: 8, height: 8)
-            Text(risk.localizedTitle).font(.system(size: 12, weight: .semibold)).foregroundStyle(Color(hex: risk.color))
-        }.padding(.horizontal, 10).padding(.vertical, 5).background(Color(hex: risk.color).opacity(0.12)).clipShape(Capsule())
-    }
 }
 
 // MARK: - Best Departure Row
@@ -206,9 +192,9 @@ public struct WizPathBestDepartureRow: View {
     }
 }
 
-// MARK: - Premium Glass Map Button (Compact)
+// MARK: - Premium Glass Map Button
 
-struct PremiumGlassMapButtonSmall: View {
+struct WizPathRouteMapButton: View {
     let title: String
     let icon: String
     let gradientColors: [Color]
@@ -221,35 +207,42 @@ struct PremiumGlassMapButtonSmall: View {
             WizPathKitHaptics.provider.medium()
             action()
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 ZStack {
                     Circle()
                         .fill(LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 28, height: 28)
+                        .frame(width: 36, height: 36)
                     Image(systemName: icon)
-                        .font(.system(size: 12, weight: .bold))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.white)
                 }
-                .shadow(color: gradientColors.first?.opacity(0.3) ?? .clear, radius: 4, x: 0, y: 2)
+                .shadow(color: gradientColors.first?.opacity(0.4) ?? .clear, radius: 6, x: 0, y: 3)
 
                 Text(title)
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.85)
                 
                 Spacer(minLength: 0)
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.3))
             }
-            .padding(.horizontal, 10)
-            .frame(height: 44)
+            .padding(.horizontal, 14)
+            .frame(maxWidth: .infinity)
+            .frame(height: 56)
             .background(
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(.ultraThinMaterial)
                         .environment(\.colorScheme, .dark)
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(gradientColors.first?.opacity(0.08) ?? .clear)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.15), .white.opacity(0.02)],
+                                colors: [.white.opacity(0.15), gradientColors.first?.opacity(0.15) ?? .clear, .clear],
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
@@ -257,7 +250,8 @@ struct PremiumGlassMapButtonSmall: View {
                         )
                 }
             )
-            .scaleEffect(isPressed ? 0.96 : 1.0)
+            .scaleEffect(isPressed ? 0.95 : 1.0)
+            .shadow(color: gradientColors.first?.opacity(0.15) ?? .clear, radius: 8, x: 0, y: 4)
         }
         .contentShape(Rectangle())
         .buttonStyle(.plain)
