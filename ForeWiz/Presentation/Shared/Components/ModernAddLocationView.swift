@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import WizPathKit
 
 // MARK: - Modern Add Location View
 
@@ -60,12 +61,13 @@ struct ModernAddLocationView: View {
                                 return
                             }
                             searchTask = Task { @MainActor in
-                                try? await Task.sleep(nanoseconds: 400_000_000)
+                                // Debounce: wait for user to stop typing
+                                try? await Task.sleep(nanoseconds: 300_000_000)
                                 guard !Task.isCancelled else { return }
-                                search()
+                                await search()
                             }
                         }
-                        .onSubmit { searchTask?.cancel(); search() }
+                        .onSubmit { searchTask?.cancel(); Task { await search() } }
 
                     if !searchText.isEmpty {
                         Button {
@@ -201,13 +203,21 @@ struct ModernAddLocationView: View {
         )
     }
 
-    private func search() {
+    private func search() async {
         guard !searchText.isEmpty else { return }
+
+        // Wait for a rate-limit slot (shared across all PlaceRequest types)
+        await PlaceRequestThrottler.shared.waitForSlot()
+
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
         request.resultTypes = .address
 
-        MKLocalSearch(request: request).start { response, _ in
+        MKLocalSearch(request: request).start { response, error in
+            if let error {
+                // Log but don't surface to user — next debounce will retry
+                return
+            }
             if let response {
                 searchResults = response.mapItems
                 withAnimation { showSearchResults = true }

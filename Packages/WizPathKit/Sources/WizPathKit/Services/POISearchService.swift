@@ -137,6 +137,9 @@ public final class POISearchService: Sendable {
         routeCoordinates: [CLLocationCoordinate2D],
         maxRouteDeviation: CLLocationDistance
     ) async -> [SmartStop] {
+        // Wait for a rate-limit slot (shared across all PlaceRequest types)
+        await PlaceRequestThrottler.shared.waitForSlot()
+
         let search = MKLocalSearch(request: request)
         // 1. MKLocalSearch sonuçlarını bekle (sync callback → async continuation)
         let mapItems: [MKMapItem] = await withCheckedContinuation { continuation in
