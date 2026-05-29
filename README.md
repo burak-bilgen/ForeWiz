@@ -414,12 +414,9 @@ xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generi
 
 **CI Pipeline (`.github/workflows/ci.yml`):**
 1. SwiftLint linting (`--strict`)
-2. Hardcoded strings check
-3. Localization completeness check
-4. Lazy TR translation check
-5. Build all targets
-6. Run unit tests (simulator)
-7. Build for release validation
+2. Build all targets
+3. Run unit tests (simulator)
+4. Build for release validation
 
 ---
 
@@ -482,7 +479,7 @@ Large files systematically refactored into focused modules:
 
 ## 📱 License
 
-Private project. All rights reserved.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -542,5 +539,5 @@ Private project. All rights reserved.
 ---
 
 <p align="center">
-  <sub>Built with ☀️ + 🧊 + Swift 6 + SwiftUI + MapKit + TipKit by Bilgen Works</sub>
+  <sub>Built with ☀️ + 🧊 + Swift 6 + SwiftUI + MapKit + TipKit by <a href="https://github.com/bilgenworks">Bilgen Works</a></sub>
 </p>

@@ -1,3 +1,4 @@
+# Xcode
 .DS_Store
 DerivedData/
 .build/
@@ -14,3 +15,25 @@ Screenshots/
 Snapfile
 fastlane/**/*
 build_log.txt
+
+# macOS
+*.swp
+*.swo
+*~
+.DS_Store?
+.AppleDouble
+.LSOverride
+Icon
+
+# CocoaPods (if ever used)
+Pods/
+
+# Carthage (if ever used)
+Carthage/Build
+
+# Swift Package Manager
+.build/
+Packages/*/
+
+# Playgrounds (user-specific)
+*.playground/Pages/*.xcuserdata
