@@ -424,6 +424,7 @@ public enum WizPathError: Error, LocalizedError {
     case weatherAPIFailed
     case destinationUnreachable
     case invalidDepartureTime
+    case timeout
 
     public var errorDescription: String? {
         switch self {
@@ -432,6 +433,7 @@ public enum WizPathError: Error, LocalizedError {
         case .weatherAPIFailed: return WizPathKitL10n.text("wizpath_error_weather_unavailable")
         case .destinationUnreachable: return WizPathKitL10n.text("wizpath_error_unreachable")
         case .invalidDepartureTime: return WizPathKitL10n.text("wizpath_error_invalid_time")
+        case .timeout: return WizPathKitL10n.text("wizpath_error_timeout")
         }
     }
 }

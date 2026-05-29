@@ -23,7 +23,15 @@ private func makeViewModel() -> WizPathViewModel {
     let departOptimizer = DepartureOptimizerService(weatherRepository: mockWeather)
     return WizPathViewModel(
         wizPathService: wizPathService,
-        departureOptimizerService: departOptimizer
+        departureOptimizerService: departOptimizer,
+        climateService: .shared,
+        sentinelService: .shared,
+        cyclingSafetyService: .shared,
+        poiSearchService: .shared,
+        tollRoadService: .shared,
+        evRangeService: EvRangeService.shared,
+        evChargingPlannerService: EvChargingPlannerService.shared,
+        elevationService: ElevationService.shared
     )
 }
 

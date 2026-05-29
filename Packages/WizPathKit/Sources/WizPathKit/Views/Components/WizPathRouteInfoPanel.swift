@@ -221,17 +221,20 @@ struct WizPathRouteMapButton: View {
                 Text(title)
                     .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                    .minimumScaleFactor(0.85)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+                    .layoutPriority(1)
                 
-                Spacer(minLength: 0)
+                Spacer(minLength: 4)
                 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.3))
+                    .frame(width: 8)
             }
-            .padding(.horizontal, 14)
+            .padding(.horizontal, 12)
             .frame(maxWidth: .infinity)
-            .frame(height: 56)
+            .frame(height: 52)
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)

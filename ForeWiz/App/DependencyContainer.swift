@@ -34,6 +34,10 @@ final class DependencyContainer {
     // MARK: - WizPath
     let wizPathService: WizPathService
     let locationService: LocationService
+    let elevationService: ElevationServiceProtocol
+    let evRangeService: EvRangeServiceProtocol
+    let evChargingPlannerService: EvChargingPlannerServiceProtocol
+    let tollRoadService: TollRoadService
     
     // MARK: - New Architecture Components
     let homeViewStateFactory: HomeViewStateFactory
@@ -61,7 +65,11 @@ final class DependencyContainer {
         weatherGradientService: WeatherGradientService,
         retryPolicy: NetworkRetryPolicy,
         wizPathService: WizPathService,
-        locationService: LocationService
+        locationService: LocationService,
+        elevationService: ElevationServiceProtocol = ElevationService.shared,
+        evRangeService: EvRangeServiceProtocol = EvRangeService.shared,
+        evChargingPlannerService: EvChargingPlannerServiceProtocol = EvChargingPlannerService.shared,
+        tollRoadService: TollRoadService = .shared
     ) {
         self.environment = environment
         self.dateProvider = dateProvider
@@ -84,6 +92,10 @@ final class DependencyContainer {
         self.severeWeatherAlertService = severeWeatherAlertService
         self.wizPathService = wizPathService
         self.locationService = locationService
+        self.elevationService = elevationService
+        self.evRangeService = evRangeService
+        self.evChargingPlannerService = evChargingPlannerService
+        self.tollRoadService = tollRoadService
         Self.instance = self
     }
 
@@ -166,7 +178,11 @@ final class DependencyContainer {
             weatherGradientService: weatherGradientService,
             retryPolicy: retryPolicy,
             wizPathService: wizPathService,
-            locationService: locationService
+            locationService: locationService,
+            elevationService: ElevationService.shared,
+            evRangeService: EvRangeService.shared,
+            evChargingPlannerService: EvChargingPlannerService.shared,
+            tollRoadService: .shared
         )
     }
 
@@ -252,7 +268,11 @@ final class DependencyContainer {
             weatherGradientService: weatherGradientService,
             retryPolicy: retryPolicy,
             wizPathService: wizPathService,
-            locationService: locationService
+            locationService: locationService,
+            elevationService: ElevationService.shared,
+            evRangeService: EvRangeService.shared,
+            evChargingPlannerService: EvChargingPlannerService.shared,
+            tollRoadService: .shared
         )
     }
 }

@@ -7,11 +7,22 @@ import OSLog
 public final class WizPathClimateService {
     public static let shared = WizPathClimateService()
 
+    /// 🌡️ Temperature thresholds with NOAA/NWS-aligned values
     public struct TemperatureThresholds {
+        // EV battery efficiency
         public static let evEfficiencyReduction: Double = 38.0
-        public static let pedestrianHeatRisk: Double = 36.0
-        public static let extremeHeat: Double = 40.0
-        public static let criticalHeat: Double = 45.0
+        // Heat risk thresholds (NWS heat index categories)
+        public static let pedestrianHeatRisk: Double = 36.0  // ~97°F — caution
+        public static let extremeHeat: Double = 40.0          // ~104°F — danger
+        public static let criticalHeat: Double = 45.0         // ~113°F — extreme danger
+        // Wind chill thresholds (NWS wind chill chart)
+        public static let windChillCaution: Double = -10.0    // °C — frostbite in 30 min
+        public static let windChillDanger: Double = -20.0     // °C — frostbite in 10 min
+        public static let windChillExtreme: Double = -30.0    // °C — frostbite in 5 min
+        // Heat index thresholds
+        public static let heatIndexCaution: Double = 27.0     // ~80°F
+        public static let heatIndexExtreme: Double = 33.0     // ~91°F
+        public static let heatIndexDanger: Double = 41.0      // ~105°F
     }
 
     public struct ClimateMultipliers {
@@ -21,9 +32,85 @@ public final class WizPathClimateService {
         public static let extremeHeat: Double = 1.25
         public static let highHeat: Double = 1.15
         public static let moderateHeat: Double = 1.05
+        // Cycling-specific wind resistance multiplier
+        public static let highWindCycling: Double = 1.35
+        // Wind chill adds to effective time penalty for exposed modes
+        public static let windChillPenalty: Double = 1.15
     }
 
     public init() {}
+
+    // MARK: - Wind Chill & Heat Index (NOAA/NWS Formulas)
+
+    /// Calculates wind chill temperature in °C using the NWS/JMA formula.
+    /// Valid for temperatures ≤ 10°C and wind speeds ≥ 4.8 km/h.
+    /// Returns the wind chill temperature. If conditions are outside valid range,
+    /// returns the actual temperature.
+    public static func windChillCelsius(temperature: Double, windSpeedKph: Double) -> Double {
+        // Wind chill is only defined for temps ≤ 10°C and wind ≥ 4.8 km/h
+        guard temperature <= 10.0, windSpeedKph >= 4.8 else { return temperature }
+        // Wind speed in mph for the NWS formula
+        let windMph = windSpeedKph * 0.621371
+        // NWS wind chill formula: 35.74 + 0.6215*T - 35.75*(V^0.16) + 0.4275*T*(V^0.16)
+        // where T is °F, V is mph
+        let tempF = temperature * 9.0 / 5.0 + 32.0
+        let vPow = pow(windMph, 0.16)
+        let windChillF = 35.74 + 0.6215 * tempF - 35.75 * vPow + 0.4275 * tempF * vPow
+        // Convert back to °C
+        return (windChillF - 32.0) * 5.0 / 9.0
+    }
+
+    /// Calculates heat index in °C using the NWS Rothfusz regression.
+    /// Valid for temperatures ≥ 27°C and humidity (approximated from conditions).
+    /// Returns the heat index temperature. If conditions are outside valid range,
+    /// returns the actual temperature.
+    public static func heatIndexCelsius(temperature: Double, humidityPercent: Double) -> Double {
+        // Heat index is only defined for temps ≥ 27°C (80°F)
+        guard temperature >= 27.0 else { return temperature }
+        // Use a default humidity estimate if humidity is 0 (no data)
+        let h = max(40, min(100, humidityPercent))
+        let tempF = temperature * 9.0 / 5.0 + 32.0
+        // Rothfusz regression
+        let hiF = -42.379
+            + 2.04901523 * tempF
+            + 10.14333127 * Double(h)
+            - 0.22475541 * tempF * Double(h)
+            - 6.83783e-3 * tempF * tempF
+            - 5.481717e-2 * Double(h) * Double(h)
+            + 1.22874e-3 * tempF * tempF * Double(h)
+            + 8.5282e-4 * tempF * Double(h) * Double(h)
+            - 1.99e-6 * tempF * tempF * Double(h) * Double(h)
+        // Adjust for low humidity (if adjustment is needed)
+        let adjustedHI: Double
+        if h < 13, temperature > 27.0, temperature < 43.0 {
+            adjustedHI = hiF - ((13.0 - h) / 4.0) * sqrt((17.0 - abs(tempF - 95.0)) / 17.0)
+        } else {
+            adjustedHI = hiF
+        }
+        return (adjustedHI - 32.0) * 5.0 / 9.0
+    }
+
+    /// Estimates relative humidity from weather conditions and temperature
+    public static func estimatedHumidity(temperature: Double, condition: SegmentWeatherCondition, precipitationChance: Double) -> Double {
+        switch condition {
+        case .thunderstorm, .heavyRain:
+            return 85 + precipitationChance * 10
+        case .rain, .snow, .sleet:
+            return 70 + precipitationChance * 20
+        case .fog:
+            return 90 + precipitationChance * 5
+        case .cloudy:
+            return 60 + precipitationChance * 15
+        case .partlyCloudy:
+            return 45 + precipitationChance * 15
+        case .clear:
+            return max(30, 40 - (temperature - 15) * 1.5)
+        case .windy:
+            return 50
+        case .unknown:
+            return 55
+        }
+    }
 
     public func analyzeRouteClimate(_ route: WizPathRoute, travelMode: TravelMode) -> ClimateAnalysis {
         var alerts: [ClimateAlert] = []

@@ -1,6 +1,29 @@
 import Foundation
 import CoreLocation
 
+// MARK: - EV Range Service Protocol
+
+public protocol EvRangeServiceProtocol: AnyObject, Sendable {
+    func estimateRange(
+        for route: WizPathRoute,
+        vehicle: VehicleModel,
+        startingChargePercent: Double
+    ) async -> EvRangeEstimate
+}
+
+// MARK: - EV Range Configuration
+
+public enum EvRangeConfig {
+    /// The vehicle model to use for range estimation
+    nonisolated(unsafe) public static var selectedVehicle: VehicleModel = VehicleDatabase.defaultVehicle
+    /// Whether to use weather-adjusted range calculations
+    nonisolated(unsafe) public static var applyWeatherAdjustment: Bool = true
+    /// Starting charge percentage (0-100)
+    nonisolated(unsafe) public static var defaultStartingCharge: Double = 80.0
+    /// Safety buffer percentage
+    nonisolated(unsafe) public static var safetyBufferPercent: Double = 15.0
+}
+
 public struct EvRangeEstimate: Sendable {
     public let baseRangeKm: Double        // EPA-rated range
     public let adjustedRangeKm: Double    // Weather-adjusted
@@ -25,26 +48,28 @@ public enum EvRangeFactor: Sendable, Equatable {
     case elevation(gradientPercent: Double, penaltyPercent: Double)
 }
 
-public final class EvRangeService: Sendable {
+public final class EvRangeService: EvRangeServiceProtocol, Sendable {
     public static let shared = EvRangeService()
     
     private init() {}
     
-    /// Predicts range and consumption for an EV traveling along a WizPathRoute.
+    /// ✅ Real EPA-backed EV range estimation using the selected vehicle model.
+    /// Uses the user's selected vehicle from EvRangeConfig or falls back to defaults.
     /// - Parameters:
     ///   - route: The route to analyze.
-    ///   - baseRangeKm: The vehicle's EPA-rated base range in km (default is 400km).
-    ///   - batteryCapacityKwh: The vehicle's battery capacity in kWh (default is 75 kWh).
-    ///   - startingChargePercent: The starting battery level (0.0 to 100.0, default is 80.0).
+    ///   - vehicle: The vehicle model with real EPA specs. Defaults to EvRangeConfig.selectedVehicle.
+    ///   - startingChargePercent: Starting charge level (0-100). Defaults to EvRangeConfig.defaultStartingCharge.
     public func estimateRange(
         for route: WizPathRoute,
-        baseRangeKm: Double = 400.0,
-        batteryCapacityKwh: Double = 75.0,
-        startingChargePercent: Double = 80.0
+        vehicle: VehicleModel = EvRangeConfig.selectedVehicle,
+        startingChargePercent: Double = EvRangeConfig.defaultStartingCharge
     ) async -> EvRangeEstimate {
+        let baseRangeKm = vehicle.epaRangeKm
+        let batteryCapacityKwh = vehicle.batteryCapacityKwh
         let baseConsumptionWhPerKm = (batteryCapacityKwh * 1000.0) / baseRangeKm
         
-        let elevationProfile = try? await ElevationService.shared.fetchElevationProfile(for: route)
+        let elevationProvider = ElevationProviderFactory.current
+        let elevationProfile = try? await elevationProvider.fetchElevationProfile(for: route)
         
         var segmentEstimates: [EvSegmentRange] = []
         var totalEnergyUsedKwh: Double = 0.0

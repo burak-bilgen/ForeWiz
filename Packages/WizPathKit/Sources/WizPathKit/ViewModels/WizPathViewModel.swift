@@ -59,18 +59,23 @@ public final class WizPathHUDStatus {
 @Observable
 public final class WizPathViewModel {
     // MARK: - Dependencies
-    private let wizPathService: WizPathService
-    private let departureOptimizerService: DepartureOptimizerService?
-    private let climateService = WizPathClimateService.shared
-    private let sentinelService = WizPathSentinelService.shared
-    private let cyclingSafetyService = WizPathCyclingSafetyService.shared
-    private let poiSearchService = POISearchService.shared
+    /// fileprivate internal erişim — extension dosyaları (WizPathViewModel+EV.swift,
+    /// WizPathViewModel+Navigation.swift) bu servislere erişebilir.
+    let wizPathService: WizPathService
+    let departureOptimizerService: DepartureOptimizerService?
+    let climateService: WizPathClimateService
+    let sentinelService: WizPathSentinelService
+    let cyclingSafetyService: WizPathCyclingSafetyService
+    let poiSearchService: POISearchService
+    let tollRoadService: TollRoadService
+    let evRangeService: EvRangeServiceProtocol
+    let evChargingPlannerService: EvChargingPlannerServiceProtocol
+    let elevationService: ElevationServiceProtocol
 
     // MARK: - State
     public var state: WizPathViewState = .idle
     public var travelMode: TravelMode = .car
     public var departureTime: Date = {
-        // Default to next hour, clamped to today/tomorrow
         let now = Date()
         let nextHour = Calendar.current.date(byAdding: .hour, value: 1, to: now) ?? now
         return nextHour
@@ -95,60 +100,44 @@ public final class WizPathViewModel {
     public var chargingStations: [SmartStop] = []
     public var evRangeEstimate: EvRangeEstimate?
     public var evChargingPlan: EvChargingPlan?
+    public var elevationProfile: ElevationProfile?
     public var isLoadingMapDetails = false
 
     // MARK: - Route Comparison & Preferences
-    /// All scored route candidates from the latest calculation
     public var routeCandidates: [ScoredRouteCandidate] = []
-    /// Index into routeCandidates for the currently selected route
     public var selectedRouteIndex: Int = 0
-    /// Whether to avoid toll roads in route calculation
     public var avoidTollRoads = false
-    /// Traffic congestion info for the current route
     public var currentTrafficCongestion: TrafficCongestionLevel = .unknown
     public var hasTollRoads: Bool = false
-    /// Whether the route comparison panel is expanded
     public var showRouteComparison = false
-    /// Map presentation: compact (small preview) vs expanded (half screen)
     public var mapExpanded = false
-    /// Whether traffic overlay is shown on the map
     public var showTrafficOnMap = false
 
     // MARK: - Waypoint Selection
-    /// IDs of waypoints the user wants to include when navigating to Maps.
-    /// - `nil`: include all available waypoints (default for backward compat)
-    /// - `[]` (empty): include no waypoints (navigate directly)
-    /// - Non-empty: include only the specified waypoints
     public var selectedWaypointIds: Set<UUID>? = nil
 
-    /// Waypoints filtered by user selection.
-    /// Returns all available waypoints when selectedWaypointIds is nil (= all selected).
-    /// Returns empty when selectedWaypointIds is empty (navigate directly).
-    public var selectedMapsWaypoints: [SmartStop] {
-        let all = mapsWaypoints
-        guard let ids = selectedWaypointIds else { return all }
-        return all.filter { ids.contains($0.id) }
-    }
-
     // MARK: - Internal State
-    private var lastCalculatedRoute: WizPathRoute?
-    /// Timestamp when lastCalculatedRoute was saved, used for cache expiration.
-    /// Internal for test access.
+    /// fileprivate internal erişim — extension dosyaları erişebilir.
+    var lastCalculatedRoute: WizPathRoute?
     var lastCalculatedRouteTimestamp: Date?
-    /// Routes older than this interval are considered stale and won't be used offline.
     let cacheExpirationInterval: TimeInterval = 1800 // 30 minutes
     public var didLoadInitialLocation = false
-    // Auto-refresh timer for traffic updates
     private var refreshTimer: Task<Void, Never>?
-    private var chargingStationsTask: Task<Void, Never>?
+    /// internal erişim — WizPathViewModel+EV.swift erişebilir.
+    var chargingStationsTask: Task<Void, Never>?
     private var placeNameTask: Task<Void, Never>?
+    private var elevationTask: Task<Void, Never>?
     private var isAutoRefreshing = false
     public var selectedWeatherSegment: WizPathSegment?
     public var showWeatherDetail = false
     public var selectedChargingStation: SmartStop?
     public var showChargingStationDetail = false
-    /// Resolved place names for weather change point segments (segment.id → place name)
     public var segmentPlaceNames: [UUID: String] = [:]
+
+    /// Maximum time to wait for the full route calculation pipeline before timing out.
+    /// MKDirections itself has a 30s timeout inside the service — this is a safety net
+    /// for the entire pipeline (MKDirections + weather + toll detection + scoring).
+    private static let routeCalculationTimeout: TimeInterval = 90.0
 
     // MARK: - Computed
     public var canCalculate: Bool { destinationCoordinate != nil && !state.isCalculating && isOnline }
@@ -159,38 +148,30 @@ public final class WizPathViewModel {
     public var weatherChangePoints: [WizPathSegment] { currentRoute?.weatherChangePoints ?? [] }
     public var overallRisk: RouteRisk { currentRoute?.overallRisk ?? .good }
 
-    /// The route to use for maps navigation — falls back to the last
-    /// successfully calculated route when offline or in error state.
-    /// This ensures users can always navigate to their destination
-    /// in Apple/Google Maps even without an active connection.
-    /// If the cached route is older than cacheExpirationInterval,
-    /// it is considered stale and returns nil to avoid showing outdated data.
-    public var mapsNavigationRoute: WizPathRoute? {
-        if let route = currentRoute { return route }
-        guard let cached = lastCalculatedRoute,
-              let timestamp = lastCalculatedRouteTimestamp else { return nil }
-        // Cache is fresh enough — use it
-        if Date().timeIntervalSince(timestamp) < cacheExpirationInterval {
-            return cached
-        }
-        // Cache expired — treat as no route
-        return nil
-    }
-
-    /// Waypoints for maps navigation, filtered by safety and sorted by
-    /// estimated arrival time so stops appear in logical route order.
-    /// This provides a seamless navigation experience with relevant
-    /// charging stations, gas stations, and rest stops along the way.
-    public var mapsWaypoints: [SmartStop] {
-        chargingStations
-            .filter { !$0.safetyStatus.shouldAvoid }
-            .sorted { $0.etaArrival < $1.etaArrival }
-    }
 
     // MARK: - Init
-    public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil) {
+    public init(
+        wizPathService: WizPathService,
+        departureOptimizerService: DepartureOptimizerService? = nil,
+        climateService: WizPathClimateService = .shared,
+        sentinelService: WizPathSentinelService = .shared,
+        cyclingSafetyService: WizPathCyclingSafetyService = .shared,
+        poiSearchService: POISearchService = .shared,
+        tollRoadService: TollRoadService = .shared,
+        evRangeService: EvRangeServiceProtocol = EvRangeService.shared,
+        evChargingPlannerService: EvChargingPlannerServiceProtocol = EvChargingPlannerService.shared,
+        elevationService: ElevationServiceProtocol = ElevationService.shared
+    ) {
         self.wizPathService = wizPathService
         self.departureOptimizerService = departureOptimizerService
+        self.climateService = climateService
+        self.sentinelService = sentinelService
+        self.cyclingSafetyService = cyclingSafetyService
+        self.poiSearchService = poiSearchService
+        self.tollRoadService = tollRoadService
+        self.evRangeService = evRangeService
+        self.evChargingPlannerService = evChargingPlannerService
+        self.elevationService = elevationService
         loadCurrentLocation()
         loadRecentDestinations()
     }
@@ -258,7 +239,6 @@ public final class WizPathViewModel {
 
     public func calculateRoute() async {
         guard isOnline else {
-            // During auto-refresh, only keep the cached route if it's still fresh
             if isAutoRefreshing,
                let lastRoute = lastCalculatedRoute,
                let timestamp = lastCalculatedRouteTimestamp,
@@ -279,21 +259,42 @@ public final class WizPathViewModel {
             isAutoRefreshing = false
             return
         }
+
         state = .calculating
         if !isAutoRefreshing { HapticEngine.shared.medium() }
+
         do {
-            let result = try await wizPathService.calculateRouteWithCandidates(
-                origin: origin,
-                destination: destination,
-                mode: travelMode,
-                departureTime: departureTime,
-                avoidTollRoads: avoidTollRoads
-            )
+            // Run the route calculation with a timeout to prevent hangs
+            // when MKDirections is slow or network is degraded
+            let result = try await withThrowingTaskGroup(
+                of: (best: WizPathRoute, candidates: [ScoredRouteCandidate]).self
+            ) { group in
+                // The actual route calculation
+                group.addTask {
+                    try await self.wizPathService.calculateRouteWithCandidates(
+                        origin: origin,
+                        destination: destination,
+                        mode: self.travelMode,
+                        departureTime: self.departureTime,
+                        avoidTollRoads: self.avoidTollRoads
+                    )
+                }
+                // Timeout guard — if this fires first, we cancel the calculation
+                group.addTask {
+                    try await Task.sleep(nanoseconds: UInt64(Self.routeCalculationTimeout * 1_000_000_000))
+                    throw WizPathError.timeout
+                }
+                // Take whichever completes first (route or timeout)
+                let result = try await group.next()!
+                // Cancel remaining tasks (the timeout or the calculation)
+                group.cancelAll()
+                return result
+            }
+
             let route = result.best
             routeCandidates = result.candidates
             selectedRouteIndex = 0
 
-            // Extract traffic/toll info from the best candidate
             if let bestCandidate = result.candidates.first {
                 currentTrafficCongestion = bestCandidate.trafficCongestion
                 hasTollRoads = bestCandidate.hasTollRoads
@@ -302,10 +303,9 @@ public final class WizPathViewModel {
                 hasTollRoads = false
             }
             climateAnalysis = climateService.analyzeRouteClimate(route, travelMode: travelMode)
-                // Analyze cycling safety if applicable
+
             if travelMode == .cycling {
                 cyclingSafetyAnalysis = cyclingSafetyService.analyzeCyclingSafety(route: route)
-                // Add health recommendations from climate service (hydration, crosswind, wet roads)
                 let winds = route.segments.compactMap { $0.weather?.windSpeed }
                 let temps = route.segments.compactMap { $0.weather?.temperature }
                 let precips = route.segments.compactMap { $0.weather?.precipitationChance }
@@ -322,7 +322,6 @@ public final class WizPathViewModel {
                 cyclingSafetyRecommendations = []
             }
 
-            // Compute EV recommendations only when the car is marked as electric.
             if travelMode == .car, isElectricVehicle, let maxTemp = climateAnalysis?.maxTemperature {
                 evRecommendations = climateService.getEVRecommendations(temperature: maxTemp)
             } else {
@@ -344,8 +343,17 @@ public final class WizPathViewModel {
                         return climateAnalysis?.isExtremeHeat == true ? .extremeHeat : nil
                     }
                 }()
-                let weatherContext = WeatherContext(primaryHazard: primaryHazard, temperature: climateAnalysis?.maxTemperature, conditions: routeConditions, isExtreme: climateAnalysis?.isExtremeHeat ?? false)
-                let decision = sentinelService.evaluateRouteChange(originalRoute: previousRoute, updatedRoute: route, weatherContext: weatherContext)
+                let weatherContext = WeatherContext(
+                    primaryHazard: primaryHazard,
+                    temperature: climateAnalysis?.maxTemperature,
+                    conditions: routeConditions,
+                    isExtreme: climateAnalysis?.isExtremeHeat ?? false
+                )
+                let decision = sentinelService.evaluateRouteChange(
+                    originalRoute: previousRoute,
+                    updatedRoute: route,
+                    weatherContext: weatherContext
+                )
                 if case .trigger(let alert) = decision {
                     sentinelAlerts.append(alert)
                     await sentinelService.dispatchSentinelAlert(alert)
@@ -358,27 +366,32 @@ public final class WizPathViewModel {
             state = .routeReady(route)
             showJourneyHUD = true
             refreshChargingStations(for: route)
+            resolveElevationProfile(for: route)
             if !isAutoRefreshing { HapticEngine.shared.success() }
             startAutoRefresh()
             resolvePlaceNames(for: route)
             AppLogger.wizPath.info("Route calculated: \(route.totalDuration)s, risk: \(route.overallRisk.rawValue)")
         } catch let error as WizPathError {
-            if isAutoRefreshing {
-                AppLogger.wizPath.warning("Auto-refresh failed (keeping old route): \(error.localizedDescription)")
-                if let lastRoute = lastCalculatedRoute {
+            if case .timeout = error {
+                AppLogger.wizPath.error("Route calculation timed out after \(Self.routeCalculationTimeout)s")
+                if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
                     state = .routeReady(lastRoute)
+                } else {
+                    state = .error(WizPathKitL10n.text("wizpath_error_timeout"))
+                    HapticEngine.shared.warning()
                 }
             } else {
-                state = .error(error.localizedDescription)
-                HapticEngine.shared.warning()
+                if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
+                    state = .routeReady(lastRoute)
+                } else {
+                    state = .error(error.localizedDescription)
+                    HapticEngine.shared.warning()
+                }
             }
         } catch {
             AppLogger.wizPath.error("Route calculation failed: \(error.localizedDescription)")
-            if isAutoRefreshing {
-                AppLogger.wizPath.warning("Auto-refresh failed (keeping old route): \(error.localizedDescription)")
-                if let lastRoute = lastCalculatedRoute {
-                    state = .routeReady(lastRoute)
-                }
+            if isAutoRefreshing, let lastRoute = lastCalculatedRoute {
+                state = .routeReady(lastRoute)
             } else {
                 state = .error(WizPathKitL10n.text("wizpath_error_route_failed"))
                 HapticEngine.shared.error()
@@ -406,7 +419,6 @@ public final class WizPathViewModel {
                 latestDeparture: sixHoursLater
             )
             
-            // Only suggest if the best time is in the future
             guard result.bestDepartureTime > now else { return }
             
             self.bestDepartureTime = result.bestDepartureTime
@@ -428,7 +440,6 @@ public final class WizPathViewModel {
             }
         } catch {
             AppLogger.wizPath.error("Departure optimization failed: \(error.localizedDescription)")
-            // Silent fallback — bestDepartureTime stays nil
         }
     }
 
@@ -436,7 +447,6 @@ public final class WizPathViewModel {
 
     public func switchTravelMode(to mode: TravelMode) {
         travelMode = mode
-        // Reset cycling analysis when switching modes
         if mode != .cycling {
             cyclingSafetyAnalysis = nil
             cyclingSafetyRecommendations = []
@@ -450,7 +460,6 @@ public final class WizPathViewModel {
     }
 
     public func updateDepartureTime(_ date: Date) {
-        // Clamp to future: if the selected time is in the past, advance to tomorrow at the same time
         let now = Date()
         let finalDate: Date
         if date <= now {
@@ -477,6 +486,8 @@ public final class WizPathViewModel {
         chargingStationsTask = nil
         placeNameTask?.cancel()
         placeNameTask = nil
+        elevationTask?.cancel()
+        elevationTask = nil
         lastCalculatedRoute = nil
         lastCalculatedRouteTimestamp = nil
         selectedWaypointIds = nil
@@ -493,6 +504,7 @@ public final class WizPathViewModel {
         chargingStations = []
         evRangeEstimate = nil
         evChargingPlan = nil
+        elevationProfile = nil
         segmentPlaceNames = [:]
         routeCandidates = []
         selectedRouteIndex = 0
@@ -504,156 +516,36 @@ public final class WizPathViewModel {
         HapticEngine.shared.light()
     }
 
-    public func setElectricVehicleEnabled(_ enabled: Bool) {
-        guard isElectricVehicle != enabled else { return }
-        // EV mode is only valid for car travel — reject enable for other modes
-        guard travelMode == .car || !enabled else { return }
-        isElectricVehicle = enabled
-        updateElectricVehicleContent()
-        HapticEngine.shared.selectionChanged()
-    }
+    // MARK: - EV Mode, Charging Stations & Smart Stop Helpers
+    // (Defined in WizPathViewModel+EV.swift)
 
-    // MARK: - Route Annotations
+    // MARK: - Maps URL Builders
+    // (Defined in WizPathViewModel+Navigation.swift)
 
-    private func updateElectricVehicleContent() {
-        if travelMode == .car, isElectricVehicle, let maxTemp = climateAnalysis?.maxTemperature {
-            evRecommendations = climateService.getEVRecommendations(temperature: maxTemp)
-        } else {
-            evRecommendations = []
-        }
-        if let route = currentRoute {
-            refreshChargingStations(for: route)
-        }
-    }
+    // MARK: - Elevation Profile
 
-    private func refreshChargingStations(for route: WizPathRoute) {
-        isLoadingMapDetails = true
-        chargingStationsTask?.cancel()
-        chargingStations = []
-
-        let categories: [POICategory]
-        switch travelMode {
-        case .car:
-            if isElectricVehicle {
-                categories = [.evCharger, .restStop]
-            } else {
-                categories = [.gasStation, .restStop]
-            }
-        case .cycling, .walking:
-            categories = [.restStop, .restaurant]
-        }
-
+    func resolveElevationProfile(for route: WizPathRoute) {
+        elevationTask?.cancel()
         let routeID = route.id
-        chargingStationsTask = Task { [weak self] in
-            guard let self else { return }
-            defer { self.isLoadingMapDetails = false }
-            let foundStops = await self.poiSearchService.searchSmartStopsAlongRoute(route: route, categories: categories)
-            
-            guard !Task.isCancelled,
-                  self.currentRoute?.id == routeID else { return }
-                  
-            var enrichedStops: [SmartStop] = []
-            for stop in foundStops {
-                let arrivalSegment = self.closestSegment(for: stop.coordinate, in: route)
-                let weatherAtArrival = arrivalSegment?.weather
-                let safetyStatus = self.computeStopSafetyStatus(weather: weatherAtArrival)
-                let recommendation = self.generateWeatherRecommendation(
-                    category: stop.category,
-                    weather: weatherAtArrival,
-                    mode: self.travelMode
-                )
-
-                let enriched = SmartStop(
-                    id: stop.id,
-                    mapItem: stop.mapItem,
-                    coordinate: stop.coordinate,
-                    name: stop.name,
-                    category: stop.category,
-                    etaArrival: arrivalSegment?.estimatedArrival ?? stop.etaArrival,
-                    weatherAtArrival: weatherAtArrival,
-                    safetyStatus: safetyStatus,
-                    distanceFromRoute: stop.distanceFromRoute,
-                    estimatedStopDuration: stop.estimatedStopDuration,
-                    weatherRecommendation: recommendation
-                )
-                enrichedStops.append(enriched)
-            }
-            
-            self.chargingStations = enrichedStops
-            
-            // Calculate EV Range and Charging stops plan if electric vehicle mode is active
-            if self.travelMode == .car, self.isElectricVehicle {
-                let rangeEst = await EvRangeService.shared.estimateRange(
-                    for: route,
-                    baseRangeKm: 400.0,
-                    batteryCapacityKwh: 75.0,
-                    startingChargePercent: 80.0
-                )
-                self.evRangeEstimate = rangeEst
-                
-                let plan = await EvChargingPlannerService.shared.planChargingStops(
-                    for: route,
-                    chargers: enrichedStops.filter { $0.category == .evCharger },
-                    batteryCapacityKwh: 75.0,
-                    startingChargePercent: 80.0,
-                    thresholdPercent: 15.0
-                )
-                self.evChargingPlan = plan
-            } else {
-                self.evRangeEstimate = nil
-                self.evChargingPlan = nil
+        elevationTask = Task { [weak self] in
+            do {
+                let profile = try await self?.elevationService.fetchElevationProfile(for: route)
+                guard !Task.isCancelled,
+                      let self,
+                      let profile,
+                      self.currentRoute?.id == routeID else { return }
+                self.elevationProfile = profile
+                AppLogger.wizPath.info("Elevation profile loaded: \(profile.terrainType.rawValue), \(Int(profile.totalClimbMeters))m climb")
+            } catch {
+                AppLogger.wizPath.warning("Elevation profile failed: \(error.localizedDescription)")
+                self?.elevationProfile = nil
             }
         }
     }
 
-    // MARK: - Smart Stop Helpers
+    // MARK: - Place Name Resolution
 
-    /// Finds the route segment closest to a given coordinate.
-    private func closestSegment(for coordinate: CLLocationCoordinate2D, in route: WizPathRoute) -> WizPathSegment? {
-        let stopLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        return route.segments.min(by: {
-            let locA = CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude)
-            let locB = CLLocation(latitude: $1.coordinate.latitude, longitude: $1.coordinate.longitude)
-            return stopLocation.distance(from: locA) < stopLocation.distance(from: locB)
-        })
-    }
-
-    private func computeStopSafetyStatus(weather: SegmentWeather?) -> POISafetyStatus {
-        guard let weather = weather else { return .safe }
-        switch weather.severity {
-        case .good: return .safe
-        case .fair: return .safe
-        case .caution: return .caution
-        case .severe: return .unsafe
-        }
-    }
-
-    private func generateWeatherRecommendation(category: POICategory, weather: SegmentWeather?, mode: TravelMode) -> String? {
-        guard let weather = weather else { return nil }
-        
-        switch weather.condition {
-        case .thunderstorm, .heavyRain, .snow, .sleet:
-            switch category {
-            case .restStop, .restaurant:
-                return WizPathKitL10n.text("wizpath_rec_severe_shelter")
-            default:
-                return WizPathKitL10n.text("wizpath_rec_severe_wait")
-            }
-        case .windy:
-            if mode == .cycling || mode == .walking {
-                return WizPathKitL10n.text("wizpath_rec_strong_wind_stop")
-            }
-        case .rain:
-            return WizPathKitL10n.text("wizpath_rec_rain_break")
-        default:
-            if weather.temperature >= 28.0 {
-                return WizPathKitL10n.formatted("wizpath_rec_high_temp", Int(weather.temperature))
-            }
-        }
-        return nil
-    }
-
-    private func resolvePlaceNames(for route: WizPathRoute) {
+    func resolvePlaceNames(for route: WizPathRoute) {
         placeNameTask?.cancel()
         segmentPlaceNames = [:]
 
@@ -668,75 +560,10 @@ public final class WizPathViewModel {
         }
     }
 
-    // MARK: - Maps URL Builders
-    /// Builds the Apple Maps URL string with waypoints for the current route.
-    /// Falls back to the last calculated route when offline.
-    /// The View layer is responsible for opening the URL via UIApplication.
-    public func appleMapsURLString() -> String? {
-        guard mapsNavigationRoute != nil,
-              let origin = originCoordinate,
-              let destination = destinationCoordinate else { return nil }
-
-        var urlString = "maps://?saddr=\(origin.latitude),\(origin.longitude)"
-        for stop in selectedMapsWaypoints {
-            urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
-        }
-        urlString += "&daddr=\(destination.latitude),\(destination.longitude)"
-        if avoidTollRoads { urlString += "&no_tolls=true" }
-        return urlString
-    }
-
-    public func appleMapsWebURLString() -> String? {
-        guard mapsNavigationRoute != nil,
-              let origin = originCoordinate,
-              let destination = destinationCoordinate else { return nil }
-        var webString = "https://maps.apple.com/?saddr=\(origin.latitude),\(origin.longitude)"
-        for stop in selectedMapsWaypoints {
-            webString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
-        }
-        webString += "&daddr=\(destination.latitude),\(destination.longitude)"
-        if avoidTollRoads { webString += "&dirflg=d" }
-        return webString
-    }
-
-    /// Builds the Google Maps URL string with waypoints for the current route.
-    /// Falls back to the last calculated route when offline.
-    public func googleMapsURLString() -> String? {
-        guard mapsNavigationRoute != nil,
-              let origin = originCoordinate,
-              let destination = destinationCoordinate else { return nil }
-
-        var urlString = "comgooglemaps://?saddr=\(origin.latitude),\(origin.longitude)"
-        for stop in selectedMapsWaypoints {
-            urlString += "&daddr=\(stop.coordinate.latitude),\(stop.coordinate.longitude)"
-        }
-        urlString += "&daddr=\(destination.latitude),\(destination.longitude)&directionsmode=driving"
-        if avoidTollRoads { urlString += "&avoid=tolls" }
-        return urlString
-    }
-
-    /// Builds the Google Maps web URL string with waypoints for the current route.
-    /// Falls back to the last calculated route when offline.
-    public func googleMapsWebURLString() -> String? {
-        guard mapsNavigationRoute != nil,
-              let origin = originCoordinate,
-              let destination = destinationCoordinate else { return nil }
-        var webString = "https://www.google.com/maps/dir/?api=1&origin=\(origin.latitude),\(origin.longitude)"
-        if !selectedMapsWaypoints.isEmpty {
-            let waypointsStr = selectedMapsWaypoints.map { "\($0.coordinate.latitude),\($0.coordinate.longitude)" }.joined(separator: "%7C")
-            webString += "&waypoints=\(waypointsStr)"
-        }
-        webString += "&destination=\(destination.latitude),\(destination.longitude)&travelmode=driving"
-        if avoidTollRoads { webString += "&avoid=tolls" }
-        return webString
-    }
-
     public func dismissError() { state = .idle }
 
     // MARK: - Auto-Refresh Timer
 
-    /// Starts a periodic timer that recalculates the route every 3 minutes
-    /// to account for traffic changes. Stops if the route is reset.
     private func startAutoRefresh() {
         refreshTimer?.cancel()
         refreshTimer = Task { [weak self] in

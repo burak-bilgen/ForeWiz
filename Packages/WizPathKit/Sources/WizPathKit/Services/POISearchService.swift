@@ -6,14 +6,42 @@ import CoreLocation
 
 public final class POISearchService: Sendable {
     public static let shared = POISearchService()
+
+    // Basit in-memory cache: hash → [SmartStop]
+    private let cache = POISearchCache()
+
     private init() {}
 
-    public func searchSmartStopsAlongRoute(route: WizPathRoute, categories: [POICategory], radius: CLLocationDistance = 10_000) async -> [SmartStop] {
+    /// Rota boyunca akıllı durak (POI) araması yapar.
+    /// - Parameters:
+    ///   - route: Analiz edilecek rota.
+    ///   - categories: Aranacak POI kategorileri.
+    ///   - radius: Her arama noktası etrafındaki tarama yarıçapı (metre).
+    ///   - maxRouteDeviation: Rotadan maksimum sapma (metre) — bundan uzak POI'lar filtrelenir.
+    ///   - forceRefresh: `true` ise cache'i atlayıp yeni arama yapar.
+    public func searchSmartStopsAlongRoute(
+        route: WizPathRoute,
+        categories: [POICategory],
+        radius: CLLocationDistance = 10_000,
+        maxRouteDeviation: CLLocationDistance = 2_000,
+        forceRefresh: Bool = false
+    ) async -> [SmartStop] {
         let routeCoordinates = route.routeCoordinates
         guard !routeCoordinates.isEmpty, !categories.isEmpty else { return [] }
 
+        // Cache key: origin + destination + travel mode + kategoriler + radius
+        // (route.id kullanılmaz çünkü her hesaplamada değişir — cache hep miss olur)
+        let og = route.origin
+        let dst = route.destination
+        let cacheKey = "\(og.latitude),\(og.longitude)|\(dst.latitude),\(dst.longitude)|\(route.travelMode.rawValue)|\(categories.map(\.rawValue).sorted().joined()):\(Int(radius))"
+        if !forceRefresh, let cached = cache.retrieve(key: cacheKey) {
+            return cached
+        }
+
+        let searchPoints = searchCoordinates(from: routeCoordinates)
+
         var stops: [SmartStop] = []
-        for coordinate in searchCoordinates(from: routeCoordinates) {
+        for coordinate in searchPoints {
             for category in categories {
                 guard !Task.isCancelled else { return [] }
 
@@ -39,24 +67,35 @@ public final class POISearchService: Sendable {
                     latitudinalMeters: radius,
                     longitudinalMeters: radius
                 )
-                stops.append(contentsOf: await executeSearch(request, category: category, routeCoordinates: routeCoordinates))
+                stops.append(contentsOf: await executeSearch(
+                    request, category: category, routeCoordinates: routeCoordinates,
+                    maxRouteDeviation: maxRouteDeviation
+                ))
             }
         }
 
         let dedupped = deduplicated(stops)
-        
-        // Compute premium niche scores and sort descending
+
+        // Skorla ve sırala
         let scoredStops = dedupped.map { stop -> (stop: SmartStop, score: Double) in
-            return (stop, self.calculateNicheScore(for: stop))
+            (stop, self.calculateNicheScore(for: stop))
         }.sorted { $0.score > $1.score }
-        
-        // Apply spatial spacing filter to prevent recommendation clustering (e.g. 10 gas stations in a row)
-        let minSpacing = max(8_000, min(25_000, route.totalDistance / 6))
+
+        // Mesafe filtresi: aynı kategorideki duraklar arasında minimum boşluk bırak
+        let segmentCount = max(1, route.segments.count)
+        let avgSegmentDistanceKm = route.totalDistance / Double(segmentCount) / 1000.0
+        let minSpacing: CLLocationDistance
+        if avgSegmentDistanceKm > 5 {
+            // Otoyol/kırsal: seyrek duraklar
+            minSpacing = max(10_000, min(30_000, route.totalDistance / 5))
+        } else {
+            // Şehir içi: daha sık durak
+            minSpacing = max(3_000, min(15_000, route.totalDistance / 8))
+        }
+
         var acceptedStops: [SmartStop] = []
-        
         for item in scoredStops {
             let stop = item.stop
-            // Check if there is an accepted stop of the same category that is too close
             let tooClose = acceptedStops.contains { accepted in
                 accepted.category == stop.category &&
                 self.coordinateDistance(accepted.coordinate, stop.coordinate) < minSpacing
@@ -65,57 +104,143 @@ public final class POISearchService: Sendable {
                 acceptedStops.append(stop)
             }
         }
-        
-        return Array(acceptedStops.prefix(12))
+
+        let result = Array(acceptedStops.prefix(12))
+
+        // Cache'e kaydet (5 dakika TTL)
+        cache.store(key: cacheKey, stops: result, ttl: 300)
+
+        return result
     }
 
-    public func searchChargersAlongRoute(route: WizPathRoute, radius: CLLocationDistance = 10_000) async -> [SmartStop] {
-        await searchSmartStopsAlongRoute(route: route, categories: [.evCharger], radius: radius)
+    public func searchChargersAlongRoute(
+        route: WizPathRoute,
+        radius: CLLocationDistance = 10_000,
+        forceRefresh: Bool = false
+    ) async -> [SmartStop] {
+        await searchSmartStopsAlongRoute(
+            route: route, categories: [.evCharger], radius: radius,
+            forceRefresh: forceRefresh
+        )
     }
 
-    private func executeSearch(_ request: MKLocalSearch.Request, category: POICategory, routeCoordinates: [CLLocationCoordinate2D]) async -> [SmartStop] {
+    /// Cache'i temizle — kullanıcı manuel yenileme yaparsa çağrılabilir.
+    public func clearCache() {
+        cache.clear()
+    }
+
+    // MARK: - MKLocalSearch
+
+    private func executeSearch(
+        _ request: MKLocalSearch.Request,
+        category: POICategory,
+        routeCoordinates: [CLLocationCoordinate2D],
+        maxRouteDeviation: CLLocationDistance
+    ) async -> [SmartStop] {
         let search = MKLocalSearch(request: request)
-        return await withCheckedContinuation { continuation in
+        // 1. MKLocalSearch sonuçlarını bekle (sync callback → async continuation)
+        let mapItems: [MKMapItem] = await withCheckedContinuation { continuation in
             search.start { response, error in
                 guard let response = response, error == nil else {
                     continuation.resume(returning: [])
                     return
                 }
-                let stops = response.mapItems.compactMap { mapItem -> SmartStop? in
-                    guard let coordinate = mapItem.placemark.location?.coordinate else { return nil }
-                    let distanceFromRoute = self.distanceFromRoute(coordinate, routeCoordinates: routeCoordinates)
-                    return SmartStop(
-                        id: UUID(),
-                        mapItem: mapItem,
-                        coordinate: coordinate,
-                        name: mapItem.name ?? category.defaultName,
-                        category: category,
-                        etaArrival: Date(),
-                        weatherAtArrival: nil,
-                        safetyStatus: .safe,
-                        distanceFromRoute: distanceFromRoute,
-                        estimatedStopDuration: 1800
-                    )
-                }
-                continuation.resume(returning: stops)
+                continuation.resume(returning: response.mapItems)
             }
         }
+
+        guard !mapItems.isEmpty else { return [] }
+
+        // 2. Temel SmartStop'ları oluştur (sync — mesafe filtresi + statik alanlar)
+        var preliminaryStops: [(stop: SmartStop, coordinate: CLLocationCoordinate2D)] = []
+        for mapItem in mapItems {
+            guard let coordinate = mapItem.placemark.location?.coordinate else { continue }
+            let distanceFromRoute = self.distanceFromRoute(coordinate, routeCoordinates: routeCoordinates)
+            guard distanceFromRoute <= maxRouteDeviation else { continue }
+
+            let stop = SmartStop(
+                id: UUID(),
+                mapItem: mapItem,
+                coordinate: coordinate,
+                name: mapItem.name ?? category.defaultName,
+                category: category,
+                etaArrival: Date(),
+                weatherAtArrival: nil,
+                safetyStatus: .safe,
+                distanceFromRoute: distanceFromRoute,
+                estimatedStopDuration: 1800,
+                phoneNumber: mapItem.phoneNumber,
+                url: mapItem.url,
+                connectorTypes: [] // placeholder, async'de doldurulacak
+            )
+            preliminaryStops.append((stop, coordinate))
+        }
+
+        guard !preliminaryStops.isEmpty else { return [] }
+
+        // 3. EV charger'lar için async connector type lookup (Overpass API + statik fallback)
+        if category == .evCharger {
+            for i in preliminaryStops.indices {
+                let item = preliminaryStops[i]
+                let types = await ChargerConnectorLookup.connectorTypes(
+                    forStationName: item.stop.name,
+                    coordinate: item.coordinate
+                )
+                // SmartStop immutable — yeni instance oluştur
+                let original = item.stop
+                preliminaryStops[i].stop = SmartStop(
+                    id: original.id,
+                    mapItem: original.mapItem,
+                    coordinate: original.coordinate,
+                    name: original.name,
+                    category: original.category,
+                    etaArrival: original.etaArrival,
+                    weatherAtArrival: original.weatherAtArrival,
+                    safetyStatus: original.safetyStatus,
+                    distanceFromRoute: original.distanceFromRoute,
+                    estimatedStopDuration: original.estimatedStopDuration,
+                    phoneNumber: original.phoneNumber,
+                    url: original.url,
+                    connectorTypes: types,
+                    chargingStationCount: original.chargingStationCount
+                )
+            }
+        }
+
+        return preliminaryStops.map { $0.stop }
     }
 
-    private func searchCoordinates(from routeCoordinates: [CLLocationCoordinate2D]) -> [CLLocationCoordinate2D] {
-        guard routeCoordinates.count > 1 else { return routeCoordinates }
+    // MARK: - Search Coordinate Sampling
 
-        let lastIndex = routeCoordinates.count - 1
-        let indices = Set([
-            0,
-            routeCoordinates.count / 4,
-            routeCoordinates.count / 2,
-            (routeCoordinates.count * 3) / 4,
-            lastIndex
-        ])
+    /// Rota koordinatlarından mesafe bazlı akıllı örnekleme yapar.
+    /// Her ~15km'de bir arama noktası seçer, minimum 9 maksimum 25 nokta.
+    private func searchCoordinates(from routeCoordinates: [CLLocationCoordinate2D]) -> [CLLocationCoordinate2D] {
+        let count = routeCoordinates.count
+        guard count > 1 else { return routeCoordinates }
+
+        // Rota toplam mesafesini kabaca hesapla
+        var totalDistance: CLLocationDistance = 0
+        for i in 1..<count {
+            let prev = CLLocation(latitude: routeCoordinates[i-1].latitude, longitude: routeCoordinates[i-1].longitude)
+            let cur = CLLocation(latitude: routeCoordinates[i].latitude, longitude: routeCoordinates[i].longitude)
+            totalDistance += cur.distance(from: prev)
+        }
+
+        let km = totalDistance / 1000.0
+        // Her ~15km'de bir nokta, ama minimum 9 maksimum 25
+        let targetCount = max(9, min(25, Int(km / 15.0) + 2))
+
+        let step = max(1, (count - 1) / (targetCount - 1))
+        var indices: Set<Int> = [0]
+        for i in stride(from: step, to: count - 1, by: step) {
+            indices.insert(i)
+        }
+        indices.insert(count - 1)
 
         return indices.sorted().map { routeCoordinates[$0] }
     }
+
+    // MARK: - Deduplication
 
     private func deduplicated(_ stops: [SmartStop]) -> [SmartStop] {
         var seen: Set<String> = []
@@ -131,6 +256,8 @@ public final class POISearchService: Sendable {
         return "\(latitude):\(longitude)"
     }
 
+    // MARK: - Distance Helpers
+
     private func distanceFromRoute(_ coordinate: CLLocationCoordinate2D, routeCoordinates: [CLLocationCoordinate2D]) -> CLLocationDistance {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         return routeCoordinates
@@ -138,45 +265,86 @@ public final class POISearchService: Sendable {
             .min() ?? 0
     }
 
-    private func calculateNicheScore(for stop: SmartStop) -> Double {
-        var score = 100.0
-        
-        // Website adds points (high quality, premium niche stop)
-        if stop.mapItem.url != nil {
-            score += 30.0
-        }
-        
-        // Phone number adds points (verified establishment)
-        if stop.mapItem.phoneNumber != nil {
-            score += 15.0
-        }
-        
-        // Distance penalty: -1 point per 200 meters from the route
-        let distPenalty = stop.distanceFromRoute / 200.0
-        score -= distPenalty
-        
-        // Check if the place has a generic, boring name (like generic "Gas", "Station", "Petrol")
-        let nameLower = stop.name.lowercased()
-        let hasGenericName = nameLower.contains("gas") || nameLower.contains("station") || nameLower.contains("petrol") || nameLower.contains("benzin") || nameLower.contains("otogaz") || nameLower.contains("istasyonu")
-        
-        if hasGenericName {
-            score -= 20.0
-        } else {
-            // Unique/Niche named places get a boost
-            score += 20.0
-        }
-        
-        // Category preference: restaurants/cafes and rest stops are more "niche/comfort" than generic gas stations
-        if stop.category == .restaurant || stop.category == .restStop {
-            score += 15.0
-        }
-        
-        return score
-    }
-
     private func coordinateDistance(_ c1: CLLocationCoordinate2D, _ c2: CLLocationCoordinate2D) -> CLLocationDistance {
         let loc1 = CLLocation(latitude: c1.latitude, longitude: c1.longitude)
         let loc2 = CLLocation(latitude: c2.latitude, longitude: c2.longitude)
         return loc1.distance(from: loc2)
+    }
+
+    // MARK: - Niche Scoring
+
+    private func calculateNicheScore(for stop: SmartStop) -> Double {
+        var score = 100.0
+
+        // Website adds points (high quality, premium niche stop)
+        if stop.mapItem.url != nil {
+            score += 30.0
+        }
+
+        // Phone number adds points (verified establishment)
+        if stop.mapItem.phoneNumber != nil {
+            score += 15.0
+        }
+
+        // Distance penalty: -1 point per 200 meters from the route
+        let distPenalty = stop.distanceFromRoute / 200.0
+        score -= distPenalty
+
+        // Generic/niche name detection
+        let nameLower = stop.name.lowercased()
+        let hasGenericName = nameLower.contains("gas") || nameLower.contains("station") || nameLower.contains("petrol") || nameLower.contains("benzin") || nameLower.contains("otogaz") || nameLower.contains("istasyonu")
+
+        if hasGenericName {
+            score -= 20.0
+        } else {
+            score += 20.0
+        }
+
+        // Category preference
+        if stop.category == .restaurant || stop.category == .restStop {
+            score += 15.0
+        }
+
+        return max(0, score)
+    }
+}
+
+// MARK: - POI Search Cache
+
+private final class POISearchCache: @unchecked Sendable {
+    private var cache: [String: CacheEntry] = [:]
+    private let lock = NSLock()
+
+    private struct CacheEntry {
+        let stops: [SmartStop]
+        let timestamp: Date
+        let ttl: TimeInterval
+        var isExpired: Bool { Date().timeIntervalSince(timestamp) > ttl }
+    }
+
+    func retrieve(key: String) -> [SmartStop]? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard let entry = cache[key], !entry.isExpired else {
+            cache.removeValue(forKey: key)
+            return nil
+        }
+        return entry.stops
+    }
+
+    func store(key: String, stops: [SmartStop], ttl: TimeInterval) {
+        lock.lock()
+        defer { lock.unlock() }
+        cache[key] = CacheEntry(stops: stops, timestamp: Date(), ttl: ttl)
+        // Periyodik temizlik: 30'dan fazla giriş varsa süresi dolanları temizle
+        if cache.count > 30 {
+            cache = cache.filter { !$0.value.isExpired }
+        }
+    }
+
+    func clear() {
+        lock.lock()
+        defer { lock.unlock() }
+        cache.removeAll()
     }
 }

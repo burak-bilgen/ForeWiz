@@ -18,11 +18,22 @@ public struct SmartStop: Identifiable, Sendable, Equatable {
     public let distanceFromRoute: CLLocationDistance
     public let estimatedStopDuration: TimeInterval
     public let weatherRecommendation: String?
+    // MARK: - Real-World POI Metadata
+    /// Phone number from MKMapItem (e.g. "+1 (555) 123-4567")
+    public let phoneNumber: String?
+    /// Business website URL from MKMapItem
+    public let url: URL?
+    /// EV connector types available at this charger
+    public let connectorTypes: [EVConnectorType]
+    /// Number of charging stations (if available)
+    public let chargingStationCount: Int?
 
     public init(id: UUID, mapItem: MKMapItem, coordinate: CLLocationCoordinate2D, name: String,
                 category: POICategory, etaArrival: Date, weatherAtArrival: SegmentWeather?,
                 safetyStatus: POISafetyStatus, distanceFromRoute: CLLocationDistance, estimatedStopDuration: TimeInterval,
-                weatherRecommendation: String? = nil) {
+                weatherRecommendation: String? = nil,
+                phoneNumber: String? = nil, url: URL? = nil,
+                connectorTypes: [EVConnectorType] = [], chargingStationCount: Int? = nil) {
         self.id = id
         self.mapItem = mapItem
         self.coordinate = coordinate
@@ -34,6 +45,10 @@ public struct SmartStop: Identifiable, Sendable, Equatable {
         self.distanceFromRoute = distanceFromRoute
         self.estimatedStopDuration = estimatedStopDuration
         self.weatherRecommendation = weatherRecommendation
+        self.phoneNumber = phoneNumber
+        self.url = url
+        self.connectorTypes = connectorTypes
+        self.chargingStationCount = chargingStationCount
     }
 
     public var displayTitle: String {
@@ -47,7 +62,9 @@ public struct SmartStop: Identifiable, Sendable, Equatable {
     public var etaDisplay: String {
         WizPathKitFormatters.shortTime.string(from: etaArrival)
     }
+
 }
+
 
 // MARK: - POI Category
 public enum POICategory: String, Sendable {

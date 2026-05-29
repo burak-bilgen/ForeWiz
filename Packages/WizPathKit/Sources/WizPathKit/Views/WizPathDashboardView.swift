@@ -21,6 +21,9 @@ public struct WizPathDashboardView: View {
     @State private var isNavigatingToMaps = false
     @State private var navigationRotationAngle: Double = 0
     @State private var mapsError: String?
+    @State private var contentAppeared = false
+    @State private var loadingDotOffset: CGFloat = 0
+
 
     /// Closure that handles maps export (e.g. showing a rewarded ad first).
     /// Default implementation proceeds directly to the maps action.
@@ -44,6 +47,13 @@ public struct WizPathDashboardView: View {
                 AppBackground().ignoresSafeArea()
                 if let viewModel {
                     contentView(viewModel: viewModel)
+                        .opacity(contentAppeared ? 1 : 0)
+                        .scaleEffect(contentAppeared ? 1 : 0.92, anchor: .bottom)
+                        .onAppear {
+                            withAnimation(AppTheme.sheetSpring.delay(0.05)) {
+                                contentAppeared = true
+                            }
+                        }
                     
                     // Global Glassmorphic Loading Overlay
                     if !viewModel.didLoadInitialLocation || viewModel.isCalculating {
@@ -53,7 +63,8 @@ public struct WizPathDashboardView: View {
                                 .environment(\.colorScheme, .dark)
                                 .ignoresSafeArea()
                             
-                            VStack(spacing: 20) {
+                            VStack(spacing: 24) {
+                                // ── Spinner ──
                                 ZStack {
                                     Circle()
                                         .stroke(Color.liquidAccent.opacity(0.15), lineWidth: 6)
@@ -72,18 +83,37 @@ public struct WizPathDashboardView: View {
                                         .frame(width: 64, height: 64)
                                         .rotationEffect(.degrees(rotationAngle))
                                         .onAppear {
-                                            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
-                                                rotationAngle = 360
-                                            }
+                                            startSpinner()
                                         }
                                 }
                                 
+                                // ── Stage Text ──
                                 Text(loadingText(viewModel: viewModel))
-                                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                    .font(.system(size: 15, weight: .semibold, design: .rounded))
                                     .foregroundStyle(.white)
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 40)
-                                    .transition(.opacity)
+                                    .contentTransition(.numericText())
+                                    .animation(.easeInOut(duration: 0.3), value: viewModel.didLoadInitialLocation)
+                                
+                                // ── Stage Indicator Dots ──
+                                HStack(spacing: 8) {
+                                    LoadingStageDot(isActive: !viewModel.didLoadInitialLocation, offset: loadingDotOffset)
+                                    LoadingStageDot(isActive: viewModel.didLoadInitialLocation && viewModel.isCalculating, offset: loadingDotOffset)
+                                }
+                                .onAppear {
+                                    withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                                        loadingDotOffset = -8
+                                    }
+                                }
+                                .onChange(of: viewModel.didLoadInitialLocation) { _, _ in
+                                    loadingDotOffset = 0
+                                    DispatchQueue.main.async {
+                                        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                                            loadingDotOffset = -8
+                                        }
+                                    }
+                                }
                             }
                         }
                         .transition(.opacity)
@@ -126,6 +156,9 @@ public struct WizPathDashboardView: View {
                                         )
                                         .frame(width: 64, height: 64)
                                         .rotationEffect(.degrees(navigationRotationAngle))
+                                        .onAppear {
+                                            startNavigationSpinner()
+                                        }
                                 }
                                 
                                 if let error = mapsError {
@@ -208,25 +241,27 @@ public struct WizPathDashboardView: View {
     /// Falls back to the web URL if the native app is not installed.
     /// Dismisses the overlay immediately if neither URL can be opened,
     /// or after a short delay to allow the app switch animation to play.
+    /// - Parameter preferWeb: When true, tries the web URL first (native `maps://`
+    ///   doesn't support waypoints via multiple `daddr` params).
     private func openMapsURL(
         nativeURL: @escaping () -> String?,
-        webURL: @escaping () -> String?
+        webURL: @escaping () -> String?,
+        preferWeb: Bool = false
     ) {
         isNavigatingToMaps = true
         mapsError = nil
-        navigationRotationAngle = 0
-        withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
-            navigationRotationAngle = 360
-        }
+        // Spinner animation is handled by startNavigationSpinner() in the overlay's .onAppear.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if let urlStr = nativeURL(), let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) {
+            let primary = preferWeb ? webURL : nativeURL
+            let secondary = preferWeb ? nativeURL : webURL
+            if let urlStr = primary(), let url = URL(string: urlStr), UIApplication.shared.canOpenURL(url) {
                 UIApplication.shared.open(url, options: [:])
                 // Auto-dismiss after app switch
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     isNavigatingToMaps = false
                 }
-            } else if let webStr = webURL(), let webURL = URL(string: webStr) {
-                UIApplication.shared.open(webURL, options: [:])
+            } else if let secStr = secondary(), let secURL = URL(string: secStr) {
+                UIApplication.shared.open(secURL, options: [:])
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     isNavigatingToMaps = false
                 }
@@ -382,17 +417,21 @@ public struct WizPathDashboardView: View {
                     if viewModel.showJourneyHUD, let route = viewModel.mapsNavigationRoute {
                         JourneyHUDView(data: route.journeyHUDData).padding(.horizontal, 16)
                     }
-                    
+
+                    // Elevation profile card
+                    if let profile = viewModel.elevationProfile {
+                        ElevationCardView(profile: profile, hasTollRoads: viewModel.hasTollRoads)
+                            .padding(.horizontal, 16)
+                    }
+
                     // Cycling safety panel (only when in cycling mode)
                     if viewModel.travelMode == .cycling, let safety = viewModel.cyclingSafetyAnalysis {
                         CyclingSafetyPanel(safety: safety).padding(.horizontal, 16)
                     }
-                    // EV range, consumption, and smart charging planner panel
+                    // EV charging stations panel — shows real POI data along the route
                     if viewModel.travelMode == .car, viewModel.isElectricVehicle {
                         EvRangePlannerPanel(
-                            rangeEstimate: viewModel.evRangeEstimate,
-                            chargingPlan: viewModel.evChargingPlan,
-                            evRecommendations: viewModel.evRecommendations
+                            chargingStations: viewModel.chargingStations.filter { $0.category == .evCharger }
                         )
                         .padding(.horizontal, 16)
                     }
@@ -413,7 +452,12 @@ public struct WizPathDashboardView: View {
                                     viewModel.selectedWaypointIds = []
                                     pendingMapsAction = { [weak viewModel] in
                                         guard let vm = viewModel else { return }
-                                        onMapsExport { openMapsURL(nativeURL: { vm.appleMapsURLString() }, webURL: { vm.appleMapsWebURLString() }) }
+                                        // Web URL'yi önce dene — native maps:// waypoint'leri desteklemiyor
+                                        onMapsExport { openMapsURL(
+                                            nativeURL: { vm.appleMapsURLString() },
+                                            webURL: { vm.appleMapsWebURLString() },
+                                            preferWeb: true
+                                        )}
                                     }
                                     showWaypointPicker = true
                                 }
@@ -426,7 +470,12 @@ public struct WizPathDashboardView: View {
                                     viewModel.selectedWaypointIds = []
                                     pendingMapsAction = { [weak viewModel] in
                                         guard let vm = viewModel else { return }
-                                        onMapsExport { openMapsURL(nativeURL: { vm.googleMapsURLString() }, webURL: { vm.googleMapsWebURLString() }) }
+                                        // Web URL'yi önce dene — native maps:// waypoint'leri desteklemiyor
+                                        onMapsExport { openMapsURL(
+                                            nativeURL: { vm.googleMapsURLString() },
+                                            webURL: { vm.googleMapsWebURLString() },
+                                            preferWeb: true
+                                        )}
                                     }
                                     showWaypointPicker = true
                                 }
@@ -439,9 +488,30 @@ public struct WizPathDashboardView: View {
                         )
                         .padding(.horizontal, 16)
                     }
+                    // ── Inline Error Card (non-disruptive, shown when cached route exists) ──
+                    if let errorMsg = viewModel.errorMessage, viewModel.mapsNavigationRoute != nil {
+                        RouteErrorCard(
+                            message: errorMsg,
+                            isDismissable: true,
+                            onRetry: {
+                                viewModel.dismissError()
+                                Task { await viewModel.refreshRoute() }
+                            },
+                            onDismiss: { viewModel.dismissError() }
+                        )
+                        .padding(.horizontal, 16)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                    
                     Text(WizPathKitL10n.text("wizpath_powered_by_apple_maps")).font(.caption2).foregroundStyle(.tertiary).padding(.top, 4).padding(.bottom, 24)
                 }
-            }.safeAreaPadding(.bottom, 8)
+            }
+            .refreshable {
+                if viewModel.mapsNavigationRoute != nil {
+                    await viewModel.refreshRoute()
+                }
+            }
+            .safeAreaPadding(.bottom, 8)
         }
         .sheet(isPresented: $showDepartureOptimizer) {
             if let route = viewModel.mapsNavigationRoute {
@@ -476,14 +546,7 @@ public struct WizPathDashboardView: View {
                 viewModel.selectedChargingStation = nil
             }
         }
-        .alert(WizPathKitL10n.text("wizpath_route_error"), isPresented: .init(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.dismissError() } })) {
-            Button(WizPathKitL10n.text("wizpath_retry")) {
-                viewModel.dismissError()
-                Task { await viewModel.refreshRoute() }
-            }
-            Button(WizPathKitL10n.text("wizpath_cancel")) { viewModel.dismissError() }
-        } message: { Text(viewModel.errorMessage ?? "") }
-        // Waypoint Picker
+                // Waypoint Picker
         .sheet(isPresented: $showWaypointPicker) {
             NavigationStack {
                 WizPathWaypointPickerSheet(
@@ -557,6 +620,124 @@ public struct WizPathDashboardView: View {
                 .environment(\.colorScheme, .dark)
         )
         .accessibilityAddTraits(viewModel.isElectricVehicle ? .isSelected : [])
+    }
+
+    // MARK: - Spinner Helpers
+
+    /// Starts the route-loading spinner animation.
+    /// Resets the angle to 0 first so the animation always runs even when the overlay
+    /// reappears after initial location load (where rotationAngle would be stuck at 360).
+    private func startSpinner() {
+        rotationAngle = 0
+        DispatchQueue.main.async {
+            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                rotationAngle = 360
+            }
+        }
+    }
+
+    /// Starts the maps-navigation spinner animation (same fix).
+    private func startNavigationSpinner() {
+        navigationRotationAngle = 0
+        DispatchQueue.main.async {
+            withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
+                navigationRotationAngle = 360
+            }
+        }
+    }
+}
+
+// MARK: - Loading Stage Dot
+
+private struct LoadingStageDot: View {
+    let isActive: Bool
+    let offset: CGFloat
+
+    var body: some View {
+        Circle()
+            .fill(isActive ? Color.liquidAccent : Color.white.opacity(0.25))
+            .frame(width: 8, height: 8)
+            .offset(y: isActive ? offset : 0)
+            .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: offset)
+            .scaleEffect(isActive ? 1.2 : 1.0)
+            .animation(.easeInOut(duration: 0.4), value: isActive)
+    }
+}
+
+// MARK: - Route Error Card
+
+private struct RouteErrorCard: View {
+    let message: String
+    let isDismissable: Bool
+    let onRetry: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(Color(hex: "#FF453A").opacity(0.15))
+                    .frame(width: 48, height: 48)
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#FF453A"))
+            }
+
+            // Message
+            Text(message)
+                .font(.system(size: 14, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.85))
+                .multilineTextAlignment(.center)
+                .lineLimit(4)
+
+            // Buttons
+            HStack(spacing: 12) {
+                if isDismissable {
+                    Button(action: onDismiss) {
+                        Text(WizPathKitL10n.text("wizpath_cancel"))
+                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.6))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(.white.opacity(0.15), lineWidth: 1)
+                            )
+                    }
+                }
+
+                Button(action: onRetry) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 12, weight: .bold))
+                        Text(WizPathKitL10n.text("wizpath_retry"))
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: "#FF453A"), Color(hex: "#FF375F")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    )
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color(hex: "#FF453A").opacity(0.2), lineWidth: 1)
+                )
+        )
     }
 }
 

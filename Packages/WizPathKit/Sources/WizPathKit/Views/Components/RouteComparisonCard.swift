@@ -8,6 +8,8 @@ public struct RouteComparisonCard: View {
     let onSelect: (Int) -> Void
     let onClose: () -> Void
 
+    @State private var rowsAppeared: Set<Int> = []
+
     public init(candidates: [ScoredRouteCandidate], selectedIndex: Int,
                 onSelect: @escaping (Int) -> Void, onClose: @escaping () -> Void) {
         self.candidates = candidates
@@ -48,7 +50,7 @@ public struct RouteComparisonCard: View {
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(.secondary)
 
-                // Candidate rows
+                // Candidate rows with staggered entrance
                 ForEach(Array(candidates.enumerated()), id: \.element.id) { index, candidate in
                     RouteCandidateRow(
                         index: index,
@@ -57,6 +59,14 @@ public struct RouteComparisonCard: View {
                         isFirst: index == 0
                     ) {
                         onSelect(index)
+                    }
+                    .opacity(rowsAppeared.contains(index) ? 1 : 0)
+                    .offset(y: rowsAppeared.contains(index) ? 0 : 12)
+                    .onAppear {
+                        let delay = Double(index) * 0.06
+                        withAnimation(AppTheme.cardSpring.delay(delay)) {
+                            _ = rowsAppeared.insert(index)
+                        }
                     }
                 }
 

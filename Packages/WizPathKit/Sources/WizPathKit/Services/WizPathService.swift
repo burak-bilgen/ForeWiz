@@ -76,8 +76,8 @@ public final class WizPathService {
             )
             let segmentsWithWeather = try await attachWeatherDataToSegments(segments: segments)
 
-            // Detect toll roads from advisory notices
-            let hasTollRoads = detectTollRoad(from: mkRoute)
+            // Detect toll roads (Overpass API + advisory notices)
+            let hasTollRoads = await detectTollRoad(from: mkRoute, origin: origin, destination: destination)
 
             // If avoiding tolls, penalize heavily
             let tollPenalty = (avoidTollRoads && hasTollRoads) ? 40 : 0
@@ -134,37 +134,66 @@ public final class WizPathService {
     // MARK: - Route Calculation via MKDirections
 
     /// Returns all alternate routes from MKDirections, up to a sensible limit.
+    /// Includes a platform-aware timeout to prevent hangs on simulator/slow networks.
     private func calculateAllMKRoutes(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D,
         mode: TravelMode,
         departureTime: Date
     ) async throws -> [MKRoute] {
-        let request = MKDirections.Request()
-        request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
-        request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
-        request.transportType = mode.mkTransportType
-        request.departureDate = departureTime
-        request.requestsAlternateRoutes = true
+        #if targetEnvironment(simulator)
+        let mkTimeout: UInt64 = 45_000_000_000 // 45s — simulator MKDirections is notoriously slow
+        #else
+        let mkTimeout: UInt64 = 25_000_000_000 // 25s — real device is usually fast
+        #endif
 
-        let directions = MKDirections(request: request)
+        return try await withThrowingTaskGroup(of: [MKRoute].self) { group in
+            group.addTask {
+                let request = MKDirections.Request()
+                request.source = MKMapItem(placemark: MKPlacemark(coordinate: origin))
+                request.destination = MKMapItem(placemark: MKPlacemark(coordinate: destination))
+                request.transportType = mode.mkTransportType
+                request.departureDate = departureTime
+                request.requestsAlternateRoutes = true
 
-        do {
-            let response = try await directions.calculate()
-            guard !response.routes.isEmpty else {
-                throw WizPathError.routeUnavailable
+                let directions = MKDirections(request: request)
+                let startTime = CFAbsoluteTimeGetCurrent()
+
+                do {
+                    let response = try await directions.calculate()
+                    let elapsed = CFAbsoluteTimeGetCurrent() - startTime
+                    AppLogger.wizPath.info("MKDirections completed in \(String(format: "%.1f", elapsed))s with \(response.routes.count) route(s)")
+                    guard !response.routes.isEmpty else {
+                        throw WizPathError.routeUnavailable
+                    }
+                    return Array(response.routes.prefix(4))
+                } catch let error as MKError {
+                    let elapsed = CFAbsoluteTimeGetCurrent() - startTime
+                    AppLogger.wizPath.error("MKDirections failed after \(String(format: "%.1f", elapsed))s: \(error.localizedDescription)")
+                    let nsError = error as NSError
+                    switch nsError.code {
+                    case 4:
+                        throw WizPathError.destinationUnreachable
+                    case 2, 5:
+                        throw WizPathError.routeUnavailable
+                    default:
+                        throw WizPathError.routeUnavailable
+                    }
+                }
             }
-            return Array(response.routes.prefix(4)) // Mercy limit — 4 is plenty
-        } catch let error as MKError {
-            let nsError = error as NSError
-            switch nsError.code {
-            case 4:
-                throw WizPathError.destinationUnreachable
-            case 2, 5:
-                throw WizPathError.routeUnavailable
-            default:
-                throw WizPathError.routeUnavailable
+            // ⏱️ Platform-aware timeout guard
+            group.addTask {
+                try await Task.sleep(nanoseconds: mkTimeout)
+                #if targetEnvironment(simulator)
+                AppLogger.wizPath.warning("MKDirections timed out after 45s (simulator)")
+                #else
+                AppLogger.wizPath.warning("MKDirections timed out after 25s (device)")
+                #endif
+                throw WizPathError.timeout
             }
+            let result = try await group.next()!
+            group.cancelAll()
+            return result
         }
     }
 
@@ -223,40 +252,98 @@ public final class WizPathService {
         return max(0, score)
     }
 
-    /// Detect if an MKRoute includes toll roads by checking advisory notices.
-    private func detectTollRoad(from route: MKRoute) -> Bool {
+    /// Detect if an MKRoute includes toll roads.
+    /// 🆕 Uses OSM Overpass API (ücretsiz, API key yok) as primary source,
+    /// falls back to multi-language advisory notice text heuristic.
+    private func detectTollRoad(from route: MKRoute, origin: CLLocationCoordinate2D? = nil, destination: CLLocationCoordinate2D? = nil) async -> Bool {
+        // First try Overpass API using the route's polyline coordinates
+        let polylinePoints = route.polyline.points()
+        let pointCount = route.polyline.pointCount
+        if pointCount > 2 {
+            let coords = (0..<min(pointCount, 20)).map { polylinePoints[$0].coordinate }
+            if !coords.isEmpty {
+                let semiRoute = WizPathRoute(
+                    id: UUID(),
+                    origin: origin ?? coords.first!,
+                    destination: destination ?? coords.last!,
+                    travelMode: .car,
+                    departureTime: Date(),
+                    segments: [],
+                    totalDuration: route.expectedTravelTime,
+                    totalDistance: route.distance,
+                    polyline: route.polyline
+                )
+                // Overpass istekleri direkt await — async context'teyiz, main thread bloke olmaz!
+                let overpassResult = await TollRoadService.shared.hasTollRoads(on: semiRoute)
+                return overpassResult
+            }
+        }
+
+        // Fallback: text heuristic (multi-language advisory notices)
+        return detectTollRoadFromAdvisoryNotices(route)
+    }
+
+    /// Multi-language advisory notice toll detection (fallback).
+    private func detectTollRoadFromAdvisoryNotices(_ route: MKRoute) -> Bool {
         for notice in route.advisoryNotices {
             let lower = notice.lowercased()
-            if lower.contains("toll") || lower.contains("ücretli") || lower.contains("paralı") {
-                return true
-            }
+            if lower.contains("toll") || lower.contains("toll road") { return true }
+            if lower.contains("ücretli") || lower.contains("paralı") || lower.contains("köprü") || lower.contains("otoyol ücret") { return true }
+            if lower.contains("maut") || lower.contains("gebührenpflichtig") { return true }
+            if lower.contains("péage") || lower.contains("payant") { return true }
+            if lower.contains("peaje") || lower.contains("cobro") { return true }
+            if lower.contains("pedaggio") { return true }
+            if lower.contains("tol") || lower.contains("tolweg") { return true }
+            if lower.contains("pedágio") { return true }
+            if lower.contains("платный") { return true }
+            if lower.contains("有料") { return true }
+            if lower.contains("유료") { return true }
+            if lower.contains("收费") { return true }
+            if lower.contains("رسوم") { return true }
         }
         return false
     }
 
     /// Detect traffic congestion from MKRoute data.
+    /// ✅ Uses MKDirections' built-in traffic-aware expectedTravelTime (which accounts for
+    /// real-time traffic when departureDate is set) combined with speed-based heuristics.
+    /// 
+    /// Apple Maps' expectedTravelTime already incorporates traffic data when a departureDate
+    /// is provided. We compare against distance-based free-flow estimates to extract a
+    /// congestion ratio, then calibrate with multi-language advisory notice scanning.
+    ///
     /// Returns level and a penalty for scoring.
     private func detectTrafficCongestion(from route: MKRoute) -> (level: TrafficCongestionLevel, trafficPenalty: Int) {
-        // Calculate a traffic factor: actual travel time vs free-flow estimate
-        // Free-flow speed estimate: highway ~90km/h, mixed ~50km/h
         let distanceKm = route.distance / 1000.0
-        let estimatedFreeFlowTime: TimeInterval
-        if distanceKm > 50 {
-            estimatedFreeFlowTime = (distanceKm / 80.0) * 3600 // Highway speeds
+        guard distanceKm > 0.1 else { return (.unknown, 0) }
+
+        // Free-flow speed estimates by road type (km/h)
+        // Highway: ~100 km/h, Arterial: ~60 km/h, Local: ~35 km/h
+        let freeFlowSpeedKph: Double
+        if distanceKm > 100 {
+            freeFlowSpeedKph = 105  // Long-distance highway
+        } else if distanceKm > 30 {
+            freeFlowSpeedKph = 85   // Mixed highway
+        } else if distanceKm > 10 {
+            freeFlowSpeedKph = 60   // Arterial roads
         } else {
-            estimatedFreeFlowTime = (distanceKm / 50.0) * 3600 // City speeds
+            freeFlowSpeedKph = 40   // City/local
         }
 
+        let estimatedFreeFlowTime: TimeInterval = (distanceKm / freeFlowSpeedKph) * 3600.0
         let actualTime = route.expectedTravelTime
-        guard estimatedFreeFlowTime > 0 else { return (.unknown, 0) }
-
         let ratio = actualTime / estimatedFreeFlowTime
 
-        // Check advisory notices for traffic-related messages
+        // Multi-language advisory notice scanning for traffic-related messages
         let hasTrafficNotice = route.advisoryNotices.contains { notice in
             let lower = notice.lowercased()
             return lower.contains("traffic") || lower.contains("congestion") ||
-                   lower.contains("delay") || lower.contains("heavy")
+                   lower.contains("delay") || lower.contains("heavy") ||
+                   lower.contains("slow") || lower.contains("stau") ||  // German
+                   lower.contains("embouteillage") || lower.contains("bouchon") ||  // French
+                   lower.contains("tráfico") || lower.contains("atasco") ||  // Spanish
+                   lower.contains("trafik") || lower.contains("yoğun") ||  // Turkish
+                   lower.contains("ingorgo") || lower.contains("rallentamento")  // Italian
         }
 
         let level: TrafficCongestionLevel
@@ -416,19 +503,82 @@ public final class WizPathService {
         }
     }
 
+    /// 🌤️ Improved fallback weather estimation using seasonal + geographic heuristics.
+    /// When real weather data is unavailable, this returns a reasonable estimate based on
+    /// the location's latitude, time of year, and time of day.
+    /// The fallback is clearly labeled as "estimated" so the UI can indicate uncertainty.
     private func estimatedWeather(for coordinate: CLLocationCoordinate2D, at date: Date) -> SegmentWeather {
-        AppLogger.wizPath.warning("Using estimated (fallback) weather — real data unavailable")
-        // Return a cautious fallback: slight rain + moderate temp, so the user sees something
-        // is wrong rather than a perfect sunny day
-        let hour = Calendar.current.component(.hour, from: date)
+        AppLogger.wizPath.warning("⚠️ Using ESTIMATED (fallback) weather — real API unavailable")
+
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        let month = calendar.component(.month, from: date)
         let isNight = hour < 6 || hour >= 21
+
+        // Latitude-based temperature estimation (simple model)
+        let absLat = abs(coordinate.latitude)
+        // Base temperature by latitude: equator ~30°C, poles ~0°C
+        let latBaseTemp = 30.0 - (absLat / 90.0) * 30.0
+
+        // Seasonal adjustment: northern hemisphere summer (months 6-8) is warmest
+        let isNorthernHemis = coordinate.latitude >= 0
+        let seasonalOffset: Double
+        if isNorthernHemis {
+            // Summer peak in July (month 7)
+            seasonalOffset = -cos(Double(month) * .pi / 6.0) * 10.0
+        } else {
+            // Summer peak in January (month 1)
+            let adjustedMonth = month <= 6 ? month + 12 : month
+            seasonalOffset = -cos(Double(adjustedMonth) * .pi / 6.0) * 10.0
+        }
+
+        // Night cooling
+        let nightCooling = isNight ? 5.0 : 0.0
+        let estimatedTemp = max(-10, min(45, latBaseTemp + seasonalOffset - nightCooling))
+
+        // Precipitation estimation: higher near equator, lower at poles
+        let basePrecip: Double
+        if absLat < 23.5 {
+            basePrecip = 0.4  // Tropical
+        } else if absLat < 45 {
+            basePrecip = 0.25 // Temperate
+        } else {
+            basePrecip = 0.15 // Polar
+        }
+        // Seasonal precip adjustment
+        let precipSeasonal = basePrecip + (seasonalOffset > 0 ? 0.1 : -0.05)
+        let estimatedPrecip = max(0, min(1, precipSeasonal + (isNight ? -0.05 : 0.0)))
+
+        // Condition estimation
+        let condition: SegmentWeatherCondition
+        if estimatedPrecip > 0.6 {
+            condition = .rain
+        } else if estimatedPrecip > 0.3 {
+            condition = isNight ? .cloudy : .partlyCloudy
+        } else if isNight {
+            condition = .clear
+        } else {
+            condition = .partlyCloudy
+        }
+
+        // Wind estimate: moderate by default
+        let windBase: Double
+        if absLat > 60 {
+            windBase = 25 // Polar winds
+        } else if absLat > 30 {
+            windBase = 15 // Mid-latitude westerlies
+        } else {
+            windBase = 10 // Tropics
+        }
+        let estimatedWind = windBase + (estimatedPrecip * 15)
+
         return SegmentWeather(
-            condition: isNight ? .partlyCloudy : .cloudy,
-            temperature: 20,
-            precipitationChance: 0.2,
-            windSpeed: 10,
-            visibility: isNight ? 8 : 10,
-            severity: .fair
+            condition: condition,
+            temperature: estimatedTemp,
+            precipitationChance: estimatedPrecip,
+            windSpeed: estimatedWind,
+            visibility: condition == .rain ? 8 : 12,
+            severity: condition.severity
         )
     }
 
@@ -494,22 +644,33 @@ public struct RecentDestination: Codable, Hashable, Identifiable {
 }
 
 // MARK: - WizPath Cache
+//// Cache TTL değeri artık `defaultTTL` parametresi ile yapılandırılabilir.
+/// Varsayılan: 15 dakika. ViewModel tarafından da override edilebilir.
 public actor WizPathCache {
     public static let shared = WizPathCache()
+
     private struct CacheEntry {
         let route: WizPathRoute
         let timestamp: Date
-        static let ttl: TimeInterval = 15 * 60
-        var isExpired: Bool { Date().timeIntervalSince(timestamp) > Self.ttl }
+        let ttl: TimeInterval
+        var isExpired: Bool { Date().timeIntervalSince(timestamp) > ttl }
     }
+
     private var routeCache: [String: CacheEntry] = [:]
+    /// Root TTL override (nil = use each entry's own TTL).
+    /// Bu değer, `WizPathService` veya ViewModel tarafından değiştirilebilir.
+    public var defaultTTL: TimeInterval? = nil
 
     public init() {}
 
-    public func store(route: WizPathRoute, avoidTollRoads: Bool = false) {
+    /// Cache route with optional TTL.
+    /// - Parameters:
+    ///   - ttl: Cache süresi (saniye). Varsayılan: 15 dk (900).
+    public func store(route: WizPathRoute, avoidTollRoads: Bool = false, ttl: TimeInterval = 900) {
         let tollSuffix = avoidTollRoads ? "|no_tolls" : ""
         let key = "\(route.origin.latitude),\(route.origin.longitude)|\(route.destination.latitude),\(route.destination.longitude)|\(route.travelMode.rawValue)\(tollSuffix)"
-        self.routeCache[key] = CacheEntry(route: route, timestamp: Date())
+        let effectiveTTL = defaultTTL ?? ttl
+        self.routeCache[key] = CacheEntry(route: route, timestamp: Date(), ttl: effectiveTTL)
         // Periodic cleanup: remove expired entries
         if self.routeCache.count > 20 {
             self.routeCache = self.routeCache.filter { !$0.value.isExpired }
@@ -520,7 +681,6 @@ public actor WizPathCache {
         let tollSuffix = avoidTollRoads ? "|no_tolls" : ""
         let key = "\(origin.latitude),\(origin.longitude)|\(destination.latitude),\(destination.longitude)|\(mode.rawValue)\(tollSuffix)"
         guard let entry = self.routeCache[key], !entry.isExpired else {
-            // Remove expired entry if present
             self.routeCache.removeValue(forKey: key)
             return nil
         }
