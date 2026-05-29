@@ -25,10 +25,7 @@ struct ToolbarLanguageButton: View {
                     if AdConsentManager.shared.privacyOptionsRequired {
                         await AdConsentManager.shared.presentPrivacyOptions()
                     } else {
-                        let privacyURL = L10n.currentLanguageCode == "tr"
-                            ? "https://github.com/burak-bilgen/ForeWiz/blob/main/docs/APP_STORE_POLICIES_TR.md"
-                            : "https://github.com/burak-bilgen/ForeWiz/blob/main/docs/APP_STORE_POLICIES.md"
-                        if let url = URL(string: privacyURL) {
+                        if let url = URL(string: "https://github.com/burak-bilgen/ForeWiz/blob/main/PRIVACY.md") {
                             _ = await UIApplication.shared.open(url)
                         }
                     }
