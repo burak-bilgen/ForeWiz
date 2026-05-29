@@ -1,7 +1,7 @@
 # 🌤️ ForeWiz - Personal Weather Decision Assistant
 
 <p align="center">
-  <img src="https://github.com/bilgenworks/forewiz/blob/main/ForeWiz/Assets.xcassets/AppIcon.appiconset/1024.png?raw=true" width="120" height="120" alt="ForeWiz">
+  <img src="https://github.com/burak-bilgen/ForeWiz/blob/main/ForeWiz/Assets.xcassets/AppIcon.appiconset/256.png?raw=true" width="120" height="120" alt="ForeWiz">
 </p>
 
 <p align="center">
