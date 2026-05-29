@@ -15339,6 +15339,42 @@
         }
       }
     },
+    "wizpath_open_in_maps": {
+      "comment": "WizPath: subtitle text for map navigation buttons",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in Maps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haritada Aç"
+          }
+        }
+      }
+    },
+    "wizpath_maps_attribution": {
+      "comment": "WizPath: legal attribution text for Apple Maps and Google Maps buttons",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Maps and Google Maps are third-party services. Directions and estimated travel times may vary."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Maps ve Google Maps üçüncü taraf servislerdir. Yol tarifleri ve tahmini varış süreleri farklılık gösterebilir."
+          }
+        }
+      }
+    },
     "wizpath_navigation_action_desc": {
       "extractionState": "manual",
       "localizations": {

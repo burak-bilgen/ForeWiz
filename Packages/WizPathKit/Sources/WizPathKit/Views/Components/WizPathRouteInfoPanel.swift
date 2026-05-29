@@ -143,16 +143,26 @@ public struct WizPathRouteInfoPanel: View {
                     HStack(spacing: 12) {
                         WizPathRouteMapButton(
                             title: WizPathKitL10n.text("wizpath_apple_maps"),
+                            subtitle: WizPathKitL10n.text("wizpath_open_in_maps"),
                             icon: "map.fill",
-                            gradientColors: [.blue, Color(red: 0.1, green: 0.6, blue: 0.95)]
+                            gradientColors: [Color(red: 0.0, green: 0.48, blue: 1.0), Color(red: 0.0, green: 0.33, blue: 0.85)]
                         ) { onOpenInAppleMaps() }
                         
                         WizPathRouteMapButton(
                             title: WizPathKitL10n.text("wizpath_google_maps"),
-                            icon: "arrow.triangle.turn.up.right.diamond.fill",
-                            gradientColors: [Color(red: 0.15, green: 0.65, blue: 0.35), Color(red: 0.25, green: 0.75, blue: 0.55)]
+                            subtitle: WizPathKitL10n.text("wizpath_open_in_maps"),
+                            icon: "mappin.circle.fill",
+                            gradientColors: [Color(red: 0.15, green: 0.68, blue: 0.38), Color(red: 0.08, green: 0.52, blue: 0.28)]
                         ) { onOpenInGoogleMaps() }
                     }
+                    
+                    // Legal attribution
+                    Text(WizPathKitL10n.text("wizpath_maps_attribution"))
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.25))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 2)
                 }
                 
                 Divider().overlay(Color.white.opacity(0.06))
@@ -196,6 +206,7 @@ public struct WizPathBestDepartureRow: View {
 
 struct WizPathRouteMapButton: View {
     let title: String
+    let subtitle: String
     let icon: String
     let gradientColors: [Color]
     let action: () -> Void
@@ -207,54 +218,59 @@ struct WizPathRouteMapButton: View {
             WizPathKitHaptics.provider.medium()
             action()
         } label: {
-            HStack(spacing: 12) {
+            VStack(spacing: 8) {
+                // Brand icon with gradient circle
                 ZStack {
                     Circle()
                         .fill(LinearGradient(colors: gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
-                        .frame(width: 36, height: 36)
+                        .frame(width: 40, height: 40)
                     Image(systemName: icon)
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                 }
-                .shadow(color: gradientColors.first?.opacity(0.4) ?? .clear, radius: 6, x: 0, y: 3)
+                .shadow(color: gradientColors.first?.opacity(0.4) ?? .clear, radius: 8, x: 0, y: 4)
 
                 Text(title)
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                Text(subtitle)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.55)
-                    .layoutPriority(1)
-                
-                Spacer(minLength: 4)
-                
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.3))
-                    .frame(width: 8)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, 12)
+            .padding(.vertical, 14)
             .frame(maxWidth: .infinity)
-            .frame(height: 52)
+            .frame(minHeight: 110)
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(.ultraThinMaterial)
                         .environment(\.colorScheme, .dark)
+                    
+                    // Subtle tint overlay matching the service color
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(gradientColors.first?.opacity(0.08) ?? .clear)
+                        .fill(gradientColors.first?.opacity(0.06) ?? .clear)
+                    
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .stroke(
                             LinearGradient(
-                                colors: [.white.opacity(0.15), gradientColors.first?.opacity(0.15) ?? .clear, .clear],
+                                colors: [.white.opacity(0.12), gradientColors.first?.opacity(0.2) ?? .clear, .clear],
                                 startPoint: .top,
-                                endPoint: .bottom
+                                endPoint: .bottomTrailing
                             ),
                             lineWidth: 1
                         )
                 }
             )
-            .scaleEffect(isPressed ? 0.95 : 1.0)
-            .shadow(color: gradientColors.first?.opacity(0.15) ?? .clear, radius: 8, x: 0, y: 4)
+            .scaleEffect(isPressed ? 0.94 : 1.0)
+            .shadow(color: gradientColors.first?.opacity(0.12) ?? .clear, radius: isPressed ? 4 : 10, x: 0, y: isPressed ? 2 : 6)
         }
         .contentShape(Rectangle())
         .buttonStyle(.plain)
