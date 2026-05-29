@@ -140,13 +140,13 @@ struct HomeView: View {
         }
 
         ToolbarItem(placement: .principal) {
-            ToolbarLocationButton(
-                locationName: viewModel.selectedLocationName,
-                action: { showLocationPicker = true }
-            )
-            .opacity(toolbarAppeared ? 1 : 0)
-            .offset(y: toolbarAppeared ? 0 : -4)
-            .animation(AppTheme.defaultEaseOut.delay(AppTheme.defaultDelay), value: toolbarAppeared)
+            if case .loaded = viewModel.state {
+                ToolbarLocationButton(
+                    locationName: viewModel.selectedLocationName,
+                    action: { showLocationPicker = true }
+                )
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
 
         ToolbarItem(placement: .topBarTrailing) {

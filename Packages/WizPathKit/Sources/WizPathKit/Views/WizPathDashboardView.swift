@@ -95,25 +95,6 @@ public struct WizPathDashboardView: View {
                                     .padding(.horizontal, 40)
                                     .contentTransition(.numericText())
                                     .animation(.easeInOut(duration: 0.3), value: viewModel.didLoadInitialLocation)
-                                
-                                // ── Stage Indicator Dots ──
-                                HStack(spacing: 8) {
-                                    LoadingStageDot(isActive: !viewModel.didLoadInitialLocation, offset: loadingDotOffset)
-                                    LoadingStageDot(isActive: viewModel.didLoadInitialLocation && viewModel.isCalculating, offset: loadingDotOffset)
-                                }
-                                .onAppear {
-                                    withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                                        loadingDotOffset = -8
-                                    }
-                                }
-                                .onChange(of: viewModel.didLoadInitialLocation) { _, _ in
-                                    loadingDotOffset = 0
-                                    DispatchQueue.main.async {
-                                        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                                            loadingDotOffset = -8
-                                        }
-                                    }
-                                }
                             }
                         }
                         .transition(.opacity)
