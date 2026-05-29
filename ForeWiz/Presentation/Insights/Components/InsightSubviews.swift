@@ -19,7 +19,7 @@ struct MetricButton: View {
                     .foregroundStyle(isSelected ? .white : .primary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.75)
+                    .minimumScaleFactor(0.85)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
@@ -63,7 +63,7 @@ struct StatisticCard: View {
                     .font(.title3.bold())
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.70)
+                    .minimumScaleFactor(0.85)
 
                 Text(title)
                     .font(.caption)
@@ -131,7 +131,7 @@ struct ComfortWindowRow: View {
                 .font(.subheadline)
                 .monospacedDigit()
                 .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .minimumScaleFactor(0.85)
 
             Spacer(minLength: 8)
 

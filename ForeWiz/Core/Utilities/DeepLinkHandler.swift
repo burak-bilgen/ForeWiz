@@ -60,7 +60,7 @@ final class DeepLinkHandler {
     func handle(_ url: URL) {
         if let link = DeepLink.from(url: url) {
             pendingLink = link
-            AnalyticsManager.shared.track(.appLaunch)
+            EventLogger.shared.track(.appLaunch)
         }
     }
 

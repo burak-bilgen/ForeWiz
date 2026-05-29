@@ -102,7 +102,7 @@ struct WeatherInsightsView: View {
             .font(.title2.bold())
             .foregroundStyle(selectedMetric.color)
             .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .minimumScaleFactor(0.85)
     }
 
     @ViewBuilder

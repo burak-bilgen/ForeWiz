@@ -1,6 +1,7 @@
 import OSLog
 import Foundation
 
+/// Centralized loggers for each subsystem.
 enum AppLogger {
     static let app = Logger(subsystem: "com.forewiz.app", category: "app")
     static let weather = Logger(subsystem: "com.forewiz.app", category: "weather")
@@ -33,82 +34,26 @@ enum LogLevel: String, CaseIterable {
     }
 }
 
-struct LogContext {
-    let file: String
-    let function: String
-    let line: Int
-    let timestamp: Date
-
-    init(
-        file: String = #file,
-        function: String = #function,
-        line: Int = #line,
-        timestamp: Date = Date()
-    ) {
-        self.file = (file as NSString).lastPathComponent
-        self.function = function
-        self.line = line
-        self.timestamp = timestamp
-    }
-}
-
-protocol Logging {
-    func log(_ message: String, level: LogLevel, context: LogContext, metadata: [String: String]?)
-}
-
-struct StructuredLogger: Logging {
-    private let logger: Logger
-    private let subsystem: String
-
-    init(subsystem: String, category: String) {
-        self.subsystem = subsystem
-        self.logger = Logger(subsystem: subsystem, category: category)
-    }
-
-    func log(_ message: String, level: LogLevel, context: LogContext, metadata: [String: String]?) {
-        let fileInfo = "[\(context.file):\(context.line)]"
-        let fullMessage = "\(fileInfo) \(context.function) - \(message)"
-
-        var metadataString = ""
-        if let metadata = metadata, !metadata.isEmpty {
-            let pairs = metadata.map { "\($0.key)=\($0.value)" }
-            metadataString = " [" + pairs.joined(separator: ", ") + "]"
-        }
-
-        switch level {
-        case .debug:
-            logger.debug("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
-        case .info:
-            logger.info("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
-        case .warning:
-            logger.warning("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
-        case .error:
-            logger.error("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
-        case .critical:
-            logger.critical("\(fullMessage, privacy: .private)\(metadataString, privacy: .private)")
-        }
-    }
-}
-
+/// Convenience logging methods that include source file/line information.
 enum AppLog {
     static func debug(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.debug("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
+        AppLogger.app.debug("\\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func info(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.info("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
+        AppLogger.app.info("\\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func warning(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.warning("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
+        AppLogger.app.warning("\\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func error(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.app.error("\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
+        AppLogger.app.error("\\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")
     }
 
     static func performance(operation: String, duration: TimeInterval, file: String = #file, function: String = #function, line: Int = #line) {
-        AppLogger.performance.info("\((file as NSString).lastPathComponent):\(line) \(operation) completed in \(String(format: "%.3f", duration))s")
+        AppLogger.performance.info("\\((file as NSString).lastPathComponent):\(line) \(operation) completed in \(String(format: "%.3f", duration))s")
     }
 
     @discardableResult
@@ -156,21 +101,5 @@ extension AppLogger {
     static func logLifecycle(_ event: String, object: String, file: String = #file, function: String = #function, line: Int = #line) {
         let fileName = (file as NSString).lastPathComponent
         AppLogger.lifecycle.debug("[\(fileName):\(line)] \(event) - \(object, privacy: .private)")
-    }
-}
-
-protocol Loggable {
-    var logDescription: String { get }
-}
-
-extension Error where Self: Loggable {
-    func log(to logger: Logger, level: LogLevel = .error) {
-        switch level {
-        case .debug: logger.debug("\(logDescription, privacy: .private)")
-        case .info: logger.info("\(logDescription, privacy: .private)")
-        case .warning: logger.warning("\(logDescription, privacy: .private)")
-        case .error: logger.error("\(logDescription, privacy: .private)")
-        case .critical: logger.critical("\(logDescription, privacy: .private)")
-        }
     }
 }

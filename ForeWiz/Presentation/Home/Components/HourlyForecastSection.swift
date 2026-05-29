@@ -89,7 +89,7 @@ struct TemperatureTrendChart: View {
                         .font(.system(size: 9, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.7))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .minimumScaleFactor(0.8)
 
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
                         .fill(barColor(for: temp))

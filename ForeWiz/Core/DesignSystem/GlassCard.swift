@@ -1,23 +1,8 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Legacy GlassCard Wrapper
-/// Thin wrapper around WizPathKit's LiquidGlassCard for backward compatibility.
-struct GlassCard<Content: View>: View {
-    var accentColor: Color? = nil
-    var innerPadding: CGFloat = 16
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        LiquidGlassCard(
-            accentColor: accentColor ?? Color.liquidAccent,
-            innerPadding: innerPadding,
-            content: { content }
-        )
-    }
-}
-
 // MARK: - Glass Effect Modifier
+
 struct GlassEffectModifier: ViewModifier {
     let style: UIBlurEffect.Style
     let cornerRadius: CGFloat
@@ -63,7 +48,26 @@ extension View {
     }
 }
 
+// MARK: - Glass Icon (minimal rounded-square icon)
+
+struct GlassIcon: View {
+    let systemName: String
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(color.opacity(0.12))
+                .frame(width: 36, height: 36)
+            Image(systemName: systemName)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(color)
+        }
+    }
+}
+
 // MARK: - Preview
+
 #Preview {
     ZStack {
         LinearGradient(
@@ -90,28 +94,11 @@ extension View {
                 }
             }
 
-            GlassCard {
+            LiquidGlassCard(accentColor: .liquidAccent) {
                 Text(L10n.text("preview_legacy_glass"))
                     .foregroundStyle(.white)
             }
         }
         .padding()
-    }
-}
-
-// MARK: - Glass Icon (minimal rounded-square icon)
-struct GlassIcon: View {
-    let systemName: String
-    let color: Color
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(color.opacity(0.12))
-                .frame(width: 36, height: 36)
-            Image(systemName: systemName)
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(color)
-        }
     }
 }

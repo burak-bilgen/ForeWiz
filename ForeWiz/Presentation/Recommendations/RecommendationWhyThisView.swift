@@ -120,7 +120,7 @@ private struct FeedbackButton: View {
                 Text(label)
                     .font(.system(size: 11, weight: .medium))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+                    .minimumScaleFactor(0.85)
             }
             .foregroundStyle(.white.opacity(0.7))
             .frame(maxWidth: .infinity)

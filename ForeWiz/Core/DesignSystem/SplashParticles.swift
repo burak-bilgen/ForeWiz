@@ -17,6 +17,7 @@ struct EnhancedWeatherParticles: View {
         }
         .opacity(progress)
         .ignoresSafeArea()
+        .drawingGroup()
     }
 
     private func drawEnhancedParticles(context: GraphicsContext, size: CGSize, elapsed: TimeInterval) {

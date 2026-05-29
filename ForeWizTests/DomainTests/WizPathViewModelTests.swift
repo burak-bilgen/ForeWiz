@@ -319,10 +319,10 @@ struct WizPathViewModelTests {
         vm.state = .routeReady(route)
 
         let url = vm.appleMapsURLString()
-        #expect(url != nil)
-        #expect(url!.contains("maps://"))
-        #expect(url!.contains("saddr=41.0082,28.9784"))
-        #expect(url!.contains("daddr=42.0,30.0"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("maps://"))
+        #expect(unwrapped.contains("saddr=41.0082,28.9784"))
+        #expect(unwrapped.contains("daddr=42.0,30.0"))
     }
 
     @Test("Apple Maps Web URL builds with origin and destination and route")
@@ -335,10 +335,10 @@ struct WizPathViewModelTests {
         vm.state = .routeReady(route)
 
         let url = vm.appleMapsWebURLString()
-        #expect(url != nil)
-        #expect(url!.contains("maps.apple.com"))
-        #expect(url!.contains("saddr=41.0,29.0"))
-        #expect(url!.contains("daddr=42.0,30.0"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("maps.apple.com"))
+        #expect(unwrapped.contains("saddr=41.0,29.0"))
+        #expect(unwrapped.contains("daddr=42.0,30.0"))
     }
 
     @Test("Google Maps URL returns nil when no route")
@@ -356,8 +356,8 @@ struct WizPathViewModelTests {
         vm.state = .routeReady(route)
 
         let url = vm.googleMapsURLString()
-        #expect(url != nil)
-        #expect(url!.contains("comgooglemaps://"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("comgooglemaps://"))
     }
 
     @Test("Google Maps Web URL builds correctly")
@@ -371,8 +371,8 @@ struct WizPathViewModelTests {
         vm.selectRouteCandidate(at: 0)
 
         let url = vm.googleMapsWebURLString()
-        #expect(url != nil)
-        #expect(url!.contains("google.com/maps"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("google.com/maps"))
     }
 
     // MARK: - Offline Maps Navigation
@@ -434,9 +434,9 @@ struct WizPathViewModelTests {
         vm.state = .offline
 
         let url = vm.appleMapsURLString()
-        #expect(url != nil)
-        #expect(url!.contains("maps://"))
-        #expect(url!.contains("saddr=41.0082,28.9784"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("maps://"))
+        #expect(unwrapped.contains("saddr=41.0082,28.9784"))
     }
 
     @Test("Apple Maps Web URL works with cached route when offline")
@@ -453,8 +453,8 @@ struct WizPathViewModelTests {
         vm.state = .offline
 
         let url = vm.appleMapsWebURLString()
-        #expect(url != nil)
-        #expect(url!.contains("maps.apple.com"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("maps.apple.com"))
     }
 
     @Test("Google Maps URL works with cached route when offline")
@@ -471,8 +471,8 @@ struct WizPathViewModelTests {
         vm.state = .offline
 
         let url = vm.googleMapsURLString()
-        #expect(url != nil)
-        #expect(url!.contains("comgooglemaps://"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("comgooglemaps://"))
     }
 
     @Test("Google Maps Web URL works with cached route when offline")
@@ -489,8 +489,8 @@ struct WizPathViewModelTests {
         vm.state = .offline
 
         let url = vm.googleMapsWebURLString()
-        #expect(url != nil)
-        #expect(url!.contains("google.com/maps"))
+        let unwrapped = try #require(url)
+        #expect(unwrapped.contains("google.com/maps"))
     }
 
     @Test("All 4 Maps URLs return nil when offline with no cached route")

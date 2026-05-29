@@ -14,10 +14,6 @@ final class ThemeManager {
 
     private init() {}
 
-    // Theme is locked to dark mode for the liquid glass experience.
-    func toggleDarkMode() {}
-    func setColorScheme(_: ColorScheme) {}
-
     // MARK: - Convenience Accessors
 
     var accentColor: Color { AppTheme.liquidAccent }
@@ -46,7 +42,7 @@ extension View {
     }
 }
 
-// MARK: - Legacy Support
+// MARK: - Adaptive Colors
 
 struct AdaptiveColor {
     static let background = Color(uiColor: .systemBackground)
@@ -58,36 +54,4 @@ struct AdaptiveColor {
     static let tertiaryLabel = Color(uiColor: .tertiaryLabel)
     static let fill = Color(uiColor: .systemFill)
     static let separator = Color(uiColor: .separator)
-}
-
-struct AdaptiveCard<Content: View>: View {
-    @ViewBuilder let content: Content
-    var body: some View {
-        LiquidGlassCard(accentColor: .liquidAccent) {
-            content
-        }
-    }
-}
-
-struct AdaptiveButtonStyle: ButtonStyle {
-    let role: ButtonRole?
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 17, weight: .semibold, design: .rounded))
-            .foregroundStyle(role == .destructive ? AppTheme.coral : .white)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(.ultraThinMaterial)
-                    .environment(\.colorScheme, .dark)
-            )
-            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
-            .animation(.spring(response: 0.28, dampingFraction: 0.72), value: configuration.isPressed)
-    }
-}
-
-extension ButtonStyle where Self == AdaptiveButtonStyle {
-    static var adaptive: AdaptiveButtonStyle { AdaptiveButtonStyle(role: nil) }
-    static func adaptive(role: ButtonRole?) -> AdaptiveButtonStyle { AdaptiveButtonStyle(role: role) }
 }

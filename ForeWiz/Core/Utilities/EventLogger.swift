@@ -1,8 +1,13 @@
 import Foundation
 import os
 
-final class AnalyticsManager {
-    static let shared = AnalyticsManager()
+/// Lightweight event logger that records key user actions and system events.
+///
+/// Currently logs to OSLog and prints in debug builds.
+/// Replace the `track` implementation with an analytics SDK (Firebase, Mixpanel, etc.)
+/// when ready — the call sites are already set up.
+final class EventLogger {
+    static let shared = EventLogger()
 
     private let logger = Logger(subsystem: "com.forewiz.analytics", category: "Events")
 
@@ -46,7 +51,7 @@ final class AnalyticsManager {
         logger.info("Tracking event: \(event.name)")
 
         #if DEBUG
-        print("📊 Analytics: \(event.name)")
+        print("📊 Event: \(event.name)")
         if let params = parameters {
             print("   Parameters: \(params)")
         }

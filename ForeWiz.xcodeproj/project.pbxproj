@@ -732,7 +732,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = ForeWizWidgets/ForeWizWidgets.entitlements;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ForeWizWidgets/Info.plist;
@@ -753,7 +753,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = ForeWizWidgets/ForeWizWidgets.entitlements;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ForeWizWidgets/Info.plist;

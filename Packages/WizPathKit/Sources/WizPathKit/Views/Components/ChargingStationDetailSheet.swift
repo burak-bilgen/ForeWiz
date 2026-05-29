@@ -267,8 +267,10 @@ public struct ChargingStationDetailSheet: View {
         let lon = station.coordinate.longitude
         let defaultName = station.category.defaultName
         let name = station.displayTitle.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? defaultName
-        let url = URL(string: "maps://?q=\(name)&ll=\(lat),\(lon)&z=14")!
-        let webURL = URL(string: "https://maps.apple.com/?q=\(name)&ll=\(lat),\(lon)&z=14")!
+        guard
+            let url = URL(string: "maps://?q=\(name)&ll=\(lat),\(lon)&z=14"),
+            let webURL = URL(string: "https://maps.apple.com/?q=\(name)&ll=\(lat),\(lon)&z=14")
+        else { return }
         
         if UIApplication.shared.canOpenURL(url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
@@ -280,8 +282,10 @@ public struct ChargingStationDetailSheet: View {
     private func openInGoogleMaps() {
         let lat = station.coordinate.latitude
         let lon = station.coordinate.longitude
-        let appURL = URL(string: "comgooglemaps://?q=\(lat),\(lon)&zoom=14")!
-        let webURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(lat),\(lon)")!
+        guard
+            let appURL = URL(string: "comgooglemaps://?q=\(lat),\(lon)&zoom=14"),
+            let webURL = URL(string: "https://www.google.com/maps/search/?api=1&query=\(lat),\(lon)")
+        else { return }
         
         if UIApplication.shared.canOpenURL(appURL) {
             UIApplication.shared.open(appURL, options: [:], completionHandler: nil)

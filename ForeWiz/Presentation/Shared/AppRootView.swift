@@ -63,11 +63,11 @@ struct AppRootView: View {
         case .insights:
             coordinator.rootFlow = .main
             coordinator.navigateToInsights = true
-            AnalyticsManager.shared.track(.insightsViewed)
+            EventLogger.shared.track(.insightsViewed)
         case .recommendationDetail(let id):
             coordinator.rootFlow = .main
             coordinator.selectedRecommendationID = id
-            AnalyticsManager.shared.track(.recommendationViewed(id))
+            EventLogger.shared.track(.recommendationViewed(id))
         }
 
         deepLinkHandler.clear()

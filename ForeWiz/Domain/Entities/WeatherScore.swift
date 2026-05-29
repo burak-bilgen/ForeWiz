@@ -8,6 +8,11 @@ struct WeatherScore: Codable, Equatable, Hashable, Sendable {
         Double(rawValue) / 10
     }
 
+    var isGood: Bool { rawValue >= 80 }
+    var isModerate: Bool { rawValue >= 60 && rawValue < 80 }
+    var isRisky: Bool { rawValue >= 40 && rawValue < 60 }
+    var isAvoid: Bool { rawValue < 40 }
+
     init(rawValue: Int, label: String? = nil) {
         let clampedValue = rawValue.clamped(to: 0...100)
         self.rawValue = clampedValue

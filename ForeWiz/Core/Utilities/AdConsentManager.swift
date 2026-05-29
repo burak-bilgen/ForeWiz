@@ -46,10 +46,10 @@ final class AdConsentManager {
         switch status {
         case .authorized:
             trackingStatus = .granted
-            AnalyticsManager.shared.track(.trackingPermissionGranted)
+            EventLogger.shared.track(.trackingPermissionGranted)
         case .denied, .restricted:
             trackingStatus = .denied
-            AnalyticsManager.shared.track(.trackingPermissionDenied)
+            EventLogger.shared.track(.trackingPermissionDenied)
         case .notDetermined:
             trackingStatus = .notDetermined
         @unknown default:

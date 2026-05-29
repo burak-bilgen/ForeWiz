@@ -1,22 +1,20 @@
 import Foundation
 
+/// Shared date formatters that respect the user's locale and regional preferences.
 enum SharedFormatters {
+    /// Short time style — respects user's 12h/24h preference (e.g. "3:45 PM" or "15:45").
     static let timeOnly: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "HH:mm"
+        f.timeStyle = .short
+        f.dateStyle = .none
         return f
     }()
 
-    static let shortTime: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "HH:mm"
-        f.locale = Locale(identifier: "en_US_POSIX")
-        return f
-    }()
-
+    /// Short date + short time — e.g. "15 May 3:45 PM"
     static let dateAndTime: DateFormatter = {
         let f = DateFormatter()
-        f.dateFormat = "dd MMM HH:mm"
+        f.dateStyle = .short
+        f.timeStyle = .short
         return f
     }()
 }

@@ -146,7 +146,7 @@ struct CardActionButton: View {
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                        .minimumScaleFactor(0.85)
                 }
 
                 Spacer(minLength: 0)

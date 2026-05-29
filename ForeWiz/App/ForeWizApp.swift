@@ -19,8 +19,16 @@ struct ForeWizApp: App {
         WizPathKitL10n.provider = ForeWizL10nProvider()
         
         // Initialize consent before the ad SDK makes any request.
+        // The sequence matters: ATT must be requested before any ad SDK
+        // initialization to comply with Guideline 2.1 (App Store review).
         Task { @MainActor in
+            // 1. Check & request App Tracking Transparency permission FIRST.
+            //    On first launch this shows the ATT dialog automatically.
+            //    On subsequent launches it returns the cached status silently.
             AdConsentManager.shared.updateConsentStatus()
+            _ = await AdConsentManager.shared.requestTrackingPermission()
+
+            // 2. Only after ATT response, proceed with UMP (GDPR) & AdMob SDK init.
             await AdConsentManager.shared.prepareConsentIfNeeded()
             await AdMobIntegration.shared.initializeSDK()
             await AdManager.shared.initialize()
@@ -87,8 +95,12 @@ struct ForeWizApp: App {
                 return minimal
             }
             AppLogger.persistence.critical("Unable to create ANY SwiftData ModelContainer - app cannot function")
-            // Graceful crash - app cannot function without persistence
-            fatalError("ForeWiz requires a working data store to operate")
+            // Last resort: return a container with minimal in-memory store.
+            // If this also fails, SwiftData itself is fundamentally broken on this device.
+            // We return a dummy container and let the app show a degraded state.
+            let fallbackConfig = ModelConfiguration(isStoredInMemoryOnly: true)
+            // We must return something – SwiftUI requires a container.
+            return try! ModelContainer(for: UserPreferencesModel.self, configurations: fallbackConfig)
         }
     }
 
@@ -107,10 +119,10 @@ struct ForeWizApp: App {
                 deepLinkHandler.handle(url)
             }
             .onContinueUserActivity("refresh") { _ in
-                AnalyticsManager.shared.track(.homeRefresh)
+                EventLogger.shared.track(.homeRefresh)
             }
             .onContinueUserActivity("settings") { _ in
-                AnalyticsManager.shared.track(.settingsOpened)
+                EventLogger.shared.track(.settingsOpened)
             }
             .onChange(of: scenePhase) { _, phase in
                 handleScenePhaseChange(phase)

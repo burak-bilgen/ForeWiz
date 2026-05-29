@@ -20,7 +20,7 @@ struct HeroCard: View {
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(2)
-                        .minimumScaleFactor(0.75)
+                        .minimumScaleFactor(0.85)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Spacer(minLength: 4)

@@ -1,6 +1,7 @@
 import SwiftUI
 import GoogleMobileAds
 import UIKit
+import WizPathKit
 
 // MARK: - Ad Banner View
 /// Professional banner ad with real Google AdMob integration.
@@ -43,7 +44,7 @@ struct AdBannerView: View {
     // MARK: - Placeholder
     
     private var bannerPlaceholder: some View {
-        GlassCard {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 4) {
             HStack(spacing: 12) {
                 ShimmerCircle(size: 32)
                 VStack(alignment: .leading, spacing: 6) {
@@ -164,7 +165,7 @@ struct NativeAdCard: View {
     // MARK: - Placeholder
     
     private var nativePlaceholder: some View {
-        GlassCard {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 4) {
             VStack(alignment: .leading, spacing: 12) {
                 // Sponsored label
                 HStack {

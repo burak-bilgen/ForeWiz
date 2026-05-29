@@ -150,7 +150,7 @@ struct ContextualRecommendationRankerTests {
     }
 
     @Test("Risk alerts get priority boost")
-    func testRiskBoost() {
+    func testRiskBoost() throws {
         let risk = makeCandidate(type: .riskAlert, score: 50)
         let outdoor = makeCandidate(type: .goingOutSuggestion, score: 60)
         let context = RecommendationContext(
@@ -163,6 +163,7 @@ struct ContextualRecommendationRankerTests {
         let result = ranker.rank([outdoor, risk], context: context)
         let riskResult = result.first { $0.type == .riskAlert }
         #expect(riskResult != nil)
-        #expect(riskResult!.score > 50)
+        let riskResultValue = try #require(riskResult)
+        #expect(riskResultValue.score > 50)
     }
 }

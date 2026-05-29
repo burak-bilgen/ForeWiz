@@ -47,10 +47,10 @@ final class OnboardingViewModel {
             let status = await locationRepository.requestAuthorization()
             locationStatus = status
             if status == .denied || status == .restricted {
-                AnalyticsManager.shared.track(.locationPermissionDenied)
+                EventLogger.shared.track(.locationPermissionDenied)
                 errorMessage = LocationPermissionMapper.userMessage(for: status)
             } else if status == .authorized {
-                AnalyticsManager.shared.track(.locationPermissionGranted)
+                EventLogger.shared.track(.locationPermissionGranted)
                 errorMessage = nil
             }
         }
@@ -61,9 +61,9 @@ final class OnboardingViewModel {
             let status = await notificationRepository.requestAuthorization()
             notificationStatus = status
             if status == .authorized {
-                AnalyticsManager.shared.track(.notificationPermissionGranted)
+                EventLogger.shared.track(.notificationPermissionGranted)
             } else if status == .denied {
-                AnalyticsManager.shared.track(.notificationPermissionDenied)
+                EventLogger.shared.track(.notificationPermissionDenied)
             }
         }
     }
@@ -74,7 +74,7 @@ final class OnboardingViewModel {
             if AdConsentManager.shared.isSystemTrackingDisabled {
                 showTrackingSettingsAlert = true
                 trackingStatus = .denied
-                AnalyticsManager.shared.track(.trackingPermissionDenied)
+                EventLogger.shared.track(.trackingPermissionDenied)
                 return
             }
             
@@ -87,9 +87,9 @@ final class OnboardingViewModel {
             }
 
             if status == .granted {
-                AnalyticsManager.shared.track(.trackingPermissionGranted)
+                EventLogger.shared.track(.trackingPermissionGranted)
             } else {
-                AnalyticsManager.shared.track(.trackingPermissionDenied)
+                EventLogger.shared.track(.trackingPermissionDenied)
             }
         }
     }

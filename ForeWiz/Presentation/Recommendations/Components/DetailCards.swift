@@ -43,7 +43,7 @@ struct DetailSectionLabel: View {
                 .textCase(.uppercase)
                 .tracking(0.5)
                 .lineLimit(2)
-                .minimumScaleFactor(0.75)
+                .minimumScaleFactor(0.85)
         }
     }
 }
@@ -160,7 +160,7 @@ struct DetailActivityCard: View {
                                     .font(.system(size: 12))
                                     .foregroundStyle(Color.white.opacity(0.4))
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.75)
+                                    .minimumScaleFactor(0.85)
                             }
                             .layoutPriority(1)
                             Spacer(minLength: 8)

@@ -23,7 +23,7 @@ final class AppCoordinator {
     }
 
     func start() async {
-        AnalyticsManager.shared.track(.appLaunch)
+        EventLogger.shared.track(.appLaunch)
 
         do {
             let loadedProfile = try await container.preferencesRepository.loadProfile()
@@ -41,7 +41,7 @@ final class AppCoordinator {
         try await container.completeOnboardingUseCase.execute(profile: profile)
         L10n.configure(language: profile.language)
         self.profile = profile
-        AnalyticsManager.shared.track(.onboardingCompleted)
+        EventLogger.shared.track(.onboardingCompleted)
         rootFlow = .main
     }
 

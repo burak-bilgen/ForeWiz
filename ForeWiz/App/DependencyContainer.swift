@@ -5,7 +5,9 @@ import WizPathKit
 @MainActor
 final class DependencyContainer {
     static var shared: DependencyContainer {
-        guard let instance else { fatalError("DependencyContainer not initialized. Call DependencyContainer.init() first.") }
+        guard let instance else {
+            preconditionFailure("DependencyContainer not initialized. Call DependencyContainer.init() first.")
+        }
         return instance
     }
     private static var instance: DependencyContainer?
