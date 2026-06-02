@@ -23,17 +23,12 @@ public struct SmartStop: Identifiable, Sendable, Equatable {
     public let phoneNumber: String?
     /// Business website URL from MKMapItem
     public let url: URL?
-    /// EV connector types available at this charger
-    public let connectorTypes: [EVConnectorType]
-    /// Number of charging stations (if available)
-    public let chargingStationCount: Int?
 
     public init(id: UUID, mapItem: MKMapItem, coordinate: CLLocationCoordinate2D, name: String,
                 category: POICategory, etaArrival: Date, weatherAtArrival: SegmentWeather?,
                 safetyStatus: POISafetyStatus, distanceFromRoute: CLLocationDistance, estimatedStopDuration: TimeInterval,
                 weatherRecommendation: String? = nil,
-                phoneNumber: String? = nil, url: URL? = nil,
-                connectorTypes: [EVConnectorType] = [], chargingStationCount: Int? = nil) {
+                phoneNumber: String? = nil, url: URL? = nil) {
         self.id = id
         self.mapItem = mapItem
         self.coordinate = coordinate
@@ -47,8 +42,6 @@ public struct SmartStop: Identifiable, Sendable, Equatable {
         self.weatherRecommendation = weatherRecommendation
         self.phoneNumber = phoneNumber
         self.url = url
-        self.connectorTypes = connectorTypes
-        self.chargingStationCount = chargingStationCount
     }
 
     public var displayTitle: String {
@@ -69,14 +62,12 @@ public struct SmartStop: Identifiable, Sendable, Equatable {
 // MARK: - POI Category
 public enum POICategory: String, Sendable {
     case gasStation
-    case evCharger
     case restStop
     case restaurant
 
     public var mkCategory: MKPointOfInterestCategory? {
         switch self {
         case .gasStation: return .gasStation
-        case .evCharger: return .evCharger
         case .restStop: return nil
         case .restaurant: return .restaurant
         }
@@ -85,7 +76,6 @@ public enum POICategory: String, Sendable {
     public var iconName: String {
         switch self {
         case .gasStation: return "fuelpump.fill"
-        case .evCharger: return "bolt.car.fill"
         case .restStop: return "bed.double.fill"
         case .restaurant: return "fork.knife"
         }
@@ -94,7 +84,6 @@ public enum POICategory: String, Sendable {
     public var defaultName: String {
         switch self {
         case .gasStation: return WizPathKitL10n.text("poi_gas_station")
-        case .evCharger: return WizPathKitL10n.text("poi_ev_charger")
         case .restStop: return WizPathKitL10n.text("poi_rest_stop")
         case .restaurant: return WizPathKitL10n.text("poi_restaurant")
         }
@@ -103,7 +92,6 @@ public enum POICategory: String, Sendable {
     public var color: String {
         switch self {
         case .gasStation: return "#00FF41"
-        case .evCharger: return "#00D9FF"
         case .restStop: return "#FF9500"
         case .restaurant: return "#FF3BFF"
         }

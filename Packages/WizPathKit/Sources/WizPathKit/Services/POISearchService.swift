@@ -29,11 +29,13 @@ public final class POISearchService: Sendable {
         let routeCoordinates = route.routeCoordinates
         guard !routeCoordinates.isEmpty, !categories.isEmpty else { return [] }
 
-        // Cache key: origin + destination + travel mode + kategoriler + radius
-        // (route.id kullanılmaz çünkü her hesaplamada değişir — cache hep miss olur)
+        // Cache key: origin + destination + travel mode + kategoriler + radius + geometry hash
+        // We include a dynamic geometry hash (coordinate count and total distance) so that detours
+        // (such as when avoidTollRoads is toggled) automatically bypass the cache and refresh stops.
         let og = route.origin
         let dst = route.destination
-        let cacheKey = "\(og.latitude),\(og.longitude)|\(dst.latitude),\(dst.longitude)|\(route.travelMode.rawValue)|\(categories.map(\.rawValue).sorted().joined()):\(Int(radius))"
+        let geometryHash = "\(routeCoordinates.count)-\(Int(route.totalDistance))"
+        let cacheKey = "\(og.latitude),\(og.longitude)|\(dst.latitude),\(dst.longitude)|\(route.travelMode.rawValue)|\(categories.map(\.rawValue).sorted().joined()):\(Int(radius))|\(geometryHash)"
         if !forceRefresh, let cached = cache.retrieve(key: cacheKey) {
             return cached
         }
@@ -47,9 +49,6 @@ public final class POISearchService: Sendable {
 
                 let request = MKLocalSearch.Request()
                 switch category {
-                case .evCharger:
-                    request.naturalLanguageQuery = "EV charger"
-                    request.pointOfInterestFilter = .init(including: [.evCharger])
                 case .gasStation:
                     request.naturalLanguageQuery = "Gas station"
                     request.pointOfInterestFilter = .init(including: [.gasStation])
@@ -113,17 +112,6 @@ public final class POISearchService: Sendable {
         return result
     }
 
-    public func searchChargersAlongRoute(
-        route: WizPathRoute,
-        radius: CLLocationDistance = 10_000,
-        forceRefresh: Bool = false
-    ) async -> [SmartStop] {
-        await searchSmartStopsAlongRoute(
-            route: route, categories: [.evCharger], radius: radius,
-            forceRefresh: forceRefresh
-        )
-    }
-
     /// Cache'i temizle — kullanıcı manuel yenileme yaparsa çağrılabilir.
     public func clearCache() {
         cache.clear()
@@ -137,9 +125,6 @@ public final class POISearchService: Sendable {
         routeCoordinates: [CLLocationCoordinate2D],
         maxRouteDeviation: CLLocationDistance
     ) async -> [SmartStop] {
-        // Wait for a rate-limit slot (shared across all PlaceRequest types)
-        await PlaceRequestThrottler.shared.waitForSlot()
-
         let search = MKLocalSearch(request: request)
         // 1. MKLocalSearch sonuçlarını bekle (sync callback → async continuation)
         let mapItems: [MKMapItem] = await withCheckedContinuation { continuation in
@@ -155,7 +140,7 @@ public final class POISearchService: Sendable {
         guard !mapItems.isEmpty else { return [] }
 
         // 2. Temel SmartStop'ları oluştur (sync — mesafe filtresi + statik alanlar)
-        var preliminaryStops: [(stop: SmartStop, coordinate: CLLocationCoordinate2D)] = []
+        var preliminaryStops: [SmartStop] = []
         for mapItem in mapItems {
             guard let coordinate = mapItem.placemark.location?.coordinate else { continue }
             let distanceFromRoute = self.distanceFromRoute(coordinate, routeCoordinates: routeCoordinates)
@@ -173,74 +158,29 @@ public final class POISearchService: Sendable {
                 distanceFromRoute: distanceFromRoute,
                 estimatedStopDuration: 1800,
                 phoneNumber: mapItem.phoneNumber,
-                url: mapItem.url,
-                connectorTypes: [] // placeholder, async'de doldurulacak
+                url: mapItem.url
             )
-            preliminaryStops.append((stop, coordinate))
+            preliminaryStops.append(stop)
         }
 
-        guard !preliminaryStops.isEmpty else { return [] }
-
-        // 3. EV charger'lar için async connector type lookup (Overpass API + statik fallback)
-        if category == .evCharger {
-            for i in preliminaryStops.indices {
-                let item = preliminaryStops[i]
-                let types = await ChargerConnectorLookup.connectorTypes(
-                    forStationName: item.stop.name,
-                    coordinate: item.coordinate
-                )
-                // SmartStop immutable — yeni instance oluştur
-                let original = item.stop
-                preliminaryStops[i].stop = SmartStop(
-                    id: original.id,
-                    mapItem: original.mapItem,
-                    coordinate: original.coordinate,
-                    name: original.name,
-                    category: original.category,
-                    etaArrival: original.etaArrival,
-                    weatherAtArrival: original.weatherAtArrival,
-                    safetyStatus: original.safetyStatus,
-                    distanceFromRoute: original.distanceFromRoute,
-                    estimatedStopDuration: original.estimatedStopDuration,
-                    phoneNumber: original.phoneNumber,
-                    url: original.url,
-                    connectorTypes: types,
-                    chargingStationCount: original.chargingStationCount
-                )
-            }
-        }
-
-        return preliminaryStops.map { $0.stop }
+        return preliminaryStops
     }
 
     // MARK: - Search Coordinate Sampling
 
     /// Rota koordinatlarından mesafe bazlı akıllı örnekleme yapar.
-    /// Her ~15km'de bir arama noktası seçer, minimum 9 maksimum 25 nokta.
+    /// Apple Maps rate limitlerini aşmamak için Origin, Midpoint ve Destination olarak tam 3 nokta seçer.
     private func searchCoordinates(from routeCoordinates: [CLLocationCoordinate2D]) -> [CLLocationCoordinate2D] {
         let count = routeCoordinates.count
         guard count > 1 else { return routeCoordinates }
-
-        // Rota toplam mesafesini kabaca hesapla
-        var totalDistance: CLLocationDistance = 0
-        for i in 1..<count {
-            let prev = CLLocation(latitude: routeCoordinates[i-1].latitude, longitude: routeCoordinates[i-1].longitude)
-            let cur = CLLocation(latitude: routeCoordinates[i].latitude, longitude: routeCoordinates[i].longitude)
-            totalDistance += cur.distance(from: prev)
+        
+        var points: [CLLocationCoordinate2D] = []
+        points.append(routeCoordinates[0]) // Origin
+        if count > 2 {
+            points.append(routeCoordinates[count / 2]) // Midpoint
         }
-
-        let km = totalDistance / 1000.0
-        // Her ~15km'de bir nokta, ama minimum 9 maksimum 25
-        let targetCount = max(9, min(25, Int(km / 15.0) + 2))
-
-        let step = max(1, (count - 1) / (targetCount - 1))
-        var indices: Set<Int> = [0]
-        for i in stride(from: step, to: count - 1, by: step) {
-            indices.insert(i)
-        }
-        indices.insert(count - 1)
-
-        return indices.sorted().map { routeCoordinates[$0] }
+        points.append(routeCoordinates[count - 1]) // Destination
+        return points
     }
 
     // MARK: - Deduplication

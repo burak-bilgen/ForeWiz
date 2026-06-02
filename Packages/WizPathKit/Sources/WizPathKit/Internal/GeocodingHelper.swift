@@ -41,8 +41,6 @@ final class GeocodingHelper {
             return cached
         }
 
-        // Wait for a rate-limit slot (shared across all PlaceRequest types)
-        await PlaceRequestThrottler.shared.waitForSlot()
 
         do {
             let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)

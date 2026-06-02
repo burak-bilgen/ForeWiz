@@ -76,8 +76,8 @@ public final class WizPathService {
             )
             let segmentsWithWeather = try await attachWeatherDataToSegments(segments: segments)
 
-            // Detect toll roads (Overpass API + advisory notices)
-            let hasTollRoads = await detectTollRoad(from: mkRoute, origin: origin, destination: destination)
+            // Detect toll roads (advisory notices)
+            let hasTollRoads = detectTollRoad(from: mkRoute)
 
             // If avoiding tolls, penalize heavily
             let tollPenalty = (avoidTollRoads && hasTollRoads) ? 40 : 0
@@ -253,33 +253,8 @@ public final class WizPathService {
     }
 
     /// Detect if an MKRoute includes toll roads.
-    /// 🆕 Uses OSM Overpass API (ücretsiz, API key yok) as primary source,
-    /// falls back to multi-language advisory notice text heuristic.
-    private func detectTollRoad(from route: MKRoute, origin: CLLocationCoordinate2D? = nil, destination: CLLocationCoordinate2D? = nil) async -> Bool {
-        // First try Overpass API using the route's polyline coordinates
-        let polylinePoints = route.polyline.points()
-        let pointCount = route.polyline.pointCount
-        if pointCount > 2 {
-            let coords = (0..<min(pointCount, 20)).map { polylinePoints[$0].coordinate }
-            if !coords.isEmpty {
-                let semiRoute = WizPathRoute(
-                    id: UUID(),
-                    origin: origin ?? coords.first!,
-                    destination: destination ?? coords.last!,
-                    travelMode: .car,
-                    departureTime: Date(),
-                    segments: [],
-                    totalDuration: route.expectedTravelTime,
-                    totalDistance: route.distance,
-                    polyline: route.polyline
-                )
-                // Overpass istekleri direkt await — async context'teyiz, main thread bloke olmaz!
-                let overpassResult = await TollRoadService.shared.hasTollRoads(on: semiRoute)
-                return overpassResult
-            }
-        }
-
-        // Fallback: text heuristic (multi-language advisory notices)
+    /// Uses Apple Maps' multi-language advisory notice text heuristic.
+    private func detectTollRoad(from route: MKRoute) -> Bool {
         return detectTollRoadFromAdvisoryNotices(route)
     }
 
