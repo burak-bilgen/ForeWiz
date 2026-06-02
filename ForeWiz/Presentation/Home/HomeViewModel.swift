@@ -190,8 +190,6 @@ final class HomeViewModel {
         let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
         Task {
             do {
-                // Wait for a rate-limit slot (shared across all PlaceRequest types)
-                await PlaceRequestThrottler.shared.waitForSlot()
                 let placemark = try await CLGeocoder().reverseGeocodeLocation(clLocation).first
                 let locationName = placemark?.locality ??
                     placemark?.subAdministrativeArea ??

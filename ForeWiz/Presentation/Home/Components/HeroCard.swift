@@ -13,31 +13,36 @@ struct HeroCard: View {
     var body: some View {
         LiquidGlassCard(accentColor: accentColor) {
             VStack(alignment: .leading, spacing: 16) {
-                // MARK: Headline + Temperature
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                // MARK: Headline + Score Arc + Temperature
+                HStack(alignment: .top, spacing: 12) {
                     // Headline — line limit + no layout priority so temperature always fits
-                    Text(assistant.headline)
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.85)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Spacer(minLength: 4)
-
-                    // Temperature + condition — pinned right, always visible
-                    VStack(alignment: .trailing, spacing: 0) {
-                        Text(weather.temperatureText)
-                            .font(.system(size: 28, weight: .semibold, design: .rounded))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(assistant.headline)
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .layoutPriority(1)
-                        Text(weather.conditionText)
-                            .font(.system(size: 12, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.5))
-                            .lineLimit(1)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.85)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        // Temperature + condition — below headline on the left
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text(weather.temperatureText)
+                                .font(.system(size: 26, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .layoutPriority(1)
+                            Text(weather.conditionText)
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.5))
+                                .lineLimit(1)
+                        }
                     }
-                    .fixedSize()
+
+                    Spacer(minLength: 8)
+
+                    // Comfort Score Arc — pinned right
+                    ComfortScoreArc(score: recommendation.outdoorScore.rawValue)
+                        .frame(width: 68, height: 68)
                 }
 
                 // MARK: Summary
@@ -136,15 +141,17 @@ private struct MetricPill: View {
                 Image(systemName: icon)
                     .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(color.opacity(0.8))
-                Text(value)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-            }
-            Text(label)
-                .font(.system(size: 8, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.35))
-                .lineLimit(1)
+                    Text(value)
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    }
+                    Text(label)
+                        .font(.system(size: 8, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.35))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)

@@ -41,8 +41,9 @@ struct ForecastRow: View {
 
     var body: some View {
         HStack(spacing: 8) {
+            // Day name — today highlighted
             Text(forecast.dayName)
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.system(size: 14, weight: forecast.isToday ? .bold : .semibold, design: .rounded))
                 .foregroundStyle(forecast.isToday ? .white : .white.opacity(0.6))
                 .frame(minWidth: 72, maxWidth: 88, alignment: .leading)
                 .lineLimit(1)
@@ -52,6 +53,7 @@ struct ForecastRow: View {
                 .foregroundStyle(.white.opacity(0.6))
                 .frame(width: 20)
 
+            // Temperature range
             HStack(spacing: 4) {
                 Text("\(Int(round(forecast.highTemp)))\(L10n.text("unit_degree"))")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -78,15 +80,24 @@ struct ForecastRow: View {
                 .frame(width: 44)
             }
 
-            // Score bar
-            RoundedRectangle(cornerRadius: 2)
-                .fill(scoreColor.opacity(0.6))
-                .frame(width: 2, height: 20)
-
-            Text(String(format: "%.1f", Double(forecast.outdoorScore) / 10.0))
-                .font(.system(size: 13, weight: .bold, design: .rounded))
-                .foregroundStyle(scoreColor)
-                .frame(width: 28, alignment: .trailing)
+            // Score capsule progress bar
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(.white.opacity(0.06))
+                    Capsule()
+                        .fill(scoreColor.opacity(0.7))
+                        .frame(width: geo.size.width * CGFloat(forecast.outdoorScore) / 100.0)
+                }
+            }
+            .frame(width: 36, height: 6)
         }
+        .padding(.vertical, forecast.isToday ? 2 : 0)
+        .background(
+            forecast.isToday
+                ? RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(.white.opacity(0.04))
+                : nil
+        )
     }
 }

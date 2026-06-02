@@ -168,64 +168,90 @@ private struct EventRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
-            // Icon
-            ZStack {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(severityColor.opacity(event.isPositive ? 0.08 : 0.12))
-                    .frame(width: 40, height: 40)
-                Image(systemName: event.symbolName)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(severityColor)
-            }
-            .frame(width: 40, height: 40)
-
-            // Content
-            VStack(alignment: .leading, spacing: 3) {
-                Text(event.title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                Text(event.description)
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
-                    .foregroundStyle(event.isPositive ? severityColor.opacity(0.7) : .white.opacity(0.55))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 8)
-
-            // Severity badge (sadece risk event'leri için)
+        HStack(spacing: 0) {
+            // Left accent stripe — intensity matches severity
             if !event.isPositive && event.severity >= .high {
-                Text(event.severity == .critical ? L10n.text("keyevent_critical") : L10n.text("keyevent_high"))
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 4)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(severityColor)
+                Rectangle()
+                    .fill(severityColor)
+                    .frame(width: 3)
+                    .clipShape(
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 14, bottomLeadingRadius: 14,
+                            bottomTrailingRadius: 0, topTrailingRadius: 0
+                        )
                     )
-                    .fixedSize()
+            } else if event.isPositive {
+                Rectangle()
+                    .fill(severityColor.opacity(0.4))
+                    .frame(width: 3)
+                    .clipShape(
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 14, bottomLeadingRadius: 14,
+                            bottomTrailingRadius: 0, topTrailingRadius: 0
+                        )
+                    )
             }
 
-            // Info badge (positive events)
-            if event.isPositive {
-                Text(L10n.text("keyevent_info_badge"))
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(severityColor)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 4)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6, style: .continuous)
-                            .fill(severityColor.opacity(0.15))
-                    )
-                    .fixedSize()
+            HStack(spacing: 12) {
+                // Icon
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(severityColor.opacity(event.isPositive ? 0.08 : 0.12))
+                        .frame(width: 40, height: 40)
+                    Image(systemName: event.symbolName)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(severityColor)
+                }
+                .frame(width: 40, height: 40)
+
+                // Content
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(event.title)
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text(event.description)
+                        .font(.system(size: 12, weight: .regular, design: .rounded))
+                        .foregroundStyle(event.isPositive ? severityColor.opacity(0.7) : .white.opacity(0.55))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                // Severity badge (sadece risk event'leri için)
+                if !event.isPositive && event.severity >= .high {
+                    Text(event.severity == .critical ? L10n.text("keyevent_critical") : L10n.text("keyevent_high"))
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(severityColor)
+                        )
+                        .fixedSize()
+                }
+
+                // Info badge (positive events)
+                if event.isPositive {
+                    Text(L10n.text("keyevent_info_badge"))
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(severityColor)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(severityColor.opacity(0.15))
+                        )
+                        .fixedSize()
+                }
             }
+            .padding(12)
         }
-        .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(event.isPositive ? severityColor.opacity(0.04) : .white.opacity(0.05))
         )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }

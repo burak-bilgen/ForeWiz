@@ -206,22 +206,16 @@ struct ModernAddLocationView: View {
     private func search() async {
         guard !searchText.isEmpty else { return }
 
-        // Wait for a rate-limit slot (shared across all PlaceRequest types)
-        await PlaceRequestThrottler.shared.waitForSlot()
-
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = searchText
         request.resultTypes = .address
 
-        MKLocalSearch(request: request).start { response, error in
-            if let error {
-                // Log but don't surface to user — next debounce will retry
-                return
-            }
-            if let response {
-                searchResults = response.mapItems
-                withAnimation { showSearchResults = true }
-            }
+        do {
+            let response = try await MKLocalSearch(request: request).start()
+            searchResults = response.mapItems
+            withAnimation { showSearchResults = true }
+        } catch {
+            // Log but don't surface to user — next debounce will retry
         }
     }
 

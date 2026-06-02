@@ -43,12 +43,13 @@ struct WizPathHUDCard: View {
                     Text(statusTitle)
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                        .minimumScaleFactor(0.85)
+                        .minimumScaleFactor(0.7)
                         .lineLimit(1)
                     Text(statusSubtitle)
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
 
                 Spacer()

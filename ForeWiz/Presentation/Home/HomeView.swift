@@ -118,9 +118,9 @@ struct HomeView: View {
                         )
                     }
                 }
-                .sheet(isPresented: $showMapsExportSheet) {
-                    mapsExportSheetContent
-                }
+            .fullScreenCover(isPresented: $showMapsExportSheet) {
+                mapsExportSheetContent
+            }
             }
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }

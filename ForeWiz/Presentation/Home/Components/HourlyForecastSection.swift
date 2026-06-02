@@ -42,7 +42,7 @@ struct HourlyPill: View {
 
     var body: some View {
         VStack(spacing: 4) {
-            Text("\(String(format: "%02d", item.hour))\(L10n.text("time_format_hour"))")
+            Text("\(item.hour)\(L10n.text("time_format_hour"))")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
@@ -93,7 +93,7 @@ struct TemperatureTrendChart: View {
 
                     RoundedRectangle(cornerRadius: 3, style: .continuous)
                         .fill(barColor(for: temp))
-                        .frame(width: 12, height: barHeight)
+                        .frame(width: 18, height: barHeight)
 
                     Text(String(format: "%02d", item.hour))
                         .font(.system(size: 8, weight: .medium, design: .rounded))
