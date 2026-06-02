@@ -16,7 +16,7 @@ struct HeroCard: View {
                 // MARK: Headline + Score Arc + Temperature
                 HStack(alignment: .top, spacing: 12) {
                     // Headline — line limit + no layout priority so temperature always fits
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 10) {
                         Text(assistant.headline)
                             .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
