@@ -1216,7 +1216,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugünkü hava koşulları zindeliğinizi etkileyebilir."
+            "value": "Bugün hava, kendinizi nasıl hissedeceğinizi etkileyebilir."
           }
         }
       }
@@ -8128,7 +8128,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kavurucu sıcak ve yüksek UV - öğlen 12 ile 3 arasında gölgede kalın."
+            "value": "Kavurucu sıcak ve yüksek UV — 12:00-15:00 arası gölgede kalın."
           }
         }
       }
@@ -8383,7 +8383,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "kendinizi yormayın"
+            "value": "yavaşlayın, kendinizi yormayın"
           }
         }
       }
@@ -10859,7 +10859,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Soğuk hava hissediliyor"
+            "value": "Soğuk olacak"
           }
         }
       }
@@ -10876,7 +10876,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava oldukça soğuk. Uzun süre dışarıda kalacaksanız kat kat giyinin ve su geçirmez ayakkabı tercih etmeniz önemli bir fark yaratacaktır."
+            "value": "Hava soğuk olacak. Uzun süre dışarıda kalacaksanız kat kat giyinin ve kapalı ayakkabı tercih edin."
           }
         }
       }
@@ -10894,7 +10894,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aşırı Sıcaklık Uyarısı 🚨"
+            "value": "Kritik Sıcak 🚨"
           }
         }
       }
@@ -10912,7 +10912,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hava koşulları bugün hayati risk taşıyor. Mümkünse dışarı çıkmayın, bol su için ve yaşlılarla hassas kişilere dikkat edin."
+            "value": "Hayati tehlike oluşturan sıcaklık. Dışarı çıkmayın, bol su için, yaşlıları ve hassas kişileri gözetin."
           }
         }
       }
@@ -10930,7 +10930,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcaklıklar yükselmeye başlıyor. Su içmeye başlayın ve öğle saatlerinde gölgede kalabileceğiniz bir plan yapın."
+            "value": "Sıcaklıklar yükseliyor. Su içmeye başlayın, öğleye doğru gölge planı yapın."
           }
         }
       }
@@ -10948,7 +10948,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcaklık artıyor"
+            "value": "Isınıyor"
           }
         }
       }
@@ -10982,7 +10982,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarısı bugün oldukça sıcak olacak. Dışarıda kaldığınız süreyi kısa tutun, bol su için ve mola verdiğinizde gölgeyi tercih edin."
+            "value": "Dışarısı oldukça sıcak hissedilecek. Kısa kalın, bol su için, gölgede mola verin."
           }
         }
       }
@@ -10999,7 +10999,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hissedilen sıcaklık daha yüksek"
+            "value": "Görünenden daha sıcak"
           }
         }
       }
@@ -11016,7 +11016,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hissedilen sıcaklık artıyor"
+            "value": "Hissedilen sıcaklık yükselecek"
           }
         }
       }
@@ -11050,7 +11050,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sıcak yorucu olabilir"
+            "value": "Sıcak yoracak"
           }
         }
       }
@@ -11169,7 +11169,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Öğle saatlerinde sıcaklık artıyor"
+            "value": "Öğleye doğru ısınıyor"
           }
         }
       }
@@ -11186,7 +11186,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Öğle saatlerinde hava zorlayıcı olacak; yoğun aktivitelerinizi sabah erken veya akşamüstü saatlerine almanızı öneririz."
+            "value": "Öğle sıcağı zorlayıcı olacak. Yoğun işleri sabah veya akşama bırakın."
           }
         }
       }
@@ -11220,7 +11220,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yaklaşık %1$d dakika içinde %2$d%% olasılıkla yağmur bekleniyor. İçeri girmeyi veya şemsiye almayı düşünebilirsiniz."
+            "value": "Yaklaşık %1$d dk içinde %2$d%% ihtimalle yağmur bekleniyor. İçeri geçin veya şemsiyenizi alın."
           }
         }
       }
@@ -11256,7 +11256,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu gece yüksek sıcaklıklar bekleniyor; uyku kaliteniz etkilenebilir. Mümkünse pencereyi açık bırakın, vantilatör kullanabilirsiniz."
+            "value": "Sıcak gece — uykunuz etkilenebilir. Pencereyi açın, vantilatör kullanın."
           }
         }
       }
@@ -11273,7 +11273,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarısı pek konforlu değil"
+            "value": "Dışarısı pek rahat değil"
           }
         }
       }
@@ -11290,7 +11290,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu saatlerde dışarısı rahatsız edici hissettirilebilir. Mümkünse planınızı daha konforlu bir saate kaydırabilirsiniz."
+            "value": "Bu saatlerde dışarısı rahatsız edici olabilir. Mümkünse planı daha konforlu bir saate kaydırın."
           }
         }
       }
@@ -11307,7 +11307,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yağmur planlarınızı etkileyebilir"
+            "value": "Yağmur planları bozabilir"
           }
         }
       }
@@ -11324,7 +11324,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yağmur bekleniyor"
+            "value": "Yağmur görünüyor"
           }
         }
       }
@@ -11341,7 +11341,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@–%@ saatleri arasında ortalama %%%d olasılıkla yağmur bekleniyor; toplam %@mm. Şemsiyenizi yanınıza almayı unutmayın."
+            "value": "%@–%@ arası %%%d olasılıkla yağmur bekleniyor, toplam %@mm. Şemsiyenizi alın."
           }
         }
       }
@@ -11358,7 +11358,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarıdayken yağmur basabilir. Yanınıza şemsiye alın veya B planı oluşturun."
+            "value": "Dışarıdayken yağmur basabilir. Yanınıza şemsiye alın veya bir B planınız olsun."
           }
         }
       }
@@ -11375,7 +11375,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yağmur dış mekan planlarınızı aksatabilir. Alternatif bir saat veya kapalı mekan seçeneğini aklınızda bulundurun."
+            "value": "Yağmur dış mekan planlarınızı aksatabilir. Alternatif saat veya kapalı mekan seçeneği bulundurun."
           }
         }
       }
@@ -11392,7 +11392,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Olumsuz hava koşulları olası"
+            "value": "Şiddetli hava olası"
           }
         }
       }
@@ -11409,7 +11409,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tahminlerde zorlu hava koşulları görünüyor. Dış mekan planlarınızı ertelemenizi öneririz."
+            "value": "Tahminlerde şiddetli hava var. Dış mekan planlarını ertelemek en güvenlisi."
           }
         }
       }
@@ -11596,7 +11596,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "UV seviyesi bugün yüksek"
+            "value": "UV bugün yüksek"
           }
         }
       }
@@ -11613,7 +11613,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "UV seviyesi yüksek. Güneş kremi, şapka ve gölgeli alanlar cildinizi koruyacaktır."
+            "value": "UV seviyesi yüksek. Güneş kremi, şapka ve gölge cildinizi korur."
           }
         }
       }
@@ -12472,7 +12472,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Olabildiğince gölgede kalmaya, yanınızda su bulundurmaya ve serin yerleri tercih etmeye çalışın."
+            "value": "Gölgede kalın ve yanınızda su bulundurun."
           }
         }
       }
