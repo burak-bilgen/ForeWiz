@@ -1,1 +1,2 @@
 google.com, pub-3149735625847287, DIRECT, f08c47fec0942fa0
+# App-ads.txt for ForeWiz - AdMob verification
