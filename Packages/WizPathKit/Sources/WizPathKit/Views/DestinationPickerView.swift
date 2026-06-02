@@ -196,8 +196,6 @@ public struct DestinationPickerView: View {
         let search = MKLocalSearch(request: searchRequest)
         Task {
             do {
-                // Wait for a rate-limit slot (shared across all PlaceRequest types)
-                await PlaceRequestThrottler.shared.waitForSlot()
                 let response = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<MKLocalSearch.Response, any Error>) in
                     search.start { response, error in
                         if let response = response {

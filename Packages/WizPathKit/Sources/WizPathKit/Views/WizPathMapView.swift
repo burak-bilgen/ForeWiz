@@ -31,17 +31,12 @@ public struct WizPathMapView: View {
 
                     weatherChangeMarkers(route: route)
 
-                    ForEach(viewModel.chargingStations) { station in
+                    ForEach(viewModel.smartStops) { station in
                         Annotation(coordinate: station.coordinate) {
-                            Button {
-                                viewModel.selectedChargingStation = station
-                                viewModel.showChargingStationDetail = true
-                                HapticEngine.shared.light()
-                            } label: {
-                                SmartStopMarker(category: station.category)
-                            }
-                            .contentShape(Rectangle())
-                            .buttonStyle(.plain)
+                            SmartStopMarker(category: station.category)
+                                .onTapGesture {
+                                    HapticEngine.shared.light()
+                                }
                         } label: {
                             Text(station.displayTitle)
                                 .font(.system(size: 8, weight: .medium))
@@ -288,17 +283,12 @@ struct FullScreenMapView: View {
                         }
                     )
 
-                    ForEach(viewModel.chargingStations) { station in
+                    ForEach(viewModel.smartStops) { station in
                         Annotation(coordinate: station.coordinate) {
-                            Button {
-                                viewModel.selectedChargingStation = station
-                                viewModel.showChargingStationDetail = true
-                                HapticEngine.shared.light()
-                            } label: {
-                                SmartStopMarker(category: station.category)
-                            }
-                            .contentShape(Rectangle())
-                            .buttonStyle(.plain)
+                            SmartStopMarker(category: station.category)
+                                .onTapGesture {
+                                    HapticEngine.shared.light()
+                                }
                         } label: {
                             Text(station.displayTitle).font(.system(size: 8, weight: .medium)).lineLimit(1)
                         }

@@ -33,8 +33,6 @@ public final class LocationSearchCompleter: NSObject, ObservableObject {
         searchTask = Task {
             try? await Task.sleep(nanoseconds: 300_000_000)
             guard !Task.isCancelled else { return }
-            // Wait for a rate-limit slot (shared across all PlaceRequest types)
-            await PlaceRequestThrottler.shared.waitForSlot()
             isSearching = true
             completer.queryFragment = query
         }

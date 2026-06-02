@@ -10,7 +10,6 @@ public struct WizPathDashboardView: View {
     @State private var showDestinationPicker = false
     @State private var showDepartureOptimizer = false
     @State private var showWeatherDetail = false
-    @State private var showChargingStationDetail = false
     @State private var showWaypointPicker = false
     @State private var pendingMapsAction: (() -> Void)?
     @Namespace private var travelModeNamespace
@@ -182,26 +181,10 @@ public struct WizPathDashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    // WizPath logo placeholder
-                    Image(systemName: "map.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(Color.liquidAccent)
-                }
                 ToolbarItem(placement: .topBarTrailing) {
-                    HStack(spacing: 2) {
-                        Button {
-                            HapticEngine.shared.light()
-                            onFeedback()
-                        } label: {
-                            Image(systemName: "bubble.left.and.bubble.right")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.5))
-                        }
-                        Button { HapticEngine.shared.light(); dismiss() } label: {
-                            Image(systemName: "xmark.circle.fill").font(.system(size: 22)).foregroundStyle(.secondary).symbolRenderingMode(.hierarchical)
-                        }.accessibilityLabel(WizPathKitL10n.text("wizpath_close"))
-                    }
+                    Button { HapticEngine.shared.light(); dismiss() } label: {
+                        Image(systemName: "xmark.circle.fill").font(.system(size: 22)).foregroundStyle(.secondary).symbolRenderingMode(.hierarchical)
+                    }.accessibilityLabel(WizPathKitL10n.text("wizpath_close"))
                 }
             }
             .animation(AppTheme.cardSpring, value: viewModel?.state)
@@ -270,229 +253,38 @@ public struct WizPathDashboardView: View {
     }
 
     private func activeRouteContent(viewModel: WizPathViewModel) -> some View {
-        GeometryReader { geometry in
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 12) {
-                    // ── Expandable map ──
-                    let mapHeight: CGFloat = viewModel.mapExpanded
-                        ? geometry.size.height * 0.55
-                        : min(220, geometry.size.height * 0.30)
-                    
-                    ZStack(alignment: .top) {
-                        WizPathMapView(viewModel: viewModel)
-                            .frame(height: mapHeight)
-                            .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                            .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 8)
-                            .overlay(alignment: .bottomTrailing) {
-                                // Expand/collapse hint label
-                                HStack(spacing: 4) {
-                                    Image(systemName: viewModel.mapExpanded ? "chevron.down" : "chevron.up")
-                                        .font(.system(size: 8, weight: .bold))
-                                    Text(viewModel.mapExpanded
-                                         ? WizPathKitL10n.text("wizpath_map_collapse")
-                                         : WizPathKitL10n.text("wizpath_map_expand"))
-                                        .font(.system(size: 8, weight: .semibold))
-                                }
-                                .foregroundStyle(.white.opacity(0.6))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(.ultraThinMaterial, in: Capsule())
-                                .environment(\.colorScheme, .dark)
-                                .padding(10)
-                                .onTapGesture {
-                                    withAnimation(AppTheme.cardSpring) {
-                                        viewModel.mapExpanded.toggle()
-                                        HapticEngine.shared.light()
-                                    }
-                                }
-                            }
-                        
-                        if viewModel.isLoadingMapDetails {
-                            HStack(spacing: 8) {
-                                ProgressView()
-                                    .scaleEffect(0.7)
-                                    .tint(.white)
-                                Text(WizPathKitL10n.text("wizpath_loading_smart_stops"))
-                                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                                    .foregroundStyle(.white)
-                            }
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(.ultraThinMaterial, in: Capsule())
-                            .overlay(Capsule().stroke(.white.opacity(0.12), lineWidth: 0.5))
-                            .padding(.top, 12)
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
+        ZStack(alignment: .top) {
+            // ── Full-screen map ──
+            WizPathMapView(viewModel: viewModel)
+                .ignoresSafeArea()
 
-                    if viewModel.state.isOffline { OfflineBanner(retry: { Task { await viewModel.calculateRoute() } }).padding(.horizontal, 16) }
-                    
-                    // Travel mode picker on active route screen - Premium Sliding Capsule
-                    LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 4) {
-                        HStack(spacing: 4) {
-                            ForEach(TravelMode.allCases) { mode in
-                                Button {
-                                    guard viewModel.travelMode != mode else { return }
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.76)) {
-                                        viewModel.switchTravelMode(to: mode)
-                                    }
-                                    HapticEngine.shared.selectionChanged()
-                                } label: {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: mode.icon)
-                                            .font(.system(size: 13, weight: .semibold))
-                                        Text(mode.localizedTitle)
-                                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                                    }
-                                    .foregroundStyle(viewModel.travelMode == mode ? .white : .white.opacity(0.55))
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background {
-                                        if viewModel.travelMode == mode {
-                                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                                .fill(
-                                                    LinearGradient(
-                                                        colors: [Color.liquidAccent.opacity(0.35), Color.liquidAccentSoft.opacity(0.18)],
-                                                        startPoint: .topLeading,
-                                                        endPoint: .bottomTrailing
-                                                    )
-                                                )
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                                        .stroke(.white.opacity(0.15), lineWidth: 0.5)
-                                                )
-                                                .matchedGeometryEffect(id: "activeTab", in: travelModeNamespace)
-                                        }
-                                    }
-                                }
-                                .contentShape(Rectangle())
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(4)
-                    }
-                    .padding(.horizontal, 16)
-
-                    if viewModel.travelMode == .car {
-                        VStack(spacing: 6) {
-                            electricVehicleToggle(viewModel: viewModel)
-                            tollRoadToggle(viewModel: viewModel)
-                        }
-                        .padding(.horizontal, 16)
-                    }
-                    
-                    // Route Comparison
-                    if viewModel.showRouteComparison && viewModel.routeCandidates.count > 1 {
-                        RouteComparisonCard(
-                            candidates: viewModel.routeCandidates,
-                            selectedIndex: viewModel.selectedRouteIndex,
-                            onSelect: { viewModel.selectRouteCandidate(at: $0) },
-                            onClose: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison = false } }
-                        )
-                        .padding(.horizontal, 16)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-
-                    if viewModel.showJourneyHUD, let route = viewModel.mapsNavigationRoute {
-                        JourneyHUDView(data: route.journeyHUDData).padding(.horizontal, 16)
-                    }
-
-                    // Elevation profile card
-                    if let profile = viewModel.elevationProfile {
-                        ElevationCardView(profile: profile, hasTollRoads: viewModel.hasTollRoads)
-                            .padding(.horizontal, 16)
-                    }
-
-                    // Cycling safety panel (only when in cycling mode)
-                    if viewModel.travelMode == .cycling, let safety = viewModel.cyclingSafetyAnalysis {
-                        CyclingSafetyPanel(safety: safety).padding(.horizontal, 16)
-                    }
-                    // EV charging stations panel — shows real POI data along the route
-                    if viewModel.travelMode == .car, viewModel.isElectricVehicle {
-                        EvRangePlannerPanel(
-                            chargingStations: viewModel.chargingStations.filter { $0.category == .evCharger }
-                        )
-                        .padding(.horizontal, 16)
-                    }
-                    if let route = viewModel.mapsNavigationRoute {
-                        WizPathRouteInfoPanel(
-                            route: route,
-                            destinationName: viewModel.destinationName,
-                            bestDepartureTime: viewModel.bestDepartureTime,
-                            departureTimeReason: viewModel.departureTimeReason,
-                            showDepartureOptimizer: { showDepartureOptimizer = true },
-                            onReset: { viewModel.reset() },
-                            onUpdateDepartureTime: { viewModel.updateDepartureTime($0) },
-                            onOpenInAppleMaps: {
-                                let waypoints = viewModel.mapsWaypoints
-                                if waypoints.isEmpty {
-                                    onMapsExport { openMapsURL(nativeURL: { viewModel.appleMapsURLString() }, webURL: { viewModel.appleMapsWebURLString() }) }
-                                } else {
-                                    viewModel.selectedWaypointIds = []
-                                    pendingMapsAction = { [weak viewModel] in
-                                        guard let vm = viewModel else { return }
-                                        // Web URL'yi önce dene — native maps:// waypoint'leri desteklemiyor
-                                        onMapsExport { openMapsURL(
-                                            nativeURL: { vm.appleMapsURLString() },
-                                            webURL: { vm.appleMapsWebURLString() },
-                                            preferWeb: true
-                                        )}
-                                    }
-                                    showWaypointPicker = true
-                                }
-                            },
-                            onOpenInGoogleMaps: {
-                                let waypoints = viewModel.mapsWaypoints
-                                if waypoints.isEmpty {
-                                    onMapsExport { openMapsURL(nativeURL: { viewModel.googleMapsURLString() }, webURL: { viewModel.googleMapsWebURLString() }) }
-                                } else {
-                                    viewModel.selectedWaypointIds = []
-                                    pendingMapsAction = { [weak viewModel] in
-                                        guard let vm = viewModel else { return }
-                                        // Web URL'yi önce dene — native maps:// waypoint'leri desteklemiyor
-                                        onMapsExport { openMapsURL(
-                                            nativeURL: { vm.googleMapsURLString() },
-                                            webURL: { vm.googleMapsWebURLString() },
-                                            preferWeb: true
-                                        )}
-                                    }
-                                    showWaypointPicker = true
-                                }
-                            },
-                            trafficCongestion: viewModel.currentTrafficCongestion,
-                            hasTollRoads: viewModel.hasTollRoads,
-                            avoidTollRoads: viewModel.avoidTollRoads,
-                            candidateCount: viewModel.routeCandidates.count,
-                            onShowRouteComparison: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison.toggle() } }
-                        )
-                        .padding(.horizontal, 16)
-                    }
-                    // ── Inline Error Card (non-disruptive, shown when cached route exists) ──
-                    if let errorMsg = viewModel.errorMessage, viewModel.mapsNavigationRoute != nil {
-                        RouteErrorCard(
-                            message: errorMsg,
-                            isDismissable: true,
-                            onRetry: {
-                                viewModel.dismissError()
-                                Task { await viewModel.refreshRoute() }
-                            },
-                            onDismiss: { viewModel.dismissError() }
-                        )
-                        .padding(.horizontal, 16)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                    
-                    Text(WizPathKitL10n.text("wizpath_powered_by_apple_maps")).font(.caption2).foregroundStyle(.tertiary).padding(.top, 4).padding(.bottom, 24)
+            // ── Smart Stops loading indicator (top center) ──
+            if viewModel.isLoadingMapDetails {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .scaleEffect(0.7)
+                        .tint(.white)
+                    Text(WizPathKitL10n.text("wizpath_loading_smart_stops"))
+                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
                 }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial, in: Capsule())
+                .overlay(Capsule().stroke(.white.opacity(0.12), lineWidth: 0.5))
+                .environment(\.colorScheme, .dark)
+                .padding(.top, 100)
+                .transition(.move(edge: .top).combined(with: .opacity))
             }
-            .refreshable {
-                if viewModel.mapsNavigationRoute != nil {
-                    await viewModel.refreshRoute()
-                }
-            }
-            .safeAreaPadding(.bottom, 8)
+        }
+        // ── Bottom sheet drawer (non-dismissable) ──
+        .sheet(isPresented: .constant(true)) {
+            routeDrawerContent(viewModel: viewModel)
+                .presentationDetents([.fraction(0.38), .fraction(0.85)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.ultraThinMaterial)
+                .presentationBackgroundInteraction(.enabled)
+                .interactiveDismissDisabled()
         }
         .sheet(isPresented: $showDepartureOptimizer) {
             if let route = viewModel.mapsNavigationRoute {
@@ -513,21 +305,6 @@ public struct WizPathDashboardView: View {
                 viewModel.selectedWeatherSegment = nil
             }
         }
-        .onChange(of: viewModel.showChargingStationDetail) { _, newValue in
-            showChargingStationDetail = newValue
-        }
-        .sheet(isPresented: $showChargingStationDetail) {
-            Group {
-                if let station = viewModel.selectedChargingStation {
-                    ChargingStationDetailSheet(station: station)
-                }
-            }
-            .onDisappear {
-                viewModel.showChargingStationDetail = false
-                viewModel.selectedChargingStation = nil
-            }
-        }
-                // Waypoint Picker
         .sheet(isPresented: $showWaypointPicker) {
             NavigationStack {
                 WizPathWaypointPickerSheet(
@@ -545,6 +322,170 @@ public struct WizPathDashboardView: View {
                 )
             }
         }
+    }
+
+    // MARK: - Route Drawer Content
+
+    @ViewBuilder
+    private func routeDrawerContent(viewModel: WizPathViewModel) -> some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 12) {
+                if viewModel.state.isOffline {
+                    OfflineBanner(retry: { Task { await viewModel.calculateRoute() } })
+                        .padding(.horizontal, 16)
+                }
+
+                // Travel mode picker — Premium Sliding Capsule
+                LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 4) {
+                    HStack(spacing: 4) {
+                        ForEach(TravelMode.allCases) { mode in
+                            Button {
+                                guard viewModel.travelMode != mode else { return }
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.76)) {
+                                    viewModel.switchTravelMode(to: mode)
+                                }
+                                HapticEngine.shared.selectionChanged()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: mode.icon)
+                                        .font(.system(size: 13, weight: .semibold))
+                                    Text(mode.localizedTitle)
+                                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                                        .contentTransition(.opacity)
+                                }
+                                .foregroundStyle(viewModel.travelMode == mode ? .white : .white.opacity(0.55))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background {
+                                    if viewModel.travelMode == mode {
+                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                            .fill(
+                                                LinearGradient(
+                                                    colors: [Color.liquidAccent.opacity(0.35), Color.liquidAccentSoft.opacity(0.18)],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                                    .stroke(.white.opacity(0.15), lineWidth: 0.5)
+                                            )
+                                            .matchedGeometryEffect(id: "activeTab", in: travelModeNamespace)
+                                    }
+                                }
+                            }
+                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(4)
+                }
+                .padding(.horizontal, 16)
+
+                if viewModel.travelMode == .car {
+                    tollRoadToggle(viewModel: viewModel)
+                        .padding(.horizontal, 16)
+                }
+
+                // Route Comparison
+                if viewModel.showRouteComparison && viewModel.routeCandidates.count > 1 {
+                    RouteComparisonCard(
+                        candidates: viewModel.routeCandidates,
+                        selectedIndex: viewModel.selectedRouteIndex,
+                        onSelect: { viewModel.selectRouteCandidate(at: $0) },
+                        onClose: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison = false } }
+                    )
+                    .padding(.horizontal, 16)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
+                if viewModel.showJourneyHUD, let route = viewModel.mapsNavigationRoute {
+                    JourneyHUDView(data: route.journeyHUDData)
+                        .padding(.horizontal, 16)
+                }
+
+                // Cycling safety panel
+                if viewModel.travelMode == .cycling, let safety = viewModel.cyclingSafetyAnalysis {
+                    CyclingSafetyPanel(safety: safety)
+                        .padding(.horizontal, 16)
+                }
+
+                if let route = viewModel.mapsNavigationRoute {
+                    WizPathRouteInfoPanel(
+                        route: route,
+                        destinationName: viewModel.destinationName,
+                        bestDepartureTime: viewModel.bestDepartureTime,
+                        departureTimeReason: viewModel.departureTimeReason,
+                        showDepartureOptimizer: { showDepartureOptimizer = true },
+                        onReset: { viewModel.reset() },
+                        onUpdateDepartureTime: { viewModel.updateDepartureTime($0) },
+                        onOpenInAppleMaps: {
+                            let waypoints = viewModel.mapsWaypoints
+                            if waypoints.isEmpty {
+                                onMapsExport { openMapsURL(nativeURL: { viewModel.appleMapsURLString() }, webURL: { viewModel.appleMapsWebURLString() }) }
+                            } else {
+                                viewModel.selectedWaypointIds = []
+                                pendingMapsAction = { [weak viewModel] in
+                                    guard let vm = viewModel else { return }
+                                    onMapsExport { openMapsURL(
+                                        nativeURL: { vm.appleMapsURLString() },
+                                        webURL: { vm.appleMapsWebURLString() },
+                                        preferWeb: true
+                                    )}
+                                }
+                                showWaypointPicker = true
+                            }
+                        },
+                        onOpenInGoogleMaps: {
+                            let waypoints = viewModel.mapsWaypoints
+                            if waypoints.isEmpty {
+                                onMapsExport { openMapsURL(nativeURL: { viewModel.googleMapsURLString() }, webURL: { viewModel.googleMapsWebURLString() }) }
+                            } else {
+                                viewModel.selectedWaypointIds = []
+                                pendingMapsAction = { [weak viewModel] in
+                                    guard let vm = viewModel else { return }
+                                    onMapsExport { openMapsURL(
+                                        nativeURL: { vm.googleMapsURLString() },
+                                        webURL: { vm.googleMapsWebURLString() },
+                                        preferWeb: true
+                                    )}
+                                }
+                                showWaypointPicker = true
+                            }
+                        },
+                        trafficCongestion: viewModel.currentTrafficCongestion,
+                        hasTollRoads: viewModel.hasTollRoads,
+                        avoidTollRoads: viewModel.avoidTollRoads,
+                        candidateCount: viewModel.routeCandidates.count,
+                        onShowRouteComparison: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison.toggle() } }
+                    )
+                    .padding(.horizontal, 16)
+                }
+
+                // Inline error card
+                if let errorMsg = viewModel.errorMessage, viewModel.mapsNavigationRoute != nil {
+                    RouteErrorCard(
+                        message: errorMsg,
+                        isDismissable: true,
+                        onRetry: {
+                            viewModel.dismissError()
+                            Task { await viewModel.refreshRoute() }
+                        },
+                        onDismiss: { viewModel.dismissError() }
+                    )
+                    .padding(.horizontal, 16)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
+                Text(WizPathKitL10n.text("wizpath_powered_by_apple_maps"))
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 4)
+                    .padding(.bottom, 32)
+            }
+            .padding(.top, 8)
+        }
+        .scrollIndicators(.hidden)
     }
 
     private func tollRoadToggle(viewModel: WizPathViewModel) -> some View {
@@ -575,33 +516,7 @@ public struct WizPathDashboardView: View {
         .accessibilityAddTraits(viewModel.avoidTollRoads ? .isSelected : [])
     }
 
-    private func electricVehicleToggle(viewModel: WizPathViewModel) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: "bolt.car.fill")
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(viewModel.isElectricVehicle ? Color(hex: POICategory.evCharger.color) : .secondary)
-            
-            Text(WizPathKitL10n.text("wizpath_ev_mode_title"))
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(.white)
-            
-            Spacer()
-            
-            Toggle(isOn: Binding(get: { viewModel.isElectricVehicle }, set: { enabled in viewModel.setElectricVehicleEnabled(enabled) })) {}
-                .tint(Color(hex: POICategory.evCharger.color))
-                .scaleEffect(0.85)
-                .labelsHidden()
-                .accessibilityLabel(WizPathKitL10n.text("wizpath_ev_mode_title"))
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .environment(\.colorScheme, .dark)
-        )
-        .accessibilityAddTraits(viewModel.isElectricVehicle ? .isSelected : [])
-    }
+
 
     // MARK: - Spinner Helpers
 
@@ -628,22 +543,8 @@ public struct WizPathDashboardView: View {
     }
 }
 
-// MARK: - Loading Stage Dot
 
-private struct LoadingStageDot: View {
-    let isActive: Bool
-    let offset: CGFloat
 
-    var body: some View {
-        Circle()
-            .fill(isActive ? Color.liquidAccent : Color.white.opacity(0.25))
-            .frame(width: 8, height: 8)
-            .offset(y: isActive ? offset : 0)
-            .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: offset)
-            .scaleEffect(isActive ? 1.2 : 1.0)
-            .animation(.easeInOut(duration: 0.4), value: isActive)
-    }
-}
 
 // MARK: - Route Error Card
 
