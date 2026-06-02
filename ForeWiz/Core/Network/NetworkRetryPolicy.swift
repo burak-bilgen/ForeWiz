@@ -190,7 +190,7 @@ extension WeatherRepository {
             // Determine if error is retryable
             if let appError = error as? AppError {
                 switch appError {
-                case .weatherUnavailable, .weatherKitFailed:
+                case .weatherUnavailable, .weatherKitFailed, .weatherKitPermissionMissing:
                     return true
                 default:
                     return false

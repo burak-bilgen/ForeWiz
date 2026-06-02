@@ -1,36 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Glass Effect Modifier
-
-struct GlassEffectModifier: ViewModifier {
-    let style: UIBlurEffect.Style
-    let cornerRadius: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .background(
-                ZStack {
-                    VisualEffectView(effect: UIBlurEffect(style: style))
-                    Color.black.opacity(0.10)
-                }
-                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            )
-    }
-}
-
-private struct VisualEffectView: UIViewRepresentable {
-    let effect: UIVisualEffect
-
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        UIVisualEffectView(effect: effect)
-    }
-
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
-        uiView.effect = effect
-    }
-}
-
 extension View {
     func glassEffect(
         in shape: some Shape = RoundedRectangle(cornerRadius: 20, style: .continuous)

@@ -131,9 +131,13 @@ enum L10n {
         return bundle(for: Constant.fallbackLanguageCode).localizedString(forKey: key, value: key, table: nil)
     }
 
+    private static let lock = NSLock()
     private static var bundleCache: [String: Bundle] = [:]
 
     private static func bundle(for languageCode: String) -> Bundle {
+        lock.lock()
+        defer { lock.unlock() }
+        
         if let cached = bundleCache[languageCode] {
             return cached
         }
@@ -146,6 +150,8 @@ enum L10n {
     }
 
     static func clearBundleCache() {
+        lock.lock()
+        defer { lock.unlock() }
         bundleCache.removeAll()
     }
 

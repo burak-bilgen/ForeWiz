@@ -47,15 +47,15 @@ struct ForeWizApp: App {
                 isStoredInMemoryOnly: false
             )
 
-            // 🔒 Pre-apply NSFileProtectionComplete to the store's parent directory
+            // 🔒 Pre-apply NSFileProtectionCompleteUntilFirstUserAuthentication to the store's parent directory
             // BEFORE the ModelContainer opens the SQLite file. This ensures that
             // any files created by SwiftData inherit the directory's protection.
             let storeDir = config.url.deletingLastPathComponent()
             try? FileManager.default.createDirectory(at: storeDir, withIntermediateDirectories: true,
-                attributes: [FileAttributeKey.protectionKey: FileProtectionType.completeUnlessOpen])
+                attributes: [FileAttributeKey.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication])
             // Also apply protection attribute on the directory via NSURL path-based API
             try? (storeDir as NSURL).setResourceValue(
-                FileProtectionType.completeUnlessOpen,
+                FileProtectionType.completeUntilFirstUserAuthentication,
                 forKey: .fileProtectionKey
             )
 
@@ -68,11 +68,11 @@ struct ForeWizApp: App {
             // This ensures the file is protected even if directory inheritance doesn't work.
             if let storeFileURL = container.configurations.first?.url {
                 try? (storeFileURL as NSURL).setResourceValue(
-                    FileProtectionType.completeUnlessOpen,
+                    FileProtectionType.completeUntilFirstUserAuthentication,
                     forKey: .fileProtectionKey
                 )
                 try? FileManager.default.setAttributes(
-                    [FileAttributeKey.protectionKey: FileProtectionType.completeUnlessOpen],
+                    [FileAttributeKey.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication],
                     ofItemAtPath: storeFileURL.path
                 )
             }

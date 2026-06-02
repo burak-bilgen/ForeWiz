@@ -42,16 +42,4 @@ extension View {
     }
 }
 
-// MARK: - Adaptive Colors
 
-struct AdaptiveColor {
-    static let background = Color(uiColor: .systemBackground)
-    static let secondaryBackground = Color(uiColor: .secondarySystemBackground)
-    static let tertiaryBackground = Color(uiColor: .tertiarySystemBackground)
-    static let groupedBackground = Color(uiColor: .systemGroupedBackground)
-    static let label = Color(uiColor: .label)
-    static let secondaryLabel = Color(uiColor: .secondaryLabel)
-    static let tertiaryLabel = Color(uiColor: .tertiaryLabel)
-    static let fill = Color(uiColor: .systemFill)
-    static let separator = Color(uiColor: .separator)
-}
