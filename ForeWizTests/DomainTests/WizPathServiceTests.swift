@@ -18,7 +18,7 @@ struct WizPathServiceTests {
             locationRepository: mockLocation
         )
         
-        #expect(service != nil)
+        #expect(service.loadRecentDestinations().count >= 0)
     }
     
     @Test("Recent destinations save and load")

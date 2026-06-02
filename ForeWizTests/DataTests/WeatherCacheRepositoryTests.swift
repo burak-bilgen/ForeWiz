@@ -197,6 +197,17 @@ struct WeatherCachePolicyTests {
 @Suite("Preferences Repository Tests")
 struct PreferencesRepositoryTests {
 
+    @Test("Persistent container creation")
+    func testPersistentContainerCreation() async throws {
+        let schema = Schema([
+            UserPreferencesModel.self,
+            WeatherSnapshotModel.self
+        ])
+        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let container = try ModelContainer(for: schema, configurations: [config])
+        #expect(container != nil)
+    }
+
     @Test("Default profile is returned when no data exists")
     func testDefaultProfile() async throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)

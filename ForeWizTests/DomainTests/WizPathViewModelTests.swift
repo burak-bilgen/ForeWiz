@@ -27,11 +27,7 @@ private func makeViewModel() -> WizPathViewModel {
         climateService: .shared,
         sentinelService: .shared,
         cyclingSafetyService: .shared,
-        poiSearchService: .shared,
-        tollRoadService: .shared,
-        evRangeService: EvRangeService.shared,
-        evChargingPlannerService: EvChargingPlannerService.shared,
-        elevationService: ElevationService.shared
+        poiSearchService: .shared
     )
 }
 
@@ -214,7 +210,7 @@ struct WizPathViewModelTests {
                 .testSegment(weather: .testWeather(condition: .clear, temperature: 22, windSpeed: 10))
             ]
         )
-        let analysis = await WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
+        let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
         let safe = WizPathCyclingSafetyService.CyclingSafety.safe
         #expect(analysis.safety == safe)
         #expect(!analysis.hasCrosswindRisk)
@@ -229,7 +225,7 @@ struct WizPathViewModelTests {
                 .testSegment(weather: .testWeather(condition: .windy, temperature: 20, windSpeed: 30))
             ]
         )
-        let analysis = await WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
+        let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
         #expect(analysis.safety.isRisky)
         #expect(analysis.hasCrosswindRisk)
         #expect(analysis.crosswindSegments.count > 0)
@@ -243,7 +239,7 @@ struct WizPathViewModelTests {
                 .testSegment(weather: .testWeather(condition: .windy, temperature: 20, windSpeed: 45))
             ]
         )
-        let analysis = await WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
+        let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
         #expect(analysis.safety.isRisky)
         #expect(analysis.maxGustSpeed >= 40)
         if case WizPathCyclingSafetyService.CyclingSafety.notRecommended = analysis.safety {
@@ -253,37 +249,7 @@ struct WizPathViewModelTests {
         }
     }
 
-    // MARK: - EV Mode
-
-    @Test("EV mode initial state is disabled")
-    func evModeInitialStateIsDisabled() async throws {
-        let vm = makeViewModel()
-        #expect(vm.isElectricVehicle == false)
-        #expect(vm.evRecommendations.isEmpty)
-    }
-
-    @Test("EV mode enable triggers recommendations for car mode")
-    func evModeEnableTriggersRecommendationsForCarMode() async throws {
-        let vm = makeViewModel()
-        vm.climateAnalysis = ClimateAnalysis(
-            maxTemperature: 40,
-            totalMultiplier: 1.0,
-            multipliers: [],
-            alerts: [],
-            heatSegments: [],
-            requiresClimateAdjustment: false
-        )
-        vm.setElectricVehicleEnabled(true)
-        #expect(vm.isElectricVehicle == true)
-    }
-
-    @Test("EV mode sets recommendations to empty for non-car")
-    func evModeDisabledForNonCar() async throws {
-        let vm = makeViewModel()
-        vm.switchTravelMode(to: .walking)
-        vm.setElectricVehicleEnabled(true)
-        #expect(vm.isElectricVehicle == false)
-    }
+    // EV mode tests removed
 
     // MARK: - Toll Road Toggle
 
@@ -546,7 +512,7 @@ struct WizPathViewModelTests {
         let stop1 = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Gas 1", category: .gasStation, etaArrival: muchLater, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
         let stop2 = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Rest 1", category: .restStop, etaArrival: later, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 200, estimatedStopDuration: 600, weatherRecommendation: nil)
 
-        vm.chargingStations = [stop1, stop2]
+        vm.smartStops = [stop1, stop2]
 
         let waypoints = vm.mapsWaypoints
         #expect(waypoints.count == 2)
@@ -563,17 +529,17 @@ struct WizPathViewModelTests {
         let now = Date()
         let dummyMapItem = makeMapItem()
         let safe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Safe Stop", category: .restStop, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
-        let unsafe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Unsafe Stop", category: .evCharger, etaArrival: now, weatherAtArrival: nil, safetyStatus: .unsafe, distanceFromRoute: 200, estimatedStopDuration: 300, weatherRecommendation: nil)
+        let unsafe = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.2, longitude: 29.2), name: "Unsafe Stop", category: .restaurant, etaArrival: now, weatherAtArrival: nil, safetyStatus: .unsafe, distanceFromRoute: 200, estimatedStopDuration: 300, weatherRecommendation: nil)
         let caution = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.3, longitude: 29.3), name: "Caution Stop", category: .gasStation, etaArrival: now, weatherAtArrival: nil, safetyStatus: .caution, distanceFromRoute: 150, estimatedStopDuration: 300, weatherRecommendation: nil)
 
-        vm.chargingStations = [safe, unsafe, caution]
+        vm.smartStops = [safe, unsafe, caution]
 
         let waypoints = vm.mapsWaypoints
         #expect(waypoints.count == 2) // safe + caution (unsafe's shouldAvoid should be true)
         #expect(waypoints.allSatisfy { $0.safetyStatus != .unsafe })
     }
 
-    @Test("mapsWaypoints returns empty when no charging stations")
+    @Test("mapsWaypoints returns empty when no smart stops")
     func mapsWaypointsEmptyWhenNoStations() async throws {
         let vm = makeViewModel()
         let route = WizPathRoute.testRoute()
@@ -587,18 +553,18 @@ struct WizPathViewModelTests {
         let route = WizPathRoute.testRoute()
         let dummyMapItem = makeMapItem()
         let now = Date()
-        let stop = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "EV Charger", category: .evCharger, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
+        let stop = SmartStop(id: UUID(), mapItem: dummyMapItem, coordinate: CLLocationCoordinate2D(latitude: 41.1, longitude: 29.1), name: "Gas Station", category: .gasStation, etaArrival: now, weatherAtArrival: nil, safetyStatus: .safe, distanceFromRoute: 100, estimatedStopDuration: 300, weatherRecommendation: nil)
 
         let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
-        vm.chargingStations = [stop]
+        vm.smartStops = [stop]
 
-        // Go offline — stations should persist
+        // Go offline — stops should persist
         vm.state = .offline
-        #expect(vm.chargingStations.count == 1)
+        #expect(vm.smartStops.count == 1)
         #expect(vm.mapsWaypoints.count == 1)
-        #expect(vm.mapsWaypoints.first?.name == "EV Charger")
+        #expect(vm.mapsWaypoints.first?.name == "Gas Station")
     }
 
     @Test("Offline state preserves routeSegments and weatherChangePoints from cached route")
@@ -753,19 +719,7 @@ struct WizPathViewModelTests {
         #expect(vm.mapsNavigationRoute?.id == route.id)
     }
 
-    @Test("Offline with cached route — EV mode state is preserved")
-    func offlinePreservesEVModeState() async throws {
-        let vm = makeViewModel()
-        vm.isElectricVehicle = true
-        let route = WizPathRoute.testRoute()
-        let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
-        vm.routeCandidates = [candidate]
-        vm.selectRouteCandidate(at: 0)
-
-        vm.state = .offline
-        #expect(vm.isElectricVehicle == true)
-        #expect(vm.mapsNavigationRoute != nil)
-    }
+    // EV state test removed
 
     @Test("Offline with cached route — toll road preference is preserved")
     func offlinePreservesTollPreference() async throws {
@@ -896,7 +850,7 @@ struct WizPathViewModelTests {
                 .testSegment(weather: .testWeather(condition: .clear, temperature: 28, windSpeed: 35))
             ]
         )
-        let analysis = await WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
+        let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
         #expect(analysis.effortLevel.level >= 4) // Wind + heat should raise effort
         #expect(analysis.effortLevel.extraTimePercent >= 0)
     }
@@ -909,7 +863,7 @@ struct WizPathViewModelTests {
                 .testSegment(weather: .testWeather(condition: .clear, temperature: 22, windSpeed: 10))
             ]
         )
-        let analysis = await WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
+        let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
         let safe = WizPathCyclingSafetyService.CyclingSafety.safe
         #expect(analysis.safety == safe)
         #expect(analysis.overallWindSpeed == 0) // No wind analysis for non-cycling

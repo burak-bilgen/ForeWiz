@@ -14,7 +14,6 @@ struct WizPathPOITests {
     @Test("POICategory enum cases")
     func poiCategoryEnumCases() async throws {
         #expect(POICategory.gasStation.rawValue == "gasStation")
-        #expect(POICategory.evCharger.rawValue == "evCharger")
         #expect(POICategory.restStop.rawValue == "restStop")
         #expect(POICategory.restaurant.rawValue == "restaurant")
     }
@@ -22,7 +21,6 @@ struct WizPathPOITests {
     @Test("POICategory icon names")
     func poiCategoryIconNames() async throws {
         #expect(POICategory.gasStation.iconName == "fuelpump.fill")
-        #expect(POICategory.evCharger.iconName == "bolt.car.fill")
         #expect(POICategory.restStop.iconName == "bed.double.fill")
         #expect(POICategory.restaurant.iconName == "fork.knife")
     }
@@ -30,7 +28,6 @@ struct WizPathPOITests {
     @Test("POICategory default names are non-empty")
     func poiCategoryDefaultNames() async throws {
         #expect(!POICategory.gasStation.defaultName.isEmpty)
-        #expect(!POICategory.evCharger.defaultName.isEmpty)
         #expect(!POICategory.restStop.defaultName.isEmpty)
         #expect(!POICategory.restaurant.defaultName.isEmpty)
     }
@@ -38,7 +35,6 @@ struct WizPathPOITests {
     @Test("POICategory colors")
     func poiCategoryColors() async throws {
         #expect(POICategory.gasStation.color == "#00FF41")
-        #expect(POICategory.evCharger.color == "#00D9FF")
         #expect(POICategory.restStop.color == "#FF9500")
         #expect(POICategory.restaurant.color == "#FF3BFF")
     }
@@ -83,7 +79,7 @@ struct WizPathPOITests {
             mapItem: mapItem,
             coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
             name: "Test Station",
-            category: .evCharger,
+            category: .gasStation,
             etaArrival: Date(),
             weatherAtArrival: nil,
             safetyStatus: .safe,
