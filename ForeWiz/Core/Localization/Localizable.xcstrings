@@ -17729,13 +17729,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Health Access"
+            "value": "Health Data Access"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sağlık Erişimi"
+            "value": "Sağlık Verisi Erişimi"
           }
         }
       }
@@ -17746,13 +17746,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "ForeWiz reads health data to personalize weather-health analysis. Your data stays on-device."
+            "value": "ForeWiz can read your health data to provide personalized weather-health insights. Your data stays on-device and is never shared."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "ForeWiz, hava durumu-sağlık analizini kişiselleştirmek için sağlık verilerinizi okur. Verileriniz cihazınızda kalır."
+            "value": "ForeWiz, kişiselleştirilmiş hava-sağlık analizleri sunmak için sağlık verilerinizi okuyabilir. Verileriniz cihazınızda kalır ve asla paylaşılmaz."
           }
         }
       }
@@ -17763,13 +17763,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Allow Access"
+            "value": "Enable Health Access"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erişime İzin Verin"
+            "value": "Sağlık Erişimini Etkinleştir"
           }
         }
       }
@@ -17786,7 +17786,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şimdi Değil"
+            "value": "Daha Sonra"
           }
         }
       }
@@ -17882,13 +17882,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No Health Data Available"
+            "value": "No health data available"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sağlık Verisi Yok"
+            "value": "Sağlık verisi bulunamadı"
           }
         }
       }
@@ -17899,13 +17899,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Health Access Required"
+            "value": "Health access required to read your data"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sağlık Erişimi Gerekli"
+            "value": "Verilerinizi okumak için sağlık erişimi gerekiyor"
           }
         }
       }
@@ -17916,13 +17916,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Health Services Unavailable on This Device"
+            "value": "Health services are not available on this device"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu Cihazda Sağlık Hizmetleri Kullanılamıyor"
+            "value": "Bu cihazda sağlık hizmetleri kullanılamıyor"
           }
         }
       }
@@ -17984,13 +17984,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Today's Commute"
+            "value": "Commute Briefing"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugünkü Yolculuk"
+            "value": "Güzergah Raporu"
           }
         }
       }
@@ -18035,13 +18035,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Weather at Destination"
+            "value": "Weather at destination"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Varış Noktasında Hava Durumu"
+            "value": "Varış noktasında hava durumu"
           }
         }
       }
@@ -18092,7 +18092,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yolculuk Modu"
+            "value": "Seyahat Türü"
           }
         }
       }
@@ -18126,7 +18126,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güvenlik Skoru"
+            "value": "Güvenlik Puanı"
           }
         }
       }
@@ -18154,13 +18154,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Remaining"
+            "value": "Distance Remaining"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kalan"
+            "value": "Kalan Mesafe"
           }
         }
       }
@@ -18177,7 +18177,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Varış"
+            "value": "Varış Saati"
           }
         }
       }
@@ -18471,210 +18471,6 @@
         }
       }
     },
-    "health_consent_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health Data Access"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık Verisi Erişimi"
-          }
-        }
-      }
-    },
-    "health_consent_message": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz can read your health data to provide personalized weather-health insights. Your data stays on-device and is never shared."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ForeWiz, kişiselleştirilmiş hava-sağlık analizleri sunmak için sağlık verilerinizi okuyabilir. Verileriniz cihazınızda kalır ve asla paylaşılmaz."
-          }
-        }
-      }
-    },
-    "health_consent_allow": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enable Health Access"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık Erişimini Etkinleştir"
-          }
-        }
-      }
-    },
-    "health_consent_deny": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not Now"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Daha Sonra"
-          }
-        }
-      }
-    },
-    "health_heart_rate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Heart Rate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kalp Atış Hızı"
-          }
-        }
-      }
-    },
-    "health_sleep": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sleep"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uyku"
-          }
-        }
-      }
-    },
-    "health_steps": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Steps"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adım"
-          }
-        }
-      }
-    },
-    "health_respiratory_rate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Respiratory Rate"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solunum Hızı"
-          }
-        }
-      }
-    },
-    "health_uv_exposure": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UV Exposure"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UV Maruziyeti"
-          }
-        }
-      }
-    },
-    "health_no_data": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No health data available"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sağlık verisi bulunamadı"
-          }
-        }
-      }
-    },
-    "health_authorization_required": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health access required to read your data"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verilerinizi okumak için sağlık erişimi gerekiyor"
-          }
-        }
-      }
-    },
-    "health_service_unavailable": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Health services are not available on this device"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu cihazda sağlık hizmetleri kullanılamıyor"
-          }
-        }
-      }
-    },
     "live_activity_route_hud_title": {
       "extractionState": "manual",
       "localizations": {
@@ -18692,23 +18488,6 @@
         }
       }
     },
-    "live_activity_safety_score": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Safety Score"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güvenlik Puanı"
-          }
-        }
-      }
-    },
     "live_active_hazards": {
       "extractionState": "manual",
       "localizations": {
@@ -18722,91 +18501,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aktif Tehlikeler"
-          }
-        }
-      }
-    },
-    "live_activity_distance_remaining": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Distance Remaining"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kalan Mesafe"
-          }
-        }
-      }
-    },
-    "live_activity_eta": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ETA"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Varış Saati"
-          }
-        }
-      }
-    },
-    "live_activity_next_stop": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next Stop"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sonraki Durak"
-          }
-        }
-      }
-    },
-    "live_activity_risk_good": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Good"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İyi"
-          }
-        }
-      }
-    },
-    "live_activity_risk_caution": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Caution"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dikkat"
           }
         }
       }
@@ -18896,23 +18590,6 @@
         }
       }
     },
-    "commute_briefing_title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Commute Briefing"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Güzergah Raporu"
-          }
-        }
-      }
-    },
     "commute_traffic_status": {
       "extractionState": "manual",
       "localizations": {
@@ -18926,74 +18603,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Trafik koşulları seyahatinizi etkileyebilir"
-          }
-        }
-      }
-    },
-    "commute_weather_at_destination": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Weather at destination"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Varış noktasında hava durumu"
-          }
-        }
-      }
-    },
-    "settings_home_location": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Home Location"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ev Konumu"
-          }
-        }
-      }
-    },
-    "settings_work_location": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Work Location"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İş Konumu"
-          }
-        }
-      }
-    },
-    "settings_commute_mode": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Commute Mode"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seyahat Türü"
           }
         }
       }
@@ -19181,6 +18790,618 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yüksek Yağmur Toleransı"
+          }
+        }
+      }
+    },
+    "notif_morning_commute": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\n🚗 Commute to Work"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\n🚗 İşe Yolculuk"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_origin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🏠 At home: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🏠 Evde: %@"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_dest": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🏢 At work: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🏢 İşte: %@"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_hazards": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Route: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Rota: %@"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_rec": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "💡 %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "💡 %@"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_same": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "📍 Home and work are the same — no commute needed 😊"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "📍 Ev ve iş aynı konumda — yolculuk gerekmez 😊"
+          }
+        }
+      }
+    },
+    "onboarding_location_step_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Locations"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konumlarınız"
+          }
+        }
+      }
+    },
+    "onboarding_location_step_subtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set home and work addresses for commute briefings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güzergah bilgilendirmeleri için ev ve iş adreslerinizi belirleyin"
+          }
+        }
+      }
+    },
+    "onboarding_set_home_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Your Home Address"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev Adresinizi Belirleyin"
+          }
+        }
+      }
+    },
+    "onboarding_set_work_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Your Work Address"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İş Adresinizi Belirleyin"
+          }
+        }
+      }
+    },
+    "onboarding_commute_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How Do You Commute?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nasıl Seyahat Edersiniz?"
+          }
+        }
+      }
+    },
+    "action_skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atla"
+          }
+        }
+      }
+    },
+    "action_clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temizle"
+          }
+        }
+      }
+    },
+    "settings_not_set": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not set"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlanmamış"
+          }
+        }
+      }
+    },
+    "travel_mode_car": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Car"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Araba"
+          }
+        }
+      }
+    },
+    "travel_mode_walking": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walking"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yürüyüş"
+          }
+        }
+      }
+    },
+    "travel_mode_cycling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisiklet"
+          }
+        }
+      }
+    },
+    "travel_mode_transit": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transit"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toplu Taşıma"
+          }
+        }
+      }
+    },
+    "settings_same_home_work_warning": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home and work are the same location — no commute needed"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev ve iş aynı konumda — yolculuk gerekmez"
+          }
+        }
+      }
+    },
+    "notif_morning_commute_skip_route": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Route not calculated: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⚠️ Rota hesaplanamadı: %@"
+          }
+        }
+      }
+    },
+    "action_delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sil"
+          }
+        }
+      }
+    },
+    "journal_entries_count": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "entries"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kayıt"
+          }
+        }
+      }
+    },
+    "journal_empty_description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your journey logs will appear here. Start a route to begin!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolculuk kayıtlarınız burada görünecek. Bir rota başlatarak başlayın!"
+          }
+        }
+      }
+    },
+    "detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detail"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detay"
+          }
+        }
+      }
+    },
+    "journal_delete_confirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Are you sure you want to delete this entry? This cannot be undone."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu kaydı silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+          }
+        }
+      }
+    },
+    "back": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geri"
+          }
+        }
+      }
+    },
+    "journal_detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Journal Entry"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Günlük Kaydı"
+          }
+        }
+      }
+    },
+    "duration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duration"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Süre"
+          }
+        }
+      }
+    },
+    "distance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distance"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mesafe"
+          }
+        }
+      }
+    },
+    "action_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paylaş"
+          }
+        }
+      }
+    },
+    "journal_no_results": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No entries found"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıt bulunamadı"
+          }
+        }
+      }
+    },
+    "date_filter": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Date Filter"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarih Filtresi"
+          }
+        }
+      }
+    },
+    "all": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tümü"
+          }
+        }
+      }
+    },
+    "date_filter_from": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlangıç"
+          }
+        }
+      }
+    },
+    "date_filter_to": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitiş"
           }
         }
       }
