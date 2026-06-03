@@ -6,5 +6,5 @@ protocol NotificationPlanningEngine {
         profile: UserComfortProfile,
         now: Date,
         calendar: Calendar
-    ) -> [NotificationPlan]
+    ) async -> [NotificationPlan]
 }

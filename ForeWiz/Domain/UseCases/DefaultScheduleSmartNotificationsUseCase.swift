@@ -32,7 +32,7 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
         let calendar = Calendar.current
 
         // 1. Standard plans (morning briefing + weather alerts)
-        let standardPlans = notificationPlanningEngine.makePlans(
+        let standardPlans = await notificationPlanningEngine.makePlans(
             recommendation: recommendation,
             profile: profile,
             now: now,

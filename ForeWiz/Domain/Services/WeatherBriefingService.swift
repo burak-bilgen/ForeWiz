@@ -15,14 +15,14 @@ struct WeatherBriefingService {
         recommendation: DailyRecommendation,
         profile: UserComfortProfile,
         calendar: Calendar = .current
-    ) -> DailyWeatherBriefing {
+    ) async -> DailyWeatherBriefing {
         let narrative = narrativeService.generateNarrative(
             snapshot: snapshot,
             recommendation: recommendation,
             calendar: calendar
         )
 
-        let health = healthService.analyzeHealth(
+        let health = await healthService.analyzeHealth(
             snapshot: snapshot,
             recommendation: recommendation,
             profile: profile,

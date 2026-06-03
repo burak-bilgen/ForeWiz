@@ -12,9 +12,19 @@ struct HomeView: View {
 
     let onRecommendationLoaded: (DailyRecommendation) -> Void
     let onLocationsChanged: ([SavedLocation], String) -> Void
+    let onHealthConsentTap: (() -> Void)?
     let wizPathService: WizPathService?
+    let homeLocation: SavedLocation?
+    let workLocation: SavedLocation?
+    let commuteModeRaw: String
+    let onSaveSettings: (SavedLocation?, SavedLocation?, String) -> Void
+    let onRouteEnded: ((WizPathRoute, String, WizPathKit.TravelMode) -> Void)?
 
     @State private var showLocationPicker = false
+    @State private var showSettings = false
+    @State private var editingHomeLocation: SavedLocation?
+    @State private var editingWorkLocation: SavedLocation?
+    @State private var editingCommuteMode: String = WizPathKit.TravelMode.car.rawValue
     @AppStorage("hasSeenAppSplash") private var hasSeenSplash = false
     @State private var showSplash = true
     @State private var contentReady = false
@@ -26,6 +36,8 @@ struct HomeView: View {
     @State private var showMapsExportSheet = false
     @State private var mapsExportStatus: MapsExportStatus = .idle
     @State private var mapsExportProceed: (() -> Void)?
+    @State private var selectedActivity: ActivityType?
+    @State private var activityRecommendations: [ActivityRecommendation] = []
     
     private enum MapsExportStatus {
         case idle
@@ -40,6 +52,27 @@ struct HomeView: View {
             default: return true
             }
         }
+    }
+
+    private var settingsHomeLocationBinding: Binding<SavedLocation?> {
+        Binding(
+            get: { homeLocation },
+            set: { _ in }
+        )
+    }
+
+    private var settingsWorkLocationBinding: Binding<SavedLocation?> {
+        Binding(
+            get: { workLocation },
+            set: { _ in }
+        )
+    }
+
+    private var settingsCommuteModeBinding: Binding<String> {
+        Binding(
+            get: { commuteModeRaw },
+            set: { _ in }
+        )
     }
 
     private var currentSymbol: String {
@@ -106,6 +139,20 @@ struct HomeView: View {
             .sheet(isPresented: $showFeedbackDashboard) {
                 FeedbackDashboardView()
             }
+            .sheet(isPresented: $showSettings) {
+                NavigationStack {
+                    SettingsView(
+                        homeLocation: $editingHomeLocation,
+                        workLocation: $editingWorkLocation,
+                        commuteModeRaw: $editingCommuteMode,
+                        onSave: {
+                            HapticEngine.shared.success()
+                            onSaveSettings(editingHomeLocation, editingWorkLocation, editingCommuteMode)
+                            showSettings = false
+                        }
+                    )
+                }
+            }
             .fullScreenCover(isPresented: $showWizPathSheet) {
                 ZStack {
                     if let wizService = wizPathService {
@@ -114,16 +161,23 @@ struct HomeView: View {
                             onMapsExport: { proceedToMaps in
                                 handleMapsExport(proceedToMaps: proceedToMaps)
                             },
-                            onFeedback: { showFeedbackSheet = true }
+                            onFeedback: { showFeedbackSheet = true },
+                            onRouteEnded: onRouteEnded
                         )
                     }
                 }
+            }
             .fullScreenCover(isPresented: $showMapsExportSheet) {
                 mapsExportSheetContent
             }
-            }
             .onChange(of: viewModel.state) { _, newState in
-                if case .loaded(let state) = newState { onRecommendationLoaded(state.recommendation) }
+                if case .loaded(let state) = newState {
+                    onRecommendationLoaded(state.recommendation)
+                    activityRecommendations = viewModel.recommendations(for: selectedActivity)
+                }
+            }
+            .onChange(of: selectedActivity) { _, newValue in
+                activityRecommendations = viewModel.recommendations(for: newValue)
             }
         }
     }
@@ -165,6 +219,16 @@ struct HomeView: View {
                     } label: {
                         Label(L10n.text("feedback_dashboard_title"), systemImage: "list.bullet.rectangle")
                     }
+
+                    if let onHealthConsentTap {
+                        Divider()
+                        Button {
+                            HapticEngine.shared.light()
+                            onHealthConsentTap()
+                        } label: {
+                            Label(L10n.text("health_consent_title"), systemImage: "heart.text.square.fill")
+                        }
+                    }
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: "bubble.left.and.bubble.right")
@@ -183,6 +247,16 @@ struct HomeView: View {
                     }
                 }
                 .accessibilityLabel(L10n.text("feedback_sheet_title"))
+
+                Button {
+                    HapticEngine.shared.light()
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+                .accessibilityLabel(L10n.text("settings_home_location"))
 
                 ToolbarLanguageButton()
             }
@@ -213,6 +287,8 @@ struct HomeView: View {
             HomeLoadedContent(
                 state: state,
                 contentReady: contentReady,
+                selectedActivity: $selectedActivity,
+                activityRecommendations: activityRecommendations,
                 refresh: { await viewModel.refresh() },
                 onWizPathTap: { showWizPathSheet = true }
             )
@@ -451,48 +527,61 @@ struct HomeBetaBadge: View {
 // MARK: - Preview
 
 #Preview {
-    guard let container = try? ModelContainer(for: UserPreferencesModel.self, WeatherSnapshotModel.self) else {
-        return Text(L10n.text("preview_unavailable"))
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black)
+    PreviewHomeView()
+}
+
+private struct PreviewHomeView: View {
+    var body: some View {
+        if let container = try? ModelContainer(for: UserPreferencesModel.self, WeatherSnapshotModel.self) {
+            let modelContext = container.mainContext
+            let preferencesRepo = SwiftDataPreferencesRepository(modelContext: modelContext)
+            let weatherCacheRepo = SwiftDataWeatherCacheRepository(modelContext: modelContext)
+            let dateProvider = SystemDateProvider()
+            let activityEngine = DefaultActivityWindowScoringEngine()
+            let outfitEngine = DefaultOutfitDecisionEngine()
+            let weatherEngine = DefaultWeatherDecisionEngine(
+                activityWindowScoringEngine: activityEngine,
+                outfitDecisionEngine: outfitEngine
+            )
+            let factory = HomeViewStateFactory(
+                dateProvider: dateProvider,
+                activityWindowScoringEngine: activityEngine
+            )
+            HomeView(
+                viewModel: HomeViewModel(
+                    loadHomeRecommendationUseCase: DefaultLoadHomeRecommendationUseCase(
+                        locationRepository: MockLocationRepository(),
+                        weatherRepository: MockWeatherRepository(),
+                        weatherCacheRepository: weatherCacheRepo,
+                        preferencesRepository: preferencesRepo,
+                        weatherDecisionEngine: weatherEngine,
+                        dateProvider: dateProvider
+                    ),
+                    scheduleSmartNotificationsUseCase: DefaultScheduleSmartNotificationsUseCase(
+                        notificationRepository: UserNotificationRepository(),
+                        notificationPlanningEngine: DefaultNotificationPlanningEngine(),
+                        dateProvider: dateProvider
+                    ),
+                    preferencesRepository: preferencesRepo,
+                    homeViewStateFactory: factory
+                ),
+                savedLocations: .constant([]),
+                selectedLocationID: .constant("current"),
+                onRecommendationLoaded: { _ in },
+                onLocationsChanged: { _, _ in },
+                onHealthConsentTap: nil,
+                wizPathService: nil,
+                homeLocation: nil,
+                workLocation: nil,
+                commuteModeRaw: WizPathKit.TravelMode.car.rawValue,
+                onSaveSettings: { _, _, _ in },
+                onRouteEnded: nil
+            )
+        } else {
+            Text(L10n.text("preview_unavailable"))
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.black)
+        }
     }
-    let modelContext = container.mainContext
-    let preferencesRepo = SwiftDataPreferencesRepository(modelContext: modelContext)
-    let weatherCacheRepo = SwiftDataWeatherCacheRepository(modelContext: modelContext)
-    let dateProvider = SystemDateProvider()
-    let activityEngine = DefaultActivityWindowScoringEngine()
-    let outfitEngine = DefaultOutfitDecisionEngine()
-    let weatherEngine = DefaultWeatherDecisionEngine(
-        activityWindowScoringEngine: activityEngine,
-        outfitDecisionEngine: outfitEngine
-    )
-    let factory = HomeViewStateFactory(
-        dateProvider: dateProvider,
-        activityWindowScoringEngine: activityEngine
-    )
-    return HomeView(
-        viewModel: HomeViewModel(
-            loadHomeRecommendationUseCase: DefaultLoadHomeRecommendationUseCase(
-                locationRepository: MockLocationRepository(),
-                weatherRepository: MockWeatherRepository(),
-                weatherCacheRepository: weatherCacheRepo,
-                preferencesRepository: preferencesRepo,
-                weatherDecisionEngine: weatherEngine,
-                dateProvider: dateProvider
-            ),
-            scheduleSmartNotificationsUseCase: DefaultScheduleSmartNotificationsUseCase(
-                notificationRepository: UserNotificationRepository(),
-                notificationPlanningEngine: DefaultNotificationPlanningEngine(),
-                dateProvider: dateProvider
-            ),
-            preferencesRepository: preferencesRepo,
-            homeViewStateFactory: factory
-        ),
-        savedLocations: .constant([]),
-        selectedLocationID: .constant("current"),
-        onRecommendationLoaded: { _ in },
-        onLocationsChanged: { _, _ in },
-        wizPathService: nil
-    )
 }

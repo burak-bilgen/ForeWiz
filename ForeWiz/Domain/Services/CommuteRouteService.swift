@@ -23,6 +23,24 @@ enum TravelMode: String, CaseIterable, Sendable {
         case .cycling: return true
         }
     }
+
+    var localizedKey: String {
+        switch self {
+        case .car: return "travel_mode_car"
+        case .walking: return "travel_mode_walking"
+        case .cycling: return "travel_mode_cycling"
+        case .transit: return "travel_mode_transit"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .car: return "car.fill"
+        case .walking: return "figure.walk"
+        case .cycling: return "bicycle"
+        case .transit: return "bus.fill"
+        }
+    }
 }
 
 struct CommuteRoute: Equatable, Sendable {

@@ -10,6 +10,8 @@ struct OnboardingView: View {
     @State private var isCompleting = false
     @State private var pageAppeared = false
     @State private var showCitySearchSheet = false
+    @State private var showHomePicker = false
+    @State private var showWorkPicker = false
 
     var body: some View {
         ZStack {
@@ -25,6 +27,9 @@ struct OnboardingView: View {
                         .padding(.bottom, 8)
 
                     permissionsSection
+                        .padding(.bottom, 8)
+
+                    locationSetupSection
                         .padding(.bottom, 8)
 
                     startButton
@@ -322,6 +327,251 @@ struct OnboardingView: View {
                 .foregroundStyle(AppTheme.coral)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 8)
+        }
+    }
+
+    // MARK: - Location Setup
+
+    private var locationSetupSection: some View {
+        LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
+            VStack(alignment: .leading, spacing: 14) {
+                sectionLabel(icon: "house.and.map.fill", text: L10n.text("onboarding_location_step_title"))
+
+                Text(L10n.text("onboarding_location_step_subtitle"))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .lineSpacing(2)
+
+                homeLocationRow
+                workLocationRow
+                commuteModeRow
+            }
+        }
+        .staggerEntrance(index: 5, appeared: pageAppeared)
+        .sheet(isPresented: $showHomePicker) {
+            NavigationStack {
+                ModernAddLocationView { location in
+                    viewModel.setHomeLocation(location)
+                }
+            }
+        }
+        .sheet(isPresented: $showWorkPicker) {
+            NavigationStack {
+                ModernAddLocationView { location in
+                    viewModel.setWorkLocation(location)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var homeLocationRow: some View {
+        if let home = viewModel.homeLocation {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(AppTheme.liquidAccent.opacity(0.12))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: "house.fill")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(AppTheme.liquidAccent)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("location_home"))
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.5))
+                    Text(home.name)
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                Button {
+                    HapticEngine.shared.medium()
+                    viewModel.clearHomeLocation()
+                } label: {
+                    Text(L10n.text("action_clear"))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(AppTheme.ember)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AppTheme.ember.opacity(0.1), in: Capsule())
+                        .overlay(Capsule().stroke(AppTheme.ember.opacity(0.25), lineWidth: 1))
+                }
+            }
+        } else {
+            Button {
+                HapticEngine.shared.medium()
+                showHomePicker = true
+            } label: {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.white.opacity(0.04))
+                            .frame(width: 38, height: 38)
+                        Image(systemName: "house.fill")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.3))
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.text("onboarding_set_home_title"))
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Text(L10n.text("action_skip"))
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.35))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(.white.opacity(0.04), in: Capsule())
+                    .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
+                }
+                .padding(10)
+                .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    @ViewBuilder
+    private var workLocationRow: some View {
+        if let work = viewModel.workLocation {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(AppTheme.liquidAccent.opacity(0.12))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: "briefcase.fill")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(AppTheme.liquidAccent)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L10n.text("location_work"))
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.5))
+                    Text(work.name)
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                }
+
+                Spacer()
+
+                Button {
+                    HapticEngine.shared.medium()
+                    viewModel.clearWorkLocation()
+                } label: {
+                    Text(L10n.text("action_clear"))
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundStyle(AppTheme.ember)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(AppTheme.ember.opacity(0.1), in: Capsule())
+                        .overlay(Capsule().stroke(AppTheme.ember.opacity(0.25), lineWidth: 1))
+                }
+            }
+        } else {
+            Button {
+                HapticEngine.shared.medium()
+                showWorkPicker = true
+            } label: {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.white.opacity(0.04))
+                            .frame(width: 38, height: 38)
+                        Image(systemName: "briefcase.fill")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.3))
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L10n.text("onboarding_set_work_title"))
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+
+                    Spacer()
+
+                    HStack(spacing: 4) {
+                        Text(L10n.text("action_skip"))
+                            .font(.system(size: 12, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.35))
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(.white.opacity(0.04), in: Capsule())
+                    .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
+                }
+                .padding(10)
+                .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var commuteModeRow: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.triangle.swap")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.45))
+                Text(L10n.text("settings_commute_mode"))
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.45))
+                Spacer()
+            }
+
+            HStack(spacing: 8) {
+                ForEach(TravelMode.allCases, id: \.self) { mode in
+                    let selected = viewModel.commuteModeRaw == mode.rawValue
+                    Button {
+                        HapticEngine.shared.selectionChanged()
+                        withAnimation(AppTheme.cardSpring) {
+                            viewModel.setCommuteMode(mode)
+                        }
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: mode.iconName)
+                                .font(.system(size: 16))
+                            Text(L10n.text(mode.localizedKey))
+                                .font(.system(size: 11, weight: selected ? .bold : .medium, design: .rounded))
+                        }
+                        .foregroundStyle(selected ? Color.liquidAccent : .white.opacity(0.45))
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                        .background(
+                            selected
+                                ? Color.liquidAccent.opacity(0.12)
+                                : .white.opacity(0.04),
+                            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .stroke(selected ? Color.liquidAccent.opacity(0.35) : .white.opacity(0.06), lineWidth: 1)
+                        )
+                    }
+                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                }
+            }
         }
     }
 

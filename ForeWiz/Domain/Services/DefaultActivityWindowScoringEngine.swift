@@ -413,7 +413,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         switch activity {
         case .swimming:
             if month <= 3 || month >= 11 {
-                return WeatherScore(rawValue: 0, label: L10n.text("reason_not_suitable"))
+                return WeatherScore(rawValue: 0)
             }
             if month <= 5 || month >= 9 {
                 return WeatherScore(rawValue: 30)
@@ -421,7 +421,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             return WeatherScore(rawValue: 60)
         case .picnic, .beach:
             if month <= 3 || month >= 11 {
-                return WeatherScore(rawValue: 10, label: L10n.text("reason_not_suitable"))
+                return WeatherScore(rawValue: 10)
             }
             if month <= 4 || month >= 10 {
                 return WeatherScore(rawValue: 35)
@@ -572,7 +572,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         case 20..<60:
             return String(format: L10n.text("reason_moderate_time"), activity.localizedTitle, time)
         default:
-            return L10n.text("reason_not_suitable")
+            return String(format: L10n.text("reason_not_suitable"), activity.localizedTitle)
         }
     }
 }

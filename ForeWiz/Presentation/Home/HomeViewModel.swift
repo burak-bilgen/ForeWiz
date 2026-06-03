@@ -18,6 +18,8 @@ final class HomeViewModel {
     @ObservationIgnored private var liveRetryTask: Task<Void, Never>?
 
     private var selectedLocation: SavedLocation?
+    private var cachedResult: HomeRecommendationResult?
+    private var cachedProfile: UserComfortProfile?
 
     init(
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
@@ -113,6 +115,8 @@ final class HomeViewModel {
             let result = try await loadHomeRecommendationUseCase
                 .execute(forceRefresh: forceRefresh, targetLocation: targetLocation)
             let profile = try await preferencesRepository.loadProfile()
+            self.cachedResult = result
+            self.cachedProfile = profile
             self.particleIntensity = profile.weatherParticleIntensity
 
             state = .loaded(
@@ -202,6 +206,38 @@ final class HomeViewModel {
                 AppLogger.app.error("Reverse geocoding failed: \(error.localizedDescription)")
                 self.selectedLocationName = L10n.text("home_current_location")
             }
+        }
+    }
+
+    func recommendations(for activityType: ActivityType?) -> [ActivityRecommendation] {
+        guard let result = cachedResult, let profile = cachedProfile else { return [] }
+        let engine = homeViewStateFactory.activityWindowScoringEngine
+
+        if let type = activityType {
+            if let rec = engine.bestWindow(
+                for: type,
+                hourly: result.hourlyPoints,
+                profile: profile,
+                now: Date(),
+                calendar: .current
+            ) {
+                return [rec]
+            }
+            return []
+        } else {
+            let allRecs: [ActivityRecommendation] = ActivityType.allCases.compactMap { type in
+                engine.bestWindow(
+                    for: type,
+                    hourly: result.hourlyPoints,
+                    profile: profile,
+                    now: Date(),
+                    calendar: .current
+                )
+            }
+            return allRecs
+                .sorted { $0.score.rawValue > $1.score.rawValue }
+                .prefix(3)
+                .map { $0 }
         }
     }
 

@@ -1,12 +1,14 @@
 import Foundation
 
 struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
+    var commuteService: CommuteRouteService = DefaultCommuteRouteService()
+
     func makePlans(
         recommendation: DailyRecommendation,
         profile: UserComfortProfile,
         now: Date,
         calendar: Calendar = .current
-    ) -> [NotificationPlan] {
+    ) async -> [NotificationPlan] {
         let enabledCategories = Set(
             profile.notificationPreferences
                 .filter(\.isEnabled)
@@ -17,11 +19,12 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
         // 1. Morning briefing
         if enabledCategories.contains(.morningBriefing),
-           let morningPlan = MorningBriefingPlanner.makePlan(
+           let morningPlan = await MorningBriefingPlanner.makePlan(
             recommendation: recommendation,
             profile: profile,
             now: now,
-            calendar: calendar
+            calendar: calendar,
+            commuteService: commuteService
            ) {
             candidates.append(morningPlan)
         }

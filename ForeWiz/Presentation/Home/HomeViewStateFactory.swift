@@ -7,7 +7,7 @@ import Foundation
 @MainActor
 final class HomeViewStateFactory {
     private let dateProvider: DateProvider
-    private let activityWindowScoringEngine: ActivityWindowScoringEngine
+    let activityWindowScoringEngine: ActivityWindowScoringEngine
     private let mapper: WeatherPresentationMapper
     
     init(

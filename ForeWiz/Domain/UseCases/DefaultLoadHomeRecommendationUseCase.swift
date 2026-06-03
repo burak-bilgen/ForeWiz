@@ -57,7 +57,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         if forceRefresh == false,
            let cached = try await weatherCacheRepository.loadLatest(),
            cachePolicy.freshness(for: cached.fetchedAt, now: now) == .fresh {
-            return makeResult(snapshot: cached, profile: profile, now: now, isCached: true, usedLocation: cached.location)
+             return await makeResult(snapshot: cached, profile: profile, now: now, isCached: true, usedLocation: cached.location)
         }
 
         do {
@@ -74,7 +74,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
 
             let snapshot = try await fetchLiveWeather(for: location)
             try await weatherCacheRepository.save(snapshot)
-            let result = makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false, usedLocation: location)
+            let result = await makeResult(snapshot: snapshot, profile: profile, now: now, isCached: false, usedLocation: location)
             cacheWidgetData(
                 snapshot: snapshot,
                 outdoorScore: result.recommendation.outdoorScore.rawValue,
@@ -86,7 +86,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
                 throw normalized(error)
             }
 
-            return makeResult(
+            return await makeResult(
                 snapshot: cached,
                 profile: profile,
                 now: now,
@@ -148,7 +148,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         isCached: Bool,
         usedLocation: LocationCoordinate?,
         warningMessage: String? = nil
-    ) -> HomeRecommendationResult {
+    ) async -> HomeRecommendationResult {
         let recommendation = weatherDecisionEngine.makeDailyRecommendation(
             snapshot: snapshot,
             profile: profile,
@@ -175,7 +175,7 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         store.saveCandidates(rankedCandidates)
 
         // Generate daily briefing
-        let briefing = weatherBriefingService.generateBriefing(
+        let briefing = await weatherBriefingService.generateBriefing(
             snapshot: snapshot,
             recommendation: recommendation,
             profile: profile

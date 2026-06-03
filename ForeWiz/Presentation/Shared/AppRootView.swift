@@ -1,5 +1,7 @@
 import OSLog
 import SwiftUI
+import CoreLocation
+import WizPathKit
 
 struct AppRootView: View {
     @Bindable var coordinator: AppCoordinator
@@ -46,6 +48,9 @@ struct AppRootView: View {
             didStart = true
             await coordinator.start()
         }
+        .sheet(isPresented: $coordinator.showHealthConsent) {
+            HealthConsentView(healthRepository: coordinator.container.healthRepository)
+        }
         .onChange(of: deepLinkHandler.pendingLink) { _, newLink in
             handleDeepLink(newLink)
         }
@@ -78,6 +83,7 @@ struct AppRootView: View {
 private struct HomeRootView: View {
     @Bindable var coordinator: AppCoordinator
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.modelContext) private var modelContext
     @State private var homeViewModel: HomeViewModel
 
     init(coordinator: AppCoordinator) {
@@ -96,7 +102,60 @@ private struct HomeRootView: View {
     }
 
     var body: some View {
-        HomeView(
+        let journalStore = DefaultJournalStore(modelContext: modelContext)
+        let onRouteEnded: (WizPathRoute, String, WizPathKit.TravelMode) -> Void = { route, destinationName, travelMode in
+            Task {
+                do {
+                    let fiveMinutesAgo = Date().addingTimeInterval(-300)
+                    let recentEntries = try await journalStore.fetch(from: fiveMinutesAgo, to: Date())
+                    let isDuplicate = recentEntries.contains { entry in
+                        guard let data = entry.routeData,
+                              let decoded = try? JSONDecoder().decode(JournalRouteData.self, from: data) else {
+                            return false
+                        }
+                        return abs(decoded.destLat - route.destination.latitude) < 0.001
+                            && abs(decoded.destLng - route.destination.longitude) < 0.001
+                            && decoded.travelMode == travelMode.rawValue
+                    }
+                    guard !isDuplicate else {
+                        AppLogger.persistence.info("Duplicate route journal skipped")
+                        return
+                    }
+                    let routeData = try JSONEncoder().encode(JournalRouteData(
+                        originLat: route.origin.latitude, originLng: route.origin.longitude,
+                        destLat: route.destination.latitude, destLng: route.destination.longitude,
+                        travelMode: travelMode.rawValue, totalDuration: route.totalDuration,
+                        totalDistance: route.totalDistance, departureTime: route.departureTime,
+                        segmentCount: route.segments.count
+                    ))
+                    var weatherData: Data?
+                    if let w = route.segments.last?.weather {
+                        weatherData = try JSONEncoder().encode(JournalWeatherSnapshot(
+                            temperature: w.temperature, condition: w.condition.rawValue,
+                            windSpeed: w.windSpeed, precipitationChance: w.precipitationChance,
+                            severity: w.severity.rawValue
+                        ))
+                    }
+                    let title = destinationName.isEmpty ? "Route Trip" : "Route to \(destinationName)"
+                    let typeRaw: String
+                    switch travelMode {
+                    case .car: typeRaw = route.totalDuration < 1800 ? "commute" : "trip"
+                    default: typeRaw = "trip"
+                    }
+                    let entry = JournalEntry(
+                        date: Date(), title: title,
+                        locationName: destinationName.isEmpty ? nil : destinationName,
+                        latitude: route.destination.latitude, longitude: route.destination.longitude,
+                        weatherSnapshotData: weatherData, routeData: routeData, typeRaw: typeRaw
+                    )
+                    try await journalStore.save(entry)
+                    AppLogger.persistence.info("Auto-saved journal: \(title)")
+                } catch {
+                    AppLogger.persistence.error("Journal auto-save failed: \(error.localizedDescription)")
+                }
+            }
+        }
+        return HomeView(
             viewModel: homeViewModel,
             savedLocations: savedLocationsBinding,
             selectedLocationID: selectedLocationIDBinding,
@@ -116,7 +175,29 @@ private struct HomeRootView: View {
                     }
                 }
             },
-            wizPathService: coordinator.container.wizPathService
+            onHealthConsentTap: { coordinator.presentHealthConsent() },
+            wizPathService: coordinator.container.wizPathService,
+            homeLocation: coordinator.profile.homeLocation,
+            workLocation: coordinator.profile.workLocation,
+            commuteModeRaw: coordinator.profile.homeLocation?.commuteModeRaw ?? WizPathKit.TravelMode.car.rawValue,
+            onSaveSettings: { home, work, commuteMode in
+                var profile = coordinator.profile
+                profile.homeLocation = home
+                profile.workLocation = work
+                if var h = home {
+                    h.commuteModeRaw = commuteMode
+                    profile.homeLocation = h
+                }
+                Task {
+                    do {
+                        try await coordinator.container.updateUserPreferencesUseCase.execute(profile: profile)
+                        coordinator.applyProfile(profile)
+                    } catch {
+                        AppLogger.persistence.error("Failed to save settings: \(error.localizedDescription)")
+                    }
+                }
+            },
+            onRouteEnded: onRouteEnded
         )
         .onChange(of: coordinator.profile.language) { _, _ in
             Task { await homeViewModel.reloadForLanguageChange() }

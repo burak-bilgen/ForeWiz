@@ -2,11 +2,64 @@ import Foundation
 
 /// Health-Weather correlation intelligence.
 /// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, stamina, and air quality.
+/// Uses HealthKit data from HealthRepository to refine scores when available.
 struct HealthWeatherService {
+    private let healthRepository: HealthRepository?
+    private let correlationService: HealthWeatherCorrelationService
+    private let sampleFetchDays: Int = 14
+
+    init(
+        healthRepository: HealthRepository? = nil,
+        correlationService: HealthWeatherCorrelationService = DefaultHealthWeatherCorrelationService()
+    ) {
+        self.healthRepository = healthRepository
+        self.correlationService = correlationService
+    }
 
     /// Generates a complete health analysis from weather data.
-    /// Each index is calculated by a dedicated calculator type.
+    /// When HealthRepository is available, refines scores using personal HealthKit data.
     func analyzeHealth(
+        snapshot: WeatherSnapshot,
+        recommendation: DailyRecommendation,
+        profile: UserComfortProfile,
+        calendar: Calendar = .current
+    ) async -> HealthWeatherAnalysis {
+        let baseAnalysis = computeBaseAnalysis(
+            snapshot: snapshot,
+            recommendation: recommendation,
+            profile: profile,
+            calendar: calendar
+        )
+
+        guard let repository = healthRepository else {
+            return baseAnalysis
+        }
+
+        do {
+            let endDate = calendar.startOfDay(for: Date()).addingTimeInterval(86399)
+            let startDate = calendar.date(byAdding: .day, value: -sampleFetchDays, to: endDate) ?? endDate
+
+            let samples = try await fetchHealthSamples(repository: repository, start: startDate, end: endDate)
+
+            guard !samples.isEmpty else {
+                return baseAnalysis
+            }
+
+            return correlationService.correlate(
+                samples: samples,
+                snapshot: snapshot,
+                profile: profile,
+                baseAnalysis: baseAnalysis,
+                calendar: calendar
+            )
+        } catch {
+            return baseAnalysis
+        }
+    }
+
+    /// Pure weather-based analysis (no HealthKit data).
+    /// Each index is calculated by a dedicated calculator type.
+    private func computeBaseAnalysis(
         snapshot: WeatherSnapshot,
         recommendation: DailyRecommendation,
         profile: UserComfortProfile,
@@ -63,6 +116,41 @@ struct HealthWeatherService {
             overallHealthScore: overallScore,
             healthSummary: summary
         )
+    }
+
+    // MARK: - HealthKit Fetching
+
+    private func fetchHealthSamples(
+        repository: HealthRepository,
+        start: Date,
+        end: Date
+    ) async throws -> [HealthSample] {
+        async let heartSamples = try repository.readHeartRateSamples(start: start, end: end)
+        async let sleepSamples = try repository.readSleepSamples(start: start, end: end)
+        async let steps = try repository.readStepCount(start: start, end: end)
+        async let respSamples = try repository.readRespiratoryRate(start: start, end: end)
+        async let uvSamples = try repository.readUVExposure(start: start, end: end)
+        async let restingHR = try repository.readRestingHeartRate(start: start, end: end)
+
+        let (heart, sleep, stepCount, resp, uv, resting) = try await (
+            heartSamples, sleepSamples, steps, respSamples, uvSamples, restingHR
+        )
+
+        var samples: [HealthSample] = []
+        samples.append(contentsOf: heart)
+        samples.append(contentsOf: sleep)
+        samples.append(contentsOf: resp)
+        samples.append(contentsOf: uv)
+
+        if stepCount > 0 {
+            samples.append(HealthSample(type: .steps, value: stepCount, date: start))
+        }
+
+        if resting > 0 {
+            samples.append(HealthSample(type: .restingHeartRate, value: resting, date: start))
+        }
+
+        return samples
     }
 
     // MARK: - Overall Score

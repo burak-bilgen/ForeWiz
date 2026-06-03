@@ -28,6 +28,9 @@ final class DependencyContainer {
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
     
+    // MARK: - Health
+    let healthRepository: HealthRepository
+
     // MARK: - Services
     let severeWeatherAlertService: SevereWeatherAlertService
     
@@ -52,6 +55,7 @@ final class DependencyContainer {
         weatherCacheRepository: WeatherCacheRepository,
         preferencesRepository: PreferencesRepository,
         notificationRepository: NotificationRepository,
+        healthRepository: HealthRepository,
         loadHomeRecommendationUseCase: LoadHomeRecommendationUseCase,
         completeOnboardingUseCase: CompleteOnboardingUseCase,
         updateUserPreferencesUseCase: UpdateUserPreferencesUseCase,
@@ -74,6 +78,7 @@ final class DependencyContainer {
         self.weatherCacheRepository = weatherCacheRepository
         self.preferencesRepository = preferencesRepository
         self.notificationRepository = notificationRepository
+        self.healthRepository = healthRepository
         self.loadHomeRecommendationUseCase = loadHomeRecommendationUseCase
         self.completeOnboardingUseCase = completeOnboardingUseCase
         self.updateUserPreferencesUseCase = updateUserPreferencesUseCase
@@ -148,6 +153,8 @@ final class DependencyContainer {
             throttlingService: throttlingService
         )
 
+        let healthRepository = MockHealthRepository()
+
         return DependencyContainer(
             environment: .simulator,
             dateProvider: dateProvider,
@@ -160,6 +167,7 @@ final class DependencyContainer {
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             notificationRepository: notificationRepository,
+            healthRepository: healthRepository,
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,
@@ -237,6 +245,8 @@ final class DependencyContainer {
             throttlingService: throttlingService
         )
 
+        let healthRepository = HealthKitRepository()
+
         return DependencyContainer(
             environment: .production,
             dateProvider: dateProvider,
@@ -249,6 +259,7 @@ final class DependencyContainer {
             weatherCacheRepository: weatherCacheRepository,
             preferencesRepository: preferencesRepository,
             notificationRepository: notificationRepository,
+            healthRepository: healthRepository,
             loadHomeRecommendationUseCase: loadHomeRecommendationUseCase,
             completeOnboardingUseCase: completeOnboardingUseCase,
             updateUserPreferencesUseCase: updateUserPreferencesUseCase,

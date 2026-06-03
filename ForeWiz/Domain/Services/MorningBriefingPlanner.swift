@@ -10,8 +10,9 @@ enum MorningBriefingPlanner {
         recommendation: DailyRecommendation,
         profile: UserComfortProfile,
         now: Date,
-        calendar: Calendar
-    ) -> NotificationPlan? {
+        calendar: Calendar,
+        commuteService: CommuteRouteService? = nil
+    ) async -> NotificationPlan? {
         let preference = profile.notificationPreferences.first { $0.category == .morningBriefing }
         let preferredTime = preference?.preferredTime ?? DateComponents(hour: 7, minute: 0)
 
@@ -33,7 +34,14 @@ enum MorningBriefingPlanner {
             }
             fireDate = nextDay
         }
-        let body = buildBody(recommendation: recommendation, now: now, calendar: calendar)
+
+        let commuteBriefing = await buildCommuteBriefing(profile: profile, commuteService: commuteService)
+        let body = buildBody(
+            recommendation: recommendation,
+            now: now,
+            calendar: calendar,
+            commuteBriefing: commuteBriefing
+        )
 
         return NotificationPlan(
             id: NotificationPlanHelpers.stableID(category: .morningBriefing, fireDate: fireDate, calendar: calendar),
@@ -46,9 +54,70 @@ enum MorningBriefingPlanner {
         )
     }
 
+    // MARK: - Commute Briefing
+
+    private static func buildCommuteBriefing(
+        profile: UserComfortProfile,
+        commuteService: CommuteRouteService?
+    ) async -> CommuteBriefing? {
+        guard let commuteService = commuteService else { return nil }
+        guard let home = profile.homeLocation, let work = profile.workLocation else { return nil }
+
+        return await commuteService.commuteBriefing(
+            home: home,
+            work: work,
+            mode: TravelMode(rawValue: home.commuteModeRaw) ?? .car
+        )
+    }
+
+    // MARK: - Commute Section Builder
+
+    private static func buildCommuteSection(_ briefing: CommuteBriefing) -> String {
+        guard briefing.weatherAtOrigin != "N/A" else {
+            return L10n.text("notif_morning_commute_same")
+        }
+
+        var lines: [String] = []
+
+        lines.append(L10n.text("notif_morning_commute"))
+
+        if briefing.routeHazards.isEmpty {
+            lines.append(String(
+                format: L10n.text("notif_morning_commute_body"),
+                briefing.summary
+            ))
+        } else {
+            let hazardsStr = briefing.routeHazards.joined(separator: "; ")
+            lines.append(String(
+                format: L10n.text("notif_morning_commute_hazards"),
+                hazardsStr
+            ))
+        }
+
+        lines.append(String(
+            format: L10n.text("notif_morning_commute_origin"),
+            briefing.weatherAtOrigin
+        ))
+        lines.append(String(
+            format: L10n.text("notif_morning_commute_dest"),
+            briefing.weatherAtDestination
+        ))
+        lines.append(String(
+            format: L10n.text("notif_morning_commute_rec"),
+            briefing.recommendation
+        ))
+
+        return lines.joined(separator: "\n")
+    }
+
     // MARK: - Body Builder
 
-    private static func buildBody(recommendation: DailyRecommendation, now: Date, calendar: Calendar) -> String {
+    private static func buildBody(
+        recommendation: DailyRecommendation,
+        now: Date,
+        calendar: Calendar,
+        commuteBriefing: CommuteBriefing?
+    ) -> String {
         var parts: [String] = []
 
         // Opening based on decision - arkadaşça, doğal bir dille
@@ -82,6 +151,10 @@ enum MorningBriefingPlanner {
             } else {
                 parts.append(String(format: L10n.text("notif_morning_risk_only"), risk.title, riskTip))
             }
+        }
+
+        if let briefing = commuteBriefing {
+            parts.append(buildCommuteSection(briefing))
         }
 
         return parts.joined(separator: " ")

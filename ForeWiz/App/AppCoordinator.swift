@@ -14,6 +14,7 @@ final class AppCoordinator {
     var profile: UserComfortProfile = .default
     var latestRecommendation: DailyRecommendation?
     var showSettings = false
+    var showHealthConsent = false
     var navigateToInsights = false
     var selectedRecommendationID: String?
 
@@ -59,6 +60,14 @@ final class AppCoordinator {
             try? await container.preferencesRepository.setOnboardingCompleted(false)
         }
         rootFlow = .onboarding
+    }
+
+    func presentHealthConsent() {
+        showHealthConsent = true
+    }
+
+    func dismissHealthConsent() {
+        showHealthConsent = false
     }
 
     func dismissSettings() {
