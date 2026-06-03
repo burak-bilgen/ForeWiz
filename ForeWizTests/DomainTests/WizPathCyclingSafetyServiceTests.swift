@@ -203,7 +203,7 @@ struct WizPathCyclingSafetyServiceTests {
 
     // MARK: - Helpers
 
-    private func makeRoute(travelMode: TravelMode, segments: [WizPathSegment]) -> WizPathRoute {
+    private func makeRoute(travelMode: WizPathKit.TravelMode, segments: [WizPathSegment]) -> WizPathRoute {
         WizPathRoute(
             id: UUID(),
             origin: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),

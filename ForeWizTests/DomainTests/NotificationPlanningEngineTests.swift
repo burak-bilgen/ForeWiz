@@ -6,7 +6,7 @@ struct NotificationPlanningEngineTests {
     private let decisionEngine = DefaultWeatherDecisionEngine()
     private let notificationEngine = DefaultNotificationPlanningEngine()
 
-    @Test func notificationPlannerCapsDeduplicatesAndRespectsQuietHours() {
+    @Test func notificationPlannerCapsDeduplicatesAndRespectsQuietHours() async {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 7, day: 10, hour: 6)
         let quietStart = WeatherTestFixtures.date(month: 7, day: 10, hour: 11)
@@ -28,7 +28,7 @@ struct NotificationPlanningEngineTests {
             calendar: calendar
         )
 
-        let plans = notificationEngine.makePlans(
+        let plans = await notificationEngine.makePlans(
             recommendation: recommendation,
             profile: profile,
             now: now,
@@ -40,7 +40,7 @@ struct NotificationPlanningEngineTests {
         #expect(plans.contains { quietHours.containsClockTime(of: $0.fireDate, calendar: calendar) } == false)
     }
 
-    @Test func notificationPlannerSchedulesDailyPreferencesForTomorrowAfterPreferredTime() {
+    @Test func notificationPlannerSchedulesDailyPreferencesForTomorrowAfterPreferredTime() async {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 7, day: 10, hour: 9)
         var profile = WeatherTestFixtures.profile(maximumDailyNotifications: 3)
@@ -52,7 +52,7 @@ struct NotificationPlanningEngineTests {
             return NotificationPreference(category: category, isEnabled: enabled, preferredTime: preferredTime)
         }
 
-        let plans = notificationEngine.makePlans(
+        let plans = await notificationEngine.makePlans(
             recommendation: .placeholder,
             profile: profile,
             now: now,

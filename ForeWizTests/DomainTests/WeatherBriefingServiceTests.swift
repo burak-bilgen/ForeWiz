@@ -86,10 +86,10 @@ struct WeatherBriefingServiceTests {
 
     // MARK: - Briefing Generation Tests
 
-    @Test func briefingContainsAllComponents() {
+    @Test func briefingContainsAllComponents() async {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 85)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         #expect(briefing.narrative.headline.isEmpty == false)
         #expect(briefing.health.overallHealthScore >= 0)
@@ -98,67 +98,67 @@ struct WeatherBriefingServiceTests {
         #expect(briefing.generatedAt <= Date())
     }
 
-    @Test func briefingHasActionItems() {
+    @Test func briefingHasActionItems() async {
         let window = TimeWindow(start: Date(), end: Date().addingTimeInterval(7200))
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 80, bestWindow: window)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         #expect(briefing.actionItems.isEmpty == false)
     }
 
-    @Test func actionItemsIncludeTimingWithBestWindow() {
+    @Test func actionItemsIncludeTimingWithBestWindow() async {
         let window = TimeWindow(start: Date(), end: Date().addingTimeInterval(7200))
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 80, bestWindow: window)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         let timingItem = briefing.actionItems.first { $0.category == .timing }
         #expect(timingItem != nil)
         #expect(timingItem?.title.isEmpty == false)
     }
 
-    @Test func actionItemsIncludeOutfit() {
+    @Test func actionItemsIncludeOutfit() async {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 75)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         let outfitItem = briefing.actionItems.first { $0.category == .outfit }
         #expect(outfitItem != nil)
     }
 
-    @Test func actionItemsIncludeLifestyleTip() {
+    @Test func actionItemsIncludeLifestyleTip() async {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 80)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         let lifestyleItem = briefing.actionItems.first { $0.category == .lifestyle }
         #expect(lifestyleItem != nil)
     }
 
-    @Test func keyTakeawayReferencesBestWindow() {
+    @Test func keyTakeawayReferencesBestWindow() async {
         let window = TimeWindow(start: Date(), end: Date().addingTimeInterval(7200))
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 80, bestWindow: window)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         #expect(briefing.keyTakeaway.isEmpty == false)
     }
 
-    @Test func keyTakeawayForCriticalRisk() {
+    @Test func keyTakeawayForCriticalRisk() async {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 15, decision: .avoid, risks: [
             WeatherRisk(type: .storm, severity: .extreme, title: "Severe Storm", message: "Dangerous storm expected")
         ])
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         #expect(briefing.keyTakeaway.lowercased().contains("critical") || briefing.keyTakeaway.contains("Severe Storm"))
     }
 
-    @Test func actionItemsPrioritized() {
+    @Test func actionItemsPrioritized() async {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 80)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         let priorities = briefing.actionItems.map { $0.priority }
         // Verify items are sorted by priority (ascending)
@@ -167,17 +167,17 @@ struct WeatherBriefingServiceTests {
         }
     }
 
-    @Test func narrativeAndHealthAndComparativeAllPresent() {
+    @Test func narrativeAndHealthAndComparativeAllPresent() async {
         let snapshot = makeSnapshot()
         let recommendation = makeRecommendation(score: 85)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         #expect(briefing.narrative.moodScore >= 1)
         #expect(briefing.health.overallHealthScore >= 0)
         #expect(briefing.comparative.anomalyLabel.isEmpty == false)
     }
 
-    @Test func healthActionItemsAddedForHighMigraineRisk() {
+    @Test func healthActionItemsAddedForHighMigraineRisk() async {
         // Create conditions that trigger high migraine risk
         let now = Date()
         let hourlyData: [HourlyWeatherPoint] = {
@@ -228,7 +228,7 @@ struct WeatherBriefingServiceTests {
             attribution: nil
         )
         let recommendation = makeRecommendation(score: 50, decision: .moderate)
-        let briefing = service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
+        let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         let healthItems = briefing.actionItems.filter { $0.category == .health }
         #expect(healthItems.isEmpty == false)

@@ -55,10 +55,10 @@ struct WizPathViewModelTests {
     func travelModeDefaultsToCar() async throws {
         let vm = makeViewModel()
         #expect(vm.travelMode == .car)
-        #expect(TravelMode.allCases.count == 3)
-        #expect(TravelMode.car.icon == "car.fill")
-        #expect(TravelMode.walking.icon == "figure.walk")
-        #expect(TravelMode.cycling.icon == "bicycle")
+        #expect(WizPathKit.TravelMode.allCases.count == 3)
+        #expect(WizPathKit.TravelMode.car.icon == "car.fill")
+        #expect(WizPathKit.TravelMode.walking.icon == "figure.walk")
+        #expect(WizPathKit.TravelMode.cycling.icon == "bicycle")
     }
 
     @Test("Travel mode switching resets cycling analysis")
@@ -873,16 +873,16 @@ struct WizPathViewModelTests {
 
     @Test("TravelMode cycling properties")
     func travelModeCyclingProperties() async throws {
-        #expect(TravelMode.cycling.rawValue == "cycling")
-        #expect(TravelMode.cycling.segmentInterval == 10 * 60)
-        #expect(TravelMode.cycling.averageSpeedKph == 15)
-        #expect(TravelMode.cycling.isWindSensitive == true)
-        #expect(TravelMode.cycling.mkTransportType == MKDirectionsTransportType.walking)
+        #expect(WizPathKit.TravelMode.cycling.rawValue == "cycling")
+        #expect(WizPathKit.TravelMode.cycling.segmentInterval == 10 * 60)
+        #expect(WizPathKit.TravelMode.cycling.averageSpeedKph == 15)
+        #expect(WizPathKit.TravelMode.cycling.isWindSensitive == true)
+        #expect(WizPathKit.TravelMode.cycling.mkTransportType == MKDirectionsTransportType.walking)
     }
 
     @Test("TravelMode all cases contain cycling")
     func travelModeAllCasesContainsCycling() async throws {
-        let modes = TravelMode.allCases
+        let modes = WizPathKit.TravelMode.allCases
         #expect(modes.contains(.cycling))
         #expect(modes.count == 3)
     }
@@ -893,7 +893,7 @@ struct WizPathViewModelTests {
 extension WizPathRoute {
     static func testRoute(
         id: UUID = UUID(),
-        travelMode: TravelMode = .car,
+        travelMode: WizPathKit.TravelMode = .car,
         segments: [WizPathSegment] = []
     ) -> WizPathRoute {
         WizPathRoute(

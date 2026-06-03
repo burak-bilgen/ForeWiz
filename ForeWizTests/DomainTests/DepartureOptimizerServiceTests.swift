@@ -281,13 +281,13 @@ struct DepartureOptimizerServiceTests {
     
     @Test("TravelMode cycling properties")
     func travelModeCyclingProperties() async throws {
-        #expect(TravelMode.cycling.rawValue == "cycling")
-        #expect(TravelMode.cycling.icon == "bicycle")
-        #expect(TravelMode.cycling.segmentInterval == 10 * 60)
-        #expect(TravelMode.cycling.colorHex == "#34C759")
-        #expect(TravelMode.cycling.averageSpeedKph == 15)
-        #expect(TravelMode.cycling.isWindSensitive == true)
-        #expect(TravelMode.car.isWindSensitive == false)
-        #expect(TravelMode.walking.isWindSensitive == false)
+        #expect(WizPathKit.TravelMode.cycling.rawValue == "cycling")
+        #expect(WizPathKit.TravelMode.cycling.icon == "bicycle")
+        #expect(WizPathKit.TravelMode.cycling.segmentInterval == 10 * 60)
+        #expect(WizPathKit.TravelMode.cycling.colorHex == "#34C759")
+        #expect(WizPathKit.TravelMode.cycling.averageSpeedKph == 15)
+        #expect(WizPathKit.TravelMode.cycling.isWindSensitive == true)
+        #expect(WizPathKit.TravelMode.car.isWindSensitive == false)
+        #expect(WizPathKit.TravelMode.walking.isWindSensitive == false)
     }
 }

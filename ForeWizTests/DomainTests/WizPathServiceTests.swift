@@ -334,8 +334,8 @@ struct WizPathServiceTests {
     
     @Test("TravelMode segment intervals")
     func travelModeSegmentIntervals() async throws {
-        #expect(TravelMode.car.segmentInterval == 15 * 60)
-        #expect(TravelMode.walking.segmentInterval == 30 * 60)
+        #expect(WizPathKit.TravelMode.car.segmentInterval == 15 * 60)
+        #expect(WizPathKit.TravelMode.walking.segmentInterval == 30 * 60)
     }
     
     @Test("SegmentWeatherCondition severity mapping")
@@ -455,18 +455,18 @@ struct WizPathServiceTests {
 
     @Test("TravelMode all properties")
     func travelModeAllProperties() async throws {
-        #expect(TravelMode.allCases.count == 3)
-        #expect(TravelMode.walking.icon == "figure.walk")
-        #expect(TravelMode.walking.averageSpeedKph == 5)
-        #expect(TravelMode.cycling.averageSpeedKph == 15)
-        #expect(TravelMode.car.averageSpeedKph == 40)
+        #expect(WizPathKit.TravelMode.allCases.count == 3)
+        #expect(WizPathKit.TravelMode.walking.icon == "figure.walk")
+        #expect(WizPathKit.TravelMode.walking.averageSpeedKph == 5)
+        #expect(WizPathKit.TravelMode.cycling.averageSpeedKph == 15)
+        #expect(WizPathKit.TravelMode.car.averageSpeedKph == 40)
     }
 
     @Test("TravelMode wind sensitivity")
     func travelModeWindSensitivity() async throws {
-        #expect(TravelMode.car.isWindSensitive == false)
-        #expect(TravelMode.walking.isWindSensitive == false)
-        #expect(TravelMode.cycling.isWindSensitive == true)
+        #expect(WizPathKit.TravelMode.car.isWindSensitive == false)
+        #expect(WizPathKit.TravelMode.walking.isWindSensitive == false)
+        #expect(WizPathKit.TravelMode.cycling.isWindSensitive == true)
     }
 
     // MARK: - WizPathError Tests
@@ -529,7 +529,7 @@ struct WizPathServiceTests {
             )
         ]
         let route = WizPathRoute.testRoute(segments: segments)
-        let hud = route.journeyHUDData
+        let hud = route.journeyHUDData()
         #expect(hud.totalDuration == route.totalDuration)
         #expect(hud.safetyScore == 85)
         #expect(hud.durationDisplay.isEmpty == false)
@@ -555,7 +555,7 @@ struct WizPathServiceTests {
             )
         ]
         let route = WizPathRoute.testRoute(segments: segments)
-        let hud = route.journeyHUDData
+        let hud = route.journeyHUDData()
         #expect(hud.hazardCount > 0)
         #expect(hud.activeHazards.count > 0)
         #expect(hud.safetyScore == 30) // severe risk

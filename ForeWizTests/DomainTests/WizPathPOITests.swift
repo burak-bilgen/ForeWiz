@@ -16,6 +16,7 @@ struct WizPathPOITests {
         #expect(POICategory.gasStation.rawValue == "gasStation")
         #expect(POICategory.restStop.rawValue == "restStop")
         #expect(POICategory.restaurant.rawValue == "restaurant")
+        #expect(POICategory.evCharger.rawValue == "evCharger")
     }
 
     @Test("POICategory icon names")
@@ -23,6 +24,7 @@ struct WizPathPOITests {
         #expect(POICategory.gasStation.iconName == "fuelpump.fill")
         #expect(POICategory.restStop.iconName == "bed.double.fill")
         #expect(POICategory.restaurant.iconName == "fork.knife")
+        #expect(POICategory.evCharger.iconName == "bolt.car.fill")
     }
 
     @Test("POICategory default names are non-empty")
@@ -30,6 +32,7 @@ struct WizPathPOITests {
         #expect(!POICategory.gasStation.defaultName.isEmpty)
         #expect(!POICategory.restStop.defaultName.isEmpty)
         #expect(!POICategory.restaurant.defaultName.isEmpty)
+        #expect(!POICategory.evCharger.defaultName.isEmpty)
     }
 
     @Test("POICategory colors")
@@ -37,6 +40,15 @@ struct WizPathPOITests {
         #expect(POICategory.gasStation.color == "#00FF41")
         #expect(POICategory.restStop.color == "#FF9500")
         #expect(POICategory.restaurant.color == "#FF3BFF")
+        #expect(POICategory.evCharger.color == "#00D9FF")
+    }
+
+    @Test("POICategory mkCategory returns correct MapKit category")
+    func poiCategoryMkCategory() async throws {
+        #expect(POICategory.gasStation.mkCategory == MKPointOfInterestCategory.gasStation)
+        #expect(POICategory.restStop.mkCategory == nil)
+        #expect(POICategory.restaurant.mkCategory == MKPointOfInterestCategory.restaurant)
+        #expect(POICategory.evCharger.mkCategory == MKPointOfInterestCategory.evCharger)
     }
 
     // MARK: - POISafetyStatus Tests
