@@ -38,6 +38,19 @@ struct WeatherNarrative: Codable, Equatable, Sendable {
     }
 }
 
+/// Confidence level for health-weather correlation data.
+/// Indicates how much personal HealthKit data was available when computing the analysis.
+enum CorrelationConfidence: String, Codable, CaseIterable, Sendable {
+    /// Sufficient data (7+ days) across correlated metrics
+    case high
+    /// At least some data (7+ days) but not all metrics
+    case medium
+    /// Less than 7 days of data — estimates are tentative
+    case low
+    /// No HealthKit data available — purely weather-based
+    case none
+}
+
 /// Health-weather correlation analysis.
 /// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, and stamina.
 struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
@@ -79,6 +92,59 @@ struct HealthWeatherAnalysis: Codable, Equatable, Sendable {
 
     /// One-sentence summary of the health impact
     let healthSummary: String
+
+    /// How much HealthKit data informed this analysis
+    let confidence: CorrelationConfidence
+
+    init(
+        migraineRisk: Int,
+        migraineLabel: String,
+        migraineAdvice: String,
+        sleepQuality: Int,
+        sleepLabel: String,
+        sleepAdvice: String,
+        jointPainIndex: Int,
+        jointPainLabel: String,
+        jointPainAdvice: String,
+        respiratoryIndex: Int,
+        respiratoryLabel: String,
+        respiratoryAdvice: String,
+        staminaIndex: Int,
+        staminaLabel: String,
+        staminaAdvice: String,
+        airQualityIndex: Int,
+        airQualityLabel: String,
+        airQualityAdvice: String,
+        airQualityCategory: AirQualityCategory,
+        pollenLevel: Int?,
+        overallHealthScore: Int,
+        healthSummary: String,
+        confidence: CorrelationConfidence = .none
+    ) {
+        self.migraineRisk = migraineRisk
+        self.migraineLabel = migraineLabel
+        self.migraineAdvice = migraineAdvice
+        self.sleepQuality = sleepQuality
+        self.sleepLabel = sleepLabel
+        self.sleepAdvice = sleepAdvice
+        self.jointPainIndex = jointPainIndex
+        self.jointPainLabel = jointPainLabel
+        self.jointPainAdvice = jointPainAdvice
+        self.respiratoryIndex = respiratoryIndex
+        self.respiratoryLabel = respiratoryLabel
+        self.respiratoryAdvice = respiratoryAdvice
+        self.staminaIndex = staminaIndex
+        self.staminaLabel = staminaLabel
+        self.staminaAdvice = staminaAdvice
+        self.airQualityIndex = airQualityIndex
+        self.airQualityLabel = airQualityLabel
+        self.airQualityAdvice = airQualityAdvice
+        self.airQualityCategory = airQualityCategory
+        self.pollenLevel = pollenLevel
+        self.overallHealthScore = overallHealthScore
+        self.healthSummary = healthSummary
+        self.confidence = confidence
+    }
 }
 
 /// Comparative analysis - how today's weather compares to seasonal norms, yesterday, and weekly patterns.

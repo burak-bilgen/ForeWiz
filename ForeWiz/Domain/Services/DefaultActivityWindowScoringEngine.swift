@@ -1,9 +1,22 @@
 import Foundation
 
 struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
-    
+
+    // MARK: - Dependencies
+
+    private let weatherCacheRepository: WeatherCacheRepository?
+    private let defaultProfile: UserComfortProfile
+
+    init(
+        weatherCacheRepository: WeatherCacheRepository? = nil,
+        defaultProfile: UserComfortProfile = .default
+    ) {
+        self.weatherCacheRepository = weatherCacheRepository
+        self.defaultProfile = defaultProfile
+    }
+
     // MARK: - Scoring Constants
-    
+
     private enum ScoringPenalties {
         static let hotSummerMidday = 20
         static let nighttime = 15
@@ -16,7 +29,7 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         static let bestWindowSize = 3
         static let minimumAcceptableScore = 60
     }
-    
+
     func score(
         hour: HourlyWeatherPoint,
         activity: ActivityType,
@@ -33,7 +46,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         let apparentTemperature = hour.apparentTemperatureCelsius
         let month = calendar.component(.month, from: hour.date)
 
-        // Apply user-specific profile adjustments
         let adjustedTemp = apparentTemperature + profile.temperatureOffset
         let adjustedWind = (hour.windSpeedKph ?? 0) * profile.windSensitivityMultiplier
 
@@ -60,6 +72,8 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         if let severeWeatherRisk = hour.severeWeatherRisk {
             score -= severeWeatherRisk == .extreme ? ScoringPenalties.severeWeatherExtreme : severeWeatherRisk.rawValue * ScoringPenalties.severeWeatherMultiplier
         }
+
+        score -= activitySpecificPenalty(for: activity, hour: hour, hourOfDay: hourOfDay, calendar: calendar)
 
         return WeatherScore(rawValue: score)
     }
@@ -149,6 +163,82 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         )
     }
 
+    // MARK: - New Protocol Methods
+
+    func scoreWindow(
+        start: Date,
+        end: Date,
+        activityType: ActivityType?
+    ) async -> WeatherScore {
+        let activity = activityType ?? .goingOutside
+        let calendar = Calendar.current
+
+        if let repo = weatherCacheRepository,
+           let snapshot = try? await repo.loadLatest() {
+            let hoursInWindow = snapshot.hourly.filter { $0.date >= start && $0.date < end }
+            if !hoursInWindow.isEmpty {
+                let scores = hoursInWindow.map {
+                    score(hour: $0, activity: activity, profile: defaultProfile, calendar: calendar)
+                }
+                let avg = scores.map(\.rawValue).reduce(0, +) / scores.count
+                return WeatherScore(rawValue: avg)
+            }
+        }
+
+        return seasonalScore(for: activity, start: start, end: end)
+    }
+
+    func bestWindows(
+        in timeSlots: [TimeWindow],
+        for activityType: ActivityType?
+    ) -> [ActivityRecommendation] {
+        let activity = activityType ?? .goingOutside
+        let calendar = Calendar.current
+
+        let recommendations: [ActivityRecommendation] = timeSlots.compactMap { window in
+            let startHour = calendar.component(.hour, from: window.start)
+            guard isActiveHour(startHour, profile: defaultProfile) else { return nil }
+
+            let month = calendar.component(.month, from: window.start)
+            let isDaylight = (6...20).contains(startHour)
+
+            let dummyHour = HourlyWeatherPoint(
+                date: window.start,
+                temperatureCelsius: 20,
+                apparentTemperatureCelsius: 20,
+                humidity: 0.50,
+                windSpeedKph: 10,
+                precipitationChance: 0.05,
+                precipitationAmountMm: 0,
+                uvIndex: uvEstimate(for: startHour, month: month),
+                conditionCode: nil,
+                isDaylight: isDaylight,
+                severeWeatherRisk: nil
+            )
+
+            var baseScore = 80
+            let penalty = activitySpecificPenalty(for: activity, hour: dummyHour, hourOfDay: startHour, calendar: calendar)
+            baseScore -= penalty
+
+            let score = WeatherScore(rawValue: max(0, baseScore))
+            let reason: String
+            if score.rawValue < 20 {
+                reason = L10n.text("reason_not_suitable")
+            } else {
+                reason = self.reason(for: activity, score: score, window: window)
+            }
+
+            return ActivityRecommendation(
+                activityType: activity,
+                bestWindow: window,
+                score: score,
+                reason: reason
+            )
+        }
+
+        return recommendations.sorted { $0.score.rawValue > $1.score.rawValue }
+    }
+
     // MARK: - Active hours guard
 
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
@@ -176,7 +266,194 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         return false
     }
 
+    // MARK: - Activity-Specific Scoring
+
+    private func activitySpecificPenalty(
+        for activity: ActivityType,
+        hour: HourlyWeatherPoint,
+        hourOfDay: Int,
+        calendar: Calendar
+    ) -> Int {
+        let temp = hour.apparentTemperatureCelsius
+        let wind = hour.windSpeedKph ?? 0
+        let precip = hour.precipitationChance ?? 0
+        let uv = hour.uvIndex ?? 0
+        let isDaylight = hour.isDaylight ?? false
+        let month = calendar.component(.month, from: hour.date)
+
+        switch activity {
+        case .goingOutside:
+            return 0
+
+        case .swimming:
+            guard temp >= 25 else { return 100 }
+            var penalty = 0
+            if precip >= 0.20 { penalty += 25 }
+            if wind >= 15 { penalty += 20 }
+            if uv >= 8 { penalty += 15 }
+            return penalty
+
+        case .cycling:
+            var penalty = 0
+            if temp < 10 || temp > 35 { penalty += 50 }
+            if precip >= 0.40 { penalty += 30 }
+            if wind >= 30 { penalty += 25 }
+            else if wind >= 20 { penalty += 10 }
+            return penalty
+
+        case .running:
+            var penalty = 0
+            if temp < 5 || temp > 30 { penalty += 35 }
+            if wind >= 30 { penalty += 20 }
+            else if wind >= 20 { penalty += 10 }
+            if uv >= 8 { penalty += 15 }
+            else if uv >= 6 { penalty += 5 }
+            return penalty
+
+        case .hiking:
+            var penalty = 0
+            if temp < 5 || temp > 35 { penalty += 40 }
+            if uv >= 7 { penalty += 20 }
+            if precip >= 0.50 { penalty += 25 }
+            if (6...10).contains(hourOfDay) && isDaylight {
+                penalty -= 10
+            }
+            return penalty
+
+        case .photography:
+            var penalty = 0
+            if isGoldenHourPeriod(hourOfDay: hourOfDay, month: month) {
+                penalty -= 20
+            }
+            if wind >= 15 { penalty += 20 }
+            if precip >= 0.30 { penalty += 30 }
+            if precip < 0.10 && !isGoldenHourPeriod(hourOfDay: hourOfDay, month: month) {
+                penalty -= 5
+            }
+            return penalty
+
+        case .picnic:
+            var penalty = 0
+            if temp < 20 || temp > 30 { penalty += 40 }
+            if precip >= 0.30 { penalty += 35 }
+            if uv >= 6 { penalty += 20 }
+            if !isDaylight { penalty += 50 }
+            return penalty
+
+        case .beach:
+            var penalty = 0
+            if temp < 25 { penalty += 60 }
+            if precip >= 0.20 { penalty += 30 }
+            return penalty
+
+        case .outdoorDining:
+            var penalty = 0
+            if temp < 15 || temp > 30 { penalty += 35 }
+            if precip >= 0.40 { penalty += 30 }
+            if (18...21).contains(hourOfDay) && isDaylight {
+                penalty -= 10
+            }
+            return penalty
+
+        case .sightseeing:
+            var penalty = 0
+            if temp < 10 || temp > 35 { penalty += 35 }
+            if precip >= 0.50 { penalty += 25 }
+            if !isDaylight { penalty += 30 }
+            return penalty
+
+        case .gardening:
+            var penalty = 0
+            if temp < 10 || temp > 30 { penalty += 35 }
+            if let severe = hour.severeWeatherRisk, severe == .extreme || severe == .high {
+                penalty += 80
+            }
+            if precip >= 0.60 { penalty += 15 }
+            return penalty
+
+        case .walking:
+            var penalty = 0
+            if temp < 0 || temp > 35 { penalty += 35 }
+            if let severe = hour.severeWeatherRisk, severe == .extreme {
+                penalty += 60
+            }
+            if wind >= 40 { penalty += 25 }
+            else if wind >= 30 { penalty += 10 }
+            return penalty
+        }
+    }
+
+    private func isGoldenHourPeriod(hourOfDay: Int, month: Int) -> Bool {
+        let isSummer = (5...8).contains(month)
+        let isWinter = month <= 2 || month >= 11
+
+        let morning: Range<Int>
+        let evening: Range<Int>
+
+        if isSummer {
+            morning = 5..<8
+            evening = 18..<21
+        } else if isWinter {
+            morning = 7..<9
+            evening = 16..<18
+        } else {
+            morning = 6..<8
+            evening = 17..<19
+        }
+
+        return morning.contains(hourOfDay) || evening.contains(hourOfDay)
+    }
+
     // MARK: - Helpers
+
+    private func seasonalScore(for activity: ActivityType, start: Date, end: Date) -> WeatherScore {
+        let calendar = Calendar.current
+        let month = calendar.component(.month, from: start)
+
+        switch activity {
+        case .swimming:
+            if month <= 3 || month >= 11 {
+                return WeatherScore(rawValue: 0, label: L10n.text("reason_not_suitable"))
+            }
+            if month <= 5 || month >= 9 {
+                return WeatherScore(rawValue: 30)
+            }
+            return WeatherScore(rawValue: 60)
+        case .picnic, .beach:
+            if month <= 3 || month >= 11 {
+                return WeatherScore(rawValue: 10, label: L10n.text("reason_not_suitable"))
+            }
+            if month <= 4 || month >= 10 {
+                return WeatherScore(rawValue: 35)
+            }
+            return WeatherScore(rawValue: 65)
+        case .photography:
+            return WeatherScore(rawValue: 55)
+        case .cycling, .running, .hiking, .walking:
+            return WeatherScore(rawValue: 55)
+        case .outdoorDining, .sightseeing, .gardening:
+            return WeatherScore(rawValue: 55)
+        case .goingOutside:
+            return WeatherScore(rawValue: 55)
+        }
+    }
+
+    private func uvEstimate(for hourOfDay: Int, month: Int) -> Int {
+        guard (9...17).contains(hourOfDay) else { return 1 }
+        let isSummer = (5...8).contains(month)
+        if isSummer {
+            switch hourOfDay {
+            case 11...14: return 8
+            case 10, 15: return 6
+            default: return 4
+            }
+        } else {
+            switch hourOfDay {
+            case 11...14: return 4
+            default: return 2
+            }
+        }
+    }
 
     /// Küresel ısınma odaklı ısı cezası - yüksek sıcaklıklar artık çok daha ağır cezalandırılıyor.
     ///   < 12°C:  soğuk (22)
@@ -274,14 +551,28 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
     }
 
     private func reason(for activity: ActivityType, score: WeatherScore, window: TimeWindow) -> String {
+        if activity == .goingOutside {
+            let time = window.shortDisplayText
+            switch score.rawValue {
+            case 80...:
+                return String(format: L10n.text("reason_best_time"), activity.localizedTitle, time)
+            case 60..<80:
+                return String(format: L10n.text("reason_good_time"), activity.localizedTitle, time)
+            default:
+                return String(format: L10n.text("reason_moderate_time"), activity.localizedTitle, time)
+            }
+        }
+
         let time = window.shortDisplayText
         switch score.rawValue {
         case 80...:
             return String(format: L10n.text("reason_best_time"), activity.localizedTitle, time)
         case 60..<80:
             return String(format: L10n.text("reason_good_time"), activity.localizedTitle, time)
-        default:
+        case 20..<60:
             return String(format: L10n.text("reason_moderate_time"), activity.localizedTitle, time)
+        default:
+            return L10n.text("reason_not_suitable")
         }
     }
 }

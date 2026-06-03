@@ -24,4 +24,15 @@ protocol ActivityWindowScoringEngine {
         calendar: Calendar,
         avoidWindows: [AvoidWindowRecommendation]
     ) -> ActivityRecommendation?
+
+    func scoreWindow(
+        start: Date,
+        end: Date,
+        activityType: ActivityType?
+    ) async -> WeatherScore
+
+    func bestWindows(
+        in timeSlots: [TimeWindow],
+        for activityType: ActivityType?
+    ) -> [ActivityRecommendation]
 }
