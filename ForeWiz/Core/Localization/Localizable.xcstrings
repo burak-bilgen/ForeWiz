@@ -10228,6 +10228,23 @@
         }
       }
     },
+    "reason_not_suitable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ is not suitable right now."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ için uygun değil."
+          }
+        }
+      }
+    },
     "rec_ev_buffer_desc": {
       "extractionState": "manual",
       "localizations": {
