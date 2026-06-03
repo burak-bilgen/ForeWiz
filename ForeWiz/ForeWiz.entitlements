@@ -8,5 +8,7 @@
 	<array>
 		<string>group.forewiz</string>
 	</array>
+	<key>com.apple.developer.healthkit</key>
+	<true/>
 </dict>
 </plist>
