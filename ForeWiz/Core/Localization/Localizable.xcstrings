@@ -2222,7 +2222,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Açıkçası bugün vakti kapalı mekanlarda geçirmek daha iyi bir fikir olabilir; hava koşulları pek elverişli değil."
+            "value": "Açıkçası bugün evde kalmak en iyisi; hava pek iyi değil."
           }
         }
       }
@@ -2239,7 +2239,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarı adım atmak için en ideal zaman aralığı burası. Acele etmenize gerek yok; hava sizden yana."
+            "value": "Dışarı çıkmak için en iyi zaman. Acele etmeyin, hava güzel."
           }
         }
       }
@@ -2307,7 +2307,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarı çıkabilirsiniz ancak bazı saatler konforsuz hissettirebilir. Saatlik rehberimize göz atabilirsiniz."
+            "value": "Dışarı çıkılır ama bazı saatler rahatsız edebilir. Saatlik tahminlere bir göz atın."
           }
         }
       }
@@ -2324,7 +2324,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Özellikle kaçınmanız gereken bir saat bulunmuyor."
+            "value": "Kaçınmanız gereken bir saat yok."
           }
         }
       }
@@ -2552,7 +2552,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kat kat giyinmenizi ve dışarıda gereğinden uzun süre kalmaktan kaçınmanızı öneririz."
+            "value": "Kat kat giyinin ve dışarıda uzun süre kalmamaya çalışın."
           }
         }
       }
@@ -4144,7 +4144,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eklemleriniz için zorlu bir gün olabilir; bol bol dinlenmenizi ve eklemlerinizi sıcak tutmanızı öneririz."
+            "value": "Eklemleriniz için zorlu bir gün; bol bol dinlenin ve eklemlerinizi sıcak tutun."
           }
         }
       }
@@ -4280,7 +4280,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Migren riski son derece yüksek; stresten olabildiğince uzak durmanızı ve mümkünse dinlenmenizi tavsiye ederiz."
+            "value": "Migren riski son derece yüksek; stresten uzak durun ve mümkünse dinlenin."
           }
         }
       }
@@ -4314,7 +4314,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Migren riski yüksek; parlak ekranlardan kaçınmanızı ve sık sık mola vermenizi öneririz."
+            "value": "Migren riski yüksek; parlak ekranlardan kaçının ve sık sık mola verin."
           }
         }
       }
@@ -4382,7 +4382,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Orta düzeyde migren riski bulunuyor; bulunduğunuz ortamdaki ışıkları kısık tutabilir ve bol su içebilirsiniz."
+            "value": "Orta düzeyde migren riski var; ışıkları kısık tutun ve bol su için."
           }
         }
       }
@@ -4756,7 +4756,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Açık havada enerji seviyeniz düşük hissedilebilir; aktivitelerinizi daha hafif tutmanızı öneririz."
+            "value": "Açık havada enerjiniz düşük olabilir; aktivitelerinizi hafif tutun."
           }
         }
       }
@@ -4892,7 +4892,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün hava koşulları sağlığınız ve konforunuz açısından oldukça zorlayıcı."
+            "value": "Bugün hava sağlığınız için zorlayıcı olabilir."
           }
         }
       }
@@ -5011,7 +5011,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün dışarı planları pek uygun değil; mümkünse kısa tutun."
+            "value": "Bugün dışarı çıkma planları pek uygun değil; çıkmanız gerekiyorsa kısa tutun."
           }
         }
       }
@@ -6171,7 +6171,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında sıcaklıklar düşüyor; üzerinize kalın bir şeyler almanın tam zamanı! 🧣"
+            "value": "%@ civarında hava soğuyor; kalın giyinmekte fayda var! 🧣"
           }
         }
       }
@@ -6188,7 +6188,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında dondurucu soğuklar bekleniyor; sıcacık giyinmeye ve tedbirli olmaya özen gösterin! 🥶"
+            "value": "%@ civarında dondurucu soğuk var; sıkı giyinip tedbirli olun! 🥶"
           }
         }
       }
@@ -6239,7 +6239,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ saatlerinde sisli hava bekleniyor"
+            "value": "%@ saatlerinde sis bekleniyor, görüş mesafesi düşebilir"
           }
         }
       }
@@ -6290,7 +6290,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında aşırı sıcaklar etkili olacak; bol su tüketimi ve gölgede kalmak bugün en kritik koruyucunuz olacaktır 🥵"
+            "value": "%@ civarında aşırı sıcak basıyor; bol su için ve gölgede kalın 🥵"
           }
         }
       }
@@ -6307,7 +6307,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında sıcaklıklar zirveye ulaşıyor; günün en sıcak saatlerinde dikkatli olmanızı öneririz 🔥"
+            "value": "%@ civarında hava en sıcak saatlerinde; dikkatli olun 🔥"
           }
         }
       }
@@ -6375,7 +6375,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında yağmur etkisini kaybediyor ve gökyüzü açıyor; günün ikinci yarısı çok daha keyifli geçecek! ☀️"
+            "value": "%@ civarında yağmur geçip gidiyor, öğleden sonra hava açıyor! ☀️"
           }
         }
       }
@@ -6426,7 +6426,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ saatleri arasında kuvvetli yağmur bekleniyor; bugün kapalı alanlarda keyif yapmak için harika bir fırsat 🌧️"
+            "value": "%@ saatleri arasında kuvvetli yağmur geliyor; evde kalıp keyif yapma günü 🌧️"
           }
         }
       }
@@ -6443,7 +6443,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında hafif bir yağmur geçişi olabilir; dışarı çıkarken şemsiyenizi yanınıza almayı unutmayın ☂️"
+            "value": "%@ civarında hafif yağmur geçebilir; şemsiyenizi almayı unutmayın ☂️"
           }
         }
       }
@@ -6511,7 +6511,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ itibarıyla kar bekleniyor"
+            "value": "%@ civarında kar bekleniyor"
           }
         }
       }
@@ -6545,7 +6545,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dikkat: Şiddetli fırtına %@ civarında etkili olacak! Korunaklı bir yerde kalmanızı ve tedbirli olmanızı öneririz 🚨"
+            "value": "%@ civarında şiddetli fırtına geliyor! Güvende kalın, dışarı çıkmayın 🚨"
           }
         }
       }
@@ -6562,7 +6562,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında fırtına etkisini gösterebilir; acil bir işiniz yoksa bugün kapalı alanda kalmak en doğrusudur ⛈️"
+            "value": "%@ civarında fırtına olabilir; işiniz yoksa evde kalın ⛈️"
           }
         }
       }
@@ -6596,7 +6596,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ saatleri arasında UV indeksi çok yüksek seviyelere ulaşacak; dışarı çıkarken güneş kreminizi sürmeyi ihmal etmeyin! ☀️"
+            "value": "%@ saatlerinde UV çok yüksek; dışarı çıkarken güneş kremini unutmayın! ☀️"
           }
         }
       }
@@ -6630,7 +6630,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ civarında rüzgâr güçlenecek; uçabilecek eşyalara ve şapkanıza dikkat edin! 🍃"
+            "value": "%@ civarında rüzgâr artıyor; şapkanızı tutun! 🍃"
           }
         }
       }
@@ -6647,7 +6647,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ saatleri arasında çok kuvvetli rüzgârlar bekleniyor; dışarı çıkmamanızı veya son derece dikkatli olmanızı öneririz 💨"
+            "value": "%@ saatlerinde çok kuvvetli rüzgâr var; mecbur kalmadıkça dışarı çıkmayın 💨"
           }
         }
       }
@@ -8213,7 +8213,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın. Bugün hava koşulları pek elverişli görünmüyor; kapalı alanlarda vakit geçirmek daha konforlu olabilir."
+            "value": "Günaydın. Bugün hava pek iyi değil, evde kalmanız en iyisi olacak."
           }
         }
       }
@@ -8230,7 +8230,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın! Bugün hava dışarıda vakit geçirmek ve planlarınızı hayata geçirmek için harika."
+            "value": "Günaydın! Bugün hava harika, dışarı çıkmak için çok güzel bir gün."
           }
         }
       }
@@ -8247,7 +8247,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın. Bugün görece ılıman bir hava var; dışarı çıkabilirsiniz, ancak detaylı rehberimize göz atmanızı öneririz."
+            "value": "Günaydın. Bugün hava idare eder, dışarı çıkılır ama bir göz atın derim."
           }
         }
       }
@@ -8264,7 +8264,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bugün %@ riski bulunuyor: %@."
+            "value": "Bugün %@ riski var: %@."
           }
         }
       }
@@ -8281,7 +8281,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bununla birlikte %@ riski de var — %@."
+            "value": "Bir de %@ riski var — %@."
           }
         }
       }
@@ -8298,7 +8298,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın. Bugün dış mekan planlarınızda dikkatli olmanızı öneririz; gün içinde hava sürprizler yapabilir."
+            "value": "Günaydın. Bugün hava biraz sorun çıkarabilir, dışarıda dikkatli olun."
           }
         }
       }
@@ -8315,7 +8315,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarı çıkmak için en uygun zaman aralığı: %@. Planlarınızı bu saate göre düzenleyebilirsiniz."
+            "value": "En iyi zaman %@ civarı. Planlarınızı buna göre ayarlayın."
           }
         }
       }
@@ -8332,7 +8332,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarı çıkmanız gerekiyorsa %@ saatleri tercih edilebilir."
+            "value": "Çıkmanız gerekiyorsa %@ saatlerini tercih edin."
           }
         }
       }
@@ -8502,7 +8502,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Günaydın, günlük özetiniz hazır"
+            "value": "Günaydın, günün özeti hazır"
           }
         }
       }
@@ -8982,7 +8982,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güneş ışınları bugün oldukça güçlü; şapka ve güneş gözlüğü takmayı, güneş kreminizi sürmeyi kesinlikle ihmal etmeyin. Olabildiğince gölge alanları tercih etmenizi öneririz."
+            "value": "Güneş ışınları bugün oldukça güçlü; şapka ve güneş gözlüğü takın, güneş kremini sürün. Mümkünse gölgede kalın."
           }
         }
       }
@@ -9441,7 +9441,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rüzgârlı — rüzgârlık almanızı öneririz."
+            "value": "Rüzgârlı — yanınıza bir rüzgârlık alın."
           }
         }
       }
@@ -9662,7 +9662,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dışarı çıkabilirsiniz ancak zamanlamayı iyi ayarlamanızı öneririz."
+            "value": "Dışarı çıkabilirsiniz ama zamanlamayı iyi ayarlayın."
           }
         }
       }
@@ -12037,6 +12037,74 @@
         }
       }
     },
+    "sentinel_body_toll": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route now includes toll roads. Duration changed %@ → %@."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota artık ücretli yollar içeriyor. Süre %@ → %@ olarak değişti."
+          }
+        }
+      }
+    },
+    "sentinel_body_traffic_weather": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heavy traffic and weather detected. Route %@ → %@ (added %@)."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yoğun trafik ve hava koşulları var. Rota %@ → %@ (%@ eklendi)."
+          }
+        }
+      }
+    },
+    "sentinel_title_toll": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🛣️ Toll Road Alert: +%@ added"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🛣️ Ücretli Yol Uyarısı: +%@ eklendi"
+          }
+        }
+      }
+    },
+    "sentinel_title_traffic_weather": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🚦 Traffic + Weather: +%@ added"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🚦 Trafik + Hava: +%@ eklendi"
+          }
+        }
+      }
+    },
     "settings_cancel": {
       "extractionState": "manual",
       "localizations": {
@@ -12437,7 +12505,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Temponuzu düşürmenizi ve yanınızda mutlaka su bulundurmanızı tavsiye ederiz."
+            "value": "Temponuzu düşürün ve yanınızda su bulundurun."
           }
         }
       }
@@ -13142,7 +13210,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güneş kremi kullanmanızı, şapka takmanızı ve mümkün mertebe gölgede kalmanızı öneririz."
+            "value": "Güneş kremi kullanın, şapka takın ve mümkünse gölgede kalın."
           }
         }
       }
@@ -14946,6 +15014,23 @@
         }
       }
     },
+    "wizpath_error_timeout": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route calculation timed out. Please try again."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota hesaplama zaman aşımına uğradı. Lütfen tekrar deneyin."
+          }
+        }
+      }
+    },
     "wizpath_estimated_arrival_eta": {
       "extractionState": "manual",
       "localizations": {
@@ -16492,7 +16577,7 @@
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hedefinizi belirleyin"
+            "value": "Hedef belirleyin"
           }
         }
       }
@@ -16988,6 +17073,2097 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld km/sa"
+          }
+        }
+      }
+    },
+    "ev_charging_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EV Charging Stops"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj Durakları"
+          }
+        }
+      }
+    },
+    "ev_no_chargers": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No EV chargers found along your route"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota üzerinde şarj istasyonu bulunamadı"
+          }
+        }
+      }
+    },
+    "ev_loading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Searching for EV chargers..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarj istasyonları aranıyor..."
+          }
+        }
+      }
+    },
+    "ev_open_in_maps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in Maps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haritalar'da Aç"
+          }
+        }
+      }
+    },
+    "wizpath_share_route": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share Route"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rotayı Paylaş"
+          }
+        }
+      }
+    },
+    "wizpath_share_format": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heading to %@\nDeparture: %@\nArrival: %@\nDuration: %@\nDistance: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ yolculuğu\nKalkış: %@\nVarış: %@\nSüre: %@\nMesafe: %@"
+          }
+        }
+      }
+    },
+    "wizpath_recent_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recent Destinations"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Son Hedefler"
+          }
+        }
+      }
+    },
+    "wizpath_recent_clear": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear All"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temizle"
+          }
+        }
+      }
+    },
+    "activity_going_outside": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General Outdoor Time"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genel Açık Hava Zamanı"
+          }
+        }
+      }
+    },
+    "activity_going_outside_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General time spent outdoors"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genel açık hava aktiviteleri"
+          }
+        }
+      }
+    },
+    "activity_running_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running and jogging"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koşu ve tempolu yürüyüş"
+          }
+        }
+      }
+    },
+    "activity_cycling": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisiklet"
+          }
+        }
+      }
+    },
+    "activity_cycling_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycling and biking"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisiklet sürüşü"
+          }
+        }
+      }
+    },
+    "activity_walking": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walking"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yürüyüş"
+          }
+        }
+      }
+    },
+    "activity_walking_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walking and strolling"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yürüyüş"
+          }
+        }
+      }
+    },
+    "activity_hiking": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiking"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doğa Yürüyüşü"
+          }
+        }
+      }
+    },
+    "activity_hiking_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nature hikes and trails"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doğa yürüyüşleri ve patikalar"
+          }
+        }
+      }
+    },
+    "activity_picnic": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picnic"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Piknik"
+          }
+        }
+      }
+    },
+    "activity_picnic_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outdoor picnics"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık hava piknikleri"
+          }
+        }
+      }
+    },
+    "activity_beach": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beach"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plaj"
+          }
+        }
+      }
+    },
+    "activity_beach_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beach and seaside"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plaj ve sahil"
+          }
+        }
+      }
+    },
+    "activity_outdoor_dining": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outdoor Dining"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık Havada Yemek"
+          }
+        }
+      }
+    },
+    "activity_outdoor_dining_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eating outdoors"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık havada yemek yeme"
+          }
+        }
+      }
+    },
+    "activity_sightseeing": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sightseeing"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gezinti"
+          }
+        }
+      }
+    },
+    "activity_sightseeing_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exploring and touring"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keşif ve gezi"
+          }
+        }
+      }
+    },
+    "activity_photography": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photography"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotoğrafçılık"
+          }
+        }
+      }
+    },
+    "activity_photography_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photography and filming"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotoğrafçılık ve çekim"
+          }
+        }
+      }
+    },
+    "activity_gardening": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gardening"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahçe İşleri"
+          }
+        }
+      }
+    },
+    "activity_gardening_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Garden work"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bahçe işleri"
+          }
+        }
+      }
+    },
+    "activity_swimming": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swimming"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüzme"
+          }
+        }
+      }
+    },
+    "activity_swimming_desc": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swimming and water activities"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüzme ve su aktiviteleri"
+          }
+        }
+      }
+    },
+    "activity_picker_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Activity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktivite Seçin"
+          }
+        }
+      }
+    },
+    "activity_picker_all": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Activities"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm Aktiviteler"
+          }
+        }
+      }
+    },
+    "activity_recommendation_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recommended for"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önerilen Aktivite"
+          }
+        }
+      }
+    },
+    "activity_best_window": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Best Time"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En İyi Zaman"
+          }
+        }
+      }
+    },
+    "activity_not_recommended": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Recommended Today"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugün Önerilmiyor"
+          }
+        }
+      }
+    },
+    "activity_perfect_for": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfect for"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İdeal"
+          }
+        }
+      }
+    },
+    "health_consent_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health Access"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık Erişimi"
+          }
+        }
+      }
+    },
+    "health_consent_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz reads health data to personalize weather-health analysis. Your data stays on-device."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz, hava durumu-sağlık analizini kişiselleştirmek için sağlık verilerinizi okur. Verileriniz cihazınızda kalır."
+          }
+        }
+      }
+    },
+    "health_consent_allow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Access"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erişime İzin Verin"
+          }
+        }
+      }
+    },
+    "health_consent_deny": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Now"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şimdi Değil"
+          }
+        }
+      }
+    },
+    "health_heart_rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heart Rate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalp Atış Hızı"
+          }
+        }
+      }
+    },
+    "health_sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku"
+          }
+        }
+      }
+    },
+    "health_steps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adım"
+          }
+        }
+      }
+    },
+    "health_respiratory_rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Respiratory Rate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solunum Hızı"
+          }
+        }
+      }
+    },
+    "health_uv_exposure": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UV Exposure"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UV Maruziyeti"
+          }
+        }
+      }
+    },
+    "health_no_data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Health Data Available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık Verisi Yok"
+          }
+        }
+      }
+    },
+    "health_authorization_required": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health Access Required"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık Erişimi Gerekli"
+          }
+        }
+      }
+    },
+    "health_service_unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health Services Unavailable on This Device"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Cihazda Sağlık Hizmetleri Kullanılamıyor"
+          }
+        }
+      }
+    },
+    "location_home": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev"
+          }
+        }
+      }
+    },
+    "location_work": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Work"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İş"
+          }
+        }
+      }
+    },
+    "location_other": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer"
+          }
+        }
+      }
+    },
+    "commute_briefing_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's Commute"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugünkü Yolculuk"
+          }
+        }
+      }
+    },
+    "commute_no_commute": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekend — No Commute Today"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafta Sonu — Bugün Yolculuk Yok"
+          }
+        }
+      }
+    },
+    "commute_remote_work": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Working from Home Today"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bugün Evden Çalışıyorsunuz"
+          }
+        }
+      }
+    },
+    "commute_weather_at_destination": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weather at Destination"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varış Noktasında Hava Durumu"
+          }
+        }
+      }
+    },
+    "settings_home_location": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home Location"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev Konumu"
+          }
+        }
+      }
+    },
+    "settings_work_location": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Work Location"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İş Konumu"
+          }
+        }
+      }
+    },
+    "settings_commute_mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commute Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolculuk Modu"
+          }
+        }
+      }
+    },
+    "live_activity_route_hud": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route HUD"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota HUD"
+          }
+        }
+      }
+    },
+    "live_activity_safety_score": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safety Score"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güvenlik Skoru"
+          }
+        }
+      }
+    },
+    "live_activity_hazards": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazards"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tehlikeler"
+          }
+        }
+      }
+    },
+    "live_activity_distance_remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remaining"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalan"
+          }
+        }
+      }
+    },
+    "live_activity_eta": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ETA"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varış"
+          }
+        }
+      }
+    },
+    "live_activity_next_stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Stop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonraki Durak"
+          }
+        }
+      }
+    },
+    "live_activity_risk_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İyi"
+          }
+        }
+      }
+    },
+    "live_activity_risk_caution": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caution"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dikkat"
+          }
+        }
+      }
+    },
+    "journal_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Travel Journal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seyahat Günlüğü"
+          }
+        }
+      }
+    },
+    "journal_empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No entries yet"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz kayıt yok"
+          }
+        }
+      }
+    },
+    "journal_entry_trip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trip"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolculuk"
+          }
+        }
+      }
+    },
+    "journal_entry_commute": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commute"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolculuk"
+          }
+        }
+      }
+    },
+    "journal_entry_explore": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keşif"
+          }
+        }
+      }
+    },
+    "journal_search_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search journal..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Günlükte ara..."
+          }
+        }
+      }
+    },
+    "journal_share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share Trip"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolculuğu Paylaş"
+          }
+        }
+      }
+    },
+    "journal_delete": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Entry"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaydı Sil"
+          }
+        }
+      }
+    },
+    "journal_notes_placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add notes..."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not ekleyin..."
+          }
+        }
+      }
+    },
+    "journal_detail_weather": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weather"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava Durumu"
+          }
+        }
+      }
+    },
+    "journal_detail_route": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota"
+          }
+        }
+      }
+    },
+    "journal_detail_health": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık"
+          }
+        }
+      }
+    },
+    "journal_auto_saved": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Journey saved to journal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolculuk günlüğe kaydedildi"
+          }
+        }
+      }
+    },
+    "journal_no_entries": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No journal entries yet"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz günlük kaydı yok"
+          }
+        }
+      }
+    },
+    "health_consent_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health Data Access"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık Verisi Erişimi"
+          }
+        }
+      }
+    },
+    "health_consent_message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz can read your health data to provide personalized weather-health insights. Your data stays on-device and is never shared."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ForeWiz, kişiselleştirilmiş hava-sağlık analizleri sunmak için sağlık verilerinizi okuyabilir. Verileriniz cihazınızda kalır ve asla paylaşılmaz."
+          }
+        }
+      }
+    },
+    "health_consent_allow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Health Access"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık Erişimini Etkinleştir"
+          }
+        }
+      }
+    },
+    "health_consent_deny": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Now"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daha Sonra"
+          }
+        }
+      }
+    },
+    "health_heart_rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heart Rate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalp Atış Hızı"
+          }
+        }
+      }
+    },
+    "health_sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sleep"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uyku"
+          }
+        }
+      }
+    },
+    "health_steps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steps"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adım"
+          }
+        }
+      }
+    },
+    "health_respiratory_rate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Respiratory Rate"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solunum Hızı"
+          }
+        }
+      }
+    },
+    "health_uv_exposure": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UV Exposure"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UV Maruziyeti"
+          }
+        }
+      }
+    },
+    "health_no_data": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No health data available"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sağlık verisi bulunamadı"
+          }
+        }
+      }
+    },
+    "health_authorization_required": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health access required to read your data"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verilerinizi okumak için sağlık erişimi gerekiyor"
+          }
+        }
+      }
+    },
+    "health_service_unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Health services are not available on this device"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu cihazda sağlık hizmetleri kullanılamıyor"
+          }
+        }
+      }
+    },
+    "live_activity_route_hud_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Route HUD"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota Görünümü"
+          }
+        }
+      }
+    },
+    "live_activity_safety_score": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safety Score"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güvenlik Puanı"
+          }
+        }
+      }
+    },
+    "live_active_hazards": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Active Hazards"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktif Tehlikeler"
+          }
+        }
+      }
+    },
+    "live_activity_distance_remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distance Remaining"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalan Mesafe"
+          }
+        }
+      }
+    },
+    "live_activity_eta": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ETA"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varış Saati"
+          }
+        }
+      }
+    },
+    "live_activity_next_stop": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next Stop"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonraki Durak"
+          }
+        }
+      }
+    },
+    "live_activity_risk_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İyi"
+          }
+        }
+      }
+    },
+    "live_activity_risk_caution": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caution"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dikkat"
+          }
+        }
+      }
+    },
+    "live_activity_risk_severe": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Severe"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şiddetli"
+          }
+        }
+      }
+    },
+    "commute_setup_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commute Setup"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güzergah Ayarları"
+          }
+        }
+      }
+    },
+    "commute_home_prompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set your home address for commute briefings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güzergah bilgilendirmeleri için ev adresinizi belirleyin"
+          }
+        }
+      }
+    },
+    "commute_work_prompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set your work address for commute briefings"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güzergah bilgilendirmeleri için iş adresinizi belirleyin"
+          }
+        }
+      }
+    },
+    "commute_mode_prompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do you usually commute?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genelde nasıl seyahat edersiniz?"
+          }
+        }
+      }
+    },
+    "commute_briefing_title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commute Briefing"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Güzergah Raporu"
+          }
+        }
+      }
+    },
+    "commute_traffic_status": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traffic conditions may affect your commute"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trafik koşulları seyahatinizi etkileyebilir"
+          }
+        }
+      }
+    },
+    "commute_weather_at_destination": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weather at destination"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varış noktasında hava durumu"
+          }
+        }
+      }
+    },
+    "settings_home_location": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home Location"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev Konumu"
+          }
+        }
+      }
+    },
+    "settings_work_location": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Work Location"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İş Konumu"
+          }
+        }
+      }
+    },
+    "settings_commute_mode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commute Mode"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seyahat Türü"
+          }
+        }
+      }
+    },
+    "activity_category_fitness": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitness"
+          }
+        }
+      }
+    },
+    "activity_category_leisure": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leisure"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eğlence"
+          }
+        }
+      }
+    },
+    "activity_category_social": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Social"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sosyal"
+          }
+        }
+      }
+    },
+    "activity_category_photography": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photography"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotoğrafçılık"
+          }
+        }
+      }
+    },
+    "activity_category_outdoors": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outdoors"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Açık Hava"
+          }
+        }
+      }
+    },
+    "activity_wind_sensitivity_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Wind Sensitivity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük Rüzgar Hassasiyeti"
+          }
+        }
+      }
+    },
+    "activity_wind_sensitivity_medium": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium Wind Sensitivity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta Rüzgar Hassasiyeti"
+          }
+        }
+      }
+    },
+    "activity_wind_sensitivity_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Wind Sensitivity"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek Rüzgar Hassasiyeti"
+          }
+        }
+      }
+    },
+    "activity_rain_tolerance_low": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low Rain Tolerance"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Düşük Yağmur Toleransı"
+          }
+        }
+      }
+    },
+    "activity_rain_tolerance_medium": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium Rain Tolerance"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orta Yağmur Toleransı"
+          }
+        }
+      }
+    },
+    "activity_rain_tolerance_high": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Rain Tolerance"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek Yağmur Toleransı"
           }
         }
       }
