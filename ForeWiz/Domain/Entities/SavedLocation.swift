@@ -8,6 +8,11 @@ struct SavedLocation: Codable, Equatable, Identifiable, Sendable {
     var address: String
     var createdAt: Date
     var isFavorite: Bool
+    var locationType: LocationType = .other
+    var commuteModeRaw: String = "car"
+    
+    var isHome: Bool { locationType == .home }
+    var isWork: Bool { locationType == .work }
 
     init(
         id: String = UUID().uuidString,
@@ -16,7 +21,9 @@ struct SavedLocation: Codable, Equatable, Identifiable, Sendable {
         longitude: Double,
         address: String = "",
         createdAt: Date = Date(),
-        isFavorite: Bool = false
+        isFavorite: Bool = false,
+        locationType: LocationType = .other,
+        commuteModeRaw: String = "car"
     ) {
         self.id = id
         self.name = name
@@ -25,6 +32,8 @@ struct SavedLocation: Codable, Equatable, Identifiable, Sendable {
         self.address = address
         self.createdAt = createdAt
         self.isFavorite = isFavorite
+        self.locationType = locationType
+        self.commuteModeRaw = commuteModeRaw
     }
 
     static var currentLocation: SavedLocation {

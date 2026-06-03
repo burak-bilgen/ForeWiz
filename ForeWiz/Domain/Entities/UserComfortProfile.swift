@@ -31,6 +31,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var hasJointSensitivity: Bool
     /// Simple thumbs feedback: tracks how many times user said "too hot" vs "too cold" vs "just right"
     var feedbackCounts: FeedbackCounts
+    var homeLocation: SavedLocation?
+    var workLocation: SavedLocation?
 
     init(
         usualWorkoutTime: DateComponents? = nil,
@@ -51,7 +53,9 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         preferredActivityEndHour: Int? = nil,
         hasRespiratoryCondition: Bool = false,
         hasJointSensitivity: Bool = false,
-        feedbackCounts: FeedbackCounts = FeedbackCounts()
+        feedbackCounts: FeedbackCounts = FeedbackCounts(),
+        homeLocation: SavedLocation? = nil,
+        workLocation: SavedLocation? = nil
     ) {
         self.usualWorkoutTime = usualWorkoutTime
         self.quietHours = quietHours
@@ -72,6 +76,8 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
         self.hasRespiratoryCondition = hasRespiratoryCondition
         self.hasJointSensitivity = hasJointSensitivity
         self.feedbackCounts = feedbackCounts
+        self.homeLocation = homeLocation
+        self.workLocation = workLocation
     }
 
     static var `default`: UserComfortProfile {
