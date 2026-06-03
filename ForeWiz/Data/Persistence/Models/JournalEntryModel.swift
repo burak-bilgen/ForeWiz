@@ -34,4 +34,40 @@ final class JournalEntryModel {
         self.createdAt = createdAt
         self.typeRaw = typeRaw
     }
+
+    func toJournalEntry() -> JournalEntry {
+        JournalEntry(
+            id: id,
+            date: date,
+            title: title,
+            locationName: locationName,
+            latitude: latitude,
+            longitude: longitude,
+            weatherSnapshotData: weatherSnapshotData,
+            routeData: routeData,
+            healthData: healthData,
+            notes: notes,
+            createdAt: createdAt,
+            typeRaw: typeRaw
+        )
+    }
+}
+
+extension JournalEntryModel {
+    convenience init(from entry: JournalEntry) {
+        self.init(
+            id: entry.id,
+            date: entry.date,
+            title: entry.title,
+            locationName: entry.locationName,
+            latitude: entry.latitude,
+            longitude: entry.longitude,
+            weatherSnapshotData: entry.weatherSnapshotData,
+            routeData: entry.routeData,
+            healthData: entry.healthData,
+            notes: entry.notes,
+            createdAt: entry.createdAt,
+            typeRaw: entry.typeRaw
+        )
+    }
 }
