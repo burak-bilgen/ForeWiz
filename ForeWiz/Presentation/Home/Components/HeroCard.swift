@@ -153,6 +153,7 @@ private struct MetricPill: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
         }
+        .frame(minHeight: 40)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
         .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 10, style: .continuous))

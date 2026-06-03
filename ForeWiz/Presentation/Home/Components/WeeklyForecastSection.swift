@@ -93,11 +93,5 @@ struct ForecastRow: View {
             .frame(width: 36, height: 6)
         }
         .padding(.vertical, forecast.isToday ? 2 : 0)
-        .background(
-            forecast.isToday
-                ? RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(.white.opacity(0.04))
-                : nil
-        )
     }
 }

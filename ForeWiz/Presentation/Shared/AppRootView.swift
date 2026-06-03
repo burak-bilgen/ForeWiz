@@ -27,6 +27,7 @@ struct AppRootView: View {
         .environment(\.locale, coordinator.profile.language.locale)
         .tint(.blue)
         .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
+            guard coordinator.rootFlow == .main else { return }
             let code = L10n.currentLanguageCode
             coordinator.profile.language = code == "tr" ? .turkish : .english
             Task {
