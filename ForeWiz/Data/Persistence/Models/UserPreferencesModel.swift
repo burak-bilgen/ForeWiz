@@ -22,6 +22,9 @@ final class UserPreferencesModel {
     var savedLocationsData: Data?
     var selectedLocationID: String = "current-location"
     var weatherParticleIntensity: Double = 0.15
+    var homeLocationData: Data?
+    var workLocationData: Data?
+    var commuteModeRaw: String?
     var createdAt: Date
     var updatedAt: Date
 
@@ -105,7 +108,9 @@ final class UserPreferencesModel {
             language: language,
             savedLocations: locations,
             selectedLocationID: selectedID,
-            weatherParticleIntensity: weatherParticleIntensity.clamped(to: 0...1)
+            weatherParticleIntensity: weatherParticleIntensity.clamped(to: 0...1),
+            homeLocation: decoded(SavedLocation.self, from: homeLocationData),
+            workLocation: decoded(SavedLocation.self, from: workLocationData)
         )
     }
 
@@ -132,6 +137,8 @@ final class UserPreferencesModel {
         self.savedLocationsData = encoded(normalizedSavedLocations(profile.savedLocations))
         self.selectedLocationID = profile.selectedLocationID
         self.weatherParticleIntensity = profile.weatherParticleIntensity.clamped(to: 0...1)
+        self.homeLocationData = encoded(profile.homeLocation)
+        self.workLocationData = encoded(profile.workLocation)
         self.updatedAt = Date()
     }
 

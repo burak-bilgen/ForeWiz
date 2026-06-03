@@ -38,7 +38,8 @@ struct ForeWizApp: App {
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([
             UserPreferencesModel.self,
-            WeatherSnapshotModel.self
+            WeatherSnapshotModel.self,
+            JournalEntryModel.self
         ])
 
         do {
