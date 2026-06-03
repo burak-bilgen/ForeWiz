@@ -37,3 +37,7 @@ Packages/*/
 
 # Playgrounds (user-specific)
 *.playground/Pages/*.xcuserdata
+
+# .omo project config + planning files (sensitive, not for GitHub)
+.omo/
+.boulder.json
