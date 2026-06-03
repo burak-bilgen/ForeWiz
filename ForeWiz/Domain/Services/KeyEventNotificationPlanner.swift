@@ -265,44 +265,72 @@ enum KeyEventNotificationPlanner {
 
     /// Converts a list of `DayKeyEvent`s into push notification plans,
     /// scheduled 30 minutes before each event starts.
+    ///
+    /// - Only moderate+ severity events produce notifications.
+    /// - At most 4 event notifications are returned per call.
+    /// - Events within 2 hours of each other are deduplicated (the highest-severity one wins).
     static func makeNotificationPlans(
         from keyEvents: [DayKeyEvent],
         now: Date,
         calendar: Calendar = .current
     ) -> [NotificationPlan] {
-        keyEvents.compactMap { event -> NotificationPlan? in
-            // Don't send notifications for info events or positive events
-            guard event.severity >= .low, !event.isPositive else { return nil }
+        let eligible = keyEvents.filter { event in
+            event.severity >= .moderate && !event.isPositive
+        }
 
+        // Deduplicate events that are within 2 hours of each other
+        let deduplicated = deduplicateCloseEvents(eligible)
+
+        var plans: [NotificationPlan] = []
+        for event in deduplicated {
             guard let fireDate = calendar.date(
                 bySettingHour: event.startHour,
                 minute: 0,
                 second: 0,
                 of: now
-            ) else { return nil }
+            ) else { continue }
 
-            let adjustedDate = fireDate.addingTimeInterval(-30 * 60) // 30 minutes before
-            guard adjustedDate > now else { return nil } // already passed
+            let adjustedDate = fireDate.addingTimeInterval(-30 * 60)
+            guard adjustedDate > now else { continue }
 
             let priority: Int
             switch event.severity {
             case .critical: priority = 95
             case .high: priority = 85
             case .moderate: priority = 70
-            case .low: priority = 50
-            case .info: return nil // no notifications for info-level events
+            case .low, .info: continue
             }
 
-            return NotificationPlan(
-                id: "keyevent.\\(event.id)",
+            plans.append(NotificationPlan(
+                id: "keyevent.\(event.id)",
                 category: .keyEvent,
                 fireDate: adjustedDate,
                 title: event.title,
                 body: event.description,
                 priority: priority,
                 reason: event.description
-            )
+            ))
+
+            if plans.count >= 4 { break }
         }
+        return plans
+    }
+
+    /// If multiple events overlap within ~2 hours, keep only the highest-severity one.
+    private static func deduplicateCloseEvents(_ events: [DayKeyEvent]) -> [DayKeyEvent] {
+        let sorted = events.sorted { a, b in
+            if a.severity != b.severity { return a.severity > b.severity }
+            return a.startHour < b.startHour
+        }
+
+        var result: [DayKeyEvent] = []
+        for event in sorted {
+            if let last = result.last, abs(event.startHour - last.startHour) < 2 {
+                continue
+            }
+            result.append(event)
+        }
+        return result
     }
 
     // MARK: - Condition Helpers

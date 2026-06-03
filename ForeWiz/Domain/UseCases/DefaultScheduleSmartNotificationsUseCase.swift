@@ -4,15 +4,18 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
     private let notificationRepository: NotificationRepository
     private let notificationPlanningEngine: NotificationPlanningEngine
     private let dateProvider: DateProvider
+    private let throttlingService: NotificationThrottlingService
 
     init(
         notificationRepository: NotificationRepository,
         notificationPlanningEngine: NotificationPlanningEngine,
-        dateProvider: DateProvider
+        dateProvider: DateProvider,
+        throttlingService: NotificationThrottlingService = NotificationThrottlingService()
     ) {
         self.notificationRepository = notificationRepository
         self.notificationPlanningEngine = notificationPlanningEngine
         self.dateProvider = dateProvider
+        self.throttlingService = throttlingService
     }
 
     func execute(
@@ -55,7 +58,14 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
             allPlans.append(contentsOf: eventPlans)
         }
 
-        try await notificationRepository.schedule(allPlans)
-        return allPlans
+        // 3. Throttle: remove plans that violate cooldown / rate limits / dedup
+        let throttledPlans = throttlingService.throttle(allPlans)
+
+        try await notificationRepository.schedule(throttledPlans)
+
+        // 4. Record throttling state for future cycles
+        throttlingService.didSchedule(throttledPlans)
+
+        return throttledPlans
     }
 }

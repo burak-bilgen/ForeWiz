@@ -139,10 +139,13 @@ final class DependencyContainer {
         let updateUserPreferencesUseCase = DefaultUpdateUserPreferencesUseCase(
             preferencesRepository: preferencesRepository
         )
+        let throttlingService = NotificationThrottlingService()
+
         let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
             notificationRepository: notificationRepository,
             notificationPlanningEngine: notificationEngine,
-            dateProvider: dateProvider
+            dateProvider: dateProvider,
+            throttlingService: throttlingService
         )
 
         return DependencyContainer(
@@ -225,10 +228,13 @@ final class DependencyContainer {
         let updateUserPreferencesUseCase = DefaultUpdateUserPreferencesUseCase(
             preferencesRepository: preferencesRepository
         )
+        let throttlingService = NotificationThrottlingService()
+
         let scheduleSmartNotificationsUseCase = DefaultScheduleSmartNotificationsUseCase(
             notificationRepository: notificationRepository,
             notificationPlanningEngine: notificationEngine,
-            dateProvider: dateProvider
+            dateProvider: dateProvider,
+            throttlingService: throttlingService
         )
 
         return DependencyContainer(
