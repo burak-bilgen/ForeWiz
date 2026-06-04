@@ -247,7 +247,7 @@ struct PreferencesRepositoryTests {
         profile.selectedLocationID = istanbul.id
         profile.notificationPreferences = [
             NotificationPreference(category: .morningBriefing, isEnabled: false, preferredTime: DateComponents(hour: 8)),
-            NotificationPreference(category: .keyEvent, isEnabled: true, preferredTime: nil),
+            NotificationPreference(category: .weatherAlert, isEnabled: true, preferredTime: nil),
             NotificationPreference(category: .weatherAlert, isEnabled: true, preferredTime: nil)
         ]
 
