@@ -82,11 +82,12 @@ struct WizPathHUDCard: View {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .stroke(.white.opacity(0.06), lineWidth: 1)
             )
-            // High-fidelity dynamic drop shadows
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            // High-fidelity dynamic drop shadows — now clipped to rounded shape
             .shadow(color: accentColor.opacity(isPressed ? 0.12 : 0.22), radius: isPressed ? 6 : 14, x: 0, y: isPressed ? 3 : 6)
             .scaleEffect(isPressed ? 0.96 : 1.0)
         }
-        .contentShape(Rectangle())
+        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .buttonStyle(.plain)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
