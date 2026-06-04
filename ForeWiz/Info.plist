@@ -49,6 +49,10 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSHealthShareUsageDescription</key>
+	<string>ForeWiz reads your heart rate, sleep, steps, and respiratory data to provide personalized health-weather correlation insights. Your health data never leaves your device.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>ForeWiz does not write any data to HealthKit. Your health data stays private and on-device.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location solely to provide weather recommendations tailored to where you are.</string>
 	<key>NSPrivacyPolicyURL</key>
