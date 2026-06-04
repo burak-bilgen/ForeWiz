@@ -157,6 +157,7 @@ struct WizPathHUDManagerTests {
 
     // MARK: - HUD Manager Singleton
 
+    @available(iOS 18.0, *)
     @Test("WizPathHUDManager shared is singleton")
     func hudManagerSharedIsSingleton() async throws {
         let instance1 = WizPathHUDManager.shared
