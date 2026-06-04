@@ -69,7 +69,8 @@ struct CommuteBriefingCard: View {
                             Text(briefing.summary)
                                 .font(.system(size: 12, weight: .medium, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.5))
-                                .lineLimit(1)
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
 
                         Spacer(minLength: 8)
@@ -107,7 +108,7 @@ struct CommuteBriefingCard: View {
 
                     VStack(alignment: .leading, spacing: 12) {
                         // Weather at origin/destination
-                        HStack(spacing: 12) {
+                        VStack(spacing: 8) {
                             briefRow(
                                 icon: "house.fill",
                                 label: L10n.text("settings_home_location"),
@@ -214,7 +215,8 @@ struct CommuteBriefingCard: View {
                 Text(value)
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

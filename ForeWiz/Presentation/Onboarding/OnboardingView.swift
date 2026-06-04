@@ -12,6 +12,7 @@ struct OnboardingView: View {
     @State private var showCitySearchSheet = false
     @State private var showHomePicker = false
     @State private var showWorkPicker = false
+    @State private var languageRefreshID = UUID()
 
     var body: some View {
         ZStack {
@@ -35,6 +36,7 @@ struct OnboardingView: View {
                     startButton
                         .padding(.bottom, 32)
                 }
+                .id(languageRefreshID)
                 .padding(.horizontal, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -74,6 +76,9 @@ struct OnboardingView: View {
             } else if new == .denied {
                 HapticEngine.shared.warning()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .appLanguageDidChange)) { _ in
+            languageRefreshID = UUID()
         }
     }
 

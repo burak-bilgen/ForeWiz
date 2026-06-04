@@ -39,6 +39,7 @@ struct SettingsView: View {
         .overlay(alignment: .topTrailing) {
             Button {
                 HapticEngine.shared.light()
+                onSave()
                 dismiss()
             } label: {
                 Image(systemName: "xmark.circle.fill")

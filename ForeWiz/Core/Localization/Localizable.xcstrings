@@ -19493,6 +19493,278 @@
           }
         }
       }
+    },
+    "commute_summary_good": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Good conditions for %1. %2, ~%3."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1 için iyi koşullar. %2, ~%3."
+          }
+        }
+      }
+    },
+    "commute_summary_moderate": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moderate conditions for %1. %2, ~%3. Some weather factors to consider."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1 için orta düzey koşullar. %2, ~%3. Dikkate alınması gereken bazı hava faktörleri var."
+          }
+        }
+      }
+    },
+    "commute_summary_poor": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Challenging conditions for %1. %2, ~%3. Check weather hazards."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1 için zorlu koşullar. %2, ~%3. Hava tehlikelerini kontrol edin."
+          }
+        }
+      }
+    },
+    "commute_rec_optimal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optimal conditions — proceed as planned."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En uygun koşullar — planlandığı gibi devam edin."
+          }
+        }
+      }
+    },
+    "commute_rec_caution": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consider departing %@ for a more comfortable commute."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daha konforlu bir yolculuk için %@ civarında çıkmayı değerlendirin."
+          }
+        }
+      }
+    },
+    "commute_rec_extra_time": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow extra time and check conditions before leaving."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ekstra zaman ayırın ve çıkmadan önce koşulları kontrol edin."
+          }
+        }
+      }
+    },
+    "commute_rec_alternative": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consider alternative transport or delaying until conditions improve."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternatif ulaşım düşünün veya koşullar düzelene kadar bekleyin."
+          }
+        }
+      }
+    },
+    "commute_weather_favorable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "favorable"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "uygun"
+          }
+        }
+      }
+    },
+    "commute_weather_suboptimal": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "suboptimal"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ideal değil"
+          }
+        }
+      }
+    },
+    "commute_weather_at_origin": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weather at origin: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başlangıçta hava: %@"
+          }
+        }
+      }
+    },
+    "commute_weather_at_dest": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weather at destination: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varış noktasında hava: %@"
+          }
+        }
+      }
+    },
+    "commute_same_location": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Home and work are the same location — enjoy your day!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ev ve iş aynı konumda — günün tadını çıkarın!"
+          }
+        }
+      }
+    },
+    "commute_hazard_long": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Long commute (%@) — weather may vary significantly along the route."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uzun yolculuk (%@) — rota boyunca hava önemli ölçüde değişebilir."
+          }
+        }
+      }
+    },
+    "commute_hazard_wind": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High wind sensitivity. Gusts could affect stability."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüksek rüzgar hassasiyeti. Rüzgarlar dengeyi etkileyebilir."
+          }
+        }
+      }
+    },
+    "commute_hazard_unable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unable to calculate route details."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rota detayları hesaplanamadı."
+          }
+        }
+      }
+    },
+    "commute_best_window": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Early morning or late afternoon to avoid peak heat"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yoğun sıcaktan kaçınmak için sabah erken veya öğleden sonra geç saatler"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

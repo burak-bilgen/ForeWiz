@@ -121,17 +121,18 @@ struct DefaultCommuteRouteService: CommuteRouteService {
         var score = 100
 
         if route.distanceKm > 50 {
-            hazards.append("Long commute (\(String(format: "%.1f", route.distanceKm)) km) — weather conditions may vary significantly along the route.")
+            let distStr = String(format: "%.1f km", route.distanceKm)
+            hazards.append(L10n.formatted("commute_hazard_long", distStr))
             score -= 10
         }
 
         if route.mode.isWindSensitive {
-            hazards.append("High wind sensitivity for \(route.mode.rawValue). Gusts could affect stability.")
+            hazards.append(L10n.text("commute_hazard_wind"))
             score -= 15
         }
 
         let bestWindow: String? = route.mode == .cycling || route.mode == .walking
-            ? "Early morning or late afternoon to avoid peak heat"
+            ? L10n.text("commute_best_window")
             : nil
 
         return CommuteWeatherImpact(
@@ -146,11 +147,11 @@ struct DefaultCommuteRouteService: CommuteRouteService {
 
         if isSameLocation {
             return CommuteBriefing(
-                summary: "Home and work are the same location. No commute needed.",
+                summary: L10n.text("commute_same_location"),
                 weatherAtOrigin: "N/A",
                 weatherAtDestination: "N/A",
                 routeHazards: [],
-                recommendation: "Enjoy your day!"
+                recommendation: L10n.text("commute_same_location")
             )
         }
 
@@ -159,39 +160,44 @@ struct DefaultCommuteRouteService: CommuteRouteService {
         if let route = route {
             impact = await weatherImpact(on: route)
         } else {
-            impact = CommuteWeatherImpact(overallScore: 50, hazardWarnings: ["Unable to calculate route details."], bestDepartureWindow: nil)
+            impact = CommuteWeatherImpact(overallScore: 50, hazardWarnings: [L10n.text("commute_hazard_unable")], bestDepartureWindow: nil)
         }
 
-        let distanceStr = route.map { String(format: "%.1f km", $0.distanceKm) } ?? "unknown"
-        let durationStr = route.map { "\($0.estimatedDurationMinutes) min" } ?? "unknown"
+        let modeName = L10n.text(mode.localizedKey).lowercased()
+        let distanceStr = route.map { String(format: "%.1f km", $0.distanceKm) } ?? "? km"
+        let durationCompact = route.map { L10n.formatted("departure_min_format", $0.estimatedDurationMinutes) } ?? "?"
 
         let summary: String = {
             if impact.overallScore >= 80 {
-                return "Good commute conditions for \(mode.rawValue). \(distanceStr), approximately \(durationStr)."
+                return L10n.formatted("commute_summary_good", modeName, distanceStr, durationCompact)
             } else if impact.overallScore >= 50 {
-                return "Moderate commute conditions for \(mode.rawValue). \(distanceStr), approximately \(durationStr). Some weather factors to consider."
+                return L10n.formatted("commute_summary_moderate", modeName, distanceStr, durationCompact)
             } else {
-                return "Challenging commute conditions for \(mode.rawValue). \(distanceStr), approximately \(durationStr). Check weather hazards."
+                return L10n.formatted("commute_summary_poor", modeName, distanceStr, durationCompact)
             }
         }()
 
         let recommendation: String = {
             if impact.overallScore >= 80 {
-                return "Optimal conditions — proceed as planned."
+                return L10n.text("commute_rec_optimal")
             } else if impact.overallScore >= 50 {
                 if let window = impact.bestDepartureWindow {
-                    return "Consider departing \(window.lowercased()) for a more comfortable commute."
+                    return L10n.formatted("commute_rec_caution", window.lowercased())
                 }
-                return "Allow extra time and check conditions before leaving."
+                return L10n.text("commute_rec_extra_time")
             } else {
-                return "Consider alternative transport or delaying your commute until conditions improve."
+                return L10n.text("commute_rec_alternative")
             }
         }()
 
+        let weatherQualifier = impact.overallScore >= 60
+            ? L10n.text("commute_weather_favorable")
+            : L10n.text("commute_weather_suboptimal")
+
         return CommuteBriefing(
             summary: summary,
-            weatherAtOrigin: "Weather at home — \(impact.overallScore >= 60 ? "favorable" : "suboptimal")",
-            weatherAtDestination: "Weather at work — \(impact.overallScore >= 60 ? "favorable" : "suboptimal")",
+            weatherAtOrigin: L10n.formatted("commute_weather_at_origin", weatherQualifier),
+            weatherAtDestination: L10n.formatted("commute_weather_at_dest", weatherQualifier),
             routeHazards: impact.hazardWarnings,
             recommendation: recommendation
         )
