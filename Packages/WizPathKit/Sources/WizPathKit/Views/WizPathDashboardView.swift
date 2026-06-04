@@ -296,42 +296,42 @@ public struct WizPathDashboardView: View {
                 .presentationBackground(.ultraThinMaterial)
                 .presentationBackgroundInteraction(.enabled)
                 .interactiveDismissDisabled()
-        }
-        .sheet(isPresented: $showDepartureOptimizer) {
-            if let route = viewModel.mapsNavigationRoute {
-                WizPathDepartureOptimizerSheet(route: route, onSelectTime: { date in viewModel.updateDepartureTime(date); showDepartureOptimizer = false })
-            }
-        }
-        .onChange(of: viewModel.showWeatherDetail) { _, newValue in
-            showWeatherDetail = newValue
-        }
-        .sheet(isPresented: $showWeatherDetail) {
-            Group {
-                if let segment = viewModel.selectedWeatherSegment, let weather = segment.weather {
-                    WeatherDetailSheet(segment: segment, weather: weather)
+                .onChange(of: viewModel.showWeatherDetail) { _, newValue in
+                    showWeatherDetail = newValue
                 }
-            }
-            .onDisappear {
-                viewModel.showWeatherDetail = false
-                viewModel.selectedWeatherSegment = nil
-            }
-        }
-        .sheet(isPresented: $showWaypointPicker) {
-            NavigationStack {
-                WizPathWaypointPickerSheet(
-                    waypoints: viewModel.mapsWaypoints,
-                    onNavigate: { ids in
-                        viewModel.selectedWaypointIds = ids
-                        pendingMapsAction?()
-                        pendingMapsAction = nil
-                    },
-                    onNavigateWithoutStops: {
-                        viewModel.selectedWaypointIds = []
-                        pendingMapsAction?()
-                        pendingMapsAction = nil
+                .sheet(isPresented: $showDepartureOptimizer) {
+                    if let route = viewModel.mapsNavigationRoute {
+                        WizPathDepartureOptimizerSheet(route: route, onSelectTime: { date in viewModel.updateDepartureTime(date); showDepartureOptimizer = false })
                     }
-                )
-            }
+                }
+                .sheet(isPresented: $showWeatherDetail) {
+                    Group {
+                        if let segment = viewModel.selectedWeatherSegment, let weather = segment.weather {
+                            WeatherDetailSheet(segment: segment, weather: weather)
+                        }
+                    }
+                    .onDisappear {
+                        viewModel.showWeatherDetail = false
+                        viewModel.selectedWeatherSegment = nil
+                    }
+                }
+                .sheet(isPresented: $showWaypointPicker) {
+                    NavigationStack {
+                        WizPathWaypointPickerSheet(
+                            waypoints: viewModel.mapsWaypoints,
+                            onNavigate: { ids in
+                                viewModel.selectedWaypointIds = ids
+                                pendingMapsAction?()
+                                pendingMapsAction = nil
+                            },
+                            onNavigateWithoutStops: {
+                                viewModel.selectedWaypointIds = []
+                                pendingMapsAction?()
+                                pendingMapsAction = nil
+                            }
+                        )
+                    }
+                }
         }
     }
 
