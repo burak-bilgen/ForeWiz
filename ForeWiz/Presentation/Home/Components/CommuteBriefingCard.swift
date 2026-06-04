@@ -70,7 +70,7 @@ struct CommuteBriefingCard: View {
                                 .font(.system(size: 12, weight: .medium, design: .rounded))
                                 .foregroundStyle(.white.opacity(0.5))
                                 .lineLimit(2)
-                                .fixedSize(horizontal: false, vertical: true)
+                                .minimumScaleFactor(0.85)
                         }
 
                         Spacer(minLength: 8)
@@ -215,11 +215,12 @@ struct CommuteBriefingCard: View {
                 Text(value)
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: 36, maxHeight: 44, alignment: .leading)
+        .clipped()
         .padding(10)
         .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }

@@ -18,7 +18,7 @@ struct WizPathHUDCard: View {
             onTap()
         }) {
             HStack(spacing: 14) {
-                // Icon
+                // Icon — fixed size, never scales up
                 ZStack {
                     Circle()
                         .fill(accentColor.opacity(0.18))
@@ -30,10 +30,11 @@ struct WizPathHUDCard: View {
                             .stroke(accentColor.opacity(0.4), lineWidth: 1.5)
                             .scaleEffect(pulseScale)
                             .opacity(2.0 - pulseScale)
+                            .frame(width: 44, height: 44)
                     }
                     
                     Image(systemName: routeStatus.iconName)
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.system(size: 18, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(accentColor)
                 }
@@ -92,7 +93,8 @@ struct WizPathHUDCard: View {
                 .onChanged { _ in withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } }
                 .onEnded { _ in withAnimation(.easeInOut(duration: 0.15)) { isPressed = false } }
         )
-        .frame(minHeight: 48)
+        .frame(minHeight: 56, maxHeight: 72)
+        .clipped()
         .onAppear {
             // Smooth, low-CPU infinite rotation for border glow
             withAnimation(.linear(duration: 6.0).repeatForever(autoreverses: false)) {
