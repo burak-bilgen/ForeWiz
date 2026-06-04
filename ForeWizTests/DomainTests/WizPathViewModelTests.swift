@@ -877,7 +877,7 @@ struct WizPathViewModelTests {
         #expect(WizPathKit.TravelMode.cycling.segmentInterval == 10 * 60)
         #expect(WizPathKit.TravelMode.cycling.averageSpeedKph == 15)
         #expect(WizPathKit.TravelMode.cycling.isWindSensitive == true)
-        #expect(WizPathKit.TravelMode.cycling.mkTransportType == MKDirectionsTransportType.walking)
+        #expect(WizPathKit.TravelMode.cycling.mkTransportType == MKDirectionsTransportType.cycling)
     }
 
     @Test("TravelMode all cases contain cycling")
