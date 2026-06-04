@@ -161,7 +161,8 @@ struct HomeLoadedContent: View {
                             .foregroundStyle(.white.opacity(0.5))
                             .multilineTextAlignment(.center)
                             .lineSpacing(3)
-                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.85)
 
                         Button {
                             HapticEngine.shared.medium()

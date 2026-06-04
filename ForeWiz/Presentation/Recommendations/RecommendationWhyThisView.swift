@@ -96,8 +96,8 @@ private struct ExplanationRow: View {
             Text(point.text)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(.white.opacity(0.8))
-                .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(3)
+                .minimumScaleFactor(0.85)
 
             Spacer()
         }

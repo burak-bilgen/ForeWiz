@@ -50,7 +50,8 @@ struct HeroCard: View {
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
                     .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.85)
 
                 // MARK: Metrics Row
                 FlowLayout(spacing: 8) {

@@ -94,7 +94,7 @@ struct WeatherInsightsView: View {
         Text(selectedMetric.localizedTitle)
             .font(.headline)
             .lineLimit(2)
-            .fixedSize(horizontal: false, vertical: true)
+            .minimumScaleFactor(0.85)
     }
 
     private var chartValue: some View {

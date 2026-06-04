@@ -186,7 +186,7 @@ struct InsightsActivityCard: View {
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.white)
                                 .lineLimit(2)
-                                .fixedSize(horizontal: false, vertical: true)
+                                .minimumScaleFactor(0.85)
                                 .layoutPriority(1)
                             Spacer(minLength: 8)
                             Text("\(window.score.rawValue)\(L10n.text("insights_score_suffix_100"))")
@@ -317,7 +317,7 @@ struct InsightsDayQualityCard: View {
                 .font(.system(size: 10))
                 .foregroundStyle(Color.white.opacity(0.4))
                 .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                .minimumScaleFactor(0.85)
         }
     }
 }

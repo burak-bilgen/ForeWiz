@@ -314,7 +314,8 @@ struct SettingsView: View {
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.4))
                 .lineSpacing(2)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(3)
+                .minimumScaleFactor(0.85)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)

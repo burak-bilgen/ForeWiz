@@ -94,7 +94,8 @@ struct ActivityRecommendationCard: View {
             .font(.system(size: 13, weight: .medium, design: .rounded))
             .foregroundStyle(.white.opacity(0.55))
             .lineSpacing(3)
-            .fixedSize(horizontal: false, vertical: true)
+            .lineLimit(4)
+            .minimumScaleFactor(0.85)
     }
 
     private var scoreColor: Color {

@@ -79,7 +79,7 @@ public struct DestinationPickerView: View {
             }
         }
         .mapStyle(.standard(elevation: .realistic))
-        .mapControls { MapUserLocationButton(); MapCompass() }
+        .mapControls { MapUserLocationButton() }
     }
 
     private var searchBar: some View {

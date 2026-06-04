@@ -69,7 +69,7 @@ struct StatisticCard: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .minimumScaleFactor(0.85)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -95,7 +95,7 @@ struct TrendRow: View {
             Text(title)
                 .font(.subheadline)
                 .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                .minimumScaleFactor(0.85)
                 .layoutPriority(1)
 
             Spacer(minLength: 8)
