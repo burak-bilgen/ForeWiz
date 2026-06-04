@@ -2,6 +2,7 @@ import Foundation
 import CoreLocation
 @preconcurrency import MapKit
 import OSLog
+@preconcurrency import ActivityKit
 
 // MARK: - WizPath Service
 @MainActor
@@ -560,13 +561,15 @@ public final class WizPathService {
     // MARK: - Traffic Update
 
     public func updateWithCurrentTraffic(route: WizPathRoute, avoidTollRoads: Bool = false) async throws -> WizPathRoute {
-        try await calculateRoute(
+        let newRoute = try await calculateRoute(
             origin: route.origin,
             destination: route.destination,
             mode: route.travelMode,
             departureTime: Date(),
             avoidTollRoads: avoidTollRoads
         )
+        await updateRouteActivity(with: newRoute)
+        return newRoute
     }
 
     // MARK: - Recent Destinations
@@ -596,6 +599,85 @@ public final class WizPathService {
     public func getCurrentLocation() async throws -> WizPathCoordinate {
         let coord = try await locationRepository.getCurrentLocation()
         return coord
+    }
+
+    // MARK: - Live Activity HUD Integration
+
+    /// Whether Live Activities are supported on this device.
+    public var areLiveActivitiesSupported: Bool {
+        if #available(iOS 18.0, *) {
+            return ActivityAuthorizationInfo().areActivitiesEnabled
+        }
+        return false
+    }
+
+    /// Start a Live Activity HUD for the given route.
+    public func startRouteActivity(route: WizPathRoute, originName: String, destinationName: String) async {
+        guard #available(iOS 18.0, *) else { return }
+        await WizPathHUDManager.shared.startRouteActivity(origin: originName, destination: destinationName, mode: route.travelMode)
+        await updateRouteActivity(with: route)
+    }
+
+    /// Update the Live Activity HUD with the latest route data.
+    public func updateRouteActivity(with route: WizPathRoute) async {
+        guard #available(iOS 18.0, *) else { return }
+        let state = contentState(for: route)
+        await WizPathHUDManager.shared.updateHUD(with: state)
+    }
+
+    /// End the current route's Live Activity HUD.
+    public func endRouteActivity() async {
+        guard #available(iOS 18.0, *) else { return }
+        await WizPathHUDManager.shared.endRouteActivity()
+    }
+
+    @available(iOS 18.0, *)
+    private func contentState(for route: WizPathRoute) -> WizPathHUDLiveActivityAttributes.ContentState {
+        let severeCount = route.segments.filter { $0.weather?.severity == .severe }.count
+        let cautionCount = route.segments.filter { $0.weather?.severity == .caution }.count
+        let hazardCount = severeCount + cautionCount
+
+        let safetyScore = computeHUDSafetyScore(for: route)
+
+        let nextSafeStop = route.segments.first { seg in
+            guard let weather = seg.weather else { return false }
+            return weather.severity == .good || weather.severity == .fair
+        }
+
+        let weatherSymbol = route.segments.first?.weather?.iconName ?? "questionmark"
+        let riskLabel = route.overallRisk.localizedTitle
+        let distanceRemaining = route.totalDistance
+        let estimatedArrival = route.segments.last?.estimatedArrival ?? route.departureTime.addingTimeInterval(route.totalDuration)
+
+        return WizPathHUDLiveActivityAttributes.ContentState(
+            safetyScore: safetyScore,
+            hazardCount: hazardCount,
+            totalDuration: route.totalDuration,
+            distanceRemaining: distanceRemaining,
+            nextSafeStopName: nextSafeStop?.placeName,
+            nextSafeStopEta: nextSafeStop?.estimatedArrival,
+            routeRiskLabel: riskLabel,
+            weatherConditionSymbol: weatherSymbol,
+            estimatedArrival: estimatedArrival
+        )
+    }
+
+    private func computeHUDSafetyScore(for route: WizPathRoute) -> Int {
+        var score = 100
+        for segment in route.segments {
+            guard let weather = segment.weather else { continue }
+            switch weather.severity {
+            case .severe:
+                score -= 30
+            case .caution:
+                score -= 15
+            case .fair:
+                score -= 5
+            case .good:
+                break
+            }
+        }
+        return max(0, score)
     }
 }
 

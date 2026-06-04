@@ -64,12 +64,14 @@ public enum POICategory: String, Sendable {
     case gasStation
     case restStop
     case restaurant
+    case evCharger
 
     public var mkCategory: MKPointOfInterestCategory? {
         switch self {
         case .gasStation: return .gasStation
         case .restStop: return nil
         case .restaurant: return .restaurant
+        case .evCharger: return .evCharger
         }
     }
 
@@ -78,6 +80,7 @@ public enum POICategory: String, Sendable {
         case .gasStation: return "fuelpump.fill"
         case .restStop: return "bed.double.fill"
         case .restaurant: return "fork.knife"
+        case .evCharger: return "bolt.car.fill"
         }
     }
 
@@ -86,6 +89,7 @@ public enum POICategory: String, Sendable {
         case .gasStation: return WizPathKitL10n.text("poi_gas_station")
         case .restStop: return WizPathKitL10n.text("poi_rest_stop")
         case .restaurant: return WizPathKitL10n.text("poi_restaurant")
+        case .evCharger: return WizPathKitL10n.text("poi_ev_charger")
         }
     }
 
@@ -94,6 +98,7 @@ public enum POICategory: String, Sendable {
         case .gasStation: return "#00FF41"
         case .restStop: return "#FF9500"
         case .restaurant: return "#FF3BFF"
+        case .evCharger: return "#00D9FF"
         }
     }
 }

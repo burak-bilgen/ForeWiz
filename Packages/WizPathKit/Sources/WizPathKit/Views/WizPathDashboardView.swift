@@ -30,14 +30,17 @@ public struct WizPathDashboardView: View {
     private let onMapsExport: (@escaping () -> Void) -> Void
     /// Closure that presents the feedback sheet.
     private let onFeedback: () -> Void
+    private let onRouteEnded: ((WizPathRoute, String, TravelMode) -> Void)?
 
     public init(wizPathService: WizPathService, departureOptimizerService: DepartureOptimizerService? = nil,
                 onMapsExport: @escaping (@escaping () -> Void) -> Void = { $0() },
-                onFeedback: @escaping () -> Void = {}) {
+                onFeedback: @escaping () -> Void = {},
+                onRouteEnded: ((WizPathRoute, String, TravelMode) -> Void)? = nil) {
         self.wizPathService = wizPathService
         self.departureOptimizerService = departureOptimizerService
         self.onMapsExport = onMapsExport
         self.onFeedback = onFeedback
+        self.onRouteEnded = onRouteEnded
     }
 
     public var body: some View {
@@ -170,10 +173,12 @@ public struct WizPathDashboardView: View {
                 } else {
                     ProgressView().task {
                         guard viewModel == nil else { return }
-                        viewModel = WizPathViewModel(
+                        let vm = WizPathViewModel(
                             wizPathService: wizPathService,
                             departureOptimizerService: departureOptimizerService
                         )
+                        vm.onRouteEnded = onRouteEnded
+                        viewModel = vm
                     }
                 }
             }
@@ -190,6 +195,12 @@ public struct WizPathDashboardView: View {
             .animation(AppTheme.cardSpring, value: viewModel?.state)
             .animation(.easeInOut(duration: 0.25), value: viewModel?.didLoadInitialLocation)
             .animation(.easeInOut(duration: 0.25), value: viewModel?.isCalculating)
+            .onDisappear {
+                if let viewModel, let route = viewModel.lastCalculatedRoute, !viewModel.hasEndedRoute {
+                    viewModel.hasEndedRoute = true
+                    onRouteEnded?(route, viewModel.destinationName, viewModel.travelMode)
+                }
+            }
         }
     }
 
@@ -400,7 +411,7 @@ public struct WizPathDashboardView: View {
                 }
 
                 if viewModel.showJourneyHUD, let route = viewModel.mapsNavigationRoute {
-                    JourneyHUDView(data: route.journeyHUDData)
+                    JourneyHUDView(data: route.journeyHUDData(smartStops: viewModel.smartStops))
                         .padding(.horizontal, 16)
                 }
 
@@ -410,12 +421,33 @@ public struct WizPathDashboardView: View {
                         .padding(.horizontal, 16)
                 }
 
+                // EV Charging stations panel
+                if viewModel.travelMode == .car {
+                    EvChargerStopsView(
+                        chargingStations: viewModel.evChargers,
+                        isLoading: viewModel.isLoadingEVChargers,
+                        errorMessage: viewModel.evChargerError
+                    ) {
+                        if let route = viewModel.mapsNavigationRoute {
+                            viewModel.refreshEVChargers(for: route)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
                 if let route = viewModel.mapsNavigationRoute {
                     WizPathRouteInfoPanel(
-                        route: route,
-                        destinationName: viewModel.destinationName,
-                        bestDepartureTime: viewModel.bestDepartureTime,
-                        departureTimeReason: viewModel.departureTimeReason,
+                        config: RouteInfoConfig(
+                            route: route,
+                            destinationName: viewModel.destinationName,
+                            bestDepartureTime: viewModel.bestDepartureTime,
+                            departureTimeReason: viewModel.departureTimeReason,
+                            trafficCongestion: viewModel.currentTrafficCongestion,
+                            hasTollRoads: viewModel.hasTollRoads,
+                            avoidTollRoads: viewModel.avoidTollRoads,
+                            candidateCount: viewModel.routeCandidates.count
+                        ),
                         showDepartureOptimizer: { showDepartureOptimizer = true },
                         onReset: { viewModel.reset() },
                         onUpdateDepartureTime: { viewModel.updateDepartureTime($0) },
@@ -453,10 +485,6 @@ public struct WizPathDashboardView: View {
                                 showWaypointPicker = true
                             }
                         },
-                        trafficCongestion: viewModel.currentTrafficCongestion,
-                        hasTollRoads: viewModel.hasTollRoads,
-                        avoidTollRoads: viewModel.avoidTollRoads,
-                        candidateCount: viewModel.routeCandidates.count,
                         onShowRouteComparison: { withAnimation(AppTheme.cardSpring) { viewModel.showRouteComparison.toggle() } }
                     )
                     .padding(.horizontal, 16)

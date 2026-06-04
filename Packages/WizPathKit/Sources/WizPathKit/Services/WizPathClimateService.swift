@@ -167,10 +167,19 @@ public final class WizPathClimateService {
         let adjustedDuration = route.totalDuration * analysis.totalMultiplier
         let addedTime = adjustedDuration - route.totalDuration
         var adjustedSegments = route.segments
+        var cumulativeAdjustment: TimeInterval = 0
         for i in adjustedSegments.indices {
             let segment = adjustedSegments[i]
             let segmentAdjustment = segment.travelTime * (analysis.totalMultiplier - 1.0)
-            adjustedSegments[i] = WizPathSegment(id: segment.id, coordinate: segment.coordinate, estimatedArrival: segment.estimatedArrival.addingTimeInterval(segmentAdjustment), distanceFromStart: segment.distanceFromStart, travelTime: segment.travelTime, weather: segment.weather)
+            cumulativeAdjustment += segmentAdjustment
+            adjustedSegments[i] = WizPathSegment(
+                id: segment.id,
+                coordinate: segment.coordinate,
+                estimatedArrival: segment.estimatedArrival.addingTimeInterval(cumulativeAdjustment),
+                distanceFromStart: segment.distanceFromStart,
+                travelTime: segment.travelTime + segmentAdjustment,
+                weather: segment.weather
+            )
         }
         return ClimateAdjustedRoute(originalRoute: route, adjustedDuration: adjustedDuration, addedTime: addedTime, multiplier: analysis.totalMultiplier, analysis: analysis, adjustedSegments: adjustedSegments)
     }

@@ -1,37 +1,56 @@
 import SwiftUI
 import CoreLocation
 
+// MARK: - Route Info Config
+
+public struct RouteInfoConfig {
+    public let route: WizPathRoute
+    public let destinationName: String
+    public let bestDepartureTime: Date?
+    public let departureTimeReason: String?
+    public let trafficCongestion: TrafficCongestionLevel?
+    public let hasTollRoads: Bool
+    public let avoidTollRoads: Bool
+    public let candidateCount: Int
+
+    public init(route: WizPathRoute, destinationName: String, bestDepartureTime: Date? = nil,
+                departureTimeReason: String? = nil, trafficCongestion: TrafficCongestionLevel? = nil,
+                hasTollRoads: Bool = false, avoidTollRoads: Bool = false, candidateCount: Int = 0) {
+        self.route = route
+        self.destinationName = destinationName
+        self.bestDepartureTime = bestDepartureTime
+        self.departureTimeReason = departureTimeReason
+        self.trafficCongestion = trafficCongestion
+        self.hasTollRoads = hasTollRoads
+        self.avoidTollRoads = avoidTollRoads
+        self.candidateCount = candidateCount
+    }
+}
+
 // MARK: - Route Info Panel
 
 public struct WizPathRouteInfoPanel: View {
-    let route: WizPathRoute
-    let destinationName: String
-    let bestDepartureTime: Date?
-    let departureTimeReason: String?
+    let config: RouteInfoConfig
     let showDepartureOptimizer: () -> Void
     let onReset: () -> Void
     let onUpdateDepartureTime: (Date) -> Void
     let onOpenInAppleMaps: () -> Void
     let onOpenInGoogleMaps: () -> Void
-    let trafficCongestion: TrafficCongestionLevel?
-    let hasTollRoads: Bool
-    let avoidTollRoads: Bool
-    let candidateCount: Int
     let onShowRouteComparison: () -> Void
 
-    public init(route: WizPathRoute, destinationName: String, bestDepartureTime: Date?, departureTimeReason: String?,
-                showDepartureOptimizer: @escaping () -> Void, onReset: @escaping () -> Void,
+    public init(config: RouteInfoConfig,
+                showDepartureOptimizer: @escaping () -> Void,
+                onReset: @escaping () -> Void,
                 onUpdateDepartureTime: @escaping (Date) -> Void,
-                onOpenInAppleMaps: @escaping () -> Void = {}, onOpenInGoogleMaps: @escaping () -> Void = {},
-                trafficCongestion: TrafficCongestionLevel? = nil, hasTollRoads: Bool = false,
-                avoidTollRoads: Bool = false, candidateCount: Int = 0,
+                onOpenInAppleMaps: @escaping () -> Void = {},
+                onOpenInGoogleMaps: @escaping () -> Void = {},
                 onShowRouteComparison: @escaping () -> Void = {}) {
-        self.route = route; self.destinationName = destinationName; self.bestDepartureTime = bestDepartureTime
-        self.departureTimeReason = departureTimeReason; self.showDepartureOptimizer = showDepartureOptimizer
-        self.onReset = onReset; self.onUpdateDepartureTime = onUpdateDepartureTime
-        self.onOpenInAppleMaps = onOpenInAppleMaps; self.onOpenInGoogleMaps = onOpenInGoogleMaps
-        self.trafficCongestion = trafficCongestion; self.hasTollRoads = hasTollRoads
-        self.avoidTollRoads = avoidTollRoads; self.candidateCount = candidateCount
+        self.config = config
+        self.showDepartureOptimizer = showDepartureOptimizer
+        self.onReset = onReset
+        self.onUpdateDepartureTime = onUpdateDepartureTime
+        self.onOpenInAppleMaps = onOpenInAppleMaps
+        self.onOpenInGoogleMaps = onOpenInGoogleMaps
         self.onShowRouteComparison = onShowRouteComparison
     }
 
@@ -40,30 +59,30 @@ public struct WizPathRouteInfoPanel: View {
             VStack(spacing: 14) {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(destinationName.isEmpty ? WizPathKitL10n.text("wizpath_destination") : destinationName).font(.system(size: 17, weight: .bold, design: .rounded)).foregroundStyle(.white).lineLimit(1)
-                        HStack(spacing: 6) { Image(systemName: route.travelMode.icon).font(.system(size: 10)); Text(route.travelMode.localizedTitle).font(.system(size: 11, weight: .medium)) }.foregroundStyle(.secondary)
+                        Text(config.destinationName.isEmpty ? WizPathKitL10n.text("wizpath_destination") : config.destinationName).font(.system(size: 17, weight: .bold, design: .rounded)).foregroundStyle(.white).lineLimit(1)
+                        HStack(spacing: 6) { Image(systemName: config.route.travelMode.icon).font(.system(size: 10)); Text(config.route.travelMode.localizedTitle).font(.system(size: 11, weight: .medium)) }.foregroundStyle(.secondary)
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 2) {
                         Text(WizPathKitL10n.text("wizpath_total_time")).font(.caption2).foregroundStyle(.tertiary)
-                        Text(formattedDuration(route.totalDuration)).font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white).monospacedDigit()
+                        Text(formattedDuration(config.route.totalDuration)).font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white).monospacedDigit()
                     }
                 }
                 HStack(spacing: 0) {
-                    RouteStatItem(icon: "arrow.triangle.swap", value: WizPathKitFormatters.formattedDistance(route.totalDistance), label: WizPathKitL10n.text("wizpath_distance"))
+                    RouteStatItem(icon: "arrow.triangle.swap", value: WizPathKitFormatters.formattedDistance(config.route.totalDistance), label: WizPathKitL10n.text("wizpath_distance"))
                     Spacer()
-                    if let temp = route.segments.first?.weather?.temperature {
+                    if let temp = config.route.segments.first?.weather?.temperature {
                         RouteStatItem(icon: "thermometer.medium", value: WizPathKitL10n.formatted("wizpath_temperature_format", Int(temp)), label: WizPathKitL10n.text("wizpath_avg_temp"))
                         Spacer()
                     }
-                    RouteStatItem(icon: "exclamationmark.triangle.fill", value: "\(route.weatherChangePoints.count)", label: WizPathKitL10n.text("wizpath_weather_changes"))
+                    RouteStatItem(icon: "exclamationmark.triangle.fill", value: "\(config.route.weatherChangePoints.count)", label: WizPathKitL10n.text("wizpath_weather_changes"))
                 }
-                    if let bestTime = bestDepartureTime, let reason = departureTimeReason, bestTime > Date() {
+                    if let bestTime = config.bestDepartureTime, let reason = config.departureTimeReason, bestTime > Date() {
                     Divider().overlay(Color.white.opacity(0.06))
                     WizPathBestDepartureRow(bestTime: bestTime, reason: reason, onSet: onUpdateDepartureTime)
                 }
                 // Traffic & Toll Info Row
-                if let congestion = trafficCongestion, congestion != .unknown {
+                if let congestion = config.trafficCongestion, congestion != .unknown {
                     HStack(spacing: 8) {
                         Image(systemName: "car.fill")
                             .font(.system(size: 10))
@@ -72,7 +91,7 @@ public struct WizPathRouteInfoPanel: View {
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundStyle(Color(hex: congestion.colorHex))
                         Spacer()
-                        if hasTollRoads {
+                        if config.hasTollRoads {
                             HStack(spacing: 3) {
                                 Image(systemName: "dollarsign.circle.fill")
                                     .font(.system(size: 9))
@@ -89,7 +108,7 @@ public struct WizPathRouteInfoPanel: View {
                             }
                             .foregroundStyle(Color.success)
                         }
-                        if avoidTollRoads && hasTollRoads {
+                        if config.avoidTollRoads && config.hasTollRoads {
                             HStack(spacing: 3) {
                                 Image(systemName: "hand.raised.fill")
                                     .font(.system(size: 9))
@@ -105,7 +124,7 @@ public struct WizPathRouteInfoPanel: View {
                 }
 
                 // Route comparison entry
-                if candidateCount > 1 {
+                if config.candidateCount > 1 {
                     Button {
                         HapticEngine.shared.light()
                         onShowRouteComparison()
@@ -113,7 +132,7 @@ public struct WizPathRouteInfoPanel: View {
                         HStack(spacing: 6) {
                             Image(systemName: "arrow.triangle.branch")
                                 .font(.system(size: 11))
-                            Text(WizPathKitL10n.formatted("wizpath_route_alternatives", candidateCount))
+                            Text(WizPathKitL10n.formatted("wizpath_route_alternatives", config.candidateCount))
                                 .font(.system(size: 11, weight: .semibold))
                             Spacer()
                             Image(systemName: "chevron.right")
@@ -127,9 +146,9 @@ public struct WizPathRouteInfoPanel: View {
                     .buttonStyle(.plain)
                 }
 
-                if !route.weatherChangePoints.isEmpty {
+                if !config.route.weatherChangePoints.isEmpty {
                     Divider().overlay(Color.white.opacity(0.06))
-                    WizPathWeatherTimeline(segments: route.segments, changePoints: route.weatherChangePoints)
+                    WizPathWeatherTimeline(segments: config.route.segments, changePoints: config.route.weatherChangePoints)
                 }
                 Divider().overlay(Color.white.opacity(0.06))
                 
@@ -170,8 +189,32 @@ public struct WizPathRouteInfoPanel: View {
                     LiquidGlassButton(WizPathKitL10n.text("wizpath_departure_optimizer"), icon: "clock.badge.checkmark.fill", style: .secondary, haptic: .light, isFullWidth: true) { showDepartureOptimizer(); HapticEngine.shared.medium() }
                     LiquidGlassButton(WizPathKitL10n.text("wizpath_new_route"), icon: "arrow.clockwise", style: .primary, haptic: .light, isFullWidth: true) { onReset() }
                 }
+                HStack(spacing: 12) {
+                    ShareLink(item: shareText) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.and.arrow.up.fill")
+                                .font(.system(size: 12))
+                            Text(WizPathKitL10n.text("wizpath_share_route"))
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        }
+                        .foregroundStyle(Color.liquidAccent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Color.liquidAccent.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
+    }
+
+    private var shareText: String {
+        let eta = formattedDuration(config.route.totalDuration)
+        let dist = WizPathKitFormatters.formattedDistance(config.route.totalDistance)
+        let dep = config.route.departureTime.formatted(date: .omitted, time: .shortened)
+        let arr = config.route.segments.last?.etaDisplay ?? "-"
+        return WizPathKitL10n.formatted("wizpath_share_format", config.destinationName, dep, arr, eta, dist)
     }
 
     private func formattedDuration(_ duration: TimeInterval) -> String {

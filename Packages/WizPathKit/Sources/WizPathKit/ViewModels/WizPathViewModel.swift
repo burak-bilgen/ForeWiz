@@ -89,8 +89,13 @@ public final class WizPathViewModel {
     public var departureTimeReason: String?
     public var cyclingSafetyAnalysis: WizPathCyclingSafetyService.CyclingSafetyAnalysis?
     public var cyclingSafetyRecommendations: [HealthRecommendation] = []
+    public var onRouteEnded: ((_ route: WizPathRoute, _ destinationName: String, _ travelMode: TravelMode) -> Void)?
+    var hasEndedRoute = false
     public var smartStops: [SmartStop] = []
     public var isLoadingMapDetails = false
+    public var evChargers: [SmartStop] = []
+    public var isLoadingEVChargers = false
+    public var evChargerError: String?
 
     // MARK: - Route Comparison & Preferences
     public var routeCandidates: [ScoredRouteCandidate] = []
@@ -191,6 +196,11 @@ public final class WizPathViewModel {
         setDestination(coordinate: recent.coordinate, name: recent.name)
     }
 
+    public func clearRecentDestinations() {
+        recentDestinations = []
+        Foundation.UserDefaults.standard.removeObject(forKey: AppKeys.UserDefaults.wizPathRecentDestinations)
+    }
+
     // MARK: - Route Calculation
 
     public func selectRouteCandidate(at index: Int) {
@@ -232,6 +242,7 @@ public final class WizPathViewModel {
         
         // Refresh smart stops for the new active candidate route
         refreshSmartStops(for: candidate.route)
+        refreshEVChargers(for: candidate.route)
         
         // Run place names resolution and best departure time analysis asynchronously
         Task {
@@ -373,6 +384,7 @@ public final class WizPathViewModel {
             state = .routeReady(route)
             showJourneyHUD = true
             refreshSmartStops(for: route)
+            refreshEVChargers(for: route)
             if !isAutoRefreshing { HapticEngine.shared.success() }
             startAutoRefresh()
             resolvePlaceNames(for: route)
@@ -457,7 +469,11 @@ public final class WizPathViewModel {
             cyclingSafetyAnalysis = nil
             cyclingSafetyRecommendations = []
         }
-        // EV features removed
+        if mode != .car {
+            evChargers = []
+            isLoadingEVChargers = false
+            evChargerError = nil
+        }
         HapticEngine.shared.selectionChanged()
         if currentRoute != nil { Task { await calculateRoute() } }
     }
@@ -483,6 +499,12 @@ public final class WizPathViewModel {
     }
 
     public func reset() {
+        if let route = lastCalculatedRoute, !hasEndedRoute {
+            hasEndedRoute = true
+            let name = destinationName
+            let mode = travelMode
+            onRouteEnded?(route, name, mode)
+        }
         refreshTimer?.cancel()
         refreshTimer = nil
         smartStopsTask?.cancel()
@@ -499,6 +521,9 @@ public final class WizPathViewModel {
         showWeatherDetail = false
         selectedWeatherSegment = nil
         smartStops = []
+        evChargers = []
+        isLoadingEVChargers = false
+        evChargerError = nil
         segmentPlaceNames = [:]
         routeCandidates = []
         selectedRouteIndex = 0
@@ -572,6 +597,64 @@ public final class WizPathViewModel {
             }
 
             self.smartStops = enrichedStops
+        }
+    }
+
+    // MARK: - EV Charger Search
+
+    func refreshEVChargers(for route: WizPathRoute) {
+        guard travelMode == .car else {
+            evChargers = []
+            isLoadingEVChargers = false
+            evChargerError = nil
+            return
+        }
+
+        isLoadingEVChargers = true
+        evChargerError = nil
+        evChargers = []
+
+        let routeID = route.id
+        Task { [weak self] in
+            guard let self else { return }
+            defer { self.isLoadingEVChargers = false }
+
+            let foundStops = await self.poiSearchService.searchSmartStopsAlongRoute(
+                route: route,
+                categories: [.evCharger]
+            )
+
+            guard !Task.isCancelled,
+                  self.currentRoute?.id == routeID else { return }
+
+            var enrichedStops: [SmartStop] = []
+            for stop in foundStops {
+                let arrivalSegment = self.closestSegment(for: stop.coordinate, in: route)
+                let weatherAtArrival = arrivalSegment?.weather
+                let safetyStatus = self.computeStopSafetyStatus(weather: weatherAtArrival)
+                let recommendation = self.generateWeatherRecommendation(
+                    category: stop.category,
+                    weather: weatherAtArrival,
+                    mode: self.travelMode
+                )
+
+                let enriched = SmartStop(
+                    id: stop.id,
+                    mapItem: stop.mapItem,
+                    coordinate: stop.coordinate,
+                    name: stop.name,
+                    category: stop.category,
+                    etaArrival: arrivalSegment?.estimatedArrival ?? stop.etaArrival,
+                    weatherAtArrival: weatherAtArrival,
+                    safetyStatus: safetyStatus,
+                    distanceFromRoute: stop.distanceFromRoute,
+                    estimatedStopDuration: stop.estimatedStopDuration,
+                    weatherRecommendation: recommendation
+                )
+                enrichedStops.append(enriched)
+            }
+
+            self.evChargers = enrichedStops
         }
     }
 

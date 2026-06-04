@@ -58,6 +58,9 @@ public final class POISearchService: Sendable {
                 case .restaurant:
                     request.naturalLanguageQuery = "Restaurant"
                     request.pointOfInterestFilter = .init(including: [.restaurant, .cafe])
+                case .evCharger:
+                    request.naturalLanguageQuery = "EV charger"
+                    request.pointOfInterestFilter = .init(including: [.evCharger])
                 }
 
                 request.resultTypes = .pointOfInterest
@@ -169,17 +172,20 @@ public final class POISearchService: Sendable {
     // MARK: - Search Coordinate Sampling
 
     /// Rota koordinatlarından mesafe bazlı akıllı örnekleme yapar.
-    /// Apple Maps rate limitlerini aşmamak için Origin, Midpoint ve Destination olarak tam 3 nokta seçer.
+    /// Kısa rotalar için 3, uzun rotalar için 6 noktaya kadar çıkar.
+    /// Her 30dk'lık rota dilimi için ~1 arama noktası.
     private func searchCoordinates(from routeCoordinates: [CLLocationCoordinate2D]) -> [CLLocationCoordinate2D] {
         let count = routeCoordinates.count
         guard count > 1 else { return routeCoordinates }
-        
+        // Dinamik nokta sayısı: her 30dk'da bir, min 3 max 6
+        let approxDurationMinutes = Double(count) * 0.5 // her koordinat ~30sn varsayımı
+        let numPoints = max(3, min(6, Int(approxDurationMinutes / 30.0)))
         var points: [CLLocationCoordinate2D] = []
-        points.append(routeCoordinates[0]) // Origin
-        if count > 2 {
-            points.append(routeCoordinates[count / 2]) // Midpoint
+        for i in 0..<numPoints {
+            let progress = Double(i) / Double(numPoints - 1)
+            let idx = min(Int(Double(count - 1) * progress), count - 1)
+            points.append(routeCoordinates[idx])
         }
-        points.append(routeCoordinates[count - 1]) // Destination
         return points
     }
 
@@ -235,7 +241,7 @@ public final class POISearchService: Sendable {
 
         // Generic/niche name detection
         let nameLower = stop.name.lowercased()
-        let hasGenericName = nameLower.contains("gas") || nameLower.contains("station") || nameLower.contains("petrol") || nameLower.contains("benzin") || nameLower.contains("otogaz") || nameLower.contains("istasyonu")
+        let hasGenericName = nameLower.contains("gas") || nameLower.contains("station") || nameLower.contains("petrol") || nameLower.contains("benzin") || nameLower.contains("otogaz") || nameLower.contains("istasyonu") || nameLower.contains("ev") || nameLower.contains("charger") || nameLower.contains("şarj")
 
         if hasGenericName {
             score -= 20.0

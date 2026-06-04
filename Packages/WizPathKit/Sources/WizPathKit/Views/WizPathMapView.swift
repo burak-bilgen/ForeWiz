@@ -44,6 +44,19 @@ public struct WizPathMapView: View {
                         }
                     }
 
+                    ForEach(viewModel.evChargers) { station in
+                        Annotation(coordinate: station.coordinate) {
+                            SmartStopMarker(category: .evCharger)
+                                .onTapGesture {
+                                    HapticEngine.shared.light()
+                                }
+                        } label: {
+                            Text(station.displayTitle)
+                                .font(.system(size: 8, weight: .medium))
+                                .lineLimit(1)
+                        }
+                    }
+
                     if let origin = viewModel.originCoordinate {
                         Annotation(coordinate: origin) {
                             OriginMarker()
@@ -286,6 +299,17 @@ struct FullScreenMapView: View {
                     ForEach(viewModel.smartStops) { station in
                         Annotation(coordinate: station.coordinate) {
                             SmartStopMarker(category: station.category)
+                                .onTapGesture {
+                                    HapticEngine.shared.light()
+                                }
+                        } label: {
+                            Text(station.displayTitle).font(.system(size: 8, weight: .medium)).lineLimit(1)
+                        }
+                    }
+
+                    ForEach(viewModel.evChargers) { station in
+                        Annotation(coordinate: station.coordinate) {
+                            SmartStopMarker(category: .evCharger)
                                 .onTapGesture {
                                     HapticEngine.shared.light()
                                 }

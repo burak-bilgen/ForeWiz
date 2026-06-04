@@ -4,9 +4,11 @@ import CoreLocation
 // MARK: - Route Risk Color (via AppTheme)
 
 extension WizPathRoute {
-    public var journeyHUDData: JourneyHUDData {
+    public func journeyHUDData(smartStops: [SmartStop] = []) -> JourneyHUDData {
         let hazards = generateEnvironmentalHazards()
-        return JourneyHUDData(totalDuration: totalDuration, totalDistance: totalDistance, hazardCount: hazards.count, safeStops: 0, safetyScore: overallRisk.safetyScore, activeHazards: hazards, nextSafeStop: nil)
+        let safeStops = smartStops.filter { $0.isRecommended }
+        let nextSafeStop = safeStops.min(by: { $0.etaArrival < $1.etaArrival })
+        return JourneyHUDData(totalDuration: totalDuration, totalDistance: totalDistance, hazardCount: hazards.count, safeStops: safeStops.count, safetyScore: overallRisk.safetyScore, activeHazards: hazards, nextSafeStop: nextSafeStop)
     }
 
     private func generateEnvironmentalHazards() -> [EnvironmentalHazard] {

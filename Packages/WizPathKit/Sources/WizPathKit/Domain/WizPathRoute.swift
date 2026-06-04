@@ -30,7 +30,7 @@ public enum TravelMode: String, CaseIterable, Identifiable, Sendable {
         switch self {
         case .car: return .automobile
         case .walking: return .walking
-        case .cycling: return .walking  // Apple Maps uses walking for cycling routes
+        case .cycling: return .cycling
         }
     }
 

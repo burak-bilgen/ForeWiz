@@ -48,7 +48,23 @@ public struct WizPathDestinationContent: View {
                     }.padding(.horizontal, 16)
 
                     if !viewModel.recentDestinations.isEmpty {
-                        RecentDestinationsScroll(destinations: viewModel.recentDestinations, onSelect: { viewModel.selectRecentDestination($0) }).padding(.top, 12)
+                        VStack(spacing: 6) {
+                            HStack {
+                                Text(WizPathKitL10n.text("wizpath_recent_title"))
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundStyle(.tertiary)
+                                Spacer()
+                                Button(WizPathKitL10n.text("wizpath_recent_clear")) {
+                                    HapticEngine.shared.light()
+                                    viewModel.clearRecentDestinations()
+                                }
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundStyle(Color.danger)
+                            }
+                            .padding(.horizontal, 20)
+                            RecentDestinationsScroll(destinations: viewModel.recentDestinations, onSelect: { viewModel.selectRecentDestination($0) })
+                        }
+                        .padding(.top, 12)
                     }
                     Spacer(minLength: 16)
                     if viewModel.state.isOffline { OfflineBanner(retry: { Task { await viewModel.calculateRoute() } }).padding(.horizontal, 16).padding(.bottom, 8) }
