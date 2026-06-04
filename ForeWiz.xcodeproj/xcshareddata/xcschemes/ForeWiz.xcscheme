@@ -53,6 +53,17 @@
                ReferencedContainer = "container:ForeWiz.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "67305E902F9E05220034CAA8"
+               BuildableName = "ForeWizUITests.xctest"
+               BlueprintName = "ForeWizUITests"
+               ReferencedContainer = "container:ForeWiz.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
