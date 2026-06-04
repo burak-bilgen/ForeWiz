@@ -77,11 +77,6 @@ public struct WizPathMapView: View {
                 }
             }
             .mapStyle(.standard(elevation: .realistic))
-            .mapControls {
-                MapUserLocationButton()
-                MapCompass()
-                MapScaleView()
-            }
             .onChange(of: viewModel.currentRoute) { _, route in
                 if let r = route {
                     withAnimation(AppTheme.slowEaseOut) { position = .region(routeRegion(r)) }
@@ -118,15 +113,18 @@ public struct WizPathMapView: View {
                 }
             }
 
-            if viewModel.mapsNavigationRoute != nil {
-                VStack(spacing: 6) {
+            // Custom map controls — always visible, no overlap with system controls
+            VStack(spacing: 6) {
+                userLocationButton
+                if viewModel.mapsNavigationRoute != nil {
                     trafficToggleButton
                     toggleRouteButton
                     fullScreenButton
                 }
-                .padding(8)
-                .transition(.move(edge: .trailing).combined(with: .opacity))
             }
+            .padding(.trailing, 8)
+            .padding(.top, 8)
+            .transition(.move(edge: .trailing).combined(with: .opacity))
         }
         .fullScreenCover(isPresented: $showFullScreenMap) {
             FullScreenMapView(
@@ -170,6 +168,37 @@ public struct WizPathMapView: View {
     }
 
     // MARK: - Control Buttons
+
+    private var userLocationButton: some View {
+        Button {
+            HapticEngine.shared.light()
+            if let coord = viewModel.originCoordinate {
+                withAnimation(AppTheme.slowEaseOut) {
+                    position = .region(MKCoordinateRegion(
+                        center: coord,
+                        span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+                    ))
+                }
+            }
+        } label: {
+            Image(systemName: "location.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(width: 32, height: 32)
+                .background(
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .environment(\.colorScheme, .dark)
+                )
+                .overlay(
+                    Circle()
+                        .stroke(.white.opacity(0.1), lineWidth: 1)
+                )
+        }
+        .contentShape(Rectangle())
+        .buttonStyle(.plain)
+        .accessibilityLabel(WizPathKitL10n.text("wizpath_map_center_location"))
+    }
 
     private var trafficToggleButton: some View {
         Button {
