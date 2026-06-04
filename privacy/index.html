@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForeWiz — Privacy Policy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #e0e0e0;
+            line-height: 1.7;
+            padding: 2rem 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+        .last-updated {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 2.5rem;
+            margin-bottom: 0.8rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ccc;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        p { margin-bottom: 1rem; }
+        ul { margin: 0.5rem 0 1rem 1.5rem; }
+        li { margin-bottom: 0.3rem; }
+        strong { color: #fff; }
+        a { color: #5a9eff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+        }
+        th {
+            background: #1a1a1a;
+            color: #fff;
+            font-weight: 600;
+        }
+        td { color: #ccc; }
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #222;
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .nav-link:hover { color: #fff; }
+        hr { border: none; border-top: 1px solid #222; margin: 1.5rem 0; }
+    </style>
+</head>
+<body>
+    <a class="nav-link" href="https://burak-bilgen.github.io/ForeWiz/">← ForeWiz Home</a>
+    <h1>Privacy Policy</h1>
+    <p class="last-updated">Last updated: May 22, 2026</p>
+
+    <h2>1. Data Collection &amp; Usage</h2>
+    <p>ForeWiz is designed with <strong>privacy by default</strong>. The app collects the minimum data necessary to provide weather-adaptive decision recommendations.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data Type</th>
+                <th>Collected</th>
+                <th>Purpose</th>
+                <th>Third-Party Sharing</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Location</strong></td>
+                <td>Yes (foreground only)</td>
+                <td>To fetch local weather, route weather, maps, and nearby route places</td>
+                <td>Apple WeatherKit / MapKit</td>
+            </tr>
+            <tr>
+                <td><strong>Preferences</strong></td>
+                <td>Yes</td>
+                <td>App settings (language, accent color, notification prefs, saved locations) — stored on-device/app group only</td>
+                <td>Never</td>
+            </tr>
+            <tr>
+                <td><strong>Usage Data / Analytics</strong></td>
+                <td>Limited</td>
+                <td>Local app/ad performance events; no third-party analytics SDK</td>
+                <td>Not sold; AdMob receives ad interaction data for ad delivery</td>
+            </tr>
+            <tr>
+                <td><strong>Advertising ID (IDFA)</strong></td>
+                <td>Yes (with consent)</td>
+                <td>Used by Google AdMob for personalized ad delivery</td>
+                <td>Google (via AdMob SDK)</td>
+            </tr>
+            <tr>
+                <td><strong>Crash Reports</strong></td>
+                <td><strong>No</strong></td>
+                <td>No crash reporting SDK is integrated</td>
+                <td>N/A</td>
+            </tr>
+            <tr>
+                <td><strong>Diagnostics</strong></td>
+                <td><strong>No</strong></td>
+                <td>No diagnostic data collection</td>
+                <td>N/A</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Advertising &amp; Consent</h2>
+    <p>ForeWiz uses <strong>Google AdMob</strong> for monetization. The following applies:</p>
+    <ul>
+        <li><strong>ATT (App Tracking Transparency):</strong> On iOS 14.5+, the app displays the ATT consent dialog on first launch. Ad personalization is only enabled if the user explicitly grants tracking permission.</li>
+        <li><strong>GDPR Consent:</strong> For users in the European Economic Area (EEA), ForeWiz uses Google's UMP (User Messaging Platform) SDK to obtain GDPR consent before loading any ads.</li>
+        <li><strong>Ad Formats:</strong> Banner, native inline, interstitial (app-open), and optional rewarded video ads.</li>
+        <li><strong>Non-Personalized Ads:</strong> If consent is denied, ForeWiz serves non-personalized ads only.</li>
+    </ul>
+
+    <h2>3. Data Storage &amp; Security</h2>
+    <ul>
+        <li><strong>Location Data:</strong> Used ephemerally to request weather data. Not stored, not logged.</li>
+        <li><strong>Preferences:</strong> All user preferences are stored <strong>on-device</strong> using Apple's SwiftData framework. No preference data is transmitted off-device.</li>
+        <li><strong>Weather Data:</strong> Cached locally with 15-minute TTL. Not shared.</li>
+        <li><strong>Network Connections:</strong> The app connects only to:
+            <ul>
+                <li>Apple WeatherKit (weather data)</li>
+                <li>Google AdMob (ad delivery, with user consent)</li>
+                <li>Google UMP (ad consent forms / privacy options)</li>
+                <li>Apple MapKit (map tiles, route planning, local search for WizPath)</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>4. Children's Privacy</h2>
+    <p>ForeWiz does not knowingly collect data from children under 13. The app is not directed at children and does not offer content targeted at minors.</p>
+
+    <h2>5. Data Deletion</h2>
+    <p>Since all user data is stored on-device:</p>
+    <ul>
+        <li><strong>Uninstalling the app</strong> removes all locally stored data.</li>
+        <li>There is no server-side data to delete.</li>
+        <li>Ad-related identifiers (IDFA) can be reset via iOS Settings → Privacy → Tracking.</li>
+    </ul>
+
+    <h2>6. Contact</h2>
+    <p>For privacy questions: <a href="mailto:support@forewiz.app">support@forewiz.app</a></p>
+
+    <hr>
+
+    <h2 id="app-store-listing">App Store Compliance</h2>
+    <p>This privacy policy is also accessible from the App Store listing. The app's <code>NSPrivacyPolicyURL</code> points to this page.</p>
+
+    <div class="footer">
+        <p>ForeWiz — Weather Intelligence for Smarter Decisions</p>
+        <p><a href="https://burak-bilgen.github.io/ForeWiz/">Home</a> · <a href="https://burak-bilgen.github.io/ForeWiz/privacy/">Privacy</a> · <a href="https://github.com/burak-bilgen/ForeWiz">GitHub</a></p>
+    </div>
+</body>
+</html>

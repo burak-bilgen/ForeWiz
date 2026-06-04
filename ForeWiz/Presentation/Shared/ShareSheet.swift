@@ -44,7 +44,7 @@ struct RecommendationShareContent {
         \(recommendation.summaryText)
 
         \(footer)
-        🌤️ forewiz.app
+        🌤️ github.com/burak-bilgen/ForeWiz
         """
     }
 

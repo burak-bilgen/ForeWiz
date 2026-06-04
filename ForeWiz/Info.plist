@@ -54,7 +54,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location solely to provide weather recommendations tailored to where you are.</string>
 	<key>NSPrivacyPolicyURL</key>
-	<string>https://forewiz.app/privacy</string>
+	<string>https://burak-bilgen.github.io/ForeWiz/privacy/</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Notifications allow us to send you weather alerts, best time recommendations, and important forecast updates.</string>
 	<key>NSUserTrackingUsageDescription</key>

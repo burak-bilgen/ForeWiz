@@ -305,7 +305,7 @@ struct JournalShareCard: View {
                     Image(systemName: "cloud.sun.fill").font(.system(size: 12)).foregroundStyle(AppTheme.liquidAccent)
                     Text("ForeWiz").font(.system(size: 13, weight: .bold, design: .rounded)).foregroundStyle(.white.opacity(0.6))
                     Spacer()
-                    Text("forewiz.app").font(.system(size: 11, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.3))
+                    Text("github.com/burak-bilgen/ForeWiz").font(.system(size: 10, weight: .medium, design: .rounded)).foregroundStyle(.white.opacity(0.3))
                 }
             }.padding(24)
         }.frame(width: 400, height: 500).clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))

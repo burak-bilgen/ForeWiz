@@ -39,7 +39,7 @@ struct DeepLinkTests {
     }
 
     @Test func invalidSchemeReturnsNil() {
-        let url = URL(string: "https://forewiz.app")!
+        let url = URL(string: "https://example.com/page")!
         let link = DeepLink.from(url: url)
 
         #expect(link == nil)
