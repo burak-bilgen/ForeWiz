@@ -143,6 +143,7 @@ typealias SharedFormatters = WizPathKitFormatters
 public enum WizPathKitKeys {
     public enum UserDefaults {
         public static let wizPathRecentDestinations = "wizpath_recent_destinations"
+        public static let wizPathVehicleType = "wizpath_vehicle_type"
     }
 }
 

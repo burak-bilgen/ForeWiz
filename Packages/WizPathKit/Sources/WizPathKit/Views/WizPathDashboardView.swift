@@ -396,6 +396,10 @@ public struct WizPathDashboardView: View {
                 if viewModel.travelMode == .car {
                     tollRoadToggle(viewModel: viewModel)
                         .padding(.horizontal, 16)
+                    
+                    // Vehicle type picker — only visible in car mode
+                    vehicleTypePicker(viewModel: viewModel)
+                        .padding(.horizontal, 16)
                 }
 
                 // Route Comparison
@@ -422,7 +426,8 @@ public struct WizPathDashboardView: View {
                 }
 
                 // EV Charging stations panel
-                if viewModel.travelMode == .car {
+                // EV şarj istasyonları — sadece elektrikli/hibrit araçlar için
+                if viewModel.travelMode == .car, viewModel.vehicleType == .electric || viewModel.vehicleType == .hybrid {
                     EvChargerStopsView(
                         chargingStations: viewModel.evChargers,
                         isLoading: viewModel.isLoadingEVChargers,
@@ -514,6 +519,51 @@ public struct WizPathDashboardView: View {
             .padding(.top, 8)
         }
         .scrollIndicators(.hidden)
+    }
+
+    // MARK: - Vehicle Type Picker
+
+    private func vehicleTypePicker(viewModel: WizPathViewModel) -> some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 4) {
+                ForEach(VehicleType.allCases) { type in
+                    Button {
+                        guard viewModel.vehicleType != type else { return }
+                        viewModel.vehicleType = type
+                        HapticEngine.shared.selectionChanged()
+                    } label: {
+                        HStack(spacing: 5) {
+                            Image(systemName: type.iconName)
+                                .font(.system(size: 11, weight: .semibold))
+                            Text(type.localizedTitle)
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .contentTransition(.opacity)
+                        }
+                        .foregroundStyle(viewModel.vehicleType == type ? .white : .white.opacity(0.5))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background {
+                            if viewModel.vehicleType == type {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(Color(hex: type.accentColor).opacity(0.25))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                            .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                                    )
+                            }
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(4)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+            )
+        }
     }
 
     private func tollRoadToggle(viewModel: WizPathViewModel) -> some View {

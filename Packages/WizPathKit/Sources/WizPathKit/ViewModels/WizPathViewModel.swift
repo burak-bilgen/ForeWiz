@@ -93,6 +93,16 @@ public final class WizPathViewModel {
     var hasEndedRoute = false
     public var smartStops: [SmartStop] = []
     public var isLoadingMapDetails = false
+    // MARK: - Vehicle Type
+    public var vehicleType: VehicleType {
+        didSet {
+            Foundation.UserDefaults.standard.set(vehicleType.rawValue, forKey: AppKeys.UserDefaults.wizPathVehicleType)
+            HapticEngine.shared.selectionChanged()
+            // Durakları vehicleType'a göre yenile
+            if currentRoute != nil { Task { await recalculateStops() } }
+        }
+    }
+
     public var evChargers: [SmartStop] = []
     public var isLoadingEVChargers = false
     public var evChargerError: String?
@@ -113,6 +123,19 @@ public final class WizPathViewModel {
     // MARK: - Internal State
     /// fileprivate internal erişim — extension dosyaları erişebilir.
     var lastCalculatedRoute: WizPathRoute?
+
+    /// VehicleType değişince durakları yeniden hesapla
+    private func recalculateStops() async {
+        guard let route = currentRoute else { return }
+        refreshSmartStops(for: route)
+        if vehicleType == .electric || vehicleType == .hybrid {
+            refreshEVChargers(for: route)
+        } else {
+            evChargers = []
+            isLoadingEVChargers = false
+            evChargerError = nil
+        }
+    }
     var lastCalculatedRouteTimestamp: Date?
     let cacheExpirationInterval: TimeInterval = 1800 // 30 minutes
     public var didLoadInitialLocation = false
@@ -149,6 +172,10 @@ public final class WizPathViewModel {
         cyclingSafetyService: WizPathCyclingSafetyService = .shared,
         poiSearchService: POISearchService = .shared
     ) {
+        // UserDefaults'tan kayıtlı araç tipini yükle, yoksa varsayılan petrol
+        let saved = Foundation.UserDefaults.standard.string(forKey: AppKeys.UserDefaults.wizPathVehicleType)
+        self.vehicleType = saved.flatMap(VehicleType.init(rawValue:)) ?? .default
+
         self.wizPathService = wizPathService
         self.departureOptimizerService = departureOptimizerService
         self.climateService = climateService
@@ -551,7 +578,8 @@ public final class WizPathViewModel {
         let categories: [POICategory]
         switch travelMode {
         case .car:
-            categories = [.gasStation, .restStop]
+            // Araç tipine göre POI filtrele: EV → şarj, Benzinli → gaz, Hibrit → ikisi de
+            categories = vehicleType.relevantCategories
         case .cycling, .walking:
             categories = [.restStop, .restaurant]
         }
@@ -603,7 +631,7 @@ public final class WizPathViewModel {
     // MARK: - EV Charger Search
 
     func refreshEVChargers(for route: WizPathRoute) {
-        guard travelMode == .car else {
+        guard travelMode == .car, vehicleType == .electric || vehicleType == .hybrid else {
             evChargers = []
             isLoadingEVChargers = false
             evChargerError = nil

@@ -103,6 +103,56 @@ public enum POICategory: String, Sendable {
     }
 }
 
+// MARK: - Vehicle Type
+
+public enum VehicleType: String, Sendable, CaseIterable, Identifiable {
+    case petrol = "petrol"
+    case electric = "electric"
+    case hybrid = "hybrid"
+
+    public var id: String { rawValue }
+
+    public var iconName: String {
+        switch self {
+        case .petrol: return "fuelpump.fill"
+        case .electric: return "bolt.car.fill"
+        case .hybrid: return "bolt.car"
+        }
+    }
+
+    public var localizedTitle: String {
+        switch self {
+        case .petrol: return WizPathKitL10n.text("vehicle_type_petrol")
+        case .electric: return WizPathKitL10n.text("vehicle_type_electric")
+        case .hybrid: return WizPathKitL10n.text("vehicle_type_hybrid")
+        }
+    }
+
+    public var accentColor: String {
+        switch self {
+        case .petrol: return "#00FF41"
+        case .electric: return "#00D9FF"
+        case .hybrid: return "#AF52DE"
+        }
+    }
+
+    /// POI kategorilerini aracın tipine göre filtreler.
+    /// Benzinli → gaz istasyonları, EV → şarj istasyonları, Hibrit → ikisi de.
+    /// Her durumda dinlenme tesisleri dahil edilir.
+    public var relevantCategories: [POICategory] {
+        switch self {
+        case .petrol:
+            return [.gasStation, .restStop]
+        case .electric:
+            return [.evCharger, .restStop]
+        case .hybrid:
+            return [.gasStation, .evCharger, .restStop]
+        }
+    }
+
+    public static var `default`: VehicleType { .petrol }
+}
+
 // MARK: - POI Safety Status
 public enum POISafetyStatus: String, Sendable {
     case safe
