@@ -32,7 +32,6 @@ final class HomeViewStateFactory {
             currentWeather: makeCurrentWeatherState(from: result.currentWeather, dailyPoints: result.dailyPoints, unitSystem: unitSystem),
             dailyForecasts: makeDailyForecasts(from: result.dailyPoints, unitSystem: unitSystem),
             hourlyScores: makeHourlyScores(from: result.hourlyPoints, profile: profile, unitSystem: unitSystem),
-            keyEvents: KeyEventNotificationPlanner.makeKeyEvents(from: result.hourlyPoints, recommendation: result.recommendation, unitSystem: unitSystem, mapper: mapper),
             lastUpdatedText: lastUpdatedText(for: result.weatherFetchedAt),
             isUsingCachedWeather: result.isUsingCachedWeather,
             warningMessage: result.warningMessage,

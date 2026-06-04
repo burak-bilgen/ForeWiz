@@ -63,15 +63,6 @@ struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
-                // 4. Key events - today's weather highlights
-                DayKeyEventsView(events: state.keyEvents)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.28)
-                
-                // Ad insertion point: after key events
-                if let idx = insertionPoints.firstIndex(of: .afterKeyEvents) {
-                    adSection(at: idx, baseDelay: 0.32)
-                }
-
                 // 5. Hourly forecast - time-sensitive
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.32)

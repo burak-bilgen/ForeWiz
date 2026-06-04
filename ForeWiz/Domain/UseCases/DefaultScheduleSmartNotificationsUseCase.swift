@@ -32,33 +32,14 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
         let calendar = Calendar.current
 
         // 1. Standard plans (morning briefing + weather alerts)
-        let standardPlans = await notificationPlanningEngine.makePlans(
+        let allPlans = await notificationPlanningEngine.makePlans(
             recommendation: recommendation,
             profile: profile,
             now: now,
             calendar: calendar
         )
 
-        // 2. Key event plans (today's important weather events as notifications)
-        var allPlans = standardPlans
-
-        let todayIsEnabled = profile.notificationPreferences
-            .first { $0.category == .keyEvent }?.isEnabled ?? true
-
-        if todayIsEnabled {
-            let keyEvents = KeyEventNotificationPlanner.makeKeyEvents(
-                from: hourlyPoints,
-                recommendation: recommendation
-            )
-            let eventPlans = KeyEventNotificationPlanner.makeNotificationPlans(
-                from: keyEvents,
-                now: now,
-                calendar: calendar
-            )
-            allPlans.append(contentsOf: eventPlans)
-        }
-
-        // 3. Throttle: remove plans that violate cooldown / rate limits / dedup
+        // 2. Throttle: remove plans that violate cooldown / rate limits / dedup
         let throttledPlans = throttlingService.throttle(allPlans)
 
         try await notificationRepository.schedule(throttledPlans)

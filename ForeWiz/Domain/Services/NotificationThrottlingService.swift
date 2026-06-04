@@ -14,14 +14,12 @@ final class NotificationThrottlingService: @unchecked Sendable {
     private static let cooldowns: [NotificationCategory: TimeInterval] = [
         .morningBriefing: 23 * 3600,  // once per day-ish
         .weatherAlert: 4 * 3600,      // 4 hours between alerts
-        .keyEvent: 3 * 3600,          // 3 hours between event notifications
     ]
 
     /// Hard daily cap per category. Beyond this, plans are dropped.
     private static let dailyLimits: [NotificationCategory: Int] = [
         .morningBriefing: 1,
         .weatherAlert: 4,
-        .keyEvent: 6,
     ]
 
     // MARK: - Persisted Keys

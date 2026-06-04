@@ -27,8 +27,6 @@ final class AdPlacementStrategy {
     enum InsertionPoint: CaseIterable {
         /// After hero/current conditions card
         case afterHero
-        /// After key events
-        case afterKeyEvents
         /// After hourly forecast
         case afterHourly
         /// After weekly forecast (default position)
@@ -40,8 +38,7 @@ final class AdPlacementStrategy {
         var weight: Int {
             switch self {
             case .afterHero: return 1    // Rare — too early, interrupts context
-            case .afterKeyEvents: return 2
-            case .afterHourly: return 3
+            case .afterHourly: return 2
             case .afterWeekly: return 4  // Most common — after content consumption
             case .beforeFooter: return 2
             }
@@ -231,10 +228,8 @@ final class AdPlacementStrategy {
 
 private extension AdPlacementStrategy.InsertionPoint {
     var order: Int {
-        switch self {
-        case .afterHero: return 0
-        case .afterKeyEvents: return 1
-        case .afterHourly: return 2
+        switch self {            case .afterHero: return 0
+            case .afterHourly: return 1
         case .afterWeekly: return 3
         case .beforeFooter: return 4
         }
@@ -243,7 +238,6 @@ private extension AdPlacementStrategy.InsertionPoint {
     var rawName: String {
         switch self {
         case .afterHero: return "afterHero"
-        case .afterKeyEvents: return "afterKeyEvents"
         case .afterHourly: return "afterHourly"
         case .afterWeekly: return "afterWeekly"
         case .beforeFooter: return "beforeFooter"
