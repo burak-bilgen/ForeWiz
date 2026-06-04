@@ -168,7 +168,12 @@ struct HomeView: View {
                         WizPathDashboardView(
                             wizPathService: wizService,
                             onMapsExport: { proceedToMaps in
-                                handleMapsExport(proceedToMaps: proceedToMaps)
+                                // Önce WizPath'i kapat, sonra maps export'u başlat.
+                                // Aynı anda iki fullScreenCover açılamaz (SwiftUI warning).
+                                showWizPathSheet = false
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                    handleMapsExport(proceedToMaps: proceedToMaps)
+                                }
                             },
                             onFeedback: { showFeedbackSheet = true },
                             onRouteEnded: onRouteEnded
