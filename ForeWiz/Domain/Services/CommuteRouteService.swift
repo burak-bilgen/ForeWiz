@@ -163,17 +163,16 @@ struct DefaultCommuteRouteService: CommuteRouteService {
             impact = CommuteWeatherImpact(overallScore: 50, hazardWarnings: [L10n.text("commute_hazard_unable")], bestDepartureWindow: nil)
         }
 
-        let modeName = L10n.text(mode.localizedKey).lowercased()
         let distanceStr = route.map { String(format: "%.1f km", $0.distanceKm) } ?? "? km"
         let durationCompact = route.map { L10n.formatted("departure_min_format", $0.estimatedDurationMinutes) } ?? "?"
 
         let summary: String = {
             if impact.overallScore >= 80 {
-                return L10n.formatted("commute_summary_good", modeName, distanceStr, durationCompact)
+                return L10n.formatted("commute_summary_good", distanceStr, durationCompact)
             } else if impact.overallScore >= 50 {
-                return L10n.formatted("commute_summary_moderate", modeName, distanceStr, durationCompact)
+                return L10n.formatted("commute_summary_moderate", distanceStr, durationCompact)
             } else {
-                return L10n.formatted("commute_summary_poor", modeName, distanceStr, durationCompact)
+                return L10n.formatted("commute_summary_poor", distanceStr, durationCompact)
             }
         }()
 
@@ -196,8 +195,8 @@ struct DefaultCommuteRouteService: CommuteRouteService {
 
         return CommuteBriefing(
             summary: summary,
-            weatherAtOrigin: L10n.formatted("commute_weather_at_origin", weatherQualifier),
-            weatherAtDestination: L10n.formatted("commute_weather_at_dest", weatherQualifier),
+            weatherAtOrigin: weatherQualifier,
+            weatherAtDestination: weatherQualifier,
             routeHazards: impact.hazardWarnings,
             recommendation: recommendation
         )

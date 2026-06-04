@@ -19500,13 +19500,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Good conditions for %1. %2, ~%3."
+            "value": "Good commute conditions. %1$@, ~%2$@."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1 için iyi koşullar. %2, ~%3."
+            "value": "İyi yolculuk koşulları. %1$@, ~%2$@."
           }
         }
       }
@@ -19517,13 +19517,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Moderate conditions for %1. %2, ~%3. Some weather factors to consider."
+            "value": "Moderate commute conditions. %1$@, ~%2$@."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1 için orta düzey koşullar. %2, ~%3. Dikkate alınması gereken bazı hava faktörleri var."
+            "value": "Orta düzey yolculuk koşulları. %1$@, ~%2$@."
           }
         }
       }
@@ -19534,13 +19534,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Challenging conditions for %1. %2, ~%3. Check weather hazards."
+            "value": "Tough commute conditions. %1$@, ~%2$@. Watch for weather hazards."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1 için zorlu koşullar. %2, ~%3. Hava tehlikelerini kontrol edin."
+            "value": "Zorlu yolculuk koşulları. %1$@, ~%2$@. Hava tehlikelerine dikkat."
           }
         }
       }
@@ -19619,13 +19619,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "favorable"
+            "value": "Favorable conditions"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "uygun"
+            "value": "Uygun koşullar"
           }
         }
       }
@@ -19636,13 +19636,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "suboptimal"
+            "value": "Suboptimal conditions"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "ideal değil"
+            "value": "İdeal değil"
           }
         }
       }
