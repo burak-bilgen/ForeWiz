@@ -213,7 +213,7 @@ struct WizPathHUDLiveActivityView: View {
                 .lineLimit(1)
 
                 HStack(spacing: 8) {
-                    Label(context.state.estimatedArrival, style: .time)
+                    Text(context.state.estimatedArrival, style: .time)
                         .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.6))
 

@@ -12,6 +12,5 @@ import SwiftUI
 struct ForeWizLiveActivityBundle: WidgetBundle {
     var body: some Widget {
         ForeWizLiveActivity()
-        ForeWizLiveActivityLiveActivity()
     }
 }
