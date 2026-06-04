@@ -349,7 +349,7 @@ struct FullScreenMapView: View {
                 }
             }
             .mapStyle(.standard(elevation: .realistic))
-            .mapControls { MapUserLocationButton(); MapScaleView() }
+            
 
             VStack(spacing: 8) {
                 Button {
