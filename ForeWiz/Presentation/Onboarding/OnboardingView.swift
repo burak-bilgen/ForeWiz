@@ -335,7 +335,7 @@ struct OnboardingView: View {
     private var locationSetupSection: some View {
         LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
             VStack(alignment: .leading, spacing: 14) {
-                sectionLabel(icon: "house.and.map.fill", text: L10n.text("onboarding_location_step_title"))
+                sectionLabel(icon: "mappin.and.ellipse", text: L10n.text("onboarding_location_step_title"))
 
                 Text(L10n.text("onboarding_location_step_subtitle"))
                     .font(.system(size: 13, weight: .medium, design: .rounded))

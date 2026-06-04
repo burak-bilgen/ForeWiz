@@ -63,7 +63,7 @@ struct SettingsView: View {
                     .fill(.ultraThinMaterial)
                     .environment(\.colorScheme, .dark)
                     .frame(width: 72, height: 72)
-                Image(systemName: "house.and.map.fill")
+                Image(systemName: "mappin.and.ellipse")
                     .font(.system(size: 30, weight: .semibold))
                     .symbolRenderingMode(.hierarchical)
                     .foregroundStyle(AppTheme.liquidAccent)
