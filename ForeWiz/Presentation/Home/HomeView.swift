@@ -38,6 +38,9 @@ struct HomeView: View {
     @State private var mapsExportProceed: (() -> Void)?
     @State private var selectedActivity: ActivityType?
     @State private var activityRecommendations: [ActivityRecommendation] = []
+    @State private var commuteBriefing: CommuteBriefing?
+    @State private var commuteTravelMode: TravelMode = .car
+    private let commuteService: CommuteRouteService = DefaultCommuteRouteService()
     
     private enum MapsExportStatus {
         case idle
@@ -179,6 +182,18 @@ struct HomeView: View {
             .onChange(of: selectedActivity) { _, newValue in
                 activityRecommendations = viewModel.recommendations(for: newValue)
             }
+            .task {
+                await computeCommuteBriefing()
+            }
+            .onChange(of: homeLocation) { _, _ in
+                Task { await computeCommuteBriefing() }
+            }
+            .onChange(of: workLocation) { _, _ in
+                Task { await computeCommuteBriefing() }
+            }
+            .onChange(of: commuteModeRaw) { _, _ in
+                Task { await computeCommuteBriefing() }
+            }
         }
     }
 
@@ -290,7 +305,12 @@ struct HomeView: View {
                 selectedActivity: $selectedActivity,
                 activityRecommendations: activityRecommendations,
                 refresh: { await viewModel.refresh() },
-                onWizPathTap: { showWizPathSheet = true }
+                onWizPathTap: { showWizPathSheet = true },
+                commuteBriefing: commuteBriefing,
+                homeName: homeLocation?.name,
+                workName: workLocation?.name,
+                travelMode: commuteTravelMode,
+                onEditLocations: { showSettings = true }
             )
             .transition(.asymmetric(
                 insertion: .opacity.combined(with: .scale(scale: 0.97)),
@@ -504,6 +524,32 @@ struct HomeView: View {
         }
         .presentationDetents([.height(320)])
         .presentationBackground(.ultraThinMaterial)
+    }
+
+    // MARK: - Commute Briefing
+
+    private func computeCommuteBriefing() async {
+        guard let home = homeLocation, let work = workLocation else {
+            commuteBriefing = nil
+            return
+        }
+
+        let mode = TravelMode(rawValue: commuteModeRaw) ?? .car
+        commuteTravelMode = mode
+
+        guard home.latitude != work.latitude || home.longitude != work.longitude else {
+            commuteBriefing = CommuteBriefing(
+                summary: L10n.text("settings_same_home_work_warning"),
+                weatherAtOrigin: "N/A",
+                weatherAtDestination: "N/A",
+                routeHazards: [],
+                recommendation: L10n.text("notif_morning_commute_same")
+            )
+            return
+        }
+
+        let briefing = await commuteService.commuteBriefing(home: home, work: work, mode: mode)
+        commuteBriefing = briefing
     }
 }
 

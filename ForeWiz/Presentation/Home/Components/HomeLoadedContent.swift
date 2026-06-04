@@ -10,6 +10,11 @@ struct HomeLoadedContent: View {
     let activityRecommendations: [ActivityRecommendation]
     let refresh: () async -> Void
     let onWizPathTap: () -> Void
+    let commuteBriefing: CommuteBriefing?
+    let homeName: String?
+    let workName: String?
+    let travelMode: TravelMode?
+    let onEditLocations: () -> Void
     @State private var showNativeAd = false
     @State private var showBannerAd = false
     @State private var insertionPoints: [AdPlacementStrategy.InsertionPoint] = []
@@ -51,6 +56,18 @@ struct HomeLoadedContent: View {
                     onTap: onWizPathTap
                 )
                 .cardEntrance(appeared: contentReady, baseDelay: 0.12)
+                
+                // Commute Briefing Card - between WizPath and ads
+                if let briefing = commuteBriefing, let home = homeName, let work = workName, let mode = travelMode {
+                    CommuteBriefingCard(
+                        briefing: briefing,
+                        homeName: home,
+                        workName: work,
+                        travelMode: mode,
+                        onEditLocations: onEditLocations
+                    )
+                    .cardEntrance(appeared: contentReady, baseDelay: 0.14)
+                }
                 
                 // Ad insertion point: after hero (rare)
                 if let idx = insertionPoints.firstIndex(of: .afterHero) {
