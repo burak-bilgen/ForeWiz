@@ -326,21 +326,21 @@ final class AdMobBannerDelegate: NSObject, BannerViewDelegate {
     var onLoadCompletion: ((Bool) -> Void)?
     
     nonisolated func bannerViewDidReceiveAd(_ bannerView: BannerView) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AppLogger.app.info("[AdMob] Banner ad received")
             AdManager.shared.recordLoaded(.banner)
             AdManager.shared.onBannerLoaded?()
-            onLoadCompletion?(true)
-            onLoadCompletion = nil
+            Self.shared.onLoadCompletion?(true)
+            Self.shared.onLoadCompletion = nil
         }
     }
     
     nonisolated func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AppLogger.app.error("[AdMob] Banner ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.banner, error: error)
-            onLoadCompletion?(false)
-            onLoadCompletion = nil
+            Self.shared.onLoadCompletion?(false)
+            Self.shared.onLoadCompletion = nil
         }
     }
     
@@ -371,37 +371,39 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
     private var loadedAds: [NativeAd] = []
     
     nonisolated func adLoader(_ adLoader: AdLoader, didReceive nativeAd: NativeAd) {
-        Task { @MainActor [self] in
-            self.loadedAds.append(nativeAd)
-            nativeAd.delegate = self
+        Task { @MainActor in
+            Self.shared.loadedAds.append(nativeAd)
+            nativeAd.delegate = Self.shared
             AppLogger.app.info("[AdMob] Native ad received")
         }
     }
     
     nonisolated func adLoaderDidFinishLoading(_ adLoader: AdLoader) {
-        Task { @MainActor [self] in
-            AppLogger.app.info("[AdMob] Native ads loading finished: \(self.loadedAds.count) ads")
+        Task { @MainActor in
+            let delegate = Self.shared
+            AppLogger.app.info("[AdMob] Native ads loading finished: \(delegate.loadedAds.count) ads")
             AdManager.shared.recordLoaded(.native)
             AdManager.shared.onNativeLoaded?()
             
-            if let singleCompletion = onSingleAdLoaded {
-                singleCompletion(loadedAds.first)
-                onSingleAdLoaded = nil
+            if let singleCompletion = delegate.onSingleAdLoaded {
+                singleCompletion(delegate.loadedAds.first)
+                delegate.onSingleAdLoaded = nil
             } else {
-                onAdsLoaded?(loadedAds)
+                delegate.onAdsLoaded?(delegate.loadedAds)
             }
             
             // Nil all callbacks to prevent any hypothetical double-fire from
             // both adLoaderDidFinishLoading and adLoader(_:didFailToReceiveAdWithError:).
-            onSingleAdLoaded = nil
-            onLoadFailed = nil
+            delegate.onSingleAdLoaded = nil
+            delegate.onLoadFailed = nil
             
-            loadedAds.removeAll()
+            delegate.loadedAds.removeAll()
         }
     }
     
     nonisolated func adLoader(_ adLoader: AdLoader, didFailToReceiveAdWithError error: Error) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
+            let delegate = Self.shared
             AppLogger.app.error("[AdMob] Native ad failed: \(error.localizedDescription)")
             AdManager.shared.recordFailure(.native, error: error)
 
@@ -409,10 +411,10 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
             // loadNativeAd() sets both onSingleAdLoaded and onLoadFailed to the same
             // completion closure. Calling both would cause a double-resume crash on the
             // CheckedContinuation, producing a SIGTRAP / EXC_BREAKPOINT.
-            let singleCompletion = onSingleAdLoaded
-            let loadFailedCompletion = onLoadFailed
-            onSingleAdLoaded = nil
-            onLoadFailed = nil
+            let singleCompletion = delegate.onSingleAdLoaded
+            let loadFailedCompletion = delegate.onLoadFailed
+            delegate.onSingleAdLoaded = nil
+            delegate.onLoadFailed = nil
 
             // Only call the callback that matches the loading path used.
             // If loadNativeAd was used, onSingleAdLoaded is non-nil.
@@ -423,7 +425,7 @@ final class AdMobNativeLoaderDelegate: NSObject, AdLoaderDelegate, NativeAdLoade
                 loadFailedCompletion?()
             }
 
-            loadedAds.removeAll()
+            delegate.loadedAds.removeAll()
         }
     }
 }
@@ -462,10 +464,10 @@ final class AdMobInterstitialDelegate: NSObject, FullScreenContentDelegate {
     }
     
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AppLogger.app.info("[AdMob] Interstitial ad dismissed")
             AdManager.shared.recordDismiss(.interstitial)
-            self.onAdDismissed?()
+            Self.shared.onAdDismissed?()
             
             Task {
                 AdAnalyticsEngine.shared.markLoadStart(.interstitial)
@@ -491,10 +493,10 @@ final class AdMobAppOpenDelegate: NSObject, FullScreenContentDelegate {
     }
     
     nonisolated func adDidDismissFullScreenContent(_ ad: FullScreenPresentingAd) {
-        Task { @MainActor [self] in
+        Task { @MainActor in
             AppLogger.app.info("[AdMob] App open ad dismissed")
             AdManager.shared.recordDismiss(.appOpen)
-            self.onAdDismissed?()
+            Self.shared.onAdDismissed?()
             
             Task {
                 AdAnalyticsEngine.shared.markLoadStart(.appOpen)

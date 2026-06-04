@@ -112,7 +112,7 @@ struct SettingsView: View {
                     emptyLocationRow(isHome: true)
                 }
 
-                if let home = homeLocation {
+                if homeLocation != nil {
                     Button {
                         HapticEngine.shared.medium()
                         homeLocation = nil
@@ -153,7 +153,7 @@ struct SettingsView: View {
                     emptyLocationRow(isHome: false)
                 }
 
-                if let work = workLocation {
+                if workLocation != nil {
                     Button {
                         HapticEngine.shared.medium()
                         workLocation = nil

@@ -1,6 +1,7 @@
 import OSLog
 import SwiftUI
 import CoreLocation
+import SwiftData
 import WizPathKit
 
 struct AppRootView: View {
