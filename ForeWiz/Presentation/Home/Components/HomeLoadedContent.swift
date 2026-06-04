@@ -6,8 +6,6 @@ import WizPathKit
 struct HomeLoadedContent: View {
     let state: HomeViewState
     let contentReady: Bool
-    @Binding var selectedActivity: ActivityType?
-    let activityRecommendations: [ActivityRecommendation]
     let refresh: () async -> Void
     let onWizPathTap: () -> Void
     let commuteBriefing: CommuteBriefing?
@@ -28,21 +26,7 @@ struct HomeLoadedContent: View {
                         .cardEntrance(appeared: contentReady, baseDelay: 0.0)
                 }
 
-                // 2. Activity picker + recommendations
-                ActivityPickerView(selectedActivity: $selectedActivity)
-                    .cardEntrance(appeared: contentReady, baseDelay: 0.04)
-
-                if selectedActivity == nil {
-                    ForEach(activityRecommendations.prefix(3)) { recommendation in
-                        ActivityRecommendationCard(recommendation: recommendation)
-                            .cardEntrance(appeared: contentReady, baseDelay: 0.06)
-                    }
-                } else if let recommendation = activityRecommendations.first {
-                    ActivityRecommendationCard(recommendation: recommendation)
-                        .cardEntrance(appeared: contentReady, baseDelay: 0.06)
-                }
-
-                // 3. Hero card - current conditions + score
+                // 2. Hero card - current conditions + score
                 HeroCard(
                     assistant: state.assistant,
                     weather: state.currentWeather,
@@ -74,13 +58,13 @@ struct HomeLoadedContent: View {
                     adSection(at: idx, baseDelay: 0.16)
                 }
 
-                // 4. Warning banner
+                // 3. Warning banner
                 if let warning = state.warningMessage {
                     WarningBanner(message: warning)
                         .cardEntrance(appeared: contentReady, baseDelay: 0.16)
                 }
 
-                // 5. Hourly forecast - time-sensitive
+                // 4. Hourly forecast - time-sensitive
                 HourlyForecastSection(hourlyScores: state.hourlyScores)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.32)
                 
@@ -89,7 +73,7 @@ struct HomeLoadedContent: View {
                     adSection(at: idx, baseDelay: 0.40)
                 }
 
-                // 6. Weekly forecast - planning reference
+                // 5. Weekly forecast - planning reference
                 WeeklyForecastSection(dailyForecasts: state.dailyForecasts)
                     .cardEntrance(appeared: contentReady, baseDelay: 0.40)
                 

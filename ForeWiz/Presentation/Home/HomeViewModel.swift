@@ -209,38 +209,6 @@ final class HomeViewModel {
         }
     }
 
-    func recommendations(for activityType: ActivityType?) -> [ActivityRecommendation] {
-        guard let result = cachedResult, let profile = cachedProfile else { return [] }
-        let engine = homeViewStateFactory.activityWindowScoringEngine
-
-        if let type = activityType {
-            if let rec = engine.bestWindow(
-                for: type,
-                hourly: result.hourlyPoints,
-                profile: profile,
-                now: Date(),
-                calendar: .current
-            ) {
-                return [rec]
-            }
-            return []
-        } else {
-            let allRecs: [ActivityRecommendation] = ActivityType.allCases.compactMap { type in
-                engine.bestWindow(
-                    for: type,
-                    hourly: result.hourlyPoints,
-                    profile: profile,
-                    now: Date(),
-                    calendar: .current
-                )
-            }
-            return allRecs
-                .sorted { $0.score.rawValue > $1.score.rawValue }
-                .prefix(3)
-                .map { $0 }
-        }
-    }
-
     // MARK: - Feedback
 
     /// Records user feedback about the weather recommendation and persists the updated profile.

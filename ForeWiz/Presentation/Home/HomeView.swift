@@ -36,8 +36,6 @@ struct HomeView: View {
     @State private var showMapsExportSheet = false
     @State private var mapsExportStatus: MapsExportStatus = .idle
     @State private var mapsExportProceed: (() -> Void)?
-    @State private var selectedActivity: ActivityType?
-    @State private var activityRecommendations: [ActivityRecommendation] = []
     @State private var commuteBriefing: CommuteBriefing?
     @State private var commuteTravelMode: TravelMode = .car
     private let commuteService: CommuteRouteService = DefaultCommuteRouteService()
@@ -176,11 +174,7 @@ struct HomeView: View {
             .onChange(of: viewModel.state) { _, newState in
                 if case .loaded(let state) = newState {
                     onRecommendationLoaded(state.recommendation)
-                    activityRecommendations = viewModel.recommendations(for: selectedActivity)
                 }
-            }
-            .onChange(of: selectedActivity) { _, newValue in
-                activityRecommendations = viewModel.recommendations(for: newValue)
             }
             .task {
                 await computeCommuteBriefing()
@@ -302,8 +296,6 @@ struct HomeView: View {
             HomeLoadedContent(
                 state: state,
                 contentReady: contentReady,
-                selectedActivity: $selectedActivity,
-                activityRecommendations: activityRecommendations,
                 refresh: { await viewModel.refresh() },
                 onWizPathTap: { showWizPathSheet = true },
                 commuteBriefing: commuteBriefing,
