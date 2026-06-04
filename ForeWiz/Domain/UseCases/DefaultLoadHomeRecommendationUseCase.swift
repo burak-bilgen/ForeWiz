@@ -65,11 +65,24 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             if let targetLocation {
                 location = targetLocation
             } else {
-                let authorizationStatus = await locationRepository.requestAuthorization()
-                guard authorizationStatus == .authorized else {
-                    throw AppError.locationPermissionDenied
+                // Location permission is already requested during onboarding.
+                // Try fetching live location first; if unavailable, fall back
+                // to the manually selected city from onboarding.
+                do {
+                    location = try await locationRepository.getCurrentLocation()
+                } catch {
+                    // Fallback: use the profile's selected saved location
+                    let fallback = profile.savedLocations.first { $0.id == profile.selectedLocationID }
+                        ?? profile.savedLocations.first
+                    if let fallback {
+                        location = LocationCoordinate(
+                            latitude: fallback.latitude,
+                            longitude: fallback.longitude
+                        )
+                    } else {
+                        throw AppError.locationPermissionDenied
+                    }
                 }
-                location = try await locationRepository.getCurrentLocation()
             }
 
             let snapshot = try await fetchLiveWeather(for: location)
