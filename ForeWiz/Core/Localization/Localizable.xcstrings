@@ -2589,13 +2589,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Commute Setup"
+            "value": "Set your home and work locations"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Güzergah Ayarları"
+            "value": "Ev ve iş konumlarınızı belirleyin"
           }
         }
       }
@@ -19762,6 +19762,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yoğun sıcaktan kaçınmak için sabah erken veya öğleden sonra geç saatler"
+          }
+        }
+      }
+    },
+    "commute_weekend": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekend — no commute needed. Enjoy your day off!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hafta sonu — yolculuk yok. İzinizin tadını çıkarın!"
+          }
+        }
+      }
+    },
+    "commute_weekend_rec": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Great day to relax or plan a weekend trip!"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dinlenmek ya da hafta sonu gezisi planlamak için harika bir gün!"
+          }
+        }
+      }
+    },
+    "commute_setup_body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get personalized commute briefings with weather conditions, route hazards, and departure recommendations."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hava koşulları, rota tehlikeleri ve çıkış önerileriyle kişiselleştirilmiş yolculuk raporları alın."
+          }
+        }
+      }
+    },
+    "commute_setup_button": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set Locations"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konumları Ayarla"
           }
         }
       }

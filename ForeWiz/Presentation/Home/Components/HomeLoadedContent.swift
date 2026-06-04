@@ -51,6 +51,10 @@ struct HomeLoadedContent: View {
                         onEditLocations: onEditLocations
                     )
                     .cardEntrance(appeared: contentReady, baseDelay: 0.14)
+                } else if homeName == nil || workName == nil {
+                    // Show setup card when home or work locations are not set
+                    CommuteSetupCard(onEditLocations: onEditLocations)
+                        .cardEntrance(appeared: contentReady, baseDelay: 0.14)
                 }
                 
                 // Ad insertion point: after hero (rare)
@@ -127,6 +131,84 @@ struct HomeLoadedContent: View {
         }
     }
     
+    // MARK: - Commute Setup Card
+
+    /// Shown when home or work locations are not configured yet.
+    private struct CommuteSetupCard: View {
+        let onEditLocations: () -> Void
+        @State private var rotationAngle = 0.0
+
+        var body: some View {
+            LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 0) {
+                VStack(spacing: 0) {
+                    VStack(spacing: 16) {
+                        ZStack {
+                            Circle()
+                                .fill(AppTheme.liquidAccent.opacity(0.12))
+                                .frame(width: 56, height: 56)
+                            Image(systemName: "mappin.and.ellipse")
+                                .font(.system(size: 24, weight: .medium))
+                                .foregroundStyle(AppTheme.liquidAccent)
+                        }
+
+                        Text(L10n.text("commute_setup_title"))
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                            .multilineTextAlignment(.center)
+
+                        Text(L10n.text("commute_setup_body"))
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .multilineTextAlignment(.center)
+                            .lineSpacing(3)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Button {
+                            HapticEngine.shared.medium()
+                            onEditLocations()
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "gearshape.fill")
+                                    .font(.system(size: 12))
+                                Text(L10n.text("commute_setup_button"))
+                                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                            }
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                LinearGradient(
+                                    colors: [AppTheme.liquidAccent, Color(hex: "#00D9FF")],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            )
+                        }
+                        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+                    }
+                    .padding(20)
+                }
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(
+                        AngularGradient(
+                            colors: [AppTheme.liquidAccent.opacity(0.3), .clear, AppTheme.liquidAccent.opacity(0.3), .clear, AppTheme.liquidAccent.opacity(0.3)],
+                            center: .center,
+                            angle: .degrees(rotationAngle)
+                        ),
+                        lineWidth: 0.8
+                    )
+            )
+            .onAppear {
+                withAnimation(.linear(duration: 8.0).repeatForever(autoreverses: false)) {
+                    rotationAngle = 360.0
+                }
+            }
+        }
+    }
+
     // MARK: - Placement Decision
     
     private func evaluateAdPlacement() {

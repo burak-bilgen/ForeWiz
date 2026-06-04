@@ -89,6 +89,13 @@ protocol CommuteRouteService {
 }
 
 struct DefaultCommuteRouteService: CommuteRouteService {
+    let weatherRepository: WeatherRepository?
+    private let mapper = WeatherPresentationMapper()
+
+    init(weatherRepository: WeatherRepository? = nil) {
+        self.weatherRepository = weatherRepository
+    }
+
     private let haversineDistance: (SavedLocation, SavedLocation) -> Double = { origin, destination in
         let lat1 = origin.latitude * .pi / 180
         let lon1 = origin.longitude * .pi / 180
@@ -143,6 +150,18 @@ struct DefaultCommuteRouteService: CommuteRouteService {
     }
 
     func commuteBriefing(home: SavedLocation, work: SavedLocation, mode: TravelMode) async -> CommuteBriefing {
+        // Weekend check
+        let calendar = Calendar.current
+        if calendar.isDateInWeekend(Date()) {
+            return CommuteBriefing(
+                summary: L10n.text("commute_weekend"),
+                weatherAtOrigin: "-",
+                weatherAtDestination: "-",
+                routeHazards: [],
+                recommendation: L10n.text("commute_weekend_rec")
+            )
+        }
+
         let isSameLocation = home.latitude == work.latitude && home.longitude == work.longitude
 
         if isSameLocation {
@@ -193,10 +212,37 @@ struct DefaultCommuteRouteService: CommuteRouteService {
             ? L10n.text("commute_weather_favorable")
             : L10n.text("commute_weather_suboptimal")
 
+        // Fetch real weather data for origin & destination if repository is available
+        let originWeather: String
+        let destinationWeather: String
+        if let repo = weatherRepository {
+            let originLoc = LocationCoordinate(latitude: home.latitude, longitude: home.longitude)
+            let destLoc = LocationCoordinate(latitude: work.latitude, longitude: work.longitude)
+            let originSnapshot = try? await repo.fetchWeather(for: originLoc)
+            let destinationSnapshot = try? await repo.fetchWeather(for: destLoc)
+            if let origin = originSnapshot {
+                let temp = mapper.temperatureText(origin.current.temperatureCelsius, unitSystem: .metric)
+                let cond = mapper.conditionText(for: origin.current.conditionCode)
+                originWeather = "\(temp), \(cond)"
+            } else {
+                originWeather = weatherQualifier
+            }
+            if let dest = destinationSnapshot {
+                let temp = mapper.temperatureText(dest.current.temperatureCelsius, unitSystem: .metric)
+                let cond = mapper.conditionText(for: dest.current.conditionCode)
+                destinationWeather = "\(temp), \(cond)"
+            } else {
+                destinationWeather = weatherQualifier
+            }
+        } else {
+            originWeather = weatherQualifier
+            destinationWeather = weatherQualifier
+        }
+
         return CommuteBriefing(
             summary: summary,
-            weatherAtOrigin: weatherQualifier,
-            weatherAtDestination: weatherQualifier,
+            weatherAtOrigin: originWeather,
+            weatherAtDestination: destinationWeather,
             routeHazards: impact.hazardWarnings,
             recommendation: recommendation
         )
