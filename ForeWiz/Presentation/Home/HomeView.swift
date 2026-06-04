@@ -270,16 +270,6 @@ struct HomeView: View {
                 }
                 .accessibilityLabel(L10n.text("feedback_sheet_title"))
 
-                Button {
-                    HapticEngine.shared.light()
-                    showSettings = true
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-                .accessibilityLabel(L10n.text("settings_home_location"))
-
                 ToolbarLanguageButton()
             }
             .opacity(toolbarAppeared ? 1 : 0)
