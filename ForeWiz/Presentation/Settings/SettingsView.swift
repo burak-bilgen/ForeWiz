@@ -36,6 +36,20 @@ struct SettingsView: View {
         .navigationBarHidden(true)
         .interactiveDismissDisabled()
         .onAppear { animatePage() }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                HapticEngine.shared.light()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 28))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .symbolRenderingMode(.hierarchical)
+            }
+            .padding(.trailing, 16)
+            .padding(.top, 8)
+            .staggerEntrance(index: 1, appeared: appears)
+        }
         .sheet(isPresented: $showHomePicker) {
             locationPickerSheet(for: .home)
         }

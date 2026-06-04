@@ -154,6 +154,14 @@ struct HomeView: View {
                     )
                 }
             }
+            .onChange(of: showSettings) { _, newValue in
+                if newValue {
+                    // Settings açılırken editing state'leri gerçek değerlerle doldur
+                    editingHomeLocation = homeLocation
+                    editingWorkLocation = workLocation
+                    editingCommuteMode = commuteModeRaw
+                }
+            }
             .fullScreenCover(isPresented: $showWizPathSheet) {
                 ZStack {
                     if let wizService = wizPathService {
