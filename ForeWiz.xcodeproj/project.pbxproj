@@ -267,6 +267,7 @@
 				67305E722F9E05210034CAA8 /* Frameworks */,
 				67305E732F9E05210034CAA8 /* Resources */,
 				67A871092FAF23C4005B23F5 /* Embed Foundation Extensions */,
+				AABBCCDDEEFF001122334456 /* Generate dSYMs for SPM frameworks */,
 			);
 			buildRules = (
 			);
@@ -657,7 +658,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
@@ -692,8 +693,11 @@
 				CODE_SIGN_ENTITLEMENTS = ForeWiz/ForeWiz.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 9;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
+				STRIP_STYLE = debugging;
 				ENABLE_PREVIEWS = YES;
 				GAD_APPLICATION_IDENTIFIER = "";
 				GAD_BANNER_AD_UNIT_ID = "";
@@ -705,7 +709,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
@@ -741,7 +745,7 @@
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = burakbilgen.ForeWizTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -763,7 +767,7 @@
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = burakbilgen.ForeWizTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -783,7 +787,7 @@
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = burakbilgen.ForeWizUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -803,7 +807,7 @@
 				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = Z8P38BHKU6;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = burakbilgen.ForeWizUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
@@ -836,7 +840,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.forewiz.app.ForeWizLiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -869,7 +873,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.forewiz.app.ForeWizLiveActivity;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -893,7 +897,7 @@
 				INFOPLIST_FILE = ForeWizWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ForeWiz;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.forewiz.app.widgets;
 				PRODUCT_NAME = ForeWizWidgets;
 				SDKROOT = iphoneos;
@@ -914,7 +918,7 @@
 				INFOPLIST_FILE = ForeWizWidgets/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ForeWiz;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = bilgenworks.forewiz.app.widgets;
 				PRODUCT_NAME = ForeWizWidgets;
 				SDKROOT = iphoneos;
@@ -1032,6 +1036,24 @@
 			productName = GoogleUserMessagingPlatform;
 		};
 /* End XCSwiftPackageProductDependency section */
+		AABBCCDDEEFF001122334456 /* Generate dSYMs for SPM frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Generate dSYMs for SPM frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\nfor f in GoogleMobileAds.framework UserMessagingPlatform.framework; do\n  if [ -d \"$f\" ] \&\& [ ! -d \"${f}.dSYM\" ]; then\n    dsymutil \"${f}\" -o \"${f}.dSYM\" 2>/dev/null || true\n  fi\ndone\n";
+		};
 	};
 	rootObject = 67305E6D2F9E05210034CAA8 /* Project object */;
 }

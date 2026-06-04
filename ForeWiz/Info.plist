@@ -51,6 +51,8 @@
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
 	<string>ForeWiz reads your heart rate, sleep, steps, and respiratory data to provide personalized health-weather correlation insights. Your health data never leaves your device.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>ForeWiz writes health-related journal entries and activity logs to your Health app so you can track how weather affects your well-being over time.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location solely to provide weather recommendations tailored to where you are.</string>
 	<key>NSPrivacyPolicyURL</key>
