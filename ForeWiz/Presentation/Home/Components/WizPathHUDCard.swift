@@ -17,12 +17,12 @@ struct WizPathHUDCard: View {
             HapticEngine.shared.light()
             onTap()
         }) {
-            HStack(spacing: 14) {
-                // Icon — fixed size, never scales up
+            HStack(spacing: 10) {
+                // Icon — compact size
                 ZStack {
                     Circle()
                         .fill(accentColor.opacity(0.18))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 36, height: 36)
                     
                     // Breathing aura for warnings/alerts
                     if isAlertActive {
@@ -30,37 +30,37 @@ struct WizPathHUDCard: View {
                             .stroke(accentColor.opacity(0.4), lineWidth: 1.5)
                             .scaleEffect(pulseScale)
                             .opacity(2.0 - pulseScale)
-                            .frame(width: 44, height: 44)
+                            .frame(width: 36, height: 36)
                     }
                     
                     Image(systemName: routeStatus.iconName)
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(.system(size: 16, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(accentColor)
                 }
 
                 // Text
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(statusTitle)
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.8)
                         .lineLimit(1)
                     Text(statusSubtitle)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .font(.system(size: 12, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.8)
                 }
 
-                Spacer()
+                Spacer(minLength: 4)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.3))
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(.ultraThinMaterial)
@@ -94,7 +94,7 @@ struct WizPathHUDCard: View {
                 .onChanged { _ in withAnimation(.easeInOut(duration: 0.1)) { isPressed = true } }
                 .onEnded { _ in withAnimation(.easeInOut(duration: 0.15)) { isPressed = false } }
         )
-        .frame(minHeight: 56, maxHeight: 72)
+        .frame(minHeight: 48, maxHeight: 58)
         .clipped()
         .onAppear {
             // Smooth, low-CPU infinite rotation for border glow
