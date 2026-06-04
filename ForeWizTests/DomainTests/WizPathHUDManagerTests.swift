@@ -147,7 +147,7 @@ struct WizPathHUDManagerTests {
     @Test("LiveActivityAttributes with cycling mode")
     func liveActivityAttributesCycling() async throws {
         let attrs = WizPathHUDLiveActivityAttributes(
-            routeOriginName: "Kad\u0131k\u00f6y",
+            routeOriginName: "Kad\u{0131}k\u{00f6}y",
             routeDestinationName: "Levent",
             travelModeRaw: "cycling"
         )
