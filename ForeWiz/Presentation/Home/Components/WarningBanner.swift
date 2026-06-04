@@ -18,7 +18,8 @@ struct WarningBanner: View {
             Text(message)
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(.white)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
