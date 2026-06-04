@@ -8,6 +8,16 @@ struct LiveActivityWidgetExtensionTests {
 
     // MARK: - Safety Score Color
 
+    /// Mirrors the widget's safetyColor helper — update if widget changes
+    private func safetyColor(_ score: Int) -> String {
+        switch score {
+        case 80...100: return "green"
+        case 60..<80: return "yellow"
+        case 40..<60: return "orange"
+        default: return "red"
+        }
+    }
+
     @Test("safetyColor returns green for 80-100 range")
     func safetyColorGreenRange() async throws {
         #expect(safetyColor(80) == "green")
@@ -46,6 +56,11 @@ struct LiveActivityWidgetExtensionTests {
 
     // MARK: - Hazard Color
 
+    /// Mirrors the widget's hazardColor helper — update if widget changes
+    private func hazardColor(_ count: Int) -> String {
+        count == 0 ? "green" : count <= 3 ? "yellow" : "red"
+    }
+
     @Test("hazardColor returns green for 0 hazards")
     func hazardColorNoHazards() async throws {
         #expect(hazardColor(0) == "green")
@@ -67,6 +82,17 @@ struct LiveActivityWidgetExtensionTests {
 
     // MARK: - Travel Mode Icon
 
+    /// Mirrors the widget's travelModeIcon helper — update if widget changes
+    private func widgetTravelModeIcon(_ rawValue: String) -> String {
+        switch rawValue {
+        case "car": return "car.fill"
+        case "walking": return "figure.walk"
+        case "cycling": return "bicycle"
+        case "transit": return "bus.fill"
+        default: return "car.fill"
+        }
+    }
+
     @Test("travelModeIcon returns correct icons for all modes")
     func travelModeIconAllModes() async throws {
         #expect(widgetTravelModeIcon("car") == "car.fill")
@@ -84,6 +110,7 @@ struct LiveActivityWidgetExtensionTests {
 
     // MARK: - Content State Combinations
 
+    @available(iOS 18.0, *)
     @Test("ContentState with no hazards shows clear state")
     func contentStateNoHazards() async throws {
         let state = WizPathHUDLiveActivityAttributes.ContentState(
@@ -103,6 +130,7 @@ struct LiveActivityWidgetExtensionTests {
         #expect(state.safetyScore >= 80)
     }
 
+    @available(iOS 18.0, *)
     @Test("ContentState with multiple hazards and next safe stop")
     func contentStateWithSafeStop() async throws {
         let eta = Date().addingTimeInterval(1200)
@@ -125,6 +153,7 @@ struct LiveActivityWidgetExtensionTests {
         #expect(state.routeRiskLabel == "Caution")
     }
 
+    @available(iOS 18.0, *)
     @Test("ContentState with zero safety score shows emergency state")
     func contentStateEmergency() async throws {
         let state = WizPathHUDLiveActivityAttributes.ContentState(
@@ -142,51 +171,5 @@ struct LiveActivityWidgetExtensionTests {
         #expect(state.safetyScore == 0)
         #expect(state.hazardCount == 15)
         #expect(state.routeRiskLabel == "Emergency")
-    }
-
-    // MARK: - Widget Configuration
-
-    @Test("Widget supported families are valid")
-    func widgetSupportedFamilies() async throws {
-        // The widget supports .systemSmall and .systemMedium
-        let supportedFamilies: Set<String> = ["systemSmall", "systemMedium"]
-        #expect(supportedFamilies.contains("systemSmall"))
-        #expect(supportedFamilies.contains("systemMedium"))
-        #expect(!supportedFamilies.contains("systemLarge"))
-    }
-
-    @Test("Widget display name and description are set")
-    func widgetDisplayConfig() async throws {
-        let displayName = "Route HUD"
-        let description = "Shows active route safety score and ETA"
-
-        #expect(!displayName.isEmpty)
-        #expect(!description.isEmpty)
-        #expect(displayName == "Route HUD")
-    }
-
-    // MARK: - Helpers (mirroring widget logic)
-
-    private func safetyColor(_ score: Int) -> String {
-        switch score {
-        case 80...100: return "green"
-        case 60..<80: return "yellow"
-        case 40..<60: return "orange"
-        default: return "red"
-        }
-    }
-
-    private func hazardColor(_ count: Int) -> String {
-        count == 0 ? "green" : count <= 3 ? "yellow" : "red"
-    }
-
-    private func widgetTravelModeIcon(_ rawValue: String) -> String {
-        switch rawValue {
-        case "car": return "car.fill"
-        case "walking": return "figure.walk"
-        case "cycling": return "bicycle"
-        case "transit": return "bus.fill"
-        default: return "car.fill"
-        }
     }
 }
