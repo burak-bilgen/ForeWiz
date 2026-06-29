@@ -1,9 +1,5 @@
 import Foundation
 
-// MARK: - Air Quality Health Calculator
-
-/// Calculates health risk from air quality: AQI, PM2.5, PM10, ozone, and pollen.
-/// Provides localized labels and actionable advice for each risk level.
 enum HealthAirQualityCalculator {
 
     static func calculate(
@@ -26,7 +22,7 @@ enum HealthAirQualityCalculator {
             advice = L10n.text("health_aqi_moderate_advice")
 
         case .unhealthyForSensitive:
-            // Add pollen context if available
+
             if let pollen = aq.pollenIndex, pollen >= 4 {
                 advice = String(format: L10n.text("health_aqi_sensitive_pollen"), aq.aqi, pollen)
             } else if let dominant = aq.dominantPollutant {
@@ -52,7 +48,6 @@ enum HealthAirQualityCalculator {
         return (healthIndex, advice, category)
     }
 
-    /// Generates a concise one-line summary of air quality conditions.
     static func summary(airQuality: AirQualityInfo?) -> String {
         guard let aq = airQuality else {
             return L10n.text("health_aqi_no_data")

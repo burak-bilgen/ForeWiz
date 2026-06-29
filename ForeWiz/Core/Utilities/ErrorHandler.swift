@@ -7,7 +7,6 @@ enum ErrorHandler {
             return appError
         }
 
-        // Map common system errors to AppError
         let nsError = error as NSError
         switch nsError.domain {
         case NSURLErrorDomain:

@@ -10,8 +10,6 @@ struct WizPathCyclingSafetyServiceTests {
 
     private let service = WizPathCyclingSafetyService.shared
 
-    // MARK: - Wind Thresholds
-
     @Test("Wind thresholds are reasonable")
     func windThresholdsAreReasonable() {
         #expect(WizPathCyclingSafetyService.WindThresholds.crosswindHazard == 25)
@@ -19,8 +17,6 @@ struct WizPathCyclingSafetyServiceTests {
         #expect(WizPathCyclingSafetyService.WindThresholds.headwindSignificant == 20)
         #expect(WizPathCyclingSafetyService.WindThresholds.headwindExtreme == 45)
     }
-
-    // MARK: - Effort Level
 
     @Test("Effort level low for calm conditions")
     func effortLevelLowForCalmConditions() {
@@ -82,8 +78,6 @@ struct WizPathCyclingSafetyServiceTests {
         #expect(hotEffort.level > comfortableEffort.level)
         #expect(coldEffort.level > comfortableEffort.level)
     }
-
-    // MARK: - Cycling Safety Analysis
 
     @Test("AnalyzeCyclingSafety returns safe for non-cycling mode")
     func analyzeCyclingSafetyReturnsSafeForNonCyclingMode() {
@@ -200,8 +194,6 @@ struct WizPathCyclingSafetyServiceTests {
         #expect(segment.isHeadwind == true)
         #expect(segment.eta == now)
     }
-
-    // MARK: - Helpers
 
     private func makeRoute(travelMode: WizPathKit.TravelMode, segments: [WizPathSegment]) -> WizPathRoute {
         WizPathRoute(

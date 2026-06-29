@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Background
-
 struct DetailBackground: View {
     var body: some View {
         AnimatedOrbBackground(
@@ -11,8 +9,6 @@ struct DetailBackground: View {
         )
     }
 }
-
-// MARK: - Shared card
 
 struct DetailCard<Content: View>: View {
     let accentColor: Color
@@ -47,8 +43,6 @@ struct DetailSectionLabel: View {
         }
     }
 }
-
-// MARK: - Hero card
 
 struct DetailHeroCard: View {
     let recommendation: DailyRecommendation
@@ -122,8 +116,6 @@ struct DetailHeroCard: View {
     }
 }
 
-// MARK: - Explanation card
-
 struct DetailExplanationCard: View {
     let explanation: String
     var body: some View {
@@ -139,8 +131,6 @@ struct DetailExplanationCard: View {
         }
     }
 }
-
-// MARK: - Activity card
 
 struct DetailActivityCard: View {
     let activities: [ActivityRecommendation]
@@ -180,8 +170,6 @@ struct DetailActivityCard: View {
     }
 }
 
-// MARK: - Outfit card
-
 struct DetailOutfitCard: View {
     let outfit: OutfitRecommendation
     var body: some View {
@@ -193,7 +181,6 @@ struct DetailOutfitCard: View {
                     .foregroundStyle(Color.white.opacity(0.55))
                     .fixedSize(horizontal: false, vertical: true)
 
-                // Human-like conversational advice
                 if let advice = outfit.detailedAdvice {
                     HStack(spacing: 10) {
                         Image(systemName: "quote.bubble.fill")
@@ -262,8 +249,6 @@ struct DetailOutfitCard: View {
     }
 }
 
-// MARK: - Avoid card
-
 struct DetailAvoidCard: View {
     let avoidWindows: [AvoidWindowRecommendation]
     var body: some View {
@@ -293,8 +278,6 @@ struct DetailAvoidCard: View {
         }
     }
 }
-
-// MARK: - Risk card
 
 struct DetailRiskCard: View {
     let risks: [WeatherRisk]

@@ -7,7 +7,7 @@ enum HealthSampleType: String, CaseIterable, Codable, Sendable {
     case steps
     case respiratoryRate
     case uvExposure
-    
+
     var localizedTitle: String {
         switch self {
         case .heartRate: return "Heart Rate"
@@ -18,7 +18,7 @@ enum HealthSampleType: String, CaseIterable, Codable, Sendable {
         case .uvExposure: return "UV Exposure"
         }
     }
-    
+
     var unit: String {
         switch self {
         case .heartRate, .restingHeartRate: return "bpm"

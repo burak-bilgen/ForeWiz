@@ -117,7 +117,7 @@ private final class MockPreferencesRepository: PreferencesRepository {
     func setOnboardingCompleted(_ completed: Bool) async throws {
         onboardingCompleted = completed
     }
-    
+
     func deleteAll() async throws {
         profile = .default
         onboardingCompleted = false

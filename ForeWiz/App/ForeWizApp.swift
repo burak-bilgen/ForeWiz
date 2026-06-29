@@ -14,25 +14,9 @@ struct ForeWizApp: App {
     init() {
         modelContainer = Self.makeModelContainer()
         BackgroundRefreshManager.shared.registerTasks()
-        
-        // Set up WizPathKit localization bridge
-        WizPathKitL10n.provider = ForeWizL10nProvider()
-        
-        // Initialize consent before the ad SDK makes any request.
-        // The sequence matters: ATT must be requested before any ad SDK
-        // initialization to comply with Guideline 2.1 (App Store review).
-        Task { @MainActor in
-            // 1. Check & request App Tracking Transparency permission FIRST.
-            //    On first launch this shows the ATT dialog automatically.
-            //    On subsequent launches it returns the cached status silently.
-            AdConsentManager.shared.updateConsentStatus()
-            _ = await AdConsentManager.shared.requestTrackingPermission()
 
-            // 2. Only after ATT response, proceed with UMP (GDPR) & AdMob SDK init.
-            await AdConsentManager.shared.prepareConsentIfNeeded()
-            await AdMobIntegration.shared.initializeSDK()
-            await AdManager.shared.initialize()
-        }
+        WizPathKitL10n.provider = ForeWizL10nProvider()
+
     }
 
     private static func makeModelContainer() -> ModelContainer {
@@ -48,13 +32,10 @@ struct ForeWizApp: App {
                 isStoredInMemoryOnly: false
             )
 
-            // 🔒 Pre-apply NSFileProtectionCompleteUntilFirstUserAuthentication to the store's parent directory
-            // BEFORE the ModelContainer opens the SQLite file. This ensures that
-            // any files created by SwiftData inherit the directory's protection.
             let storeDir = config.url.deletingLastPathComponent()
             try? FileManager.default.createDirectory(at: storeDir, withIntermediateDirectories: true,
                 attributes: [FileAttributeKey.protectionKey: FileProtectionType.completeUntilFirstUserAuthentication])
-            // Also apply protection attribute on the directory via NSURL path-based API
+
             try? (storeDir as NSURL).setResourceValue(
                 FileProtectionType.completeUntilFirstUserAuthentication,
                 forKey: .fileProtectionKey
@@ -65,8 +46,6 @@ struct ForeWizApp: App {
                 configurations: [config]
             )
 
-            // 🔐 Also set protection directly on the store file (belt-and-suspenders).
-            // This ensures the file is protected even if directory inheritance doesn't work.
             if let storeFileURL = container.configurations.first?.url {
                 try? (storeFileURL as NSURL).setResourceValue(
                     FileProtectionType.completeUntilFirstUserAuthentication,
@@ -89,18 +68,16 @@ struct ForeWizApp: App {
             return try ModelContainer(for: schema, configurations: [fallbackConfig])
         } catch {
             AppLogger.persistence.error("Fallback ModelContainer also failed: \(error.localizedDescription, privacy: .private)")
-            // Last resort: minimal in-memory container with empty schema
+
             let minimalSchema = Schema([UserPreferencesModel.self])
             let minimalConfig = ModelConfiguration(schema: minimalSchema, isStoredInMemoryOnly: true)
             if let minimal = try? ModelContainer(for: minimalSchema, configurations: [minimalConfig]) {
                 return minimal
             }
             AppLogger.persistence.critical("Unable to create ANY SwiftData ModelContainer - app cannot function")
-            // Last resort: return a container with minimal in-memory store.
-            // If this also fails, SwiftData itself is fundamentally broken on this device.
-            // We return a dummy container and let the app show a degraded state.
+
             let fallbackConfig = ModelConfiguration(isStoredInMemoryOnly: true)
-            // We must return something – SwiftUI requires a container.
+
             return try! ModelContainer(for: UserPreferencesModel.self, configurations: fallbackConfig)
         }
     }
@@ -153,34 +130,10 @@ struct ForeWizApp: App {
         case .active:
             AppLifecycleManager.shared.applicationWillEnterForeground()
             AppLifecycleManager.shared.applicationDidBecomeActive()
-            AdPlacementStrategy.shared.sessionStarted()
-            
-            // Refresh expired ad caches periodically
-            Task {
-                if AdConsentManager.shared.canServeAds {
-                    await AdManager.shared.refreshExpiredCaches()
-                }
-            }
-            
-            // Show app open ad at natural transition point
-            if AdConsentManager.shared.canServeAds,
-               AdPlacementStrategy.shared.shouldShowAppOpen(),
-               let rootVC = UIApplication.shared.connectedScenes
-                .compactMap({ $0 as? UIWindowScene })
-                .first?
-                .windows
-                .first?
-                .rootViewController {
-                _ = AdMobIntegration.shared.showAppOpenAd(
-                    from: rootVC,
-                    onDismiss: {}
-                )
-            }
         case .inactive:
             AppLifecycleManager.shared.applicationWillResignActive()
         case .background:
             AppLifecycleManager.shared.applicationDidEnterBackground()
-            AdPlacementStrategy.shared.sessionEnded()
         @unknown default:
             break
         }

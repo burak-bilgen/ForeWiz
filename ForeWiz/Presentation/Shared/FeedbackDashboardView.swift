@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Feedback Dashboard View
-/// Shows the user their submitted feedback history.
 struct FeedbackDashboardView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var store = FeedbackDashboardStore.shared
@@ -83,14 +81,12 @@ struct FeedbackDashboardView: View {
     }
 }
 
-// MARK: - Dashboard Row
-
 private struct FeedbackDashboardRow: View {
     let item: FeedbackDashboardItem
 
     var body: some View {
         HStack(spacing: 12) {
-            // Type indicator
+
             ZStack {
                 Circle()
                     .fill(typeColor.opacity(0.15))
@@ -159,8 +155,6 @@ private struct FeedbackDashboardRow: View {
         item.submittedAt.formatted(date: .abbreviated, time: .shortened)
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     FeedbackDashboardView()

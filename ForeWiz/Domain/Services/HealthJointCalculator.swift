@@ -1,8 +1,5 @@
 import Foundation
 
-// MARK: - Joint Pain Index Calculator
-
-/// Calculates joint pain risk from weather triggers: cold + humidity combo, rapid temperature drops, storm fronts.
 enum HealthJointCalculator {
 
     static func calculate(
@@ -14,7 +11,6 @@ enum HealthJointCalculator {
         let temp = current.apparentTemperatureCelsius
         let humidity = current.humidity ?? 0.5
 
-        // Cold + humidity = worst combo for joints
         if temp <= 10 && humidity >= 0.70 {
             painScore += 4
         } else if temp <= 10 {
@@ -27,7 +23,6 @@ enum HealthJointCalculator {
             painScore += 2
         }
 
-        // Rapid temperature drops (within 12 hours)
         let temps = hourly.prefix(12).map { $0.apparentTemperatureCelsius }
         if let first = temps.first, let last = temps.last {
             let drop = first - last
@@ -38,7 +33,6 @@ enum HealthJointCalculator {
             }
         }
 
-        // Storm front (pressure drop correlate)
         if hourly.contains(where: { point in
             guard let severeRisk = point.severeWeatherRisk else { return false }
             return severeRisk >= .low
@@ -51,8 +45,6 @@ enum HealthJointCalculator {
 
         return (clampedPain, label, advice)
     }
-
-    // MARK: - Labels
 
     private static func labelAndAdvice(for index: Int) -> (String, String) {
         switch index {

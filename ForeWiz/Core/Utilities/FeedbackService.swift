@@ -2,13 +2,8 @@ import Foundation
 import OSLog
 import UIKit
 
-// MARK: - Feedback Service
-/// Sends user feedback to a Formspree endpoint.
-/// No backend required — Formspree forwards submissions to email.
 enum FeedbackService {
-    // ⚙️ Formspree endpoint — create a free form at https://formspree.io and paste your URL here.
-    // The app POSTs JSON to this URL; Formspree forwards it to your email.
-    // No backend, no API keys in the binary.
+
     private static let formspreeEndpoint = "https://formspree.io/f/mnjrznrp"
 
     enum FeedbackType: String, CaseIterable, Sendable {
@@ -58,10 +53,8 @@ enum FeedbackService {
         }
     }
 
-    /// Maximum screenshot size: 10 MB
     private static let maxScreenshotSize = 10 * 1024 * 1024
 
-    /// Sends feedback to Formspree. Returns true on success.
     @discardableResult
     static func sendFeedback(
         type: FeedbackType,
@@ -74,7 +67,6 @@ enum FeedbackService {
             throw FeedbackError.invalidEndpoint
         }
 
-        // Validate and compress screenshot
         var screenshotBase64: String? = nil
         if var data = screenshotData {
             if data.count > maxScreenshotSize,
@@ -121,7 +113,6 @@ enum FeedbackService {
     }
 }
 
-// MARK: - App Info helpers
 enum AppInfo {
     static var version: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"

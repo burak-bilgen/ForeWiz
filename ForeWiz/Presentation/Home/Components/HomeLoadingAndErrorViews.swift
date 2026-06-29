@@ -1,8 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Loading View
-
 struct HomeLoadingView: View {
     @State private var rotationAngle: Double = 0
 
@@ -36,8 +34,6 @@ struct HomeLoadingView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
-
-// MARK: - Error View
 
 struct HomeErrorView: View {
     let message: String

@@ -1,7 +1,7 @@
 import SwiftUI
+import AppTrackingTransparency
 import WizPathKit
 
-// MARK: - Liquid Glass Onboarding
 struct OnboardingView: View {
     @Bindable var viewModel: OnboardingViewModel
     let existingProfile: UserComfortProfile
@@ -58,20 +58,20 @@ struct OnboardingView: View {
                 viewModel.addManualLocation(location)
             }
         }
-        .onChange(of: viewModel.locationStatus) { old, new in
+        .onChange(of: viewModel.locationStatus) { _, new in
             if new == .authorized {
                 HapticEngine.shared.success()
             } else if new == .denied || new == .restricted {
                 HapticEngine.shared.warning()
             }
         }
-        .onChange(of: viewModel.notificationStatus) { old, new in
+        .onChange(of: viewModel.notificationStatus) { _, new in
             if new == .authorized || new == .provisional {
                 HapticEngine.shared.success()
             }
         }
-        .onChange(of: viewModel.trackingStatus) { old, new in
-            if new == .granted {
+        .onChange(of: viewModel.trackingStatus) { _, new in
+            if new == .authorized {
                 HapticEngine.shared.success()
             } else if new == .denied {
                 HapticEngine.shared.warning()
@@ -87,8 +87,6 @@ struct OnboardingView: View {
             pageAppeared = true
         }
     }
-
-    // MARK: - Welcome Section
 
     private var welcomeSection: some View {
         VStack(spacing: 14) {
@@ -124,8 +122,6 @@ struct OnboardingView: View {
                 .staggerEntrance(index: 2, appeared: pageAppeared)
         }
     }
-
-    // MARK: - Preferences
 
     private var preferencesSection: some View {
         LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
@@ -165,8 +161,6 @@ struct OnboardingView: View {
         .staggerEntrance(index: 3, appeared: pageAppeared)
     }
 
-    // MARK: - Permissions
-
     @ViewBuilder
     private var permissionsSection: some View {
         LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 14) {
@@ -196,27 +190,25 @@ struct OnboardingView: View {
                 ) {
                     viewModel.requestNotificationPermission()
                 }
-                
-                // Tracking permission for personalized ads
+
                 PermissionRow(
                     icon: "hand.raised.fill",
                     color: .purple,
                     title: L10n.text("permission_tracking"),
                     subtitle: L10n.text("permission_tracking_subtitle"),
-                    isGranted: viewModel.trackingStatus == .granted,
+                    isGranted: viewModel.trackingStatus == .authorized,
                     isDenied: viewModel.trackingStatus == .denied,
                     isRequired: false
                 ) {
                     viewModel.requestTrackingPermission()
                 }
 
-                // Premium Tooltip Tracking Explanation
                 HStack(alignment: .top, spacing: 6) {
                     Image(systemName: "info.circle.fill")
                         .font(.system(size: 11))
                         .foregroundStyle(Color.purple.opacity(0.8))
                         .padding(.top, 1)
-                    
+
                     Text(L10n.text("permission_tracking_tooltip"))
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.4))
@@ -334,8 +326,6 @@ struct OnboardingView: View {
                 .padding(.horizontal, 8)
         }
     }
-
-    // MARK: - Location Setup
 
     private var locationSetupSection: some View {
         LiquidGlassCard(accentColor: .liquidAccent, innerPadding: 14) {
@@ -580,8 +570,6 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Start Button
-
     private var startButton: some View {
         Button {
             HapticEngine.shared.medium()
@@ -641,8 +629,6 @@ struct OnboardingView: View {
         .staggerEntrance(index: 6, appeared: pageAppeared)
     }
 
-    // MARK: - Helpers
-
     private func sectionLabel(icon: String, text: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
@@ -663,8 +649,6 @@ struct OnboardingView: View {
         UIApplication.shared.open(url)
     }
 }
-
-// MARK: - Permission Row
 
 private struct PermissionRow: View {
     let icon: String
@@ -747,8 +731,6 @@ private struct PermissionRow: View {
         .disabled(isGranted || isDenied)
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     OnboardingView(

@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Lightweight animated gradient background - transitions between colors smoothly.
 struct AnimatedGradientBackground: View {
     @State private var start = UnitPoint(x: 0, y: 0)
     @State private var end = UnitPoint(x: 1, y: 1)
@@ -29,7 +28,6 @@ struct AnimatedGradientBackground: View {
     }
 }
 
-/// Neon glow effect - layered shadows around content.
 struct NeonGlowEffect: ViewModifier {
     let color: Color
     let intensity: CGFloat

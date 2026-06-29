@@ -6,11 +6,11 @@ enum ActivityCategory: String, CaseIterable, Codable, Sendable {
     case social
     case photography
     case outdoors
-    
+
     var localizedTitle: String {
         "activity_category_\(rawValue)"
     }
-    
+
     var iconName: String {
         switch self {
         case .fitness: return "figure.run"

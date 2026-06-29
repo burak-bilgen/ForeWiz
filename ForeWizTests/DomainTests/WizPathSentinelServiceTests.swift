@@ -7,15 +7,15 @@ import WizPathKit
 @MainActor
 @Suite("WizPathSentinelService Tests")
 struct WizPathSentinelServiceTests {
-    
+
     @Test("evaluateRouteChange returns suppressed when below threshold")
     func evaluateRouteChangeReturnsSuppressedWhenBelowThreshold() async throws {
         let service = WizPathSentinelService.shared
-        
+
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
         let now = Date()
-        
+
         let originalRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -27,7 +27,7 @@ struct WizPathSentinelServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         let updatedRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -39,20 +39,20 @@ struct WizPathSentinelServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         let weatherContext = WeatherContext(
             primaryHazard: nil,
             temperature: 25,
             conditions: [.clear],
             isExtreme: false
         )
-        
+
         let decision = service.evaluateRouteChange(
             originalRoute: originalRoute,
             updatedRoute: updatedRoute,
             weatherContext: weatherContext
         )
-        
+
         switch decision {
         case .suppressed(let reason):
             #expect(reason == .belowThreshold)
@@ -60,15 +60,15 @@ struct WizPathSentinelServiceTests {
             Issue.record("Expected suppressed decision but got trigger")
         }
     }
-    
+
     @Test("evaluateRouteChange triggers alert when delay exceeds 30 minutes")
     func evaluateRouteChangeTriggersAlertWhenDelayExceeds30Minutes() async throws {
         let service = WizPathSentinelService.shared
-        
+
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
         let now = Date()
-        
+
         let originalRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -80,7 +80,7 @@ struct WizPathSentinelServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         let updatedRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -92,20 +92,20 @@ struct WizPathSentinelServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         let weatherContext = WeatherContext(
             primaryHazard: .extremeHeat,
             temperature: 42,
             conditions: [.clear],
             isExtreme: true
         )
-        
+
         let decision = service.evaluateRouteChange(
             originalRoute: originalRoute,
             updatedRoute: updatedRoute,
             weatherContext: weatherContext
         )
-        
+
         switch decision {
         case .trigger(let alert):
             #expect(alert.severity == .high || alert.severity == .critical)
@@ -114,15 +114,15 @@ struct WizPathSentinelServiceTests {
             Issue.record("Expected trigger decision but got suppressed: \(reason.description)")
         }
     }
-    
+
     @Test("evaluateRouteChange triggers alert when percentage increase exceeds 40%")
     func evaluateRouteChangeTriggersAlertWhenPercentageIncreaseExceeds40Percent() async throws {
         let service = WizPathSentinelService.shared
-        
+
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
         let now = Date()
-        
+
         let originalRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -134,7 +134,7 @@ struct WizPathSentinelServiceTests {
             totalDistance: 30000,
             polyline: nil
         )
-        
+
         let updatedRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -146,20 +146,20 @@ struct WizPathSentinelServiceTests {
             totalDistance: 30000,
             polyline: nil
         )
-        
+
         let weatherContext = WeatherContext(
             primaryHazard: .severeStorm,
             temperature: 20,
             conditions: [.thunderstorm],
             isExtreme: false
         )
-        
+
         let decision = service.evaluateRouteChange(
             originalRoute: originalRoute,
             updatedRoute: updatedRoute,
             weatherContext: weatherContext
         )
-        
+
         switch decision {
         case .trigger(let alert):
             let percentageIncrease = alert.timeDifference / originalRoute.totalDuration
@@ -168,7 +168,7 @@ struct WizPathSentinelServiceTests {
             Issue.record("Expected trigger decision but got suppressed: \(reason.description)")
         }
     }
-    
+
     @Test("SentinelAlert timeDifference calculation")
     func sentinelAlertTimeDifferenceCalculation() async throws {
         let alert = SentinelAlert(
@@ -187,10 +187,10 @@ struct WizPathSentinelServiceTests {
             ),
             timestamp: Date()
         )
-        
+
         #expect(alert.timeDifference == 1800)
     }
-    
+
     @Test("SuppressionReason descriptions")
     func suppressionReasonDescriptions() async throws {
         #expect(!SuppressionReason.belowThreshold.description.isEmpty)
@@ -198,7 +198,7 @@ struct WizPathSentinelServiceTests {
         #expect(!SuppressionReason.cooldownActive.description.isEmpty)
         #expect(!SuppressionReason.userDisabled.description.isEmpty)
     }
-    
+
     @Test("WeatherContext isExtreme flag")
     func weatherContextIsExtremeFlag() async throws {
         let extremeContext = WeatherContext(
@@ -208,7 +208,7 @@ struct WizPathSentinelServiceTests {
             isExtreme: true
         )
         #expect(extremeContext.isExtreme == true)
-        
+
         let normalContext = WeatherContext(
             primaryHazard: nil,
             temperature: 25,

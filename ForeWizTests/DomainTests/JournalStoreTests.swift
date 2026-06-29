@@ -25,8 +25,6 @@ struct JournalStoreTests {
         )
     }
 
-    // MARK: - CRUD
-
     @Test func saveAndFetchAll() async throws {
         let store = makeMockStore()
         let entry = makeEntry()
@@ -86,7 +84,7 @@ struct JournalStoreTests {
     @Test func deleteNonExistentIsNoOp() async throws {
         let store = makeMockStore()
         try await store.save(makeEntry())
-        // Deleting non-existent ID should not throw
+
         try await store.delete(UUID())
         let all = try await store.fetchAll()
         #expect(all.count == 1)
@@ -108,11 +106,9 @@ struct JournalStoreTests {
     @Test func updateNonExistentEntry() async throws {
         let store = makeMockStore()
         let entry = makeEntry()
-        // Should not throw for mock
+
         try await store.updateEntry(entry)
     }
-
-    // MARK: - Search
 
     @Test func searchByTitle() async throws {
         let store = makeMockStore()
@@ -202,8 +198,6 @@ struct JournalStoreTests {
         #expect(mixed.count == 1)
     }
 
-    // MARK: - Date Range
-
     @Test func fetchByDateRange() async throws {
         let store = makeMockStore()
         let calendar = Calendar.current
@@ -229,14 +223,11 @@ struct JournalStoreTests {
         try await store.save(makeEntry(id: UUID(), title: "Old", date: lastWeek))
         try await store.save(makeEntry(id: UUID(), title: "Today", date: today))
 
-        // Fetch only recent
         let threeDaysAgo = calendar.date(byAdding: .day, value: -3, to: today)!
         let results = try await store.fetch(from: threeDaysAgo, to: today)
         #expect(results.count == 1)
         #expect(results.first?.title == "Today")
     }
-
-    // MARK: - Edge Cases
 
     @Test func emptyStore() async throws {
         let store = makeMockStore()

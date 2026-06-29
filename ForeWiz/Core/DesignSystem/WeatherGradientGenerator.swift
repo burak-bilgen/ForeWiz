@@ -1,12 +1,6 @@
 import SwiftUI
 
-// MARK: - Gradient Generator
-
-/// Stateless helper that generates weather-responsive gradient configurations.
-/// Extracted from WeatherGradientService private extensions for modularity.
 enum WeatherGradientGenerator {
-
-    // MARK: - Internal Types
 
     enum TimeOfDay {
         case dawn, day, dusk, night
@@ -15,8 +9,6 @@ enum WeatherGradientGenerator {
     enum WeatherState {
         case clear, cloudy, rainy, stormy, snowy, foggy, hot, cold
     }
-
-    // MARK: - Resolution
 
     static func resolveTimeOfDay(isDaylight: Bool?, colorScheme: ColorScheme) -> TimeOfDay {
         guard let isDaylight else {
@@ -61,15 +53,13 @@ enum WeatherGradientGenerator {
         return "clear"
     }
 
-    // MARK: - Primary Gradient
-
     static func primaryGradient(
         timeOfDay: TimeOfDay,
         weatherState: WeatherState,
         colorScheme: ColorScheme
     ) -> LinearGradient {
         switch (timeOfDay, weatherState, colorScheme) {
-        // Day + Clear = Bright, cheerful
+
         case (.day, .clear, _):
             return LinearGradient(
                 colors: [
@@ -81,7 +71,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottomTrailing
             )
 
-        // Night + Clear = Deep, starry
         case (.night, .clear, .dark), (.night, .clear, .light):
             return LinearGradient(
                 colors: [
@@ -93,7 +82,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Rainy = Moody, cool
         case (_, .rainy, .dark):
             return LinearGradient(
                 colors: [
@@ -116,7 +104,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Stormy = Dramatic, intense
         case (_, .stormy, .dark):
             return LinearGradient(
                 colors: [
@@ -128,7 +115,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Cloudy = Soft, diffused
         case (_, .cloudy, .dark):
             return LinearGradient(
                 colors: [
@@ -151,7 +137,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Snowy = Crisp, cold
         case (_, .snowy, .dark):
             return LinearGradient(
                 colors: [
@@ -163,7 +148,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Hot = Warm, intense
         case (_, .hot, _):
             return LinearGradient(
                 colors: [
@@ -175,7 +159,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Cold = Icy, sharp
         case (_, .cold, _):
             return LinearGradient(
                 colors: [
@@ -187,7 +170,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Foggy = Muted, mysterious
         case (_, .foggy, .dark):
             return LinearGradient(
                 colors: [
@@ -199,7 +181,6 @@ enum WeatherGradientGenerator {
                 endPoint: .bottom
             )
 
-        // Default fallback
         default:
             return colorScheme == .dark
                 ? LinearGradient(
@@ -220,8 +201,6 @@ enum WeatherGradientGenerator {
                 )
         }
     }
-
-    // MARK: - Secondary Gradient
 
     static func secondaryGradient(
         timeOfDay: TimeOfDay,
@@ -252,8 +231,6 @@ enum WeatherGradientGenerator {
         )
     }
 
-    // MARK: - Accent Color
-
     static func accentColor(weatherState: WeatherState, decision: OutdoorDecision?) -> Color {
         if let decision {
             switch decision {
@@ -276,8 +253,6 @@ enum WeatherGradientGenerator {
         }
     }
 
-    // MARK: - Particle Effect
-
     static func particleEffect(weatherState: WeatherState, timeOfDay: TimeOfDay) -> ParticleEffect? {
         switch weatherState {
         case .rainy:
@@ -294,8 +269,6 @@ enum WeatherGradientGenerator {
             return nil
         }
     }
-
-    // MARK: - Animation Speed
 
     static func animationSpeed(weatherState: WeatherState) -> Double {
         switch weatherState {

@@ -14,7 +14,7 @@ struct WeatherScoreTests {
     }
 
     @Test func defaultLabelFollowsScoreBands() {
-        // Both sides use the same L10n call to avoid language mismatch
+
         #expect(WeatherScore(rawValue: 90).label == L10n.text("decision_good"))
         #expect(WeatherScore(rawValue: 70).label == L10n.text("decision_moderate"))
         #expect(WeatherScore(rawValue: 50).label == L10n.text("decision_risky"))

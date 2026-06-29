@@ -10,26 +10,23 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     var language: AppLanguage
     var savedLocations: [SavedLocation]
     var selectedLocationID: String
-    var weatherParticleIntensity: Double // 0 (kapalı) – 1 (maks), varsayılan 0.15
-    
-    // MARK: - User Feedback / Learning
-    /// Temperature offset in °C: positive means user runs hotter (feels warmer), negative means colder.
-    /// Used by WeatherDecisionEngine to adjust scores. Range: -5 to +5.
+    var weatherParticleIntensity: Double
+
     var temperatureOffset: Double
-    /// Wind sensitivity multiplier: >1 means more sensitive to wind, <1 means less. Range: 0.5 to 2.0.
+
     var windSensitivityMultiplier: Double
-    /// UV sensitivity: >1 means more sensitive to sun, <1 means less. Range: 0.5 to 2.0.
+
     var uvSensitivityMultiplier: Double
-    /// Humidity sensitivity: >1 means more affected by humidity, <1 means less. Range: 0.5 to 2.0.
+
     var humiditySensitivityMultiplier: Double
-    /// Preferred activity time: nil = flexible, or user's typical outdoor activity hours
+
     var preferredActivityStartHour: Int?
     var preferredActivityEndHour: Int?
-    /// Whether the user has respiratory conditions (asthma, allergies) — affects AQI weighting
+
     var hasRespiratoryCondition: Bool
-    /// Whether the user has joint sensitivity — affects joint pain weighting
+
     var hasJointSensitivity: Bool
-    /// Simple thumbs feedback: tracks how many times user said "too hot" vs "too cold" vs "just right"
+
     var feedbackCounts: FeedbackCounts
     var homeLocation: SavedLocation?
     var workLocation: SavedLocation?
@@ -87,8 +84,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
             }
         )
     }
-    
-    /// Record a piece of feedback and adjust learning parameters accordingly.
+
     mutating func recordFeedback(_ feedback: UserWeatherFeedback) {
         switch feedback {
         case .tooHot:
@@ -121,8 +117,7 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
             humiditySensitivityMultiplier = (humiditySensitivityMultiplier - 0.1).clamped(to: 0.5...2.0)
         }
     }
-    
-    /// Reset all learning data to defaults.
+
     mutating func resetLearning() {
         temperatureOffset = 0
         windSensitivityMultiplier = 1.0
@@ -136,9 +131,6 @@ struct UserComfortProfile: Codable, Equatable, Sendable {
     }
 }
 
-// MARK: - Feedback Types
-
-/// Simple thumbs feedback counts to track user preferences over time.
 struct FeedbackCounts: Codable, Equatable, Sendable {
     var tooHot: Int = 0
     var tooCold: Int = 0
@@ -146,16 +138,15 @@ struct FeedbackCounts: Codable, Equatable, Sendable {
     var windSensitive: Int = 0
     var tooSunny: Int = 0
     var tooHumid: Int = 0
-    
+
     var total: Int { tooHot + tooCold + justRight + windSensitive + tooSunny + tooHumid }
 }
 
-/// Types of feedback a user can give about a weather recommendation.
 enum UserWeatherFeedback: Equatable, Sendable, CustomStringConvertible {
     case tooHot
     case tooCold
     case justRight
-    case windSensitive(Bool) // true = sensitive, false = not sensitive
+    case windSensitive(Bool)
     case tooSunny
     case tooHumid
     case humidityFine

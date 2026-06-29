@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Gradient Set
-
 struct WeatherGradientSet {
     let primary: LinearGradient
     let secondary: LinearGradient?
@@ -22,8 +20,6 @@ struct WeatherGradientSet {
     )
 }
 
-// MARK: - Particle Effect
-
 enum ParticleEffect: Equatable {
     case rain(Intensity: Double)
     case snow(Intensity: Double)
@@ -31,5 +27,3 @@ enum ParticleEffect: Equatable {
     case stars(Count: Int)
     case sunRays(Intensity: Double)
 }
-
-

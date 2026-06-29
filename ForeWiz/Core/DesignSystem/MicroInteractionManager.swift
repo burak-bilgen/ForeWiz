@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - View Modifiers (inline values, no manager)
-
 struct MicroButtonStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) var reduceMotion
 
@@ -57,20 +55,16 @@ struct MicroRefreshModifier: ViewModifier {
     }
 }
 
-// MARK: - View Extensions
-
 extension View {
-    /// Applies premium button micro-interactions.
+
     func microButton() -> some View {
         buttonStyle(MicroButtonStyle())
     }
 
-    /// Applies card entrance animation with staggered delay.
     func microCardEntrance(index: Int, baseDelay: Double = 0.0) -> some View {
         modifier(MicroCardEntranceModifier(index: index, baseDelay: baseDelay))
     }
 
-    /// Applies refresh rotation animation.
     func microRefresh(isRefreshing: Bool) -> some View {
         modifier(MicroRefreshModifier(isRefreshing: isRefreshing))
     }

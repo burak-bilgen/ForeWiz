@@ -3,15 +3,12 @@ import Foundation
 import OSLog
 import WeatherKit
 
-// MARK: - Rate Limiter
-/// Prevents WeatherKit API calls more frequently than the minimum interval.
-/// Avoids hitting Apple's rate limits and reduces battery drain from rapid refreshes.
 private actor WeatherKitRateLimiter {
     static let shared = WeatherKitRateLimiter()
-    
+
     private var lastFetchTime: Date?
-    private let minimumInterval: TimeInterval = 30 // seconds between calls
-    
+    private let minimumInterval: TimeInterval = 30
+
     func canFetch() -> Bool {
         guard let last = lastFetchTime else {
             lastFetchTime = Date()
@@ -25,7 +22,7 @@ private actor WeatherKitRateLimiter {
         lastFetchTime = Date()
         return true
     }
-    
+
     func reset() {
         lastFetchTime = nil
     }
@@ -45,12 +42,12 @@ final class WeatherKitWeatherRepository: WeatherRepository {
     }
 
     func fetchWeather(for location: LocationCoordinate) async throws -> WeatherSnapshot {
-        // ⏱️ Rate limiting: prevent calls more frequent than 30s
+
         guard await rateLimiter.canFetch() else {
-            // Try to return cached data instead of throwing
+
             throw AppError.weatherUnavailable
         }
-        
+
         do {
             let clLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
             AppLogger.weather.info("Fetching WeatherKit forecast")
@@ -99,7 +96,7 @@ final class WeatherKitWeatherRepository: WeatherRepository {
         guard localizedDescription != reflectedDescription else {
             return localizedDescription
         }
-        // NOT logged anywhere - only used for internal diagnostic matching (caller applies privacy)
+
         return "\(localizedDescription) (\(reflectedDescription))"
     }
 

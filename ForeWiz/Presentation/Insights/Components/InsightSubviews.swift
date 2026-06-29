@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Metric Button
-
 struct MetricButton: View {
     let metric: MetricType
     let isSelected: Bool
@@ -41,8 +39,6 @@ struct MetricButton: View {
     }
 }
 
-// MARK: - Statistic Card
-
 struct StatisticCard: View {
     let title: String
     let value: String
@@ -78,8 +74,6 @@ struct StatisticCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
-
-// MARK: - Trend Row
 
 struct TrendRow: View {
     let title: String
@@ -117,8 +111,6 @@ struct TrendRow: View {
     }
 }
 
-// MARK: - Comfort Window Row
-
 struct ComfortWindowRow: View {
     let window: ComfortWindow
 
@@ -154,8 +146,6 @@ struct ComfortWindowRow: View {
         .padding(.vertical, 8)
     }
 }
-
-// MARK: - Legacy Chart View (iOS < 16)
 
 struct LegacyChartView: View {
     let data: [ChartDataPoint]

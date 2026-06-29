@@ -10,8 +10,6 @@ struct ComparativeWeatherServiceTests {
         return cal
     }()
 
-    // MARK: - Helpers
-
     private func makeDailyPoints(
         temps: [(high: Double, low: Double)] = [(28, 18), (26, 16), (24, 14)],
         precipChances: [Double?] = [0.1, 0.2, 0.3],
@@ -101,8 +99,6 @@ struct ComparativeWeatherServiceTests {
         )
     }
 
-    // MARK: - Temperature Anomaly Tests
-
     @Test func anomalyLabelPresentForSummer() {
         let daily = makeDailyPoints(temps: [(35, 24), (33, 22), (31, 20)])
         let snapshot = makeSnapshot(daily: daily)
@@ -114,14 +110,11 @@ struct ComparativeWeatherServiceTests {
     @Test func anomalyValueIsOptional() {
         let snapshot = makeSnapshot(daily: [])
         let analysis = service.analyze(snapshot: snapshot, recommendation: makeRecommendation(), calendar: calendar)
-        // With no daily data, anomaly might be nil
-        // Just verify it doesn't crash
+
         if let anomaly = analysis.temperatureAnomalyCelsius {
             #expect(anomaly.isFinite)
         }
     }
-
-    // MARK: - Precipitation Tests
 
     @Test func dryPrecipitationWhenLow() {
         let hourly = makeHourlyPoints(precipChances: [0.05, 0.08, 0.02, 0.03, 0.01, 0.0])
@@ -138,8 +131,6 @@ struct ComparativeWeatherServiceTests {
         #expect(analysis.isUnusuallyRainy == true)
     }
 
-    // MARK: - Day Over Day Tests
-
     @Test func dayOverDayWithMultipleDays() {
         let daily = makeDailyPoints(temps: [(30, 20), (26, 18), (25, 17)])
         let snapshot = makeSnapshot(daily: daily)
@@ -154,8 +145,6 @@ struct ComparativeWeatherServiceTests {
         #expect(analysis.dayOverDayChange.isEmpty == false)
         #expect(analysis.dayOverDayDeltaCelsius != nil)
     }
-
-    // MARK: - Week Pattern Tests
 
     @Test func heatwaveDetection() {
         let daily = makeDailyPoints(temps: [(36, 24), (37, 25), (38, 26), (35, 24), (34, 23)])
@@ -186,8 +175,6 @@ struct ComparativeWeatherServiceTests {
         let isStable = analysis.weekPattern == .stable
         #expect(isWarming || isStable, "Should detect warming or stay stable with limited data")
     }
-
-    // MARK: - All Fields Tests
 
     @Test func allComparativeFieldsPopulated() {
         let daily = makeDailyPoints(temps: [(28, 18), (26, 16)])

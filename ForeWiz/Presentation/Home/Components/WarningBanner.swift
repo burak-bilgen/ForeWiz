@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Warning Banner
-
 struct WarningBanner: View {
     let message: String
 

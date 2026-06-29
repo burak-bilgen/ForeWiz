@@ -41,7 +41,6 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
 
         candidates.append(avoidCandidate(from: snapshot, hourly: hourly, now: now, calendar: calendar))
 
-        // Use the risk classifier instead of duplicating threshold logic
         let detectedRisks = riskClassifier.uniqueRisks(from: hourly, current: current, calendar: calendar)
         for risk in detectedRisks {
             if let candidate = riskCandidate(from: risk, current: current, fetchedAt: snapshot.fetchedAt) {
@@ -169,8 +168,6 @@ struct DefaultRecommendationCandidateProvider: RecommendationCandidateProvider {
         )
     }
 
-    /// Creates a recommendation candidate from a single classified WeatherRisk.
-    /// Uses the classifier's severity and thresholds instead of duplicating logic.
     private func riskCandidate(
         from risk: WeatherRisk,
         current: CurrentWeatherPoint,

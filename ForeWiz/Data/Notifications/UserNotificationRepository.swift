@@ -43,7 +43,6 @@ final class UserNotificationRepository: NotificationRepository {
 
             content.categoryIdentifier = plan.category.rawValue
 
-            // Map priority to interruption level
             if plan.priority >= 70 {
                 content.interruptionLevel = .timeSensitive
             } else {

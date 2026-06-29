@@ -5,8 +5,6 @@ import MapKit
 @testable import WizPathKit
 @testable import ForeWiz
 
-// MARK: - Test Helpers
-
 @MainActor
 private func makeMapItem() -> MKMapItem {
     MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)))
@@ -35,8 +33,6 @@ private func makeViewModel() -> WizPathViewModel {
 @Suite("WizPathViewModel Tests")
 struct WizPathViewModelTests {
 
-    // MARK: - Initial State
-
     @Test("ViewModel initializes with idle state")
     func initialStateIsIdle() async throws {
         let vm = makeViewModel()
@@ -48,8 +44,6 @@ struct WizPathViewModelTests {
         #expect(vm.sentinelAlerts.isEmpty)
         #expect(vm.bestDepartureTime == nil)
     }
-
-    // MARK: - Travel Mode
 
     @Test("Travel mode defaults to car")
     func travelModeDefaultsToCar() async throws {
@@ -64,7 +58,7 @@ struct WizPathViewModelTests {
     @Test("Travel mode switching resets cycling analysis")
     func travelModeSwitchResetsCycling() async throws {
         let vm = makeViewModel()
-        // Simulate cycling analysis being set
+
         vm.cyclingSafetyAnalysis = WizPathCyclingSafetyService.CyclingSafetyAnalysis(
             safety: WizPathCyclingSafetyService.CyclingSafety.safe,
             effortLevel: WizPathCyclingSafetyService.EffortLevel(
@@ -82,7 +76,6 @@ struct WizPathViewModelTests {
         #expect(vm.cyclingSafetyAnalysis != nil)
         #expect(vm.cyclingSafetyRecommendations.count == 1)
 
-        // Switch to car — should reset cycling state
         vm.switchTravelMode(to: .car)
         #expect(vm.travelMode == .car)
         #expect(vm.cyclingSafetyAnalysis == nil)
@@ -94,32 +87,27 @@ struct WizPathViewModelTests {
         let vm = makeViewModel()
         vm.switchTravelMode(to: .cycling)
         #expect(vm.travelMode == .cycling)
-        // Analysis is nil until route is calculated
+
         #expect(vm.cyclingSafetyAnalysis == nil)
     }
-
-    // MARK: - Destination Setting
 
     @Test("Setting destination triggers state reset")
     func settingDestinationResetsState() async throws {
         let vm = makeViewModel()
         let coord = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
-        // Just set the coordinate without triggering full calculation
-        // (which requires async setup)
+
         vm.destinationCoordinate = coord
         vm.destinationName = "Test Location"
         #expect(vm.destinationCoordinate?.latitude == 41.0)
         #expect(vm.destinationName == "Test Location")
     }
 
-    // MARK: - Computed Properties
-
     @Test("Can calculate requires coordinate and not calculating")
     func canCalculateComputed() async throws {
         let vm = makeViewModel()
-        // Initially no destination — can't calculate
+
         #expect(vm.canCalculate == false)
-        // Set coordinate
+
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         #expect(vm.canCalculate == true)
     }
@@ -135,12 +123,10 @@ struct WizPathViewModelTests {
         #expect(vm.weatherChangePoints.isEmpty)
     }
 
-    // MARK: - Reset
-
     @Test("Reset clears state back to idle")
     func resetClearsState() async throws {
         let vm = makeViewModel()
-        // Simulate non-idle state
+
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         vm.destinationName = "Test"
         vm.showJourneyHUD = true
@@ -154,8 +140,6 @@ struct WizPathViewModelTests {
         #expect(vm.showWeatherDetail == false)
     }
 
-    // MARK: - Departure Time
-
     @Test("Departure time is in the future")
     func departureTimeIsInFuture() async throws {
         let vm = makeViewModel()
@@ -166,14 +150,12 @@ struct WizPathViewModelTests {
     @Test("Update departure time clamps to future")
     func updateDepartureTimeClamps() async throws {
         let vm = makeViewModel()
-        let pastDate = Date().addingTimeInterval(-86400) // Yesterday
+        let pastDate = Date().addingTimeInterval(-86400)
         vm.updateDepartureTime(pastDate)
-        // Should have advanced beyond the past date
-        #expect(vm.departureTime > pastDate)
-        #expect(vm.departureTime.timeIntervalSince(pastDate) >= 86400 - 1) // ~1 day forward
-    }
 
-    // MARK: - Cycling Safety Analysis
+        #expect(vm.departureTime > pastDate)
+        #expect(vm.departureTime.timeIntervalSince(pastDate) >= 86400 - 1)
+    }
 
     @Test("Cycling safety analysis defaults to nil for non-cycling")
     func cyclingSafetyNilForCar() async throws {
@@ -187,20 +169,15 @@ struct WizPathViewModelTests {
         vm.switchTravelMode(to: .cycling)
         #expect(vm.travelMode == .cycling)
 
-        // When no analysis yet, properties should be nil/empty
         #expect(vm.cyclingSafetyAnalysis == nil)
         #expect(vm.cyclingSafetyRecommendations.isEmpty)
     }
-
-    // MARK: - Sentinel Alerts
 
     @Test("Sentinel alerts initialize empty")
     func sentinelAlertsStartEmpty() async throws {
         let vm = makeViewModel()
         #expect(vm.sentinelAlerts.isEmpty)
     }
-
-    // MARK: - WizPathCyclingSafetyService Direct Tests
 
     @Test("CyclingSafety safe for good conditions")
     func cyclingSafetySafeForGoodConditions() async throws {
@@ -243,15 +220,11 @@ struct WizPathViewModelTests {
         #expect(analysis.safety.isRisky)
         #expect(analysis.maxGustSpeed >= 40)
         if case WizPathCyclingSafetyService.CyclingSafety.notRecommended = analysis.safety {
-            #expect(true) // Correct safety case
+            #expect(true)
         } else {
             Issue.record("Expected notRecommended safety")
         }
     }
-
-    // EV mode tests removed
-
-    // MARK: - Toll Road Toggle
 
     @Test("Toll road toggle flips state")
     func tollRoadToggleFlipsState() async throws {
@@ -263,8 +236,6 @@ struct WizPathViewModelTests {
         #expect(vm.avoidTollRoads == false)
     }
 
-    // MARK: - Dismiss Error
-
     @Test("Dismiss error sets state to idle")
     func dismissErrorSetsStateToIdle() async throws {
         let vm = makeViewModel()
@@ -274,8 +245,6 @@ struct WizPathViewModelTests {
         #expect(vm.state == .idle)
         #expect(vm.errorMessage == nil)
     }
-
-    // MARK: - Maps URL Builders
 
     @Test("Apple Maps URL returns nil when no route")
     func appleMapsURLReturnsNilWhenNoRoute() async throws {
@@ -288,7 +257,7 @@ struct WizPathViewModelTests {
         let vm = makeViewModel()
         vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
-        // Set a route to pass guard check
+
         let route = WizPathRoute.testRoute()
         vm.state = .routeReady(route)
 
@@ -304,7 +273,7 @@ struct WizPathViewModelTests {
         let vm = makeViewModel()
         vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
-        // Web URL now includes waypoints, requires a route
+
         let route = WizPathRoute.testRoute()
         vm.state = .routeReady(route)
 
@@ -349,8 +318,6 @@ struct WizPathViewModelTests {
         #expect(unwrapped.contains("google.com/maps"))
     }
 
-    // MARK: - Offline Maps Navigation
-
     @Test("mapsNavigationRoute returns currentRoute when state is routeReady")
     func mapsNavigationRouteReturnsCurrentRouteWhenReady() async throws {
         let vm = makeViewModel()
@@ -365,18 +332,16 @@ struct WizPathViewModelTests {
         vm.originCoordinate = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         vm.destinationCoordinate = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
 
-        // Simulate a successful route calculation by selecting a candidate
         let route = WizPathRoute.testRoute()
         let candidate = ScoredRouteCandidate(route: route, score: 85, trafficCongestion: .freeFlow, hasTollRoads: false)
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        #expect(vm.currentRoute != nil) // Should be routeReady after selection
+        #expect(vm.currentRoute != nil)
 
-        // Now go offline — currentRoute becomes nil
         vm.state = .offline
         #expect(vm.currentRoute == nil)
-        #expect(vm.mapsNavigationRoute?.id == route.id) // Falls back to cached route
+        #expect(vm.mapsNavigationRoute?.id == route.id)
     }
 
     @Test("mapsNavigationRoute returns nil when never calculated and offline")
@@ -404,7 +369,6 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Go offline
         vm.state = .offline
 
         let url = vm.appleMapsURLString()
@@ -493,7 +457,6 @@ struct WizPathViewModelTests {
 
         vm.reset()
 
-        // After reset, cache is cleared
         #expect(vm.state == .idle)
         #expect(vm.mapsNavigationRoute == nil)
     }
@@ -516,8 +479,8 @@ struct WizPathViewModelTests {
 
         let waypoints = vm.mapsWaypoints
         #expect(waypoints.count == 2)
-        #expect(waypoints[0].id == stop2.id) // earlier arrival first
-        #expect(waypoints[1].id == stop1.id) // later arrival second
+        #expect(waypoints[0].id == stop2.id)
+        #expect(waypoints[1].id == stop1.id)
     }
 
     @Test("mapsWaypoints excludes unsafe stops")
@@ -535,7 +498,7 @@ struct WizPathViewModelTests {
         vm.smartStops = [safe, unsafe, caution]
 
         let waypoints = vm.mapsWaypoints
-        #expect(waypoints.count == 2) // safe + caution (unsafe's shouldAvoid should be true)
+        #expect(waypoints.count == 2)
         #expect(waypoints.allSatisfy { $0.safetyStatus != .unsafe })
     }
 
@@ -560,7 +523,6 @@ struct WizPathViewModelTests {
         vm.selectRouteCandidate(at: 0)
         vm.smartStops = [stop]
 
-        // Go offline — stops should persist
         vm.state = .offline
         #expect(vm.smartStops.count == 1)
         #expect(vm.mapsWaypoints.count == 1)
@@ -576,7 +538,7 @@ struct WizPathViewModelTests {
         vm.selectRouteCandidate(at: 0)
 
         vm.state = .offline
-        // mapsNavigationRoute should return the cached route with its properties
+
         #expect(vm.mapsNavigationRoute != nil)
         #expect(vm.mapsNavigationRoute?.id == route.id)
     }
@@ -589,18 +551,14 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        #expect(vm.mapsNavigationRoute != nil) // Cache is set
+        #expect(vm.mapsNavigationRoute != nil)
 
-        // Error state does NOT clear lastCalculatedRoute (state machine handles this)
         vm.state = .error("Network error")
-        #expect(vm.mapsNavigationRoute?.id == route.id) // Cache preserved
+        #expect(vm.mapsNavigationRoute?.id == route.id)
 
-        // Only reset() clears cache
         vm.reset()
         #expect(vm.mapsNavigationRoute == nil)
     }
-
-    // MARK: - Cache Expiration
 
     @Test("mapsNavigationRoute uses fresh cache when route is recent (< 30 min)")
     func mapsNavigationRouteUsesFreshCache() async throws {
@@ -610,7 +568,6 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Cache is fresh (just set)
         vm.state = .offline
         #expect(vm.mapsNavigationRoute != nil)
         #expect(vm.mapsNavigationRoute?.id == route.id)
@@ -624,7 +581,6 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Manipulate timestamp to be expired (cacheExpirationInterval = 1800)
         vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-1801)
 
         vm.state = .offline
@@ -653,7 +609,6 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Set timestamp to just under expiration (1799 seconds ago)
         vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-1799)
 
         vm.state = .offline
@@ -669,18 +624,15 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Simulate old cache
         vm.lastCalculatedRouteTimestamp = Date().addingTimeInterval(-3600)
 
-        // Select a new candidate — refreshes timestamp
         let newRoute = WizPathRoute.testRoute(id: UUID())
         let newCandidate = ScoredRouteCandidate(route: newRoute, score: 90, trafficCongestion: .freeFlow, hasTollRoads: false)
         vm.routeCandidates = [newCandidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Timestamp should be refreshed to now
         let cachedAt = try #require(vm.lastCalculatedRouteTimestamp)
-        #expect(Date().timeIntervalSince(cachedAt) < 2) // Just set
+        #expect(Date().timeIntervalSince(cachedAt) < 2)
 
         vm.state = .offline
         #expect(vm.mapsNavigationRoute?.id == newRoute.id)
@@ -702,8 +654,6 @@ struct WizPathViewModelTests {
         #expect(vm.mapsNavigationRoute == nil)
     }
 
-    // MARK: - Offline State Preservation
-
     @Test("State transitions: idle → loading → offline preserves cache")
     func stateTransitionOfflinePreservesCache() async throws {
         let vm = makeViewModel()
@@ -718,8 +668,6 @@ struct WizPathViewModelTests {
         #expect(vm.mapsNavigationRoute != nil)
         #expect(vm.mapsNavigationRoute?.id == route.id)
     }
-
-    // EV state test removed
 
     @Test("Offline with cached route — toll road preference is preserved")
     func offlinePreservesTollPreference() async throws {
@@ -757,10 +705,9 @@ struct WizPathViewModelTests {
         vm.routeCandidates = [candidate]
         vm.selectRouteCandidate(at: 0)
 
-        // Simulate going to error state after having a route
         vm.state = .error("API failure")
         #expect(vm.currentRoute == nil)
-        #expect(vm.mapsNavigationRoute?.id == route.id) // Falls back
+        #expect(vm.mapsNavigationRoute?.id == route.id)
     }
 
     @Test("Toll avoidance reflected in Apple Maps URL")
@@ -775,8 +722,6 @@ struct WizPathViewModelTests {
         let webURL = vm.appleMapsWebURLString()
         #expect(webURL?.contains("dirflg=d") == true)
     }
-
-    // MARK: - Route Candidates
 
     @Test("Route candidates initialize empty")
     func routeCandidatesInitializeEmpty() async throws {
@@ -821,8 +766,6 @@ struct WizPathViewModelTests {
         #expect(vm.cyclingSafetyAnalysis == nil)
     }
 
-    // MARK: - Sentinel Alert Management
-
     @Test("Add sentinel alert")
     func addSentinelAlert() async throws {
         let vm = makeViewModel()
@@ -851,7 +794,7 @@ struct WizPathViewModelTests {
             ]
         )
         let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
-        #expect(analysis.effortLevel.level >= 4) // Wind + heat should raise effort
+        #expect(analysis.effortLevel.level >= 4)
         #expect(analysis.effortLevel.extraTimePercent >= 0)
     }
 
@@ -866,10 +809,8 @@ struct WizPathViewModelTests {
         let analysis = WizPathCyclingSafetyService.shared.analyzeCyclingSafety(route: route)
         let safe = WizPathCyclingSafetyService.CyclingSafety.safe
         #expect(analysis.safety == safe)
-        #expect(analysis.overallWindSpeed == 0) // No wind analysis for non-cycling
+        #expect(analysis.overallWindSpeed == 0)
     }
-
-    // MARK: - TravelMode Enum Tests
 
     @Test("TravelMode cycling properties")
     func travelModeCyclingProperties() async throws {
@@ -887,8 +828,6 @@ struct WizPathViewModelTests {
         #expect(modes.count == 3)
     }
 }
-
-// MARK: - Test Helpers for Route Building
 
 extension WizPathRoute {
     static func testRoute(

@@ -1,18 +1,12 @@
 import SwiftUI
 import Combine
 
-/// A service that generates context-aware gradient backgrounds based on
-/// weather conditions, time of day, and outdoor decision state.
-///
-/// This creates the \"delight\" factor for Apple Design Award consideration by
-/// providing fluid, weather-responsive visual atmospheres.
 @MainActor
 final class WeatherGradientService: ObservableObject {
     static let shared = WeatherGradientService()
 
     private init() {}
 
-    /// Generates a gradient set for the current weather context.
     func gradientFor(
         condition: String?,
         isDaylight: Bool?,
@@ -32,7 +26,6 @@ final class WeatherGradientService: ObservableObject {
         )
     }
 
-    /// Quick gradient for symbol names (backward compatibility).
     func gradientFor(symbolName: String, colorScheme: ColorScheme) -> LinearGradient {
         let condition = WeatherGradientGenerator.conditionFromSymbol(symbolName)
         let set = gradientFor(

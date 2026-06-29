@@ -1,32 +1,23 @@
 import Foundation
 
-/// Air Quality Index information for a location.
-/// Uses the EPA AQI scale (0–500) with standard breakpoints.
 struct AirQualityInfo: Codable, Equatable, Sendable {
-    /// The numeric AQI value (0–500)
+
     let aqi: Int
-    
-    /// Concentration of PM2.5 in µg/m³ (optional — depends on data source)
+
     let pm25: Double?
-    
-    /// Concentration of PM10 in µg/m³ (optional)
+
     let pm10: Double?
-    
-    /// Ozone concentration in ppb (optional)
+
     let ozone: Double?
-    
-    /// Pollen count index (0–10, where 0 = none, 10 = extreme)
+
     let pollenIndex: Int?
-    
-    /// The dominant pollutant, if known
+
     let dominantPollutant: PollutantType?
-    
-    /// Category label derived from AQI value
+
     var category: AirQualityCategory {
         AirQualityCategory(aqi: aqi)
     }
-    
-    /// A 0–10 health risk index derived from AQI (0 = pristine, 10 = hazardous)
+
     var healthRiskIndex: Int {
         switch aqi {
         case 0...50: return 0
@@ -37,17 +28,15 @@ struct AirQualityInfo: Codable, Equatable, Sendable {
         default: return 10
         }
     }
-    
-    /// Whether outdoor exercise is advised against
+
     var isUnhealthyForSensitiveGroups: Bool {
         aqi >= 101
     }
-    
-    /// Whether it's unhealthy for the general population
+
     var isUnhealthy: Bool {
         aqi >= 151
     }
-    
+
     init(
         aqi: Int,
         pm25: Double? = nil,
@@ -65,8 +54,6 @@ struct AirQualityInfo: Codable, Equatable, Sendable {
     }
 }
 
-// MARK: - Air Quality Category
-
 enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
     case good
     case moderate
@@ -74,7 +61,7 @@ enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
     case unhealthy
     case veryUnhealthy
     case hazardous
-    
+
     init(aqi: Int) {
         switch aqi {
         case 0...50: self = .good
@@ -85,7 +72,7 @@ enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
         default: self = .hazardous
         }
     }
-    
+
     var localizedTitle: String {
         switch self {
         case .good: return L10n.text("aqi_good")
@@ -96,7 +83,7 @@ enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
         case .hazardous: return L10n.text("aqi_hazardous")
         }
     }
-    
+
     var localizedAdvice: String {
         switch self {
         case .good: return L10n.text("aqi_advice_good")
@@ -107,7 +94,7 @@ enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
         case .hazardous: return L10n.text("aqi_advice_hazardous")
         }
     }
-    
+
     var symbolName: String {
         switch self {
         case .good: return "leaf.fill"
@@ -118,8 +105,7 @@ enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
         case .hazardous: return "xmark.octagon.fill"
         }
     }
-    
-    /// Color tint level 0–3 for UI (0 = green, 3 = maroon/dark red)
+
     var severityLevel: Int {
         switch self {
         case .good: return 0
@@ -132,8 +118,6 @@ enum AirQualityCategory: String, Codable, CaseIterable, Sendable {
     }
 }
 
-// MARK: - Pollutant Types
-
 enum PollutantType: String, Codable, CaseIterable, Sendable {
     case pm25 = "PM2.5"
     case pm10 = "PM10"
@@ -142,7 +126,7 @@ enum PollutantType: String, Codable, CaseIterable, Sendable {
     case sulfurDioxide = "SO2"
     case carbonMonoxide = "CO"
     case unknown
-    
+
     var localizedName: String {
         switch self {
         case .pm25: return L10n.text("pollutant_pm25")
@@ -156,8 +140,6 @@ enum PollutantType: String, Codable, CaseIterable, Sendable {
     }
 }
 
-// MARK: - Pollen Category
-
 enum PollenLevel: Int, Codable, Sendable {
     case none = 0
     case veryLow = 1
@@ -166,7 +148,7 @@ enum PollenLevel: Int, Codable, Sendable {
     case high = 4
     case veryHigh = 5
     case extreme = 6
-    
+
     init(index: Int) {
         switch index {
         case 0...1: self = .none
@@ -178,7 +160,7 @@ enum PollenLevel: Int, Codable, Sendable {
         default: self = .none
         }
     }
-    
+
     var localizedTitle: String {
         switch self {
         case .none: return L10n.text("pollen_none")

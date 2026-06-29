@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Background
-
 struct InsightsBackground: View {
     var body: some View {
         AnimatedOrbBackground(
@@ -11,8 +9,6 @@ struct InsightsBackground: View {
         )
     }
 }
-
-// MARK: - Header
 
 struct InsightsHeader: View {
     @State private var appeared = false
@@ -37,8 +33,6 @@ struct InsightsHeader: View {
         .onAppear { withAnimation(AppTheme.sheetSpring.delay(AppTheme.staggerDelay)) { appeared = true } }
     }
 }
-
-// MARK: - Score Card
 
 struct InsightsScoreCard: View {
     let recommendation: DailyRecommendation
@@ -148,8 +142,6 @@ struct InsightsScoreCard: View {
     }
 }
 
-// MARK: - Activity Card
-
 struct InsightsActivityCard: View {
     let recommendation: DailyRecommendation
 
@@ -207,8 +199,6 @@ struct InsightsActivityCard: View {
         .glassEffect(in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
-
-// MARK: - Day Quality Card
 
 struct InsightsDayQualityCard: View {
     let recommendation: DailyRecommendation
@@ -321,8 +311,6 @@ struct InsightsDayQualityCard: View {
         }
     }
 }
-
-// MARK: - Animated Bar
 
 struct AnimatedBar: View {
     let height: CGFloat

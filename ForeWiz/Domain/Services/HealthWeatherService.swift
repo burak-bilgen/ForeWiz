@@ -1,8 +1,5 @@
 import Foundation
 
-/// Health-Weather correlation intelligence.
-/// Analyzes how weather conditions affect migraines, sleep, joints, respiratory health, stamina, and air quality.
-/// Uses HealthKit data from HealthRepository to refine scores when available.
 struct HealthWeatherService {
     private let healthRepository: HealthRepository?
     private let correlationService: HealthWeatherCorrelationService
@@ -16,8 +13,6 @@ struct HealthWeatherService {
         self.correlationService = correlationService
     }
 
-    /// Generates a complete health analysis from weather data.
-    /// When HealthRepository is available, refines scores using personal HealthKit data.
     func analyzeHealth(
         snapshot: WeatherSnapshot,
         recommendation: DailyRecommendation,
@@ -57,8 +52,6 @@ struct HealthWeatherService {
         }
     }
 
-    /// Pure weather-based analysis (no HealthKit data).
-    /// Each index is calculated by a dedicated calculator type.
     private func computeBaseAnalysis(
         snapshot: WeatherSnapshot,
         recommendation: DailyRecommendation,
@@ -118,8 +111,6 @@ struct HealthWeatherService {
         )
     }
 
-    // MARK: - HealthKit Fetching
-
     private func fetchHealthSamples(
         repository: HealthRepository,
         start: Date,
@@ -153,8 +144,6 @@ struct HealthWeatherService {
         return samples
     }
 
-    // MARK: - Overall Score
-
     private func calculateOverallHealthScore(
         migraine: Int,
         sleep: Int,
@@ -163,13 +152,12 @@ struct HealthWeatherService {
         stamina: Int,
         airQuality: Int
     ) -> Int {
-        // Invert scores where higher = worse
+
         let migraineInverted = 10 - migraine
         let jointInverted = 10 - joint
         let respiratoryInverted = 10 - respiratory
         let airQualityInverted = 10 - airQuality
 
-        // All on 1-10 scale
         let avg = Double(migraineInverted + sleep + jointInverted + respiratoryInverted + stamina + airQualityInverted) / 6.0
         return Int((avg / 10.0) * 100.0)
     }
@@ -180,12 +168,11 @@ struct HealthWeatherService {
         migraineRisk: Int,
         decision: OutdoorDecision
     ) -> String {
-        // If air quality is bad, mention it first
+
         if airQuality.index >= 6 {
             return String(format: L10n.text("health_summary_aqi_poor"), airQuality.category.localizedTitle)
         }
 
-        // If migraine risk is high, prioritize that
         if migraineRisk >= 7 {
             return L10n.text("health_summary_migraine_risk")
         }

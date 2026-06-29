@@ -1,8 +1,6 @@
 import Foundation
 import CoreLocation
 
-/// Encodable route data stored in JournalEntry.routeData.
-/// Used for deduplication and display in Journal UI.
 struct JournalRouteData: Codable, Equatable {
     let originLat: Double
     let originLng: Double
@@ -15,7 +13,6 @@ struct JournalRouteData: Codable, Equatable {
     let segmentCount: Int
 }
 
-/// Encodable weather snapshot stored in JournalEntry.weatherSnapshotData.
 struct JournalWeatherSnapshot: Codable, Equatable {
     let temperature: Double
     let condition: String

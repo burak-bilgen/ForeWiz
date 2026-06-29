@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Location Card
-
 struct LocationCard: View {
     let location: SavedLocation
     let isSelected: Bool
@@ -14,7 +12,7 @@ struct LocationCard: View {
 
     var body: some View {
         ZStack {
-            // Delete background
+
             if showDelete {
                 HStack {
                     Spacer()
@@ -113,8 +111,6 @@ struct LocationCard: View {
         }
     }
 }
-
-// MARK: - Current Location Card
 
 struct CurrentLocationCard: View {
     let location: SavedLocation

@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Animated circular progress ring showing an outdoor-friendliness score.
-/// Displays score as X/10 with modern design.
 struct ScoreRingView: View {
     let score: WeatherScore
     var size: CGFloat = 92

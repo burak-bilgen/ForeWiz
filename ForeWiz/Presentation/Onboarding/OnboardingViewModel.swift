@@ -1,4 +1,5 @@
 import Foundation
+import AppTrackingTransparency
 
 @MainActor
 @Observable
@@ -6,10 +7,10 @@ final class OnboardingViewModel {
     private(set) var selectedLanguage: AppLanguage = .english
     private(set) var locationStatus: LocationAuthorizationStatus = .notDetermined
     private(set) var notificationStatus: NotificationAuthorizationStatus = .notDetermined
-    private(set) var trackingStatus: AdConsentManager.ConsentStatus = .notDetermined
     private(set) var errorMessage: String?
-    var showTrackingSettingsAlert = false
     private(set) var profile: UserComfortProfile
+    var showTrackingSettingsAlert = false
+    private(set) var trackingStatus: ATTrackingManager.AuthorizationStatus = .notDetermined
 
     private(set) var homeLocation: SavedLocation?
     private(set) var workLocation: SavedLocation?
@@ -33,10 +34,7 @@ final class OnboardingViewModel {
         }
         let currentCode = L10n.currentLanguageCode
         selectedLanguage = AppLanguage.allCases.first { $0.localeIdentifier == currentCode } ?? profile.language
-        
-        // Sync tracking status with actual ATT system state
-        AdConsentManager.shared.updateConsentStatus()
-        trackingStatus = AdConsentManager.shared.trackingStatus
+
     }
 
     var canContinue: Bool {
@@ -76,39 +74,28 @@ final class OnboardingViewModel {
     }
 
     func requestTrackingPermission() {
-        Task {
-            // Check if system-level ATT is disabled first
-            if AdConsentManager.shared.isSystemTrackingDisabled {
-                showTrackingSettingsAlert = true
-                trackingStatus = .denied
-                EventLogger.shared.track(.trackingPermissionDenied)
-                return
-            }
-            
-            let status = await AdConsentManager.shared.requestTrackingPermission()
+        Task { @MainActor in
+            let status = await ATTrackingManager.requestTrackingAuthorization()
             trackingStatus = status
-
-            if AdConsentManager.shared.canServeAds {
-                AdManager.shared.clearAllCaches()
-                await AdManager.shared.preloadAllAds()
-            }
-
-            if status == .granted {
-                EventLogger.shared.track(.trackingPermissionGranted)
-            } else {
-                EventLogger.shared.track(.trackingPermissionDenied)
-            }
         }
     }
-    
-    func setErrorMessage(_ message: String?) {
-        errorMessage = message
-    }
-    
+
     func dismissTrackingSettingsAlert() {
         showTrackingSettingsAlert = false
     }
-    
+
+    func checkTrackingSettings() {
+        let status = ATTrackingManager.trackingAuthorizationStatus
+        trackingStatus = status
+        if status == .denied {
+            showTrackingSettingsAlert = true
+        }
+    }
+
+    func setErrorMessage(_ message: String?) {
+        errorMessage = message
+    }
+
     func addManualLocation(_ location: SavedLocation) {
         var updatedProfile = profile
         if !updatedProfile.savedLocations.contains(where: { $0.id == location.id }) {

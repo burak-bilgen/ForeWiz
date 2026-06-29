@@ -40,8 +40,6 @@ struct HealthConsentView: View {
         .task { await viewModel.checkAuthorization() }
     }
 
-    // MARK: - Header
-
     private var header: some View {
         VStack(spacing: 8) {
             ZStack {
@@ -68,8 +66,6 @@ struct HealthConsentView: View {
         }
     }
 
-    // MARK: - Scroll Content
-
     private var scrollContent: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -89,8 +85,6 @@ struct HealthConsentView: View {
         }
     }
 
-    // MARK: - Data Types List
-
     private var dataTypesList: some View {
         LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 8) {
             VStack(spacing: 0) {
@@ -105,8 +99,6 @@ struct HealthConsentView: View {
             }
         }
     }
-
-    // MARK: - Authorized View
 
     private var authorizedView: some View {
         LiquidGlassCard(accentColor: AppTheme.success, innerPadding: 16) {
@@ -144,8 +136,6 @@ struct HealthConsentView: View {
         }
     }
 
-    // MARK: - Denied View
-
     private var deniedView: some View {
         LiquidGlassCard(accentColor: AppTheme.warning, innerPadding: 16) {
             VStack(spacing: 16) {
@@ -165,8 +155,6 @@ struct HealthConsentView: View {
         }
     }
 
-    // MARK: - Unavailable View
-
     private var unavailableView: some View {
         LiquidGlassCard(accentColor: AppTheme.stormGray, innerPadding: 16) {
             VStack(spacing: 12) {
@@ -181,8 +169,6 @@ struct HealthConsentView: View {
             }
         }
     }
-
-    // MARK: - Bottom Bar
 
     private var bottomBar: some View {
         VStack(spacing: 10) {
@@ -254,8 +240,6 @@ struct HealthConsentView: View {
         .padding(.top, 8)
     }
 }
-
-// MARK: - Data Type Row
 
 private struct DataTypeRow: View {
     let item: HealthDataType

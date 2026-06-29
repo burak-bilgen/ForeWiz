@@ -26,7 +26,7 @@ struct WeatherCachePolicy {
 
     func freshness(for fetchedAt: Date, now: Date) -> WeatherCacheFreshness {
         let age = now.timeIntervalSince(fetchedAt)
-        // Use default intervals when no snapshot context is available
+
         if age <= baseFreshInterval {
             return .fresh
         }
@@ -36,8 +36,6 @@ struct WeatherCachePolicy {
         return .expired
     }
 
-    /// Smart freshness: adapts intervals based on weather volatility.
-    /// Stable weather → cache lives longer, volatile weather → refresh sooner.
     func freshness(for fetchedAt: Date, now: Date, hourlyTempRange: Double?) -> WeatherCacheFreshness {
         guard let range = hourlyTempRange else {
             return freshness(for: fetchedAt, now: now)
@@ -45,7 +43,6 @@ struct WeatherCachePolicy {
 
         let age = now.timeIntervalSince(fetchedAt)
 
-        // Volatile weather (large temperature swings): shorten cache
         if range >= 12 {
             let fresh = minFreshInterval
             let usable = baseUsableInterval * 0.5
@@ -54,7 +51,6 @@ struct WeatherCachePolicy {
             return .expired
         }
 
-        // Moderate variability
         if range >= 6 {
             let fresh = baseFreshInterval * 0.8
             let usable = baseUsableInterval
@@ -63,7 +59,6 @@ struct WeatherCachePolicy {
             return .expired
         }
 
-        // Stable weather: extend cache
         if age <= baseFreshInterval * 1.5 {
             return .fresh
         }

@@ -1,8 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Journal List View
-
 struct JournalListView: View {
     @State private var entries: [JournalEntry] = []
     @State private var isLoading = false
@@ -23,7 +21,7 @@ struct JournalListView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header
+
                 headerSection
                     .padding(.horizontal, 20)
                     .padding(.top, 48)
@@ -35,7 +33,6 @@ struct JournalListView: View {
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                // Content
                 if isLoading {
                     Spacer()
                     PulsingDotsLoader(color: .liquidAccent, dotSize: 8)
@@ -63,8 +60,6 @@ struct JournalListView: View {
             }
         }
     }
-
-    // MARK: - Header
 
     private var headerSection: some View {
         HStack {
@@ -98,8 +93,6 @@ struct JournalListView: View {
             .buttonStyle(.plain)
         }
     }
-
-    // MARK: - Search Bar
 
     private var searchBar: some View {
         HStack(spacing: 10) {
@@ -138,8 +131,6 @@ struct JournalListView: View {
         )
     }
 
-    // MARK: - Empty State
-
     private var emptyState: some View {
         VStack(spacing: 16) {
             ZStack {
@@ -164,8 +155,6 @@ struct JournalListView: View {
                 .padding(.horizontal, 40)
         }
     }
-
-    // MARK: - Entries List
 
     private var entriesList: some View {
         ScrollView(showsIndicators: false) {
@@ -198,8 +187,6 @@ struct JournalListView: View {
         }
         .refreshable { await loadEntries() }
     }
-
-    // MARK: - Actions
 
     private func loadEntries() async {
         isLoading = true
@@ -240,8 +227,6 @@ struct JournalListView: View {
     }
 }
 
-// MARK: - Journal Entry Row
-
 struct JournalEntryRow: View {
     let entry: JournalEntry
     @State private var appears = false
@@ -249,7 +234,7 @@ struct JournalEntryRow: View {
     var body: some View {
         LiquidGlassCard(accentColor: accentColor, innerPadding: 14) {
             HStack(spacing: 14) {
-                // Icon
+
                 ZStack {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .fill(accentColor.opacity(0.12))
@@ -260,7 +245,6 @@ struct JournalEntryRow: View {
                         .foregroundStyle(accentColor)
                 }
 
-                // Text
                 VStack(alignment: .leading, spacing: 3) {
                     Text(entry.title)
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
@@ -285,7 +269,6 @@ struct JournalEntryRow: View {
 
                 Spacer()
 
-                // Type badge
                 Text(typeLabel)
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(accentColor)
@@ -331,8 +314,6 @@ struct JournalEntryRow: View {
         }
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     JournalListView(journalStore: MockJournalStore())

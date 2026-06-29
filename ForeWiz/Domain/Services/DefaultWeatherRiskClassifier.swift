@@ -26,13 +26,11 @@ struct DefaultWeatherRiskClassifier {
         let allRisks = allHours.flatMap { risks(for: $0, calendar: calendar) }
         var bestByType: [WeatherRiskType: WeatherRisk] = [:]
 
-        // Group rain hours and create a single merged risk
         let rainHours = allHours.filter { isRainyHour($0) }
         if !rainHours.isEmpty, let mergedRain = mergeRainRisk(from: rainHours, calendar: calendar) {
             bestByType[.rain] = mergedRain
         }
 
-        // Non-rain risks
         let nonRainRisks = allRisks.filter { $0.type != .rain }
         for risk in nonRainRisks {
             if let existing = bestByType[risk.type], risk.severity <= existing.severity {
@@ -190,7 +188,6 @@ struct DefaultWeatherRiskClassifier {
             )
         }
 
-        // 🌙 Night heat avoidance - serinlemek için gece saatleri
         if !(6..<22).contains(hourOfDay) && hour.apparentTemperatureCelsius >= 24 {
             return WeatherRisk(
                 type: .heat,
@@ -262,7 +259,6 @@ struct DefaultWeatherRiskClassifier {
         let hourOfDay = calendar.component(.hour, from: hour.date)
         let apparentTemp = hour.apparentTemperatureCelsius
 
-        // 🌙 Night Heat (Tropikal Gece) - >20°C at night disrupts sleep & recovery
         if !(6..<20).contains(hourOfDay) && apparentTemp > 20 {
             let severity: RiskLevel = apparentTemp >= 25 ? .high : .medium
             return WeatherRisk(
@@ -273,11 +269,6 @@ struct DefaultWeatherRiskClassifier {
             )
         }
 
-        // ☀️ Daytime Heat - kademeli threshold (küresel ısınma odaklı)
-        // Kritik: 40°C+ → extreme
-        // Ekstrem: 36°C+ → high
-        // Yüksek: 32°C+ → medium (gün ortası)
-        // Uyarı: 28°C+ → low (erken uyarı)
         if apparentTemp >= 40 {
             return WeatherRisk(
                 type: .heat,

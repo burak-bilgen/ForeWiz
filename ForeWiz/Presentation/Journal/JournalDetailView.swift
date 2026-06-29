@@ -2,8 +2,6 @@ import SwiftUI
 import CoreLocation
 import WizPathKit
 
-// MARK: - Journal Detail View
-
 struct JournalDetailView: View {
     let entry: JournalEntry
     let journalStore: JournalStore
@@ -48,7 +46,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Header
     private var headerSection: some View {
         HStack {
             Button {
@@ -69,7 +66,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Route Summary Card
     private func routeSummaryCard(route: RouteSnapshot) -> some View {
         LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 16) {
             VStack(alignment: .leading, spacing: 14) {
@@ -100,7 +96,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Date & Location Card
     private var dateLocationCard: some View {
         LiquidGlassCard(accentColor: .white, innerPadding: 16) {
             HStack(spacing: 14) {
@@ -125,7 +120,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Weather & Health Info Cards
     private var weatherInfoCard: some View {
         LiquidGlassCard(accentColor: AppTheme.sunshine, innerPadding: 16) {
             HStack(spacing: 14) {
@@ -160,7 +154,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Notes Section
     private var notesSection: some View {
         LiquidGlassCard(accentColor: .white, innerPadding: 16) {
             VStack(alignment: .leading, spacing: 10) {
@@ -180,7 +173,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Action Buttons
     private var actionButtons: some View {
         HStack(spacing: 12) {
             LiquidGlassButton(L10n.text("journal_share"), icon: "square.and.arrow.up", style: .secondary, haptic: .light, isFullWidth: true) {
@@ -200,7 +192,6 @@ struct JournalDetailView: View {
         }
     }
 
-    // MARK: - Helpers
     private func travelModeIcon(_ rawValue: String) -> String {
         switch rawValue {
         case "car": return "car.fill"; case "walking": return "figure.walk"
@@ -245,7 +236,6 @@ struct JournalDetailView: View {
         }.frame(maxWidth: .infinity)
     }
 
-    // MARK: - Actions
     private func saveNotes() async {
         var updatedEntry = entry
         updatedEntry.notes = notes.isEmpty ? nil : notes
@@ -266,7 +256,6 @@ struct JournalDetailView: View {
     }
 }
 
-// MARK: - Journal Share Card
 struct JournalShareCard: View {
     let entry: JournalEntry
     let routeSnapshot: RouteSnapshot?

@@ -1,20 +1,16 @@
 import SwiftUI
 import WizPathKit
 
-/// Manages the visual theme for ForeWiz - always uses Liquid Glass dark aesthetic.
 @available(iOS 17.0, *)
 @Observable
 final class ThemeManager {
     static let shared = ThemeManager()
 
-    /// Always dark - liquid glass aesthetic is designed for dark mode.
     let colorScheme: ColorScheme = .dark
 
     var isDarkMode: Bool { true }
 
     private init() {}
-
-    // MARK: - Convenience Accessors
 
     var accentColor: Color { AppTheme.liquidAccent }
     var accentSoft: Color { AppTheme.liquidAccentSoft }
@@ -26,8 +22,6 @@ final class ThemeManager {
         AppTheme.ambientGradient(for: .dark)
     }
 }
-
-// MARK: - Theme Modifier
 
 struct ThemeModifier: ViewModifier {
     func body(content: Content) -> some View {
@@ -41,5 +35,3 @@ extension View {
         modifier(ThemeModifier())
     }
 }
-
-

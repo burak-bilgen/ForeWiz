@@ -1,8 +1,6 @@
 import SwiftUI
 import WidgetKit
 
-// MARK: - Shared Helpers
-
 private func formattedTemp(_ temp: Double) -> String {
     "\(Int(round(temp)))°"
 }
@@ -30,7 +28,6 @@ private func glassBackground() -> some View {
             .fill(.ultraThinMaterial)
             .environment(\.colorScheme, .dark)
 
-        // Neutral cool overlay
         RoundedRectangle(cornerRadius: 20, style: .continuous)
             .fill(
                 LinearGradient(
@@ -45,7 +42,6 @@ private func glassBackground() -> some View {
                 )
             )
 
-        // Cool white border
         RoundedRectangle(cornerRadius: 20, style: .continuous)
             .stroke(
                 LinearGradient(
@@ -64,8 +60,6 @@ private func glassBackground() -> some View {
             )
     }
 }
-
-// MARK: - Score Ring
 
 private struct ScoreRing: View {
     let score: Int
@@ -89,8 +83,6 @@ private struct ScoreRing: View {
         .frame(width: size, height: size)
     }
 }
-
-// MARK: - Placeholder Views (shared by medium & small)
 
 private struct EmptyPlaceholderView: View {
     let icon: String
@@ -133,22 +125,19 @@ private struct StaleBadge: View {
     }
 }
 
-// MARK: - Medium Widget
-
 struct ForeWizWidgetMediumView: View {
     let entry: ForeWizWidgetEntry
 
     var body: some View {
         if let data = entry.widgetData {
             HStack(spacing: 0) {
-                // Left: Current conditions
+
                 currentPanel(data: data)
 
                 Divider()
                     .frame(width: 1)
                     .overlay(.white.opacity(0.12))
 
-                // Right: Forecast
                 forecastPanel(data: data)
             }
             .containerBackground(for: .widget) {
@@ -195,7 +184,7 @@ struct ForeWizWidgetMediumView: View {
             )
 
         case .staleData:
-            // Shouldn't reach here since stale state has data
+
             EmptyPlaceholderView(
                 icon: "clock.fill",
                 title: WidgetL10n.text("widget_stale_title"),
@@ -204,11 +193,9 @@ struct ForeWizWidgetMediumView: View {
         }
     }
 
-    // MARK: Current Conditions Panel
-
     private func currentPanel(data: WeatherWidgetData) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Location
+
             Text(data.locationName)
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white.opacity(0.6))
@@ -216,7 +203,6 @@ struct ForeWizWidgetMediumView: View {
 
             Spacer(minLength: 0)
 
-            // Icon + Temp
             HStack(spacing: 6) {
                 Image(systemName: data.currentConditionSymbol)
                     .font(.system(size: 32))
@@ -229,7 +215,6 @@ struct ForeWizWidgetMediumView: View {
                     .minimumScaleFactor(0.7)
             }
 
-            // Condition description
             Text(data.currentConditionDescription)
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(.white.opacity(0.5))
@@ -237,7 +222,6 @@ struct ForeWizWidgetMediumView: View {
 
             Spacer(minLength: 0)
 
-            // Bottom row: Score + Last updated
             HStack(spacing: 8) {
                 ScoreRing(score: data.outdoorScore, size: 30, lineWidth: 3)
 
@@ -252,7 +236,6 @@ struct ForeWizWidgetMediumView: View {
 
                 Spacer(minLength: 0)
 
-                // Last updated
                 let ago = timeAgoText(from: data.lastUpdated)
                 if !ago.isEmpty {
                     HStack(spacing: 3) {
@@ -269,8 +252,6 @@ struct ForeWizWidgetMediumView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
 
-    // MARK: Forecast Panel
-
     private func forecastPanel(data: WeatherWidgetData) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(WidgetL10n.text("widget_forecast_title"))
@@ -281,19 +262,17 @@ struct ForeWizWidgetMediumView: View {
 
             ForEach(Array(data.dailyForecasts.prefix(4).enumerated()), id: \.element.id) { index, day in
                 HStack(spacing: 6) {
-                    // Day name
+
                     Text(day.isToday ? WidgetL10n.text("widget_today") : String(day.dayName.prefix(3)))
                         .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
                         .frame(width: 30, alignment: .leading)
 
-                    // Condition icon
                     Image(systemName: day.conditionSymbol)
                         .font(.system(size: 10))
                         .foregroundStyle(.white.opacity(0.6))
                         .frame(width: 14)
 
-                    // Score bar
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             Capsule()
@@ -306,13 +285,11 @@ struct ForeWizWidgetMediumView: View {
                     }
                     .frame(height: 3)
 
-                    // Low temp
                     Text(formattedTemp(day.lowTemp))
                         .font(.system(size: 10, weight: .regular, design: .rounded))
                         .foregroundStyle(.white.opacity(0.4))
                         .frame(width: 26, alignment: .trailing)
 
-                    // High temp
                     Text(formattedTemp(day.highTemp))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white.opacity(0.8))
@@ -331,15 +308,13 @@ struct ForeWizWidgetMediumView: View {
     }
 }
 
-// MARK: - Small Widget
-
 struct ForeWizWidgetSmallView: View {
     let entry: ForeWizWidgetEntry
 
     var body: some View {
         if let data = entry.widgetData {
             VStack(spacing: 0) {
-                // Location
+
                 Text(data.locationName)
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.55))
@@ -347,18 +322,15 @@ struct ForeWizWidgetSmallView: View {
 
                 Spacer(minLength: 0)
 
-                // Icon
                 Image(systemName: data.currentConditionSymbol)
                     .font(.system(size: 32))
                     .foregroundStyle(.white)
                     .symbolRenderingMode(.multicolor)
 
-                // Temperature
                 Text(formattedTemp(data.currentTemperature))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
 
-                // Condition
                 Text(data.currentConditionDescription)
                     .font(.system(size: 10, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.5))
@@ -366,7 +338,6 @@ struct ForeWizWidgetSmallView: View {
 
                 Spacer(minLength: 0)
 
-                // Score ring + label
                 HStack(spacing: 4) {
                     ScoreRing(score: data.outdoorScore, size: 26, lineWidth: 2.5)
                     Text(WidgetL10n.text("widget_score_label"))
@@ -428,8 +399,6 @@ struct ForeWizWidgetSmallView: View {
         }
     }
 }
-
-// MARK: - Lock Screen Accessory Views
 
 struct ForeWizWidgetInlineView: View {
     let entry: ForeWizWidgetEntry
@@ -513,8 +482,6 @@ struct ForeWizWidgetRectangularView: View {
         }
     }
 }
-
-// MARK: - Widget Configuration
 
 struct ForeWizWidgetEntryView: View {
     var entry: ForeWizWidgetProvider.Entry

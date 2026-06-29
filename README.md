@@ -1,239 +1,54 @@
-# 🌤️ ForeWiz - Personal Weather Decision Assistant
+# ForeWiz — Personal Weather Decision Assistant
 
 <p align="center">
   <img src="https://github.com/burak-bilgen/ForeWiz/blob/main/ForeWiz/Assets.xcassets/AppIcon.appiconset/256.png?raw=true" width="120" height="120" alt="ForeWiz">
 </p>
 
-<p align="center">
-  <strong>Your smart weather sidekick. Not just weather - decisions.</strong>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/iOS-17%2B-blue?style=flat-square&logo=apple" alt="iOS 17+">
   <img src="https://img.shields.io/badge/Swift-6.0-orange?style=flat-square&logo=swift" alt="Swift 6.0">
-  <img src="https://img.shields.io/badge/Version-2.0-brightgreen?style=flat-square" alt="Version 2.0">
   <img src="https://img.shields.io/badge/Architecture-Clean%20%2B%20MVVM-blue?style=flat-square" alt="Architecture">
-  <img src="https://img.shields.io/badge/Monetization-AdMob-purple?style=flat-square" alt="AdMob">
   <img src="https://img.shields.io/badge/SPM-WizPathKit-brightgreen?style=flat-square" alt="SPM">
-  <img src="https://img.shields.io/badge/localization-EN%20%2B%20TR-red?style=flat-square" alt="Localization">
+  <img src="https://img.shields.io/badge/Localization-EN%20%2F%20TR-red?style=flat-square" alt="Localization">
+  <img src="https://img.shields.io/badge/Tests-30%2B%20suites-success?style=flat-square" alt="Tests">
+  <img src="https://img.shields.io/badge/SwiftUI-100%25-purple?style=flat-square" alt="SwiftUI">
 </p>
 
-ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It doesn't just tell you it's raining - it tells you *when* to go out, *what* to wear, *where* the weather is safest on your route, and *how* it might affect your health.
-
-> Built with Apple's native frameworks + **Google AdMob** for sustainable monetization.
+ForeWiz transforms raw Apple WeatherKit data into **personalized, actionable decisions**. It analyzes current and forecasted conditions through a multi-engine decision pipeline to tell you not just what the weather *is*, but what it *means* for you — when to go out, what to wear, how your health may be affected, and which route is safest.
 
 ---
 
-## ✨ Key Features
-
-### 🧠 Decision Engine
-ForeWiz processes weather data through a chain of specialized engines to produce holistic recommendations:
-
-| Engine | What It Does |
-|--------|-------------|
-| **WeatherDecisionEngine** | Computes overall outdoor score (0–100), classifies into good/moderate/risky/avoid, identifies optimal time windows |
-| **ActivityWindowScoringEngine** | Scores each hour (0–100) based on temperature, precipitation, UV, wind, humidity, and time-of-day bonuses |
-| **OutfitDecisionEngine** | Recommends clothing combinations from 10+ categories with natural-language advice |
-| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, and stamina — 5 independent calculators |
-| **WeatherNarrativeService** | Generates a human-like "story" about today's weather with personality archetypes — dynamically context-aware |
-| **ComparativeWeatherService** | Compares today against seasonal norms, yesterday, and weekly trends with anomaly detection |
-| **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable daily briefing |
-| **DefaultWeatherRiskClassifier** | Classifies 8 risk types: heat, UV, rain, wind, storm, humidity, cold, poorComfort |
-
-### 🌡️ Health-Weather Correlation
-ForeWiz goes beyond basic weather by showing **how weather affects your body**:
-
-| Factor | Inputs | Output |
-|--------|--------|--------|
-| **Migraine Risk** | Temperature swing, humidity, storms, UV | 0–10 risk score + explanation |
-| **Sleep Quality** | Night temperature, humidity, wind, storms | 0–10 forecast + advice |
-| **Joint Pain** | Cold+humidity combo, sudden drops | 0–10 index + tips |
-| **Respiratory Comfort** | Cold air, humidity, wind+dry | 0–10 risk + recommendations |
-| **Stamina/Energy** | Heat index, humidity amplification, cold | 0–10 energy forecast |
-
-→ **Overall Health Score** (0–100) with a one-sentence summary.
-
-### 🗺️ WizPath — Climate-Aware Route Planning Engine
-
-WizPath is a **local Swift Package (SPM)** that powers climate-aware route planning with an advanced multi-engine architecture. It calculates weather conditions at every segment of your route based on estimated arrival time and provides real-time safety intelligence:
-
-#### 🚗 Multi-Modal Routing
-- **Driving** — 15-min segment granularity with weather-adaptive routing
-- **Cycling** — Full cycling safety analysis: crosswind risk, wet roads, effort level (1–10) with ETA multipliers
-- **Walking** — 30-min segment granularity with pedestrian safety alerts
-- **Electric Vehicle Mode** — Battery efficiency warnings at 38°C+, charging station recommendations along route
-
-#### 🗺️ Interactive Map Experience
-- **Weather-coded polylines** — Neon green (good) → orange (caution) → red (dangerous) per segment
-- **Expandable/collapsible map** — Compact preview (220pt) ↔ expanded half-screen with smooth spring animation
-- **Smart Stop Markers** — POI-based gas stations, EV chargers, rest stops, restaurants with weather at arrival
-- **Weather Change Markers** — Animated markers at every condition shift with temperature, ETA, and place name annotations
-- **Traffic Overlay** — Real-time congestion overlay (green → yellow → red) with toggle control
-- **Full-Screen Mode** — Immersive map experience with weather legend and all controls
-- **Origin/Destination Markers** — Pulsing origin marker, destination flag with route polyline
-
-#### 🌡️ Climate Intelligence
-- **WizPathClimateService** — Analyzes route segments for extreme heat, snow/blizzard, heavy rain, severe storms with climate multiplier scoring
-- **Heat stroke risk alerts** at 36°C+ for pedestrians
-- **EV battery efficiency** warnings and charging recommendations
-- **Infrastructure stress** alerts during extreme weather
-- **Multiplier system** — Adds weighted penalty scores to segments based on climate severity
-
-#### 🚴 Cycling Safety Engine
-- **Crosswind risk detection** — Analyzes wind direction vs. route heading, flags dangerous segments
-- **Wet road analysis** — Combines precipitation + temperature to detect icy/slippery conditions
-- **Effort level scoring** (1–10) — Based on headwind, temperature, terrain gradient
-- **Extra time calculation** — Estimates delay percentage from adverse conditions
-- **Safety status** — Safe / Caution / Not Recommended with localized explanations
-
-#### 🚨 Sentinel Alerts
-- Monitors route changes and dispatches **push notifications** when:
-  - Weather delays exceed 30 minutes or 40%
-  - New severe weather hazards appear on the route
-  - Route conditions degrade significantly
-- **Smart deduplication** — Only triggers when condition thresholds are crossed
-- **Context-aware** — Considers temperature, precipitation, wind speed, visibility
-
-#### ⏰ Departure Optimizer
-- **WizPathDepartureOptimizerService** — Analyzes 6-hour window for optimal departure time
-- Scores each time slot (0–100) based on weather severity + traffic congestion
-- Recommends best time with natural language explanation
-- **Interactive time picker** — Scrollable hour/minute columns with quick-select chips (06:00–20:00)
-
-#### 📊 Route Comparison
-- Scores multiple route candidates (0–100) with Best / Good / Moderate labels
-- Compares duration, distance, traffic congestion, toll roads, severe weather segments
-- Visual ranking with animated selection and color-coded score badges
-- **Toll avoidance toggle** with intelligent routing
-
-#### 🎛️ Journey HUD
-- **Real-time safety score** (0–100) with animated progress bar
-- Active hazard list with severity badges and ETA at location
-- Next safe stop recommendation with weather conditions
-- Expandable detail panel with confidence rating (Excellent → Dangerous)
-- **Confidence Tip** — Educational TipKit popover explaining safety scoring
-
-#### 🧩 Smart Stops (POI Search)
-- Searches for points of interest along the route within a corridor
-- Enriches stops with **weather at arrival**, safety status, and weather recommendations
-- Category-based search: gas stations, EV chargers, rest stops, restaurants
-- **Weather-aware recommendations** — "Seek shelter during thunderstorm", "Take a rain break", "Watch for high heat"
-- Direct navigation to stops via Apple Maps or Google Maps
-
-### 🔔 Smart Notifications
-Five notification planners work together to keep you informed without noise:
-
-- **Morning Briefing** - Daily weather narrative + key action items
-- **Outfit Plan** - Clothing recommendations for the day
-- **Activity Plan** - Best outdoor windows based on comfort scores
-- **Smart Risk Plans** - Severe weather alerts with interruption levels
-- **Immediate Risk Plans** - Time-sensitive danger warnings
-
-→ Deduplication, quiet hours, configurable daily limits.
-
-### 🎨 Liquid Glass Design System
-A premium dark-mode aesthetic with fluid animations — now powered by **WizPathKit's shared design tokens**:
-
-- **LiquidGlassCard** — Ultra-thin material cards with animated diagonal sheen (like Apple Wallet)
-- **LiquidGlassButton** — Premium glass buttons with press-scale spring physics, haptic feedback, and animated sheen on primary variants
-- **LiquidOrbBackground** — Animated gradient orbs that change with weather conditions
-- **Micro-interactions** — Haptic feedback (light/medium/heavy/success/warning/error), spring animations, staggered entrances
-- **Weather-responsive palettes** — Clear sky, stormy, snowy, rainy, night modes
-- **Scene transitions** — CardEntrance, StaggerEntrance, Float, PulseGlow modifiers
-- **Enhanced Splash** — Weather-conditioned animated splash screen
-- **Design tokens** — Centralized in WizPathKit for cross-target consistency (colors, typography, animation curves)
-
-### 📱 Home Screen & Widgets
-
-**Home Screen:**
-- Real-time weather card with temperature, conditions, wind, humidity, UV
-- Smart briefing section (narrative + health + comparative)
-- WizPath HUD card for quick journey status
-- Multi-location support with map-based search
-- Language switcher and location picker in toolbar
-
-**Widgets (WidgetKit):**
-- **System Small** - Current conditions + outdoor score ring
-- **System Medium** - Current conditions + 4-day forecast with score bars
-- **Lock Screen Inline** - Temperature + condition text
-- **Lock Screen Circular** - Outdoor score ring
-- **Lock Screen Rectangular** - Detailed current conditions
-
-### 🌍 Localization & Accessibility
-- **English** and **Turkish** (fully translated via `.xcstrings`)
-- **Formal Turkish tone** — all UI strings use formal "siz" (you) pronoun for corporate/professional voice
-- **Turkish naturalness audit**: All 22 WizPath Turkish translations reviewed — 18 spelling fixes (Tipii→Tipi, rüzgar→rüzgâr with circumflex) + 4 naturalness improvements ("tespit edildi" → "var"/"bekleniyor", "enkaz" → "döküntü")
-- Dynamic language switching at runtime
-- Accessibility: dynamic type, reduce motion support, VoiceOver labels
-- Biometric and haptic feedback for interactions
-
-### 💰 Smart Ad Monetization
-ForeWiz uses **Google AdMob** with intelligent ad placement that respects user experience:
-
-| Ad Format | Placement | Strategy |
-|-----------|-----------|----------|
-| **Banner** | Native ad card + bottom home banner | Smart fatigue prevention, cooldown intervals |
-| **Native** | Inline content ad card | Context-aware placement in forecast sections |
-| **Interstitial** | Between navigation transitions | App-open ads (every N foregrounds) + session gating |
-| **Rewarded** | Optional video ads for premium features | User-initiated, value-exchange model |
-
-**Key Features:**
-- **AdFatiguePrevention** - Adaptive frequency capping based on user engagement
-- **AdRevenueTracker** - Per-unit revenue tracking with eCPM calculation
-- **AdPlacementStrategy** - Session-based placement rules, app-open gating
-- **AdConsentManager** - ATT (iOS 14.5+) and GDPR consent management
-- **AdAnalyticsEngine** - Impression, click, and revenue analytics
-- **Configurable daily limits & cooldowns** per ad unit
-
-### 🧩 Siri Shortcuts (6 Intents)
-- Get current outdoor score
-- Get today's recommendation
-- Check health-weather impact
-- Get outfit suggestion
-- Get activity windows
-- Quick refresh
-
-### 🚚 Background Refresh
-- BGTaskScheduler for periodic weather updates
-- Background notifications for severe weather changes
-- Smart cache invalidation (15-min TTL, stale data detection)
-
----
-
-## 🏗️ Architecture
+## Architecture
 
 ```
 ForeWiz/
 ├── App/               # Entry point, coordinator, dependency injection
 ├── Core/              # Design system, localization, utilities
-│   ├── DesignSystem/  # Theme, colors, animations, glass components, ad views
-│   ├── Localization/  # L10n system, xcstrings (EN + TR)
-│   ├── Location/      # LocationService with hardened timeout
-│   └── Utilities/     # Logger, haptics, deep links, AdMob integration, analytics
+│   ├── DesignSystem/  # Theme, colors, animations, glass components
+│   ├── Localization/  # L10n system (EN + TR)
+│   ├── Location/      # Location service
+│   └── Utilities/     # Logger, haptics, deep links, formatters
 ├── Data/              # Repository implementations
 │   ├── Location/      # CoreLocation repository + mocks
-│   ├── Notifications/ # UNNotification repository + content factory
-│   ├── Persistence/   # SwiftData models (UserPreferences, WeatherSnapshot)
-│   └── Weather/       # WeatherKit repository, mapper, cache policy
+│   ├── Notifications/ # UNNotification repository
+│   ├── Persistence/   # SwiftData models
+│   └── Weather/       # WeatherKit repository, mapper, cache
 ├── Domain/            # Business logic (pure Swift, Foundation only)
-│   ├── Entities/      # Models: DailyRecommendation, WeatherScore, Narrative, etc.
-│   ├── Enums/         # ActivityType, RiskLevel, OutdoorDecision, etc.
-│   ├── Repositories/  # Protocol interfaces (Location, Weather, Preferences, etc.)
-│   ├── Services/      # Decision engines, scoring, alerts, planners
-│   └── UseCases/      # Business operations (LoadRecommendation, ScheduleNotifications, etc.)
-├── Features/          # Feature modules
-│   └── WizPath/       # Climate-aware route planning (map, dashboard, sentinel)
+│   ├── Entities/      # Domain models
+│   ├── Enums/         # Type definitions
+│   ├── Repositories/  # Protocol interfaces
+│   ├── Services/      # Decision engines, scoring, planners
+│   └── UseCases/      # Business operations
 ├── Presentation/      # SwiftUI views + ViewModels
-│   ├── Home/          # Main screen, briefing, HUD card, ad placements
-│   ├── Insights/      # Weather insights view
-│   ├── Onboarding/    # Language + permissions setup (incl. ATT consent)
-│   ├── Recommendations/ # Detailed recommendation view
-│   └── Shared/        # Location picker, splash, root views, error screens
-└── ForeWizWidgets/         # Widget extension (small, medium, lock screen)
-    ├── WidgetProvider.swift
-    ├── WidgetViews.swift
-    ├── WidgetLocalization.swift
-    └── WidgetEntry.swift
+│   ├── Home/          # Main screen, briefing, HUD
+│   ├── Insights/      # Weather insights
+│   ├── Onboarding/    # Language + permissions setup
+│   ├── Recommendations/
+│   └── Shared/        # Reusable components
+├── ForeWizWidgets/    # Widget extension
+├── ForeWizLiveActivity/ # Live Activity extension
+└── ForeWizTests/      # Unit tests (49 test files)
 ```
 
 ### Key Design Decisions
@@ -241,137 +56,109 @@ ForeWiz/
 | Principle | Implementation |
 |-----------|---------------|
 | **Clean Architecture + MVVM-C** | Domain is pure Swift (Foundation only), Data handles I/O, Presentation owns SwiftUI |
-| **AdMob Monetization** | Google AdMob with smart fatigue prevention, revenue tracking, consent management, and configurable placements |
 | **Actor-based Concurrency** | Thread-safe services with Swift actors + async/await |
 | **Protocol-driven Repositories** | Every data source has a protocol + mock + production implementation |
-| **Deterministic Engines** | All decision engines are pure functions - fully unit testable |
+| **Deterministic Engines** | All decision engines are pure functions — fully unit testable |
 | **Dependency Injection** | Centralized `DependencyContainer` with `.live()` and `.simulator()` factories |
-| **Facade Refactoring** | Large files (>400 lines) split into focused, single-responsibility modules |
+| **Zero Force Unwraps** | All `!` unwraps eliminated in favor of `guard let` / `if let` / optional chaining |
+| **250 LOC Ceiling** | Large files systematically refactored into focused, single-responsibility modules |
 
 ---
 
-## 📦 Module Overview
+## Decision Engine Pipeline
 
-<details>
-<summary><b>Domain Layer - 50+ files</b></summary>
+ForeWiz processes weather data through a chain of specialized engines to produce holistic recommendations:
 
-```
-Services/
-├── WeatherDecisionEngine.swift          # Core decision orchestrator
-├── ActivityWindowScoringEngine.swift    # Hourly scoring (0-100)
-├── OutfitDecisionEngine.swift           # 10+ clothing categories
-├── HealthWeatherService.swift           # 5 health calculators
-│   ├── HealthMigraineCalculator.swift
-│   ├── HealthSleepCalculator.swift
-│   ├── HealthJointCalculator.swift
-│   ├── HealthRespiratoryCalculator.swift
-│   └── HealthStaminaCalculator.swift
-├── WeatherNarrativeService.swift        # Human-like story generation
-├── WeatherBriefingService.swift         # Combines all analyses
-├── ComparativeWeatherService.swift      # Normals, trends, anomalies
-├── DefaultWeatherRiskClassifier.swift   # 8 risk types
-├── NotificationPlanningEngine.swift     # 5 notification planners
-│   ├── MorningBriefingPlanner.swift
-│   ├── OutfitPlanBuilder.swift
-│   ├── ActivityPlanBuilder.swift
-│   ├── RiskPlanBuilder.swift
-│   └── NotificationPlanHelpers.swift
-├── RecommendationStore.swift            # Cached recommendations
-├── RecommendationExplainer.swift        # Human-readable explanations
-├── SevereWeatherAlertService.swift      # Critical alerts
-├── FeatureGate.swift                    # Feature flags
-└── DepartureOptimizerService.swift      # Optimal departure finder (WizPath)
+| Engine | Responsibility |
+|--------|---------------|
+| **ActivityWindowScoringEngine** | Scores each hour (0–100) based on temperature, precipitation, UV, wind, humidity |
+| **OutfitDecisionEngine** | Recommends clothing combinations with natural-language advice |
+| **WeatherDecisionEngine** | Computes overall outdoor score (0–100), identifies optimal time windows |
+| **HealthWeatherService** | Analyzes impact on migraines, sleep, joints, respiratory health, stamina (5 calculators) |
+| **WeatherNarrativeService** | Generates context-aware daily weather story with personality archetypes |
+| **ComparativeWeatherService** | Compares today against seasonal norms, yesterday, and weekly trends |
+| **WeatherBriefingService** | Combines narrative + health + comparative analysis into a single actionable briefing |
+| **DefaultWeatherRiskClassifier** | Classifies 8 risk types: heat, UV, rain, wind, storm, humidity, cold, poor comfort |
+| **NotificationPlanningEngine** | 5 planners: morning briefing, outfit, activity, smart risks, immediate risks |
 
-Entities/
-├── DailyRecommendation.swift
-├── WeatherScore.swift
-├── WeatherNarrative.swift
-├── HealthWeatherAnalysis.swift
-├── ComparativeWeatherAnalysis.swift
-├── DailyWeatherBriefing.swift
-├── OutfitRecommendation.swift
-├── ActivityRecommendation.swift
-├── UserComfortProfile.swift
-├── TimeWindow.swift
-├── WeatherSnapshot.swift
-├── HourlyWeatherPoint.swift
-├── DailyWeatherPoint.swift
-├── SavedLocation.swift
-└── NotificationPreference.swift
+### Health-Weather Correlation
 
-UseCases/
-├── LoadHomeRecommendationUseCase.swift
-├── UpdateUserPreferencesUseCase.swift
-├── CompleteOnboardingUseCase.swift
-└── ScheduleSmartNotificationsUseCase.swift
-```
-</details>
-
-<details>
-<summary><b>Presentation Layer - 20+ views</b></summary>
-
-```
-Home/
-├── HomeView.swift                     # Main screen with toolbar + content + splash
-├── HomeViewModel.swift                # State management
-├── HomeViewState.swift                # Loadable state enum
-├── HomeViewStateFactory.swift         # State construction
-└── Components/
-    ├── BriefingSection.swift          # Narrative + health + comparative UI
-    └── WizPathHUDCard.swift           # Quick journey status
-
-Onboarding/
-├── OnboardingView.swift               # Language + permissions setup
-└── OnboardingViewModel.swift
-
-Recommendations/
-├── RecommendationDetailView.swift
-├── RecommendationDetailViewModel.swift
-└── Components/
-    ├── RecommendationWhyThisView.swift # Explanation UI
-    └── HourlyRecommendationRow.swift
-
-Shared/
-├── AppRootView.swift                   # Navigation root
-├── AppSplashView.swift                 # Animated launch
-├── LocationPickerView.swift            # Map-based city search
-├── ScreenErrorView.swift               # Error + retry
-└── ShareSheet.swift
-```
-</details>
-
-<details>
-<summary><b>Core Design System - 15+ components</b></summary>
-
-```
-DesignSystem/
-├── AppTheme.swift                      # Colors, typography, motion tokens
-├── ThemeManager.swift                  # Dark mode manager
-├── GlassCard.swift                     # Ultra-thin material cards
-├── GlassButton.swift                   # Glass-styled buttons
-├── ScoreRingView.swift                 # Animated score rings
-├── OrbBackground.swift                 # LiquidOrb + AnimatedOrbBackground
-├── EntranceAnimations.swift            # StaggerEntrance, CardEntrance, Float
-├── ShimmerAndSheen.swift               # Shimmer + LiquidSheen modifiers
-├── ButtonStyles.swift                  # PressScale, FullTapArea
-├── PulseAndLoader.swift                # PulseGlow + PulsingDotsLoader
-├── AnimationHelpers.swift              # Preview helpers
-├── WeatherGradientService.swift        # Weather-responsive gradient orchestrator
-├── WeatherGradientTypes.swift          # GradientSet + ParticleEffect types
-├── WeatherGradientGenerator.swift      # Gradient computation
-├── WeatherAwareBackground.swift        # Background view
-├── WeatherStateTransitionManager.swift # Smooth transitions between weather states
-├── MicroInteractionManager.swift       # Haptic + animation coordination
-├── AdvancedAnimations.swift            # Reactive animations
-└── EnhancedWeatherSplash.swift         # Weather-conditioned splash
-```
-</details>
+| Factor | Inputs | Output |
+|--------|--------|--------|
+| **Migraine Risk** | Temperature swing, humidity, storms, UV | 0–10 risk score |
+| **Sleep Quality** | Night temperature, humidity, wind, storms | 0–10 forecast |
+| **Joint Pain** | Cold + humidity combo, sudden drops | 0–10 index |
+| **Respiratory Comfort** | Cold air, humidity, wind + dry | 0–10 risk |
+| **Stamina / Energy** | Heat index, humidity amplification, cold | 0–10 energy forecast |
 
 ---
 
-## 🚀 Getting Started
+## WizPath — Climate-Aware Route Planning
+
+WizPath is a local SPM package that powers climate-aware route planning with weather intelligence at every segment:
+
+- **Multi-modal routing** — Driving, cycling, walking, EV mode with battery efficiency warnings
+- **Weather-coded polylines** — Green (good) to red (dangerous) per route segment
+- **Cycling Safety Engine** — Crosswind risk, wet road analysis, effort level scoring
+- **Departure Optimizer** — Analyzes 6-hour window, recommends optimal departure time
+- **Route Comparison** — Scores multiple candidates with duration, traffic, weather severity analysis
+- **Smart Stops** — POI search for gas, EV charging, rest stops with weather-at-arrival data
+- **Journey HUD** — Real-time safety score, hazard list, next safe stop recommendation
+- **Sentinel Alerts** — Push notifications when weather delays exceed thresholds
+- **Live Activity** — Lock screen / Dynamic Island journey tracking
+
+---
+
+## Design System
+
+A premium dark-mode aesthetic with liquid glass components and fluid animations:
+
+- **LiquidGlassCard** — Ultra-thin material cards with animated diagonal sheen
+- **LiquidOrbBackground** — Animated gradient orbs that change with weather conditions
+- **Weather-responsive palettes** — Clear sky, stormy, snowy, rainy, night modes
+- **Micro-interactions** — Haptic feedback, spring animations, staggered entrances
+- **Scene transitions** — CardEntrance, StaggerEntrance, Float, PulseGlow
+- **Enhanced Splash** — Weather-conditioned animated splash screen
+- **Design tokens** — Centralized colors, typography, animation curves via WizPathKit
+
+---
+
+## Technical Highlights
+
+- **Swift 6** with strict concurrency checking — actor-based thread safety
+- **SwiftUI** — 100% declarative UI, no UIKit in production code
+- **SwiftData** — On-device persistence with encryption for widget data
+- **WidgetKit** — System small, medium, lock screen widgets
+- **Live Activities** — Dynamic Island journey tracking
+- **TipKit** — Contextual onboarding and feature discovery
+- **Siri Shortcuts** — 6 custom intents (outdoor score, recommendations, health, outfit, etc.)
+- **BGTaskScheduler** — Background refresh with smart cache invalidation
+- **CI Pipeline** — GitHub Actions: lint, build all targets, run unit tests
+- **Localization** — English + Turkish (formal tone) with runtime language switching
+
+---
+
+## Testing
+
+| Suite | Coverage |
+|-------|----------|
+| WeatherDecisionEngineTests | Outdoor scoring, risk detection, window selection |
+| OutfitDecisionEngineTests | Category selection, advice generation |
+| ActivityWindowScoringEngineTests | Hourly scoring, edge cases |
+| HealthWeatherServiceTests | All 5 calculators, overall scoring |
+| NotificationPlanningEngineTests | Plan creation, deduplication, scheduling |
+| WeatherBriefingServiceTests | Narrative integration, action items |
+| DataConsistencyTests | Cache coherence, repository integration |
+| LocalizationTests | Key coverage, format strings |
+| ErrorHandlerTests | Error propagation, user messages |
+| PerformanceTests | Scoring throughput, concurrency safety |
+
+---
+
+## Getting Started
 
 ### Requirements
+
 - Xcode 16+
 - iOS 17+ deployment target
 - Apple Developer account with **WeatherKit** entitlement
@@ -386,7 +173,7 @@ open ForeWiz.xcodeproj
 
 1. Select the **ForeWiz** target
 2. Signing & Capabilities → Add **WeatherKit**
-3. Build and run (`⌘R`)
+3. Build and run (⌘R)
 
 ### Running Tests
 
@@ -396,148 +183,28 @@ xcodebuild test -project ForeWiz.xcodeproj -scheme ForeWiz \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max'
 ```
 
-Test domains:
-- Decision engines (weather, outfit, activity window)
-- Notification planning
-- Localization coverage
-- Error handling
-- Data consistency
-- Performance benchmarks
-
 ---
 
-## 🔧 Build & CI
-
-```bash
-xcodebuild build -project ForeWiz.xcodeproj -scheme ForeWiz -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO
-```
-
-**CI Pipeline (`.github/workflows/ci.yml`):**
-1. SwiftLint linting (`--strict`)
-2. Build all targets
-3. Run unit tests (simulator)
-4. Build for release validation
-
----
-
-## 📊 Project Statistics
+## Project Statistics
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift files** | ~150+ |
-| **WizPathKit Swift files** | ~30+ (local SPM package) |
-| **Unit tests** | 30+ test suites |
-| **Localized strings** | ~1,000 keys (EN + TR) — formal Turkish tone |
-| **Build errors/warnings** | 0 error, 0 warning (production target) |
-| **Force unwraps in production code** | **0** — fully eliminated |
-| **External dependencies** | **Google AdMob + UMP** (monetization/consent) — everything else Apple-first-party |
-| **Deployment target** | iOS 17+ |
-
-### File Size Management
-Large files systematically refactored into focused modules:
-
-| Original File | Before | After | Reduction |
-|---------------|--------|-------|-----------|
-| `HomeView.swift` | 899 | ~150 | -749 |
-| `WizPathDashboardView.swift` | 847 | ~150 | -697 |
-| `EnhancedWeatherSplash.swift` | 712 | ~120 | -592 |
-| `LocationPickerView.swift` | 702 | ~200 | -502 |
-| `SiriShortcutsManager.swift` | 460 | 0 (deleted) | -460 |
-| `HealthWeatherService.swift` | 440 | ~80 | -360 |
-| `DefaultNotificationPlanningEngine.swift` | 420 | ~70 | -350 |
-| `WeatherGradientService.swift` | 413 | ~50 | -363 |
-| `AnimationHelpers.swift` | 424 | ~20 | -404 |
-| **Total** | **~7,800** | **~1,700** | **-6,100** |
+| Swift files | ~200 (production) |
+| Unit test files | 49 |
+| Test suites | 30+ |
+| Localized strings | ~1,000 keys (EN + TR) |
+| External dependencies | Apple first-party + WizPathKit (local SPM) |
+| Deployment target | iOS 17+ |
+| Architecture layers | 4 (Domain, Data, Presentation, Core) |
 
 ---
 
-## 🔒 Privacy
+## License
 
-- **Location**: Used for local weather, route weather, and MapKit search - no background tracking
-- **Preferences**: Stored **on-device** via SwiftData/app group; widget payloads are encrypted locally
-- **Analytics**: No third-party analytics SDK; only local app/ad performance counters
-- **Network**: Apple WeatherKit/MapKit plus Google AdMob/UMP for ads and consent
-
----
-
-## 🧪 Testing Strategy
-
-| Test Suite | What It Covers |
-|-----------|----------------|
-| `WeatherDecisionEngineTests` | Outdoor scoring, risk detection, window selection |
-| `OutfitDecisionEngineTests` | Category selection, advice generation |
-| `ActivityWindowScoringEngineTests` | Hourly scoring, time bonuses, edge cases |
-| `HealthWeatherServiceTests` | All 5 calculators, overall scoring |
-| `NotificationPlanningEngineTests` | Plan creation, deduplication, scheduling |
-| `WeatherBriefingServiceTests` | Narrative integration, action items |
-| `DataConsistencyTests` | Cache coherence, repository integration |
-| `LocalizationTests` | Key coverage, format strings |
-| `ErrorHandlerTests` | Error propagation, user messages |
-| `PerformanceTests` | Scoring throughput, concurrency safety |
-
----
-
-## 📱 License
-
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
-
----
-
----
-
-## 📋 Changelog
-
-### v2.0.0 — WizPath V3: Offline Navigation, Cache Expiration & Continuation Safety (Latest)
-
-| Change | Details |
-|--------|---------|
-| 🗺️ **Offline Maps Navigation** | New `mapsNavigationRoute` computed property (`currentRoute ?? lastCalculatedRoute`) enables route viewing and Maps URL generation even when offline. Charging waypoints preserved and sorted by ETA. 4 URL builders (Apple Maps, Google Maps — native + web) unified with shared waypoints. |
-| ⏳ **Cache Expiration** | `lastCalculatedRouteTimestamp` with 30-minute `cacheExpirationInterval`. Expired caches return `nil` from `mapsNavigationRoute`. Auto-refresh also respects freshness — prevents stale route display. |
-| 📐 **DRY Refactor** | `RouteMapContent` enum with 3 shared `@MapContentBuilder` static methods eliminated `fullScreenWeatherPolylines`/`fullScreenTrafficOverlay` (~50 lines duplicated code removed). Traffic overlay opacity parameterized (0.45 WizPathMap, 0.35 FullScreen). |
-| 🧪 **Offline Test Suite** | 23 new tests covering `mapsNavigationRoute` behavior, offline URL generation, waypoint sorting, cache expiration (fresh/expired/boundary/reset), and 9 state preservation scenarios. |
-| 🛡️ **Continuation Safety** | Comprehensive test suite (7 patterns) verifying double-resume guards, stale continuation handling, timeout cleanup, deinit cleanup, weak self, and Sendable closure safety. |
-| 🔒 **Continuation Hardening** | `LocationService`, `CoreLocationRepository`, and `AdMobIntegration` updated with nil-out-after-use patterns to prevent `SIGTRAP` crashes from `CheckedContinuation` double-resume. |
-| 🎨 **FullScreen Map Enhancement** | Smart stop markers now respond to taps with haptic feedback and charging station detail sheet — matching WizPathMapView behavior. |
-| 📸 **Offline Camera** | `onAppear` and `didLoadInitialLocation` now check for cached route first — zooms to route region when opening offline, falls back to origin pin view. |
-| 🔄 **Loading Overlay** | Maps loading overlay with error state UI; `openMapsURL` helper with 0.5s delay and `navigationRotationAngle` reset. |
-
-### v1.3.0 — Premium UX Polish, Map Overlays & Localization Audits
-
-| Change | Details |
-|--------|---------|
-| 🗺️ **WizPath HUD Redesign** | Removed redundant home entry button, replaced with a premium rotating haptic gradient border HUD card. Added blur spinner loading overlays on calculations and selection waiting states. |
-| 🔌 **Smart Stops Overhaul** | Enforced visual full-width cards on detail sheet. Handcrafted modern 52pt Maps redirect buttons with dual-gradient backgrounds, reactive spring physics, and haptic feedback. |
-| 🛡️ **Legal Safety Card** | Integrated a gorgeous frosted glass legal disclaimer card before maps redirection, protecting users from mapping inconsistencies. |
-| 🗣️ **Copywriting Audits** | Fully resolved Turkish robotic phrasing in tomorrow's briefs (removed "bugün" conflicts), and implemented dynamic lowercase first letter handling for natural, grammatically correct concatenations. |
-| 🌍 **Dropdown & Privacy Fallback** | Refactored language context selector to render native conditional Label checkmarks, and integrated external browser privacy policy redirect fallback for users outside EEA regions. |
-| 🎨 **Feedback Alignment** | Uniformly locked home weather feedback buttons to 54x42 dimensions with minimum scale factor support to prevent uneven layout boxes. |
-
----
-
-### v1.2.0 — Dynamic Narrative, Learning Feedback & WizPath Polish
-
-| Change | Details |
-|--------|---------|
-| 🗺️ **Place Name Annotations** | WizPath map now shows real location names (e.g. "Kadıköy", "Levent") at weather change points via reverse geocoding with actor-based caching |
-| 🧠 **Dynamic Narrative Engine** | WeatherNarrativeService now context-aware — generates stories referencing actual temperature, wind, humidity, and time-of-day instead of static templates. 16 new localization keys |
-| 📝 **User Feedback System** | New WeatherFeedbackCard lets users rate forecasts (cold/good/hot). Feedback adjusts temperature offset and wind sensitivity for personalized future scores. 7 new localization keys |
-| 🗣️ **Turkish Naturalness Audit** | 22 WizPath translations reviewed: 18 spelling fixes (Tipii→Tipi, rüzgar→rüzgâr) + 4 naturalness improvements (AI-sounding phrases → natural Turkish) |
-| 🔒 **Swift 6 Concurrency Fixes** | GeocodingHelper rewritten with actor-based cache + sequential resolution to comply with strict concurrency |
-| 📋 **App Store Policies** | Comprehensive Privacy Policy, App Review checklist, and submission guide added to docs/
-
----
-
-### v1.1.0 — Code Quality & Localization Polish
-
-| Change | Details |
-|--------|---------|
-| 🇹🇷 **Formal Turkish Tone** | All ~70 Turkish UI strings converted from informal "sen" to formal "siz" (corporate/professional voice). Includes decision messages, health advice, weather instructions, Siri responses, and WizPath strings |
-| 🧹 **Build Error Fixes** | Resolved all compiler errors (2 errors + 9 warnings): OnboardingView memberwise init, ForeWizApp NSURL throws, AdComponents dangling reference, ModelConfiguration non-throwing init |
-| ⚠️ **Warning Cleanup** | Fixed ~15 warnings: unused variables, deprecated `contentEdgeInsets`, unnecessary `try?`, Swift 6 concurrency capture semantics, double-backslash string interpolation |
-| 🔒 **Force Unwrap Elimination** | Removed all 19 force unwraps across 6 files — replaced with `guard let` / `if let` / optional chaining. **Zero force unwraps in production code** |
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
 <p align="center">
-  <sub>Built with ☀️ + 🧊 + Swift 6 + SwiftUI + MapKit + TipKit by <a href="https://github.com/bilgenworks">Bilgen Works</a></sub>
+  <sub>Built with Swift 6 + SwiftUI + WeatherKit + MapKit by <a href="https://github.com/bilgenworks">Bilgen Works</a></sub>
 </p>

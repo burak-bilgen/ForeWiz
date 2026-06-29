@@ -1,9 +1,6 @@
 import SwiftUI
 import PhotosUI
 
-// MARK: - Feedback Sheet
-/// Native SwiftUI sheet for users to submit bug reports, feature requests, or general feedback.
-/// Submissions are sent to Formspree — no backend required.
 struct FeedbackSheetView: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -38,7 +35,7 @@ struct FeedbackSheetView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Header
+
                     VStack(spacing: 6) {
                         Image(systemName: "bubble.left.and.bubble.right.fill")
                             .font(.system(size: 32))
@@ -61,7 +58,6 @@ struct FeedbackSheetView: View {
                     }
                     .padding(.top, 8)
 
-                    // Feedback Type Picker
                     VStack(spacing: 8) {
                         Text(L10n.text("feedback_type_label"))
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -75,7 +71,6 @@ struct FeedbackSheetView: View {
                         }
                     }
 
-                    // Title Field
                     VStack(spacing: 6) {
                         Text(L10n.text("feedback_title_label"))
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -98,7 +93,6 @@ struct FeedbackSheetView: View {
                             )
                     }
 
-                    // Message Field
                     VStack(spacing: 6) {
                         Text(L10n.text("feedback_message_label"))
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -132,7 +126,6 @@ struct FeedbackSheetView: View {
                             }
                     }
 
-                    // Email Field (optional)
                     VStack(spacing: 6) {
                         Text(L10n.text("feedback_email_label"))
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -170,7 +163,6 @@ struct FeedbackSheetView: View {
                         }
                     }
 
-                    // Screenshot Attachment
                     VStack(spacing: 6) {
                         Text(L10n.text("feedback_screenshot_label"))
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -233,7 +225,6 @@ struct FeedbackSheetView: View {
                         }
                     }
 
-                    // Submit Button
                     Button {
                         submitFeedback()
                     } label: {
@@ -294,8 +285,6 @@ struct FeedbackSheetView: View {
         }
     }
 
-    // MARK: - Type Button
-
     private func feedbackTypeButton(_ type: FeedbackService.FeedbackType) -> some View {
         Button {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
@@ -326,8 +315,6 @@ struct FeedbackSheetView: View {
                                  : .white.opacity(0.6))
         }
     }
-
-    // MARK: - Submit
 
     private func submitFeedback() {
         guard isFormValid else { return }
@@ -371,8 +358,6 @@ struct FeedbackSheetView: View {
             }
         }
     }
-
-    // MARK: - Success Overlay
 
     private var successOverlay: some View {
         VStack(spacing: 16) {
@@ -431,8 +416,6 @@ struct FeedbackSheetView: View {
         .background(.ultraThinMaterial)
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     FeedbackSheetView()

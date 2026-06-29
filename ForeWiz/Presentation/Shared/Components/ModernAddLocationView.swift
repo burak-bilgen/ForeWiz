@@ -2,8 +2,6 @@ import SwiftUI
 import MapKit
 import WizPathKit
 
-// MARK: - Modern Add Location View
-
 struct ModernAddLocationView: View {
     @Environment(\.dismiss) private var dismiss
     let onAdd: (SavedLocation) -> Void
@@ -61,7 +59,7 @@ struct ModernAddLocationView: View {
                                 return
                             }
                             searchTask = Task { @MainActor in
-                                // Debounce: wait for user to stop typing
+
                                 try? await Task.sleep(nanoseconds: 300_000_000)
                                 guard !Task.isCancelled else { return }
                                 await search()
@@ -215,7 +213,7 @@ struct ModernAddLocationView: View {
             searchResults = response.mapItems
             withAnimation { showSearchResults = true }
         } catch {
-            // Log but don't surface to user — next debounce will retry
+
         }
     }
 

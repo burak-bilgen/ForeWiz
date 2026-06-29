@@ -1,9 +1,5 @@
 import Foundation
 
-// MARK: - Morning Briefing Planner
-
-/// Builds the morning briefing notification - a short, human-like daily weather summary.
-/// All text is in natural Turkish, as if a friend is giving you the weather lowdown.
 enum MorningBriefingPlanner {
 
     static func makePlan(
@@ -27,7 +23,6 @@ enum MorningBriefingPlanner {
 
         guard var fireDate = matchingComponents.date else { return nil }
 
-        // If the computed date is before or equal to now, move to the next day
         if fireDate <= now {
             guard let nextDay = calendar.date(byAdding: .day, value: 1, to: fireDate) else {
                 return nil
@@ -50,11 +45,9 @@ enum MorningBriefingPlanner {
             title: L10n.text("notification_morning_title"),
             body: body,
             priority: 70,
-            reason: "günlük hava özeti"
+            reason: "morning_weather_summary"
         )
     }
-
-    // MARK: - Commute Briefing
 
     private static func buildCommuteBriefing(
         profile: UserComfortProfile,
@@ -69,8 +62,6 @@ enum MorningBriefingPlanner {
             mode: TravelMode(rawValue: home.commuteModeRaw) ?? .car
         )
     }
-
-    // MARK: - Commute Section Builder
 
     private static func buildCommuteSection(_ briefing: CommuteBriefing) -> String {
         guard briefing.weatherAtOrigin != "N/A" else {
@@ -110,8 +101,6 @@ enum MorningBriefingPlanner {
         return lines.joined(separator: "\n")
     }
 
-    // MARK: - Body Builder
-
     private static func buildBody(
         recommendation: DailyRecommendation,
         now: Date,
@@ -120,7 +109,6 @@ enum MorningBriefingPlanner {
     ) -> String {
         var parts: [String] = []
 
-        // Opening based on decision - arkadaşça, doğal bir dille
         switch recommendation.outdoorDecision {
         case .good:
             parts.append(L10n.text("notif_morning_good"))
@@ -132,7 +120,6 @@ enum MorningBriefingPlanner {
             parts.append(L10n.text("notif_morning_avoid"))
         }
 
-        // Best window - varsa ve henüz geçmemişse ekle
         if let window = recommendation.bestOutdoorWindow, window.end > now {
             let timeInfo = window.shortDisplayText
             switch recommendation.outdoorDecision {
@@ -143,7 +130,6 @@ enum MorningBriefingPlanner {
             }
         }
 
-        // Top risk warning - doğal dille uyarı
         if let risk = recommendation.risks.first(where: { $0.severity >= .high }) {
             let riskTip = actionTip(for: risk)
             if let window = recommendation.bestOutdoorWindow, window.end > now {

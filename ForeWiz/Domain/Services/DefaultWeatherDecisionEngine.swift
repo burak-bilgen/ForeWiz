@@ -36,9 +36,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         let outdoorScore = makeOutdoorScore(from: todayHours, profile: profile, risks: risks, calendar: calendar)
         let outdoorDecision = OutdoorDecision(score: outdoorScore)
 
-        // Use ALL today's waking hours for best window calculation, so the result
-        // is based on the day's weather metrics - not the current time.
-        // This prevents the "best time" from shifting forward every time you open the app.
         let bestOutdoorWindow: TimeWindow? = calculateBestWindow(
             from: snapshot.hourly,
             profile: profile,
@@ -82,10 +79,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         )
     }
 
-    // MARK: - Helpers
-
-    /// Calculates the best outdoor window using ALL today's waking hours (not just future hours),
-    /// so the result is stable throughout the day.
     private func calculateBestWindow(
         from hourly: [HourlyWeatherPoint],
         profile: UserComfortProfile,
@@ -98,7 +91,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
         guard outdoorDecision != .avoid else { return nil }
         guard risks.contains(where: { $0.severity == .extreme }) == false else { return nil }
 
-        // All today's waking hours - 07:00 to 21:00 (21:30 sonrası dışarı önerilmez)
         let dayHours = hourly
             .filter { calendar.isDate($0.date, inSameDayAs: now) }
             .filter { hour in
@@ -109,7 +101,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
 
         guard !dayHours.isEmpty else { return nil }
 
-        // Use start of waking hours so ALL hours are evaluated equally
         let baseDate = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: now) ?? now
 
         guard let recommendation = activityWindowScoringEngine.bestWindow(
@@ -121,7 +112,6 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
             avoidWindows: avoidWindows
         ) else { return nil }
 
-        // If the day's best window has already passed entirely, don't show it
         guard recommendation.bestWindow.end >= now else { return nil }
 
         return recommendation.bestWindow
@@ -284,7 +274,7 @@ struct DefaultWeatherDecisionEngine: WeatherDecisionEngine {
 
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
         let startHour = 7
-        // 21:30 sonrası dışarı önerilmez
+
         let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? 21
 
         if endHour > startHour {

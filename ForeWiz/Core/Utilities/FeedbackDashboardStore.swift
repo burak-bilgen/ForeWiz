@@ -1,9 +1,6 @@
 import Foundation
 import OSLog
 
-// MARK: - Feedback Dashboard Store
-/// Stores submitted feedback locally in UserDefaults.
-/// Shows users their feedback history with delivery status.
 @MainActor
 @Observable
 final class FeedbackDashboardStore {
@@ -20,7 +17,6 @@ final class FeedbackDashboardStore {
         load()
     }
 
-    /// Adds a new submitted feedback item to local storage.
     func addItem(type: String, title: String, message: String, success: Bool) {
         let item = FeedbackDashboardItem(
             id: UUID(),
@@ -38,7 +34,6 @@ final class FeedbackDashboardStore {
         AppLogger.app.info("[Dashboard] Feedback saved locally: \(title)")
     }
 
-    /// Marks all items as read.
     func markAllRead() {
         for i in items.indices {
             items[i].isRead = true
@@ -47,7 +42,6 @@ final class FeedbackDashboardStore {
         save()
     }
 
-    /// Marks a single item as read.
     func markRead(_ id: UUID) {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return }
         items[index].isRead = true
@@ -55,22 +49,18 @@ final class FeedbackDashboardStore {
         save()
     }
 
-    /// Removes all items.
     func removeAll() {
         items.removeAll()
         unreadCount = 0
         save()
     }
 
-    /// Removes items at the given indices.
     func removeItems(at indexSet: IndexSet) {
         let idsToRemove = indexSet.map { items[$0].id }
         items.removeAll { idsToRemove.contains($0.id) }
         unreadCount = items.filter { !$0.isRead }.count
         save()
     }
-
-    // MARK: - Persistence
 
     private func load() {
         guard let data = userDefaults.data(forKey: storageKey),
@@ -84,8 +74,6 @@ final class FeedbackDashboardStore {
         userDefaults.set(data, forKey: storageKey)
     }
 }
-
-// MARK: - Dashboard Item
 
 struct FeedbackDashboardItem: Codable, Identifiable, Equatable {
     let id: UUID

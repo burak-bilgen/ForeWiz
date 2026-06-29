@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Journal Search View
-
 struct JournalSearchView: View {
     @Binding var searchText: String
     let results: [JournalEntry]
@@ -33,7 +31,6 @@ struct JournalSearchView: View {
         }
     }
 
-    // MARK: - Search Bar
     private var searchBar: some View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass").font(.system(size: 14, weight: .medium)).foregroundStyle(.white.opacity(0.4))
@@ -51,7 +48,6 @@ struct JournalSearchView: View {
         .padding(.horizontal, 20)
     }
 
-    // MARK: - Filter Chips
     private var filterChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -95,7 +91,6 @@ struct JournalSearchView: View {
         }
     }
 
-    // MARK: - Date Filter
     private var dateFilterView: some View {
         VStack(spacing: 8) {
             HStack(spacing: 12) {
@@ -115,7 +110,6 @@ struct JournalSearchView: View {
         .padding(.horizontal, 20).padding(.bottom, 8)
     }
 
-    // MARK: - Empty / Results
     private var emptyResults: some View {
         VStack(spacing: 12) {
             Image(systemName: "magnifyingglass").font(.system(size: 32)).foregroundStyle(.white.opacity(0.2))

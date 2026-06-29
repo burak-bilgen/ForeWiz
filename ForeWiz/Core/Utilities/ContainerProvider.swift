@@ -2,10 +2,6 @@ import Foundation
 import OSLog
 import SwiftData
 
-// MARK: - Container Provider
-
-/// Provides a `DependencyContainer` for app extensions and background tasks.
-/// Falls back to in-memory storage if the persistent container fails.
 @MainActor
 final class ContainerProvider {
     static let shared = ContainerProvider()

@@ -1,14 +1,12 @@
 import SwiftUI
 
-// MARK: - Compact Footer
-
 struct CompactFooter: View {
     let attribution: WeatherAttributionInfo
     let lastUpdatedText: String
 
     var body: some View {
         VStack(spacing: 8) {
-            // Apple Weather Attribution Link
+
             Link(destination: URL(string: attribution.legalPageURLString ?? "https://weatherkit.apple.com/legal-attribution.html")!) {
                 HStack(spacing: 4) {
                     Text(L10n.text("apple_weather_trademark"))
@@ -21,7 +19,6 @@ struct CompactFooter: View {
                 .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 0.5))
             }
 
-            // Legal text if present
             if let legal = attribution.legalAttributionText, !legal.isEmpty {
                 Text(legal)
                     .font(.system(size: 9, weight: .medium, design: .rounded))

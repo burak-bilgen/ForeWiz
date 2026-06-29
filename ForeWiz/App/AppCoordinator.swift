@@ -19,7 +19,7 @@ final class AppCoordinator {
     var selectedRecommendationID: String?
 
     init(container: DependencyContainer, rootFlow: RootFlow = .onboarding) {
-        self.container = container  
+        self.container = container
         self.rootFlow = rootFlow
     }
 
@@ -91,7 +91,6 @@ final class AppCoordinator {
         }
     }
 }
-
 
 extension Notification.Name {
     static let appLanguageDidChange = AppKeys.NotificationName.appLanguageDidChange

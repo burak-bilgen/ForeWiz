@@ -1,11 +1,7 @@
 import Foundation
 
-// MARK: - Risk Plan Builder
-
-/// Builds weather alert notification plans for high+ severity risks.
 enum RiskPlanBuilder {
 
-    /// Creates immediate alert notifications for high+ severity risks.
     static func makeAlertPlans(
         recommendation: DailyRecommendation,
         now: Date,
@@ -28,8 +24,6 @@ enum RiskPlanBuilder {
             )
         }
     }
-
-    // MARK: - Helpers
 
     private static func stableDateID(date: Date, calendar: Calendar) -> String {
         let c = calendar.dateComponents([.year, .month, .day], from: date)

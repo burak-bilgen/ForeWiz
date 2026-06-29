@@ -1,11 +1,6 @@
 import Foundation
 import os
 
-/// Lightweight event logger that records key user actions and system events.
-///
-/// Currently logs to OSLog and prints in debug builds.
-/// Replace the `track` implementation with an analytics SDK (Firebase, Mixpanel, etc.)
-/// when ready — the call sites are already set up.
 final class EventLogger {
     static let shared = EventLogger()
 
@@ -50,12 +45,7 @@ final class EventLogger {
     func track(_ event: Event, parameters: [String: Any]? = nil) {
         logger.info("Tracking event: \(event.name)")
 
-        #if DEBUG
-        print("📊 Event: \(event.name)")
-        if let params = parameters {
-            print("   Parameters: \(params)")
-        }
-        #endif
+
     }
 
     func trackScreenView(_ screenName: String) {

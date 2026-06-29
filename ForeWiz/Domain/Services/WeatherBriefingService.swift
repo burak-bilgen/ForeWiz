@@ -1,15 +1,10 @@
 import Foundation
 
-/// The master service that orchestrates all weather analysis.
-/// Combines narrative storytelling, health intelligence, and comparative analysis
-/// into a single comprehensive daily briefing.
 struct WeatherBriefingService {
     private let narrativeService = WeatherNarrativeService()
     private let healthService = HealthWeatherService()
     private let comparativeService = ComparativeWeatherService()
 
-    /// Generates a complete daily briefing from weather data.
-    /// Call this once per recommendation cycle to populate the briefing.
     func generateBriefing(
         snapshot: WeatherSnapshot,
         recommendation: DailyRecommendation,
@@ -60,38 +55,31 @@ struct WeatherBriefingService {
         )
     }
 
-    // MARK: - Key Takeaway
-
     private func generateKeyTakeaway(
         narrative: WeatherNarrative,
         health: HealthWeatherAnalysis,
         comparative: ComparativeWeatherAnalysis,
         recommendation: DailyRecommendation
     ) -> String {
-        // If there's a critical risk, highlight that
+
         if let criticalRisk = recommendation.risks.first(where: { $0.severity == .extreme }) {
             return String(format: L10n.text("briefing_takeaway_critical"), criticalRisk.title)
         }
 
-        // If health score is very low, highlight health
         if health.overallHealthScore < 40 {
             return L10n.text("briefing_takeaway_health")
         }
 
-        // If unusually hot/cold
         if comparative.temperatureAnomalyCelsius.map({ abs($0) >= 4 }) ?? false {
             return String(format: L10n.text("briefing_takeaway_anomaly"), comparative.anomalyLabel)
         }
 
-        // Default: reference best window
         if let window = recommendation.bestOutdoorWindow {
             return String(format: L10n.text("briefing_takeaway_window"), window.shortDisplayText)
         }
 
         return narrative.headline
     }
-
-    // MARK: - Action Items
 
     private func generateActionItems(
         narrative: WeatherNarrative,
@@ -102,7 +90,6 @@ struct WeatherBriefingService {
     ) -> [WeatherActionItem] {
         var items: [WeatherActionItem] = []
 
-        // 1. Timing action (best window)
         if let window = recommendation.bestOutdoorWindow {
             items.append(WeatherActionItem(
                 id: "timing-best-window",
@@ -114,7 +101,6 @@ struct WeatherBriefingService {
             ))
         }
 
-        // 2. Avoid windows
         if let avoid = recommendation.avoidWindows.first {
             items.append(WeatherActionItem(
                 id: "avoid-\(avoid.id)",
@@ -126,7 +112,6 @@ struct WeatherBriefingService {
             ))
         }
 
-        // 3. Air Quality action
         if health.airQualityIndex >= 4 {
             items.append(WeatherActionItem(
                 id: "health-aqi",
@@ -138,7 +123,6 @@ struct WeatherBriefingService {
             ))
         }
 
-        // 3. Health actions
         if health.migraineRisk >= 6 {
             items.append(WeatherActionItem(
                 id: "health-migraine",
@@ -172,7 +156,6 @@ struct WeatherBriefingService {
             ))
         }
 
-        // 4. Outfit action
         if !recommendation.outfit.items.isEmpty {
             items.append(WeatherActionItem(
                 id: "outfit-main",
@@ -184,7 +167,6 @@ struct WeatherBriefingService {
             ))
         }
 
-        // 5. Lifestyle tip from narrative
         items.append(WeatherActionItem(
             id: "lifestyle-tip",
             priority: 7,

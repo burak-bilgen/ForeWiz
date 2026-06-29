@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Card Entrance Animation
-
 struct CardEntranceModifier: ViewModifier {
     let index: Int
     let appeared: Bool
@@ -31,8 +29,6 @@ extension View {
     }
 }
 
-// MARK: - Stagger Entrance (Legacy Support)
-
 struct StaggerEntranceModifier: ViewModifier {
     let index: Int
     let appeared: Bool
@@ -55,8 +51,6 @@ extension View {
         modifier(StaggerEntranceModifier(index: index, appeared: appeared, baseDelay: baseDelay))
     }
 }
-
-// MARK: - Floating Animation
 
 struct FloatModifier: ViewModifier {
     var amplitude: CGFloat = 8

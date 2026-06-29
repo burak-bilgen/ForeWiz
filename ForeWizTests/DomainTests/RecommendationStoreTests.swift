@@ -100,7 +100,6 @@ struct RecommendationStoreTests {
         #expect(store.recentFeedback().count == 5)
     }
 
-    /// Creates UserDefaults with a unique suite name that gets auto-removed.
     private func createEphemeralDefaults() -> UserDefaults {
         let uniqueName = "test_recommendation_\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: uniqueName)!

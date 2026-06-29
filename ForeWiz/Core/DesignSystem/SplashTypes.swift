@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - Enhanced Weather Splash Kind
 enum EnhancedWeatherSplashKind: String, CaseIterable {
     case sunny, rainy, snowy, stormy, cloudy, foggy, windy, nightClear
 

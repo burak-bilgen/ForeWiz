@@ -158,8 +158,7 @@ final class HomeViewModel {
     private func scheduleLiveRetry() {
         liveRetryTask?.cancel()
         liveRetryTask = Task { [weak self] in
-            // Base delays with added jitter (±25%) to avoid thundering herd
-            // when multiple users' apps retry simultaneously
+
             let baseDelays = [6, 18, 45]
             for base in baseDelays {
                 let jitter = Double.random(in: -0.25...0.25)
@@ -200,7 +199,7 @@ final class HomeViewModel {
                     placemark?.administrativeArea ??
                     placemark?.name ??
                     L10n.text("home_current_location")
-                // Already on @MainActor — outer Task inherits class actor context
+
                 self.selectedLocationName = locationName
             } catch {
                 AppLogger.app.error("Reverse geocoding failed: \(error.localizedDescription)")
@@ -209,9 +208,6 @@ final class HomeViewModel {
         }
     }
 
-    // MARK: - Feedback
-
-    /// Records user feedback about the weather recommendation and persists the updated profile.
     func recordFeedback(_ feedback: UserWeatherFeedback) async {
         do {
             var profile = try await preferencesRepository.loadProfile()
@@ -223,7 +219,6 @@ final class HomeViewModel {
         }
     }
 
-    /// Resets all learning data back to defaults.
     func resetLearning() async {
         do {
             var profile = try await preferencesRepository.loadProfile()

@@ -2,9 +2,6 @@ import Foundation
 import UIKit
 import OSLog
 
-/// Manages manual and scheduled data refreshes with throttling.
-/// @MainActor ensures all state mutations are serialized on the main actor,
-/// eliminating the need for a separate NSLock.
 @MainActor
 final class RefreshController {
     static let shared = RefreshController()

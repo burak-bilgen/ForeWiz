@@ -10,8 +10,6 @@ struct HealthWeatherServiceTests {
         return cal
     }()
 
-    // MARK: - Helpers
-
     private func makeHourlyPoints(
         temps: [Double] = [22, 23, 24, 25, 26, 27],
         humidities: [Double]? = nil,
@@ -98,8 +96,6 @@ struct HealthWeatherServiceTests {
         )
     }
 
-    // MARK: - Migraine Tests
-
     @Test func migraineRiskLowInStableConditions() async {
         let hourly = makeHourlyPoints(temps: [22, 23, 23, 22, 23, 24])
         let snapshot = makeSnapshot(temp: 22, humidity: 0.4, hourly: hourly)
@@ -127,8 +123,6 @@ struct HealthWeatherServiceTests {
         #expect(analysis.migraineAdvice.isEmpty == false)
     }
 
-    // MARK: - Sleep Tests
-
     @Test func sleepExcellentInIdealNightTemp() async {
         let hourly = makeHourlyPoints(temps: [18, 17, 16, 16, 15, 15])
         let snapshot = makeSnapshot(temp: 18, humidity: 0.4, hourly: hourly)
@@ -150,8 +144,6 @@ struct HealthWeatherServiceTests {
         #expect(analysis.sleepQuality <= 10)
     }
 
-    // MARK: - Joint Pain Tests
-
     @Test func jointPainHighInColdAndHumid() async {
         let snapshot = makeSnapshot(temp: 5, humidity: 0.85, hourly: makeHourlyPoints(temps: [5, 5, 5, 5, 5, 5]))
         let analysis = await service.analyzeHealth(snapshot: snapshot, recommendation: makeRecommendation(), profile: makeProfile(), calendar: calendar)
@@ -171,8 +163,6 @@ struct HealthWeatherServiceTests {
         #expect(analysis.jointPainIndex <= 10)
     }
 
-    // MARK: - Respiratory Tests
-
     @Test func respiratoryRiskyInColdWindy() async {
         let snapshot = makeSnapshot(temp: 3, humidity: 0.3, wind: 30, hourly: makeHourlyPoints(temps: [3, 3, 2, 2, 1, 1]))
         let analysis = await service.analyzeHealth(snapshot: snapshot, recommendation: makeRecommendation(), profile: makeProfile(), calendar: calendar)
@@ -184,8 +174,6 @@ struct HealthWeatherServiceTests {
         let analysis = await service.analyzeHealth(snapshot: snapshot, recommendation: makeRecommendation(), profile: makeProfile(), calendar: calendar)
         #expect(analysis.respiratoryIndex <= 3)
     }
-
-    // MARK: - Stamina Tests
 
     @Test func staminaLowInExtremeHeat() async {
         let snapshot = makeSnapshot(temp: 38, humidity: 0.6, hourly: makeHourlyPoints(temps: [38, 39, 40, 40, 39, 38]))
@@ -205,8 +193,6 @@ struct HealthWeatherServiceTests {
         #expect(analysis.staminaIndex >= 1)
         #expect(analysis.staminaIndex <= 10)
     }
-
-    // MARK: - Overall Score Tests
 
     @Test func overallHealthScoreInIdealConditions() async {
         let hourly = makeHourlyPoints(temps: [22, 23, 23, 22, 22, 21])
@@ -229,8 +215,6 @@ struct HealthWeatherServiceTests {
         #expect(analysis.healthSummary.isEmpty == false)
     }
 
-    // MARK: - All Fields Present
-
     @Test func allHealthFieldsPopulated() async {
         let snapshot = makeSnapshot(temp: 22, hourly: makeHourlyPoints())
         let analysis = await service.analyzeHealth(snapshot: snapshot, recommendation: makeRecommendation(), profile: makeProfile(), calendar: calendar)
@@ -246,8 +230,6 @@ struct HealthWeatherServiceTests {
         #expect(analysis.staminaAdvice.isEmpty == false)
     }
 }
-
-// MARK: - Safe Array Extension for Tests
 
 private extension Array {
     subscript(safe index: Int) -> Element? {

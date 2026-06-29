@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Enhanced Weather Particles
-
 struct EnhancedWeatherParticles: View {
     let kind: EnhancedWeatherSplashKind
     let progress: Double

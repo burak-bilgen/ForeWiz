@@ -50,8 +50,6 @@ final class JournalShareService {
         return parts.joined(separator: "\n")
     }
 
-    // MARK: - Helpers
-
     private func formatDuration(_ duration: TimeInterval) -> String {
         let h = Int(duration) / 3600; let m = (Int(duration) % 3600) / 60
         if h > 0 { return "\(h)h \(m)m" }; return "\(m)m"

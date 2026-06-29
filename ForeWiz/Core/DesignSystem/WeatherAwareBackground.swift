@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Weather-Aware Background View
-
 struct WeatherAwareBackground: View {
     @ObservedObject private var service = WeatherGradientService.shared
     let condition: String?

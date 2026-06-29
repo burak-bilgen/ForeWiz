@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Preview
-
 #Preview {
     ZStack {
         LiquidOrbBackground(palette: .clearSky)

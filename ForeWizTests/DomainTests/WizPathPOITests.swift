@@ -9,8 +9,6 @@ import WizPathKit
 @Suite("WizPath POI & Hazard Tests")
 struct WizPathPOITests {
 
-    // MARK: - POICategory Tests
-
     @Test("POICategory enum cases")
     func poiCategoryEnumCases() async throws {
         #expect(POICategory.gasStation.rawValue == "gasStation")
@@ -51,8 +49,6 @@ struct WizPathPOITests {
         #expect(POICategory.evCharger.mkCategory == MKPointOfInterestCategory.evCharger)
     }
 
-    // MARK: - POISafetyStatus Tests
-
     @Test("POISafetyStatus enum values")
     func poiSafetyStatusEnumValues() async throws {
         #expect(POISafetyStatus.safe.rawValue == "safe")
@@ -76,8 +72,6 @@ struct WizPathPOITests {
         #expect(!POISafetyStatus.unsafe.localizedTitle.isEmpty)
         #expect(!POISafetyStatus.dangerous.localizedTitle.isEmpty)
     }
-
-    // MARK: - SmartStop Tests
 
     private func makeMapItem() -> MKMapItem {
         MKMapItem(placemark: MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)))
@@ -135,8 +129,6 @@ struct WizPathPOITests {
         #expect(!stop.etaDisplay.isEmpty)
     }
 
-    // MARK: - HazardType Tests
-
     @Test("HazardType enum cases")
     func hazardTypeEnumCases() async throws {
         #expect(HazardType.crosswind.rawValue == "crosswind")
@@ -180,8 +172,6 @@ struct WizPathPOITests {
         #expect(HazardType.ice.vehicleTypesAffected.contains(.walking))
     }
 
-    // MARK: - HazardSeverity Tests
-
     @Test("HazardSeverity enum values")
     func hazardSeverityEnumValues() async throws {
         #expect(HazardSeverity.low.rawValue == "low")
@@ -206,8 +196,6 @@ struct WizPathPOITests {
         #expect(!HazardSeverity.critical.localizedTitle.isEmpty)
     }
 
-    // MARK: - EnvironmentalHazard Tests
-
     @Test("EnvironmentalHazard properties")
     func environmentalHazardProperties() async throws {
         let hazard = EnvironmentalHazard(
@@ -228,12 +216,10 @@ struct WizPathPOITests {
         #expect(!hazard.iconName.isEmpty)
     }
 
-    // MARK: - JourneyHUDData Tests
-
     @Test("JourneyHUDData duration display")
     func journeyHUDDataDurationDisplay() async throws {
         let hud = JourneyHUDData(
-            totalDuration: 3660, // 1h 1m
+            totalDuration: 3660,
             totalDistance: 30000,
             hazardCount: 2,
             safeStops: 3,
@@ -250,7 +236,7 @@ struct WizPathPOITests {
     @Test("JourneyHUDData duration display for short trips")
     func journeyHUDDataDurationDisplayForShortTrips() async throws {
         let hud = JourneyHUDData(
-            totalDuration: 600, // 10 min
+            totalDuration: 600,
             totalDistance: 5000,
             hazardCount: 0,
             safeStops: 0,

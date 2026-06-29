@@ -1,8 +1,6 @@
 import SwiftUI
 import Combine
 
-// MARK: - Pulse Glow Modifier
-
 struct PulseGlowModifier: ViewModifier {
     var color: Color
     var radius: CGFloat = 14
@@ -13,7 +11,7 @@ struct PulseGlowModifier: ViewModifier {
         content
             .shadow(color: color.opacity(pulse ? 0.5 : 0.2), radius: pulse ? radius : radius * 0.6, x: 0, y: 0)
             .onAppear {
-                // Single spring animation - no endless loop
+
                 withAnimation(AppTheme.transitionSpring) {
                     pulse = true
                 }
@@ -26,8 +24,6 @@ extension View {
         modifier(PulseGlowModifier(color: color, radius: radius))
     }
 }
-
-// MARK: - Pulsing Dots Loader
 
 struct PulsingDotsLoader: View {
     var color: Color = .white

@@ -150,7 +150,7 @@ struct DefaultCommuteRouteService: CommuteRouteService {
     }
 
     func commuteBriefing(home: SavedLocation, work: SavedLocation, mode: TravelMode) async -> CommuteBriefing {
-        // Weekend check
+
         let calendar = Calendar.current
         if calendar.isDateInWeekend(Date()) {
             return CommuteBriefing(
@@ -212,7 +212,6 @@ struct DefaultCommuteRouteService: CommuteRouteService {
             ? L10n.text("commute_weather_favorable")
             : L10n.text("commute_weather_suboptimal")
 
-        // Fetch real weather data for origin & destination if repository is available
         let originWeather: String
         let destinationWeather: String
         if let repo = weatherRepository {

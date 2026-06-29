@@ -2,9 +2,6 @@ import SwiftUI
 import SwiftData
 import WizPathKit
 
-// MARK: - Liquid Glass Home View
-/// Premium weather assistant home screen with Liquid Glass aesthetic.
-/// Features animated orb backgrounds, glass cards, micro-interactions, and accessibility.
 struct HomeView: View {
     @Bindable var viewModel: HomeViewModel
     @Binding var savedLocations: [SavedLocation]
@@ -39,14 +36,13 @@ struct HomeView: View {
     @State private var commuteBriefing: CommuteBriefing?
     @State private var commuteTravelMode: TravelMode = .car
     private let commuteService: CommuteRouteService = DefaultCommuteRouteService()
-    
+
     private enum MapsExportStatus {
         case idle
-        case loadingAd
         case timedOut
         case error(String)
         case ready
-        
+
         var isActive: Bool {
             switch self {
             case .idle: return false
@@ -91,7 +87,6 @@ struct HomeView: View {
                 LiquidOrbBackground(palette: orbPalette)
                     .ignoresSafeArea()
 
-                // Weather particle background - günün hava durumuna göre animasyon
                 EnhancedWeatherParticles(kind: splashKind, progress: viewModel.particleIntensity)
                     .ignoresSafeArea()
                     .allowsHitTesting(false)
@@ -156,7 +151,7 @@ struct HomeView: View {
             }
             .onChange(of: showSettings) { _, newValue in
                 if newValue {
-                    // Settings açılırken editing state'leri gerçek değerlerle doldur
+
                     editingHomeLocation = homeLocation
                     editingWorkLocation = workLocation
                     editingCommuteMode = commuteModeRaw
@@ -168,8 +163,7 @@ struct HomeView: View {
                         WizPathDashboardView(
                             wizPathService: wizService,
                             onMapsExport: { proceedToMaps in
-                                // Önce WizPath'i kapat, sonra maps export'u başlat.
-                                // Aynı anda iki fullScreenCover açılamaz (SwiftUI warning).
+
                                 showWizPathSheet = false
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                                     handleMapsExport(proceedToMaps: proceedToMaps)
@@ -203,8 +197,6 @@ struct HomeView: View {
             }
         }
     }
-
-    // MARK: - Toolbar
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
@@ -256,7 +248,7 @@ struct HomeView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(.white.opacity(0.5))
-                        
+
                         if feedbackStore.unreadCount > 0 {
                             Text(String(feedbackStore.unreadCount))
                                 .font(.system(size: 10, weight: .bold))
@@ -283,8 +275,6 @@ struct HomeView: View {
             toolbarAppeared = true
         }
     }
-
-    // MARK: - Content
 
     @ViewBuilder
     private var content: some View {
@@ -314,8 +304,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Orb Palette
-
     private var orbPalette: LiquidOrbBackground.OrbPalette {
         switch currentSymbol {
         case _ where currentSymbol.contains("storm") || currentSymbol.contains("thunder"):
@@ -335,102 +323,16 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Maps Export (Rewarded Ad Flow)
-
     private func handleMapsExport(proceedToMaps: @escaping () -> Void) {
         mapsExportProceed = proceedToMaps
-        mapsExportStatus = .loadingAd
+        mapsExportStatus = .ready
         showMapsExportSheet = true
         HapticEngine.shared.light()
 
-        Task { @MainActor in
-            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                  let rootVC = windowScene.windows.first?.rootViewController else {
-                mapsExportStatus = .error(L10n.text("error_unknown"))
-                return
-            }
-
-            let adUnitID = AdManager.AdUnit.rewarded.currentID
-
-            // Timeout: if ad doesn't load in 10 seconds, proceed directly
-            let timeoutTask = Task {
-                try? await Task.sleep(nanoseconds: 10_000_000_000)
-                guard !Task.isCancelled else { return }
-                await MainActor.run {
-                    mapsExportStatus = .timedOut
-                    HapticEngine.shared.warning()
-                    proceedToMaps()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        showMapsExportSheet = false
-                        mapsExportProceed = nil
-                    }
-                }
-            }
-
-            // Track whether the reward flow completed (ad shown or failed)
-            var rewardFlowCompleted = false
-            
-            AdMobRewardedIntegration.shared.loadRewardedAd(adUnitID: adUnitID) { success in
-                timeoutTask.cancel()
-                Task { @MainActor in
-                    if success {
-                        mapsExportStatus = .ready
-                        let presented = AdMobRewardedIntegration.shared.showRewardedAd(
-                            from: rootVC,
-                            reward: .default,
-                            onRewardGranted: { _ in
-                                rewardFlowCompleted = true
-                                Task { @MainActor in
-                                    AdManager.shared.recordReward(.rewarded, amount: 1.0)
-                                    showMapsExportSheet = false
-                                    HapticEngine.shared.success()
-                                    proceedToMaps()
-                                    mapsExportProceed = nil
-                                }
-                            },
-                            onRewardFailed: {
-                                rewardFlowCompleted = true
-                                Task { @MainActor in
-                                    showMapsExportSheet = false
-                                    HapticEngine.shared.warning()
-                                    proceedToMaps()
-                                    mapsExportProceed = nil
-                                }
-                            }
-                        )
-                        
-                        // If ad couldn't be presented, proceed directly
-                        if !presented {
-                            showMapsExportSheet = false
-                            HapticEngine.shared.warning()
-                            proceedToMaps()
-                            mapsExportProceed = nil
-                        } else {
-                            // Presentation safety timeout: if ad doesn't play within 5s, auto-proceed
-                            Task {
-                                try? await Task.sleep(nanoseconds: 5_000_000_000)
-                                guard !Task.isCancelled else { return }
-                                await MainActor.run {
-                                    // Only proceed if the reward flow hasn't completed yet
-                                    guard !rewardFlowCompleted, mapsExportProceed != nil else { return }
-                                    showMapsExportSheet = false
-                                    HapticEngine.shared.warning()
-                                    proceedToMaps()
-                                    mapsExportProceed = nil
-                                }
-                            }
-                        }
-                    } else {
-                        mapsExportStatus = .error(L10n.text("maps_export_error"))
-                        HapticEngine.shared.warning()
-                        // Auto-dismiss and proceed after showing error
-                        try? await Task.sleep(nanoseconds: 2_000_000_000)
-                        showMapsExportSheet = false
-                        proceedToMaps()
-                        mapsExportProceed = nil
-                    }
-                }
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            showMapsExportSheet = false
+            proceedToMaps()
+            mapsExportProceed = nil
         }
     }
 
@@ -458,10 +360,9 @@ struct HomeView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
 
-                // Status indicator
                 HStack(spacing: 10) {
                     switch mapsExportStatus {
-                    case .idle, .loadingAd:
+                    case .idle:
                         ProgressView()
                             .tint(Color(hex: "#FFD60A"))
                             .scaleEffect(0.9)
@@ -501,27 +402,12 @@ struct HomeView: View {
                         .fill(.white.opacity(0.05))
                 )
 
-                // Skip button (only during loading)
-                if case .loadingAd = mapsExportStatus {
-                    Button {
-                        HapticEngine.shared.light()
-                        showMapsExportSheet = false
-                        mapsExportProceed?()
-                        mapsExportProceed = nil
-                    } label: {
-                        Text(L10n.text("maps_export_skip"))
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.4))
-                            .underline()
-                    }
-                }
+
             }
         }
         .presentationDetents([.height(320)])
         .presentationBackground(.ultraThinMaterial)
     }
-
-    // MARK: - Commute Briefing
 
     private func computeCommuteBriefing() async {
         guard let home = homeLocation, let work = workLocation else {
@@ -548,8 +434,6 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Beta Badge
-
 struct HomeBetaBadge: View {
     var body: some View {
         HStack(spacing: 2) {
@@ -564,8 +448,6 @@ struct HomeBetaBadge: View {
         .padding(.horizontal, 4)
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     PreviewHomeView()

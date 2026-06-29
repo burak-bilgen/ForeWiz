@@ -2,8 +2,6 @@ import Foundation
 
 struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
 
-    // MARK: - Dependencies
-
     private let weatherCacheRepository: WeatherCacheRepository?
     private let defaultProfile: UserComfortProfile
 
@@ -14,8 +12,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         self.weatherCacheRepository = weatherCacheRepository
         self.defaultProfile = defaultProfile
     }
-
-    // MARK: - Scoring Constants
 
     private enum ScoringPenalties {
         static let hotSummerMidday = 20
@@ -163,8 +159,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         )
     }
 
-    // MARK: - New Protocol Methods
-
     func scoreWindow(
         start: Date,
         end: Date,
@@ -239,8 +233,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         return recommendations.sorted { $0.score.rawValue > $1.score.rawValue }
     }
 
-    // MARK: - Active hours guard
-
     private func isActiveHour(_ hourOfDay: Int, profile: UserComfortProfile) -> Bool {
         let endHour = profile.quietHours.map { Calendar.current.component(.hour, from: $0.start) } ?? ScoringPenalties.defaultEndHour
         let startHour = ScoringPenalties.defaultStartHour
@@ -250,8 +242,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
             return hourOfDay >= startHour || hourOfDay < endHour
         }
     }
-
-    // MARK: - Avoid window overlap
 
     private func overlapsAvoidWindows(
         start: Date,
@@ -265,8 +255,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
         return false
     }
-
-    // MARK: - Activity-Specific Scoring
 
     private func activitySpecificPenalty(
         for activity: ActivityType,
@@ -404,8 +392,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         return morning.contains(hourOfDay) || evening.contains(hourOfDay)
     }
 
-    // MARK: - Helpers
-
     private func seasonalScore(for activity: ActivityType, start: Date, end: Date) -> WeatherScore {
         let calendar = Calendar.current
         let month = calendar.component(.month, from: start)
@@ -455,14 +441,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
-    /// Küresel ısınma odaklı ısı cezası - yüksek sıcaklıklar artık çok daha ağır cezalandırılıyor.
-    ///   < 12°C:  soğuk (22)
-    ///   12-26°C: ideal (0)
-    ///   26-29°C: sıcaklık başlangıcı (15)
-    ///   29-32°C: rahatsız (35)
-    ///   32-35°C: tehlikeli (50)
-    ///   35-38°C: çok tehlikeli (65)
-    ///   > 38°C:  ekstrem (85)
     private func goingOutTemperaturePenalty(_ temperature: Double) -> Int {
         switch temperature {
         case 12...26: 0
@@ -503,8 +481,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
-    /// Nem cezası - ısı + nem kombinasyonu (Heat Index / Humidex) çok daha agresif.
-    /// Yüksek sıcaklıkta nem, hissedilen sıcaklığı dramatik artırır.
     private func humidityPenalty(
         _ humidity: Double?,
         apparentTemperature: Double
@@ -512,7 +488,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         let humidityValue = humidity ?? 0
         guard apparentTemperature >= 22 else { return 0 }
 
-        // Heat index yaklaşımı: sıcaklık arttıkça nem cezası katlanır
         let basePenalty: Int
         switch humidityValue {
         case 0.80...: basePenalty = 20
@@ -521,7 +496,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         default: basePenalty = 0
         }
 
-        // Sıcaklık yükseldikçe nem cezası çarpanı artar
         let multiplier: Double
         switch apparentTemperature {
         case 35...: multiplier = 2.0
@@ -544,8 +518,6 @@ struct DefaultActivityWindowScoringEngine: ActivityWindowScoringEngine {
         }
     }
 
-    /// Sıcak mevsim genişletildi: Mayıs-Ekim (5-10) arası, 26°C+ başlangıç
-    /// Küresel ısınmayla sıcak mevsim uzadı ve erken başlıyor.
     private func isHotSummerMidday(month: Int, hour: Int, apparentTemperature: Double) -> Bool {
         (5...10).contains(month) && (11...17).contains(hour) && apparentTemperature >= 26
     }

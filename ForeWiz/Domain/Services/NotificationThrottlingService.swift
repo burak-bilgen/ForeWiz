@@ -1,28 +1,18 @@
 import Foundation
 
-// MARK: - Notification Throttling Service
-
-/// Tracks recently sent notifications and enforces cooldown + rate limits.
-/// Uses UserDefaults for persistence so limits survive app restarts.
 final class NotificationThrottlingService: @unchecked Sendable {
     private let defaults: UserDefaults
     private let lock = NSLock()
 
-    // MARK: - Configuration
-
-    /// Cooldown per category (seconds). Same-category notification won't fire again within this window.
     private static let cooldowns: [NotificationCategory: TimeInterval] = [
-        .morningBriefing: 23 * 3600,  // once per day-ish
-        .weatherAlert: 4 * 3600,      // 4 hours between alerts
+        .morningBriefing: 23 * 3600,
+        .weatherAlert: 4 * 3600,
     ]
 
-    /// Hard daily cap per category. Beyond this, plans are dropped.
     private static let dailyLimits: [NotificationCategory: Int] = [
         .morningBriefing: 1,
         .weatherAlert: 4,
     ]
-
-    // MARK: - Persisted Keys
 
     private static let sentTimestampsKey = "notif_throttle_sent_timestamps"
     private static let dailyCountKeyPrefix = "notif_throttle_daily_count_"
@@ -32,10 +22,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
         self.defaults = defaults
     }
 
-    // MARK: - Public API
-
-    /// Filters `plans`, removing any that exceed cooldown or daily-limit thresholds.
-    /// Also records filtered‑in plans so future calls respect the new limits.
     func throttle(_ plans: [NotificationPlan], now: Date = Date()) -> [NotificationPlan] {
         lock.lock()
         defer { lock.unlock() }
@@ -50,7 +36,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
         }
     }
 
-    /// Records that `plans` were actually scheduled, updating cooldown and daily counters.
     func didSchedule(_ plans: [NotificationPlan], now: Date = Date()) {
         lock.lock()
         defer { lock.unlock() }
@@ -64,7 +49,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
         }
     }
 
-    /// Resets all throttling state (useful for testing).
     func reset() {
         lock.lock()
         defer { lock.unlock() }
@@ -74,8 +58,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
             defaults.removeObject(forKey: key)
         }
     }
-
-    // MARK: - Cooldown
 
     private func allowedByCooldown(_ plan: NotificationPlan) -> Bool {
         let cooldown = Self.cooldowns[plan.category] ?? 0
@@ -96,8 +78,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
         defaults.set(timestamps, forKey: Self.sentTimestampsKey)
     }
 
-    // MARK: - Daily Limit
-
     private func allowedByDailyLimit(_ plan: NotificationPlan, todayKey: String) -> Bool {
         let limit = Self.dailyLimits[plan.category] ?? Int.max
         guard limit < Int.max else { return true }
@@ -116,9 +96,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
         defaults.set(current + 1, forKey: key)
     }
 
-    // MARK: - Content Deduplication
-
-    /// Blocks the same notification title + body from being re-scheduled within the same day.
     private func allowedByContentDeduplication(_ plan: NotificationPlan) -> Bool {
         let hash = contentHash(plan)
         let todayKey = dailyKey(for: Date())
@@ -137,8 +114,6 @@ final class NotificationThrottlingService: @unchecked Sendable {
         let raw = "\(plan.category.rawValue)|\(plan.title)|\(plan.body)"
         return String(raw.hashValue)
     }
-
-    // MARK: - Helpers
 
     private func dailyKey(for date: Date) -> String {
         let comps = Calendar.current.dateComponents([.year, .month, .day], from: date)

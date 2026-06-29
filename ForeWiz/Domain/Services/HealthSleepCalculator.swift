@@ -1,7 +1,5 @@
 import Foundation
 
-// MARK: - Array Average Helper
-
 extension Array where Element == Double {
     var average: Double? {
         guard !isEmpty else { return nil }
@@ -9,9 +7,6 @@ extension Array where Element == Double {
     }
 }
 
-// MARK: - Sleep Quality Calculator
-
-/// Calculates sleep quality from weather factors: night temperature, humidity, wind noise, storm activity.
 enum HealthSleepCalculator {
 
     static func calculate(
@@ -22,7 +17,6 @@ enum HealthSleepCalculator {
     ) -> (quality: Int, label: String, advice: String) {
         var sleepScore = 10
 
-        // Night temperature (ideal sleep: 16-20°C)
         let nightHours = hourly.filter {
             let h = calendar.component(.hour, from: $0.date)
             return (22...23).contains(h) || (0...5).contains(h)
@@ -30,7 +24,7 @@ enum HealthSleepCalculator {
 
         if let avgNightTemp = nightHours.map({ $0.apparentTemperatureCelsius }).average {
             if avgNightTemp > 25 {
-                sleepScore -= 4 // Tropical night - very disruptive
+                sleepScore -= 4
             } else if avgNightTemp > 22 {
                 sleepScore -= 3
             } else if avgNightTemp > 20 {
@@ -41,7 +35,7 @@ enum HealthSleepCalculator {
                 sleepScore -= 1
             }
         } else if let tonightTemp = current.apparentTemperatureCelsius as Double? {
-            // Fallback to current temp if no night data
+
             if tonightTemp > 25 {
                 sleepScore -= 3
             } else if tonightTemp > 22 {
@@ -51,7 +45,6 @@ enum HealthSleepCalculator {
             }
         }
 
-        // Humidity impact on sleep
         if let humidity = current.humidity {
             if humidity >= 0.80 {
                 sleepScore -= 2
@@ -60,14 +53,12 @@ enum HealthSleepCalculator {
             }
         }
 
-        // Wind noise (high wind = disturbed sleep)
         if let wind = current.windSpeedKph, wind >= 30 {
             sleepScore -= 2
         } else if let wind = current.windSpeedKph, wind >= 20 {
             sleepScore -= 1
         }
 
-        // Storm night
         if hourly.contains(where: { point in
             guard let severeRisk = point.severeWeatherRisk else { return false }
             return severeRisk >= .medium
@@ -80,8 +71,6 @@ enum HealthSleepCalculator {
 
         return (clampedQuality, label, advice)
     }
-
-    // MARK: - Labels
 
     private static func labelAndAdvice(for quality: Int) -> (String, String) {
         switch quality {

@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Liquid Sheen Modifier
-
 struct LiquidSheenModifier: ViewModifier {
     let accentColor: Color
     let isActive: Bool
@@ -45,8 +43,6 @@ extension View {
         modifier(LiquidSheenModifier(accentColor: accent, isActive: isActive))
     }
 }
-
-// MARK: - Shimmer Modifier
 
 struct ShimmerModifier: ViewModifier {
     @State private var phase: CGFloat = -1.0

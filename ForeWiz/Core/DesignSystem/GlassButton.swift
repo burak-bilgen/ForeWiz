@@ -1,8 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Compact Icon Button
-
 struct IconGlassButton: View {
     let icon: String
     let style: LiquidGlassButtonStyle
@@ -17,8 +15,6 @@ struct IconGlassButton: View {
         )
     }
 }
-
-// MARK: - Toolbar Buttons
 
 struct ToolbarLocationButton: View {
     let locationName: String
@@ -117,8 +113,6 @@ struct ToolbarRefreshButton: View {
     }
 }
 
-// MARK: - Card Action Button
-
 struct CardActionButton: View {
     let icon: String
     let title: String
@@ -174,8 +168,6 @@ struct CardActionButton: View {
         .accessibilityLabel(L10n.formatted("%@: %@", title, detail))
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     ZStack {

@@ -6,8 +6,6 @@ import CryptoKit
 @Suite("Widget Data Crypto Tests")
 struct WidgetDataCryptoTests {
 
-    // MARK: - Deterministic Key Tests
-
     @Test("Deterministic key is 256 bits (32 bytes)")
     func deterministicKeySize() {
         let key = WidgetDataCrypto.deterministicKey()
@@ -20,8 +18,6 @@ struct WidgetDataCryptoTests {
         let key2 = WidgetDataCrypto.deterministicKey()
         #expect(key1 == key2)
     }
-
-    // MARK: - Encrypt/Decrypt Roundtrip Tests
 
     @Test("Encrypt then decrypt returns original data (deterministic key)")
     func roundtripDeterministic() throws {
@@ -46,7 +42,7 @@ struct WidgetDataCryptoTests {
         let original = "{\"location\":\"Istanbul\",\"temp\":22.5}".data(using: .utf8)!
 
         let encrypted = try WidgetDataCrypto.encrypt(original)
-        // Simulates widget reading the data later with a fresh key derivation
+
         let decrypted = try WidgetDataCrypto.decrypt(encrypted)
         #expect(decrypted == original)
     }
@@ -64,7 +60,7 @@ struct WidgetDataCryptoTests {
         let original = "Same data each time".data(using: .utf8)!
         let encrypted1 = try WidgetDataCrypto.encrypt(original)
         let encrypted2 = try WidgetDataCrypto.encrypt(original)
-        // AES-GCM uses a random nonce, so ciphertexts should differ
+
         #expect(encrypted1 != encrypted2)
     }
 
@@ -98,7 +94,7 @@ struct WidgetDataCryptoTests {
 
     @Test("Large JSON-like data roundtrip")
     func largeDataRoundtrip() throws {
-        // Simulate a realistic widget payload
+
         var items: [[String: Any]] = []
         for i in 0..<50 {
             items.append([

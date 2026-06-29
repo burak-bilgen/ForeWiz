@@ -1,13 +1,9 @@
 import Foundation
 
-/// Lightweight localization helper for the widget target.
-/// Reads the language override saved by L10n in the main app via shared UserDefaults.
 enum WidgetL10n {
     private static let appGroupSuiteName = "group.forewiz"
     private static let languageOverrideKey = "forewiz.languageOverride.v1"
 
-    /// Returns the current language code ("en" or "tr") from shared UserDefaults,
-    /// falling back to the system language if no override is set.
     static var currentLanguageCode: String {
         guard let defaults = UserDefaults(suiteName: appGroupSuiteName),
               let identifier = defaults.string(forKey: languageOverrideKey) else {
@@ -17,15 +13,11 @@ enum WidgetL10n {
         return identifier.hasPrefix("tr") ? "tr" : "en"
     }
 
-    /// Returns true if the current language is Turkish.
     static var isTurkish: Bool { currentLanguageCode == "tr" }
 
-    /// Returns a localized string for the given key.
     static func text(_ key: String) -> String {
         translations[key]?[currentLanguageCode] ?? key
     }
-
-    // MARK: - Translation Table
 
     private static let translations: [String: [String: String]] = [
         "widget_outdoor_label": [

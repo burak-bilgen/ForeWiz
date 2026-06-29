@@ -1,8 +1,6 @@
 import Foundation
 import WizPathKit
 
-// MARK: - WizPathLocationSource Adapter
-
 @MainActor
 final class WizPathLocationServiceAdapter: WizPathLocationSource {
     private let locationService: LocationService
@@ -16,8 +14,6 @@ final class WizPathLocationServiceAdapter: WizPathLocationSource {
         return WizPathCoordinate(latitude: coord.latitude, longitude: coord.longitude)
     }
 }
-
-// MARK: - WizPathWeatherSource Adapter
 
 @MainActor
 final class WizPathWeatherServiceAdapter: WizPathWeatherSource {

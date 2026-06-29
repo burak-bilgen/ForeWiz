@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Metric Type
-
 enum MetricType: String, CaseIterable, Identifiable {
     case temperature, humidity, wind, uvIndex, precipitation
 
@@ -59,8 +57,6 @@ enum MetricType: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - Time Range
-
 enum TimeRange: String, CaseIterable, Identifiable {
     case today, next24Hours, tomorrow
 
@@ -74,8 +70,6 @@ enum TimeRange: String, CaseIterable, Identifiable {
         }
     }
 }
-
-// MARK: - Trend
 
 enum Trend {
     case rising, falling, stable
@@ -104,8 +98,6 @@ enum Trend {
         }
     }
 }
-
-// MARK: - Comfort Level
 
 enum ComfortLevel {
     case excellent, good, moderate, poor

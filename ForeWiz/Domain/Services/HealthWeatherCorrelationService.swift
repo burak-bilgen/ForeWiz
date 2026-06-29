@@ -139,8 +139,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
         )
     }
 
-    // MARK: - Confidence
-
     private func determineConfidence(samples: [HealthSample], uniqueDays: Set<Date>) -> CorrelationConfidence {
         guard !samples.isEmpty else { return .none }
         guard uniqueDays.count >= minimumDaysForHighConfidence else { return .low }
@@ -156,8 +154,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
         }
         return .medium
     }
-
-    // MARK: - Heart Rate + Temperature
 
     private func correlateHeartRateWithHeat(
         heartSamples: [HealthSample],
@@ -198,8 +194,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
         }
     }
 
-    // MARK: - Sleep + Night Temperature
-
     private func correlateSleepWithTemperature(
         sleepSamples: [HealthSample],
         daily: [DailyWeatherPoint],
@@ -237,8 +231,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
         }
     }
 
-    // MARK: - Steps + Weather
-
     private func correlateStepsWithWeather(
         stepSamples: [HealthSample],
         daily: [DailyWeatherPoint],
@@ -265,8 +257,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
             staminaAdvice = "You've been active regardless of weather — your fitness routine is solid."
         }
     }
-
-    // MARK: - Respiratory Rate + Air Quality
 
     private func correlateRespiratoryWithAQI(
         respSamples: [HealthSample],
@@ -306,8 +296,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
         }
     }
 
-    // MARK: - UV Exposure Trend
-
     private func correlateUVTrend(
         uvSamples: [HealthSample],
         current: CurrentWeatherPoint,
@@ -339,8 +327,6 @@ struct DefaultHealthWeatherCorrelationService: HealthWeatherCorrelationService {
             }
         }
     }
-
-    // MARK: - Overall Score
 
     private func recalculateOverallScore(
         migraineRisk: Int,

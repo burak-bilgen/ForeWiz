@@ -1,8 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Commute Briefing Card
-
 struct CommuteBriefingCard: View {
     let briefing: CommuteBriefing
     let homeName: String
@@ -13,7 +11,6 @@ struct CommuteBriefingCard: View {
     @State private var isExpanded = false
     @State private var rotationAngle = 0.0
 
-    /// Score based purely on route hazards — no string parsing.
     private var score: Int {
         if briefing.routeHazards.isEmpty {
             return 85
@@ -32,7 +29,7 @@ struct CommuteBriefingCard: View {
     var body: some View {
         LiquidGlassCard(accentColor: scoreColor, innerPadding: 0) {
             VStack(spacing: 0) {
-                // Header
+
                 Button {
                     withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                         isExpanded.toggle()
@@ -40,7 +37,7 @@ struct CommuteBriefingCard: View {
                     }
                 } label: {
                     HStack(spacing: 14) {
-                        // Travel mode icon
+
                         ZStack {
                             Circle()
                                 .fill(scoreColor.opacity(0.18))
@@ -51,7 +48,6 @@ struct CommuteBriefingCard: View {
                                 .foregroundStyle(scoreColor)
                         }
 
-                        // Route info
                         VStack(alignment: .leading, spacing: 3) {
                             HStack(spacing: 4) {
                                 Text(homeName)
@@ -75,7 +71,6 @@ struct CommuteBriefingCard: View {
 
                         Spacer(minLength: 8)
 
-                        // Score ring
                         ZStack {
                             Circle()
                                 .stroke(scoreColor.opacity(0.2), lineWidth: 3)
@@ -100,14 +95,13 @@ struct CommuteBriefingCard: View {
                 }
                 .buttonStyle(.plain)
 
-                // Expanded detail
                 if isExpanded {
                     Divider()
                         .background(.white.opacity(0.06))
                         .padding(.horizontal, 16)
 
                     VStack(alignment: .leading, spacing: 12) {
-                        // Weather at origin/destination
+
                         VStack(spacing: 8) {
                             briefRow(
                                 icon: "house.fill",
@@ -121,7 +115,6 @@ struct CommuteBriefingCard: View {
                             )
                         }
 
-                        // Route hazards
                         if !briefing.routeHazards.isEmpty {
                             VStack(alignment: .leading, spacing: 6) {
                                 Label {
@@ -149,7 +142,6 @@ struct CommuteBriefingCard: View {
                             .background(AppTheme.warning.opacity(0.08), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                         }
 
-                        // Recommendation
                         HStack(spacing: 6) {
                             Image(systemName: "lightbulb.fill")
                                 .font(.system(size: 10))
@@ -160,7 +152,6 @@ struct CommuteBriefingCard: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
 
-                        // Edit locations button
                         Button {
                             HapticEngine.shared.light()
                             onEditLocations()
@@ -225,8 +216,6 @@ struct CommuteBriefingCard: View {
         .background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     ZStack {

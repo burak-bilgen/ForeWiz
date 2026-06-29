@@ -65,13 +65,11 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             if let targetLocation {
                 location = targetLocation
             } else {
-                // Location permission is already requested during onboarding.
-                // Try fetching live location first; if unavailable, fall back
-                // to the manually selected city from onboarding.
+
                 do {
                     location = try await locationRepository.getCurrentLocation()
                 } catch {
-                    // Fallback: use the profile's selected saved location
+
                     let fallback = profile.savedLocations.first { $0.id == profile.selectedLocationID }
                         ?? profile.savedLocations.first
                     if let fallback {
@@ -115,7 +113,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             return nil
         }
 
-        // Compute hourly temperature range for smart cache decisions
         let tempRange: Double? = {
             let temps = cached.hourly.map(\.temperatureCelsius)
             guard let min = temps.min(), let max = temps.max() else { return nil }
@@ -139,14 +136,11 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             } catch {
                 lastError = error
                 guard attempt < liveFetchAttempts else { break }
-                
-                // Exponential backoff with randomized jitter
-                // attempt 1: base = 600ms, jitter = 0-150ms -> 600-750ms
-                // attempt 2: base = 1200ms, jitter = 0-150ms -> 1200-1350ms
+
                 let baseDelayMs = Double(1 << attempt) * 300.0
                 let jitterMs = Double.random(in: 0...150.0)
                 let delayNanoseconds = UInt64((baseDelayMs + jitterMs) * 1_000_000.0)
-                
+
                 try? await Task.sleep(nanoseconds: delayNanoseconds)
             }
         }
@@ -187,7 +181,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         let rankedCandidates = ranker.rank(candidates, context: context)
         store.saveCandidates(rankedCandidates)
 
-        // Generate daily briefing
         let briefing = await weatherBriefingService.generateBriefing(
             snapshot: snapshot,
             recommendation: recommendation,
@@ -215,8 +208,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
     private func normalized(_ error: any Error) -> AppError {
         ErrorHandler.normalized(error)
     }
-
-
 
     private func cacheWidgetData(snapshot: WeatherSnapshot, outdoorScore: Int, locationName: String) {
         let calendar = Calendar.current
@@ -257,7 +248,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
         guard let defaults = UserDefaults(suiteName: "group.forewiz"),
               let encoded = try? JSONEncoder().encode(widgetData) else { return }
 
-        // Use shared-container key if available, fall back to deterministic key
         let key = WidgetKeyManager.loadOrCreateKey()
         do {
             let encrypted = try WidgetDataCrypto.encrypt(encoded, key: key)
@@ -266,8 +256,6 @@ final class DefaultLoadHomeRecommendationUseCase: LoadHomeRecommendationUseCase 
             AppLogger.app.error("Failed to encrypt widget data: \(error.localizedDescription, privacy: .public)")
         }
     }
-
-    // MARK: - Widget Cache Models
 
     private struct WidgetCacheData: Codable {
         let locationName: String

@@ -1,8 +1,6 @@
 import SwiftUI
 import WidgetKit
 
-/// ForeWiz widget bundle - offers system small/medium and Lock Screen accessory widgets
-/// that display current weather conditions and outdoor activity scores.
 @main
 struct ForeWizWidgets: WidgetBundle {
     var body: some Widget {

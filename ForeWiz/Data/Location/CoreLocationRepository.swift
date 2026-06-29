@@ -15,9 +15,7 @@ final class CoreLocationRepository: NSObject, LocationRepository {
 
     deinit {
         manager.delegate = nil
-        // Resume any dangling continuations to prevent task leaks.
-        // If a location request is in-flight when deinit runs, the continuation
-        // must be resumed so the awaiting task doesn't hang forever.
+
         authorizationContinuation?.resume(returning: .notDetermined)
         authorizationContinuation = nil
         locationContinuation?.resume(throwing: AppError.locationUnavailable)
@@ -32,8 +30,7 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
 
         return await withCheckedContinuation { continuation in
-            // If a previous request is still in-flight, resume it first
-            // (with a fallback value) before overwriting.
+
             if let oldContinuation = authorizationContinuation {
                 oldContinuation.resume(returning: .notDetermined)
             }
@@ -55,8 +52,7 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
 
         return try await withCheckedThrowingContinuation { continuation in
-            // If a previous location request is still in-flight, resume it first
-            // (with an error) before overwriting.
+
             if let oldContinuation = locationContinuation {
                 oldContinuation.resume(throwing: AppError.locationUnavailable)
             }
@@ -80,8 +76,6 @@ final class CoreLocationRepository: NSObject, LocationRepository {
         }
     }
 }
-
-// MARK: - CLLocationManagerDelegate
 
 extension CoreLocationRepository: CLLocationManagerDelegate {
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

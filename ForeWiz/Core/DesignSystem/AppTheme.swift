@@ -1,73 +1,43 @@
 import SwiftUI
 import UIKit
 
-/// 🎨 ForeWiz Liquid Glass Design System
-///
-/// A premium, weather-aware color palette built around Apple's Liquid Glass aesthetic.
-/// Features vibrant, saturated accent colors with deep glass morphism support.
 enum AppTheme {
 
-    // MARK: - Liquid Glass Core
-
-    /// Primary dynamic accent - shifts with context, always vibrant.
     static let liquidAccent = Color(red: 0.25, green: 0.60, blue: 1.0)
 
-    /// Secondary accent for highlights and badges.
     static let liquidAccentSoft = Color(red: 0.45, green: 0.75, blue: 1.0)
 
-    /// Deep base for glass surfaces.
     static let liquidBase = Color(red: 0.06, green: 0.08, blue: 0.14)
 
-    /// Surface overlay for glass cards.
     static let liquidSurface = Color(red: 0.10, green: 0.12, blue: 0.20)
 
-    /// Glow effect color for active states.
     static let liquidGlow = Color(red: 0.20, green: 0.50, blue: 1.0).opacity(0.3)
 
-    // MARK: - Weather-Inspired Accents
-
-    /// Clear sky - bright, cheerful blue.
     static let sky = Color(red: 0.35, green: 0.68, blue: 1.0)
 
-    /// Deep ocean - for rainy conditions.
     static let ocean = Color(red: 0.18, green: 0.40, blue: 0.75)
 
-    /// Teal - for moderate, balanced weather.
     static let teal = Color(red: 0.15, green: 0.75, blue: 0.68)
 
-    /// Golden sunshine - warm, bright.
     static let sunshine = Color(red: 1.0, green: 0.75, blue: 0.25)
 
-    /// Warm ember - for hot conditions.
     static let ember = Color(red: 1.0, green: 0.55, blue: 0.20)
 
-    /// Vibrant coral - for warnings/alerts.
     static let coral = Color(red: 1.0, green: 0.40, blue: 0.40)
 
-    /// Royal purple - for storms/dramatic weather.
     static let royalPurple = Color(red: 0.55, green: 0.35, blue: 0.95)
 
-    /// Soft pink - for dawn/dusk transitions.
     static let dawnPink = Color(red: 0.95, green: 0.50, blue: 0.70)
 
-    /// Icy blue - for cold/snow conditions.
     static let ice = Color(red: 0.70, green: 0.85, blue: 1.0)
 
-    /// Storm gray - for fog/overcast.
     static let stormGray = Color(red: 0.45, green: 0.50, blue: 0.60)
 
-    // MARK: - Status / Decision Colors
-
-    /// Optimal outdoor conditions - rich emerald.
     static let success = Color(red: 0.18, green: 0.70, blue: 0.48)
 
-    /// Moderate conditions - warm amber.
     static let warning = Color(red: 0.95, green: 0.62, blue: 0.18)
 
-    /// Avoid/postpone - vibrant coral.
     static let danger = Color(red: 0.92, green: 0.28, blue: 0.32)
-
-    // MARK: - Semantic Tokens
 
     static let ink = Color(uiColor: .label)
     static let secondaryText = Color(uiColor: .secondaryLabel)
@@ -80,50 +50,30 @@ enum AppTheme {
 
     static let separator = Color(uiColor: .separator)
 
-    // MARK: - Geometry Tokens
-
     static let cardRadius: CGFloat = 22
     static let compactRadius: CGFloat = 14
     static let pillRadius: CGFloat = 18
     static let glassRadius: CGFloat = 20
 
-    // MARK: - Animation Tokens (Telegram-style)
-    //
-    // All animations use spring physics for 60fps natural motion.
-    // Never use easeInOut/easeOut for interactive animations - only for
-    // non-interactive transitions where spring would overshoot.
-
-    /// Button press (fast, subtle). Response: 0.2–0.25
     static let pressSpring: Animation = .spring(response: 0.22, dampingFraction: 0.72)
 
-    /// Card entrance / list stagger. Response: 0.35–0.4
     static let cardSpring: Animation = .spring(response: 0.38, dampingFraction: 0.82)
 
-    /// View transition / page change. Response: 0.45–0.5
     static let transitionSpring: Animation = .spring(response: 0.48, dampingFraction: 0.85)
 
-    /// Sheet / modal presentation. Response: 0.55–0.65
     static let sheetSpring: Animation = .spring(response: 0.6, dampingFraction: 0.8)
 
-    /// Stagger delay between items (seconds)
     static let staggerDelay: Double = 0.05
 
-    /// Default ease-out for non-interactive transitions (background, splash)
     static let slowEaseOut: Animation = .easeOut(duration: 0.55)
 
-    /// Standard ease-out for appearing elements
     static let defaultEaseOut: Animation = .easeOut(duration: 0.35)
 
-    /// Fast ease-out for micro-interactions
     static let quickEaseOut: Animation = .easeOut(duration: 0.2)
 
-    /// Slow pulse for splash/map markers (gentle, premium feel)
     static let pulseEaseOut: Animation = .easeInOut(duration: 1.0)
 
-    /// Default stagger offset delay
     static let defaultDelay: Double = 0.08
-
-    // MARK: - Weather Decision → Color Mapping
 
     static func color(for decision: OutdoorDecision) -> Color {
         switch decision {
@@ -160,8 +110,6 @@ enum AppTheme {
         }
     }
 
-    // MARK: - Accent Palette
-
     static func accent(for palette: AppAccentPalette) -> Color {
         switch palette {
         case .sky: liquidAccent
@@ -170,9 +118,6 @@ enum AppTheme {
         }
     }
 
-    // MARK: - Liquid Glass Gradients
-
-    /// Ambient page gradient - Apple-style cool neutral tones.
     static func ambientGradient(for colorScheme: ColorScheme = .dark) -> LinearGradient {
         switch colorScheme {
         case .dark:
@@ -198,7 +143,6 @@ enum AppTheme {
         }
     }
 
-    /// Hero gradient that shifts with outdoor decision state.
     static func heroGradient(for decision: OutdoorDecision, colorScheme: ColorScheme = .dark) -> LinearGradient {
         let base = color(for: decision)
         switch colorScheme {
@@ -225,7 +169,6 @@ enum AppTheme {
         }
     }
 
-    /// Soft tinted bubble for icon backgrounds.
     static func softBubble(_ tint: Color) -> LinearGradient {
         LinearGradient(
             colors: [tint.opacity(0.25), tint.opacity(0.06)],
@@ -234,7 +177,6 @@ enum AppTheme {
         )
     }
 
-    /// Liquid glass sheen gradient for card overlays.
     static func glassSheen(_ accent: Color) -> LinearGradient {
         LinearGradient(
             colors: [
@@ -248,8 +190,6 @@ enum AppTheme {
         )
     }
 }
-
-// MARK: - Color Blending Helper
 
 private extension Color {
     func blended(with other: Color, fraction: Double) -> Color {
@@ -268,8 +208,6 @@ private extension Color {
         )
     }
 }
-
-// MARK: - Color Extensions for Direct Use
 
 @available(iOS 17.0, *)
 extension Color {
@@ -291,9 +229,6 @@ extension Color {
     static let liquidSurface = AppTheme.liquidSurface
     static let liquidAccentSoft = AppTheme.liquidAccentSoft
 }
-
-// MARK: - App Background
-
 
 struct AppBackground: View {
     @Environment(\.colorScheme) private var colorScheme

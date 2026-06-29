@@ -40,7 +40,6 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
 
         let outfitTitle = title(for: items, apparentTemperature: apparentTemperature)
 
-        // Generate human-like conversational advice
         let detailedAdvice = generateAdvice(
             apparentTemp: apparentTemperature,
             actualTemp: actualTemperature,
@@ -101,8 +100,6 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         return eveningHours.contains { dayTemperature - $0.apparentTemperatureCelsius >= 5 }
     }
 
-    // MARK: - Human-Like Conversational Advice Engine
-
     private func generateAdvice(
         apparentTemp: Double,
         actualTemp: Double,
@@ -119,44 +116,34 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         let isHumid = humidity >= 0.65
         let tempSwing = detectTemperatureSwing(hourly: hourly, calendar: calendar)
 
-        // Collect advice fragments in order
         var parts: [String] = []
 
-        // 1. Temperature/humidity core advice
         parts.append(coreAdvice(apparentTemp: apparentTemp, isHumid: isHumid))
 
-        // 2. Layering advice if there's a temperature swing or evening cooling
         if let swing = tempSwing, swing >= 8 {
             parts.append(layerForSwingAdvice())
         } else if eveningCooling && apparentTemp < 24 {
             parts.append(eveningLayerAdvice())
         }
 
-        // 3. Rain-specific advice
         if isRainRisk {
             parts.append(rainAdvice())
         }
 
-        // 4. Wind-specific advice
         if isWindRisk {
             parts.append(windAdvice())
         }
 
-        // 5. UV / sun protection
         if isUVRisk || (isHeatRisk && isDaylight) {
             parts.append(sunProtectionAdvice())
         }
 
-        // 6. Humidity-specific fabric tip
         if isHumid && apparentTemp >= 24 {
             parts.append(humidFabricAdvice())
         }
 
-        // Join with spaces, ensure natural flow
         return parts.joined(separator: " ")
     }
-
-    // MARK: - Advice Fragment Builders
 
     private func coreAdvice(apparentTemp: Double, isHumid: Bool) -> String {
         switch apparentTemp {
@@ -210,7 +197,6 @@ struct DefaultOutfitDecisionEngine: OutfitDecisionEngine {
         L10n.text("outfit_advice_humid_fabric")
     }
 
-    /// Detects if there's a significant temperature swing from morning to afternoon
     private func detectTemperatureSwing(hourly: [HourlyWeatherPoint], calendar: Calendar) -> Double? {
         let morningHours = hourly.filter {
             let hour = calendar.component(.hour, from: $0.date)

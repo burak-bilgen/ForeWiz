@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Critical Alert Card
-
 struct CriticalAlertCard: View {
     let signal: HomeAssistantSignal
 

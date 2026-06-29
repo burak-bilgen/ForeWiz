@@ -1,8 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Hero Card
-
 struct HeroCard: View {
     let assistant: HomeAssistantViewState
     let weather: HomeCurrentWeatherViewState
@@ -13,9 +11,9 @@ struct HeroCard: View {
     var body: some View {
         LiquidGlassCard(accentColor: accentColor) {
             VStack(alignment: .leading, spacing: 16) {
-                // MARK: Headline + Score Arc + Temperature
+
                 HStack(alignment: .top, spacing: 12) {
-                    // Headline — line limit + no layout priority so temperature always fits
+
                     VStack(alignment: .leading, spacing: 10) {
                         Text(assistant.headline)
                             .font(.system(size: 22, weight: .bold, design: .rounded))
@@ -24,7 +22,6 @@ struct HeroCard: View {
                             .minimumScaleFactor(0.85)
                             .fixedSize(horizontal: false, vertical: true)
 
-                        // Temperature + condition — below headline on the left
                         HStack(alignment: .firstTextBaseline, spacing: 6) {
                             Text(weather.temperatureText)
                                 .font(.system(size: 26, weight: .semibold, design: .rounded))
@@ -40,12 +37,10 @@ struct HeroCard: View {
 
                     Spacer(minLength: 8)
 
-                    // Comfort Score Arc — pinned right
                     ComfortScoreArc(score: recommendation.outdoorScore.rawValue)
                         .frame(width: 68, height: 68)
                 }
 
-                // MARK: Summary
                 Text(assistant.summary)
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.65))
@@ -53,9 +48,8 @@ struct HeroCard: View {
                     .lineLimit(3)
                     .minimumScaleFactor(0.85)
 
-                // MARK: Metrics Row
                 FlowLayout(spacing: 8) {
-                    // Feels like
+
                     MetricPill(
                         icon: "thermometer.medium",
                         label: L10n.text("weather_feels_like"),
@@ -64,7 +58,6 @@ struct HeroCard: View {
                         color: .white
                     )
 
-                    // High
                     if weather.highTempText != "-" {
                         MetricPill(
                             icon: "arrow.up",
@@ -74,7 +67,6 @@ struct HeroCard: View {
                         )
                     }
 
-                    // Low
                     if weather.lowTempText != "-" {
                         MetricPill(
                             icon: "arrow.down",
@@ -84,7 +76,6 @@ struct HeroCard: View {
                         )
                     }
 
-                    // Humidity
                     if weather.humidityText != "-" {
                         MetricPill(
                             icon: "humidity.fill",
@@ -95,7 +86,6 @@ struct HeroCard: View {
                     }
                 }
 
-                // MARK: Sunrise/Sunset
                 if weather.sunriseText != nil || weather.sunsetText != nil {
                     HStack(spacing: 12) {
                         if let sunrise = weather.sunriseText {
@@ -120,8 +110,6 @@ struct HeroCard: View {
         .accessibilityLabel(L10n.formatted("accessibility_hero_weather_template", weather.temperatureText, weather.conditionText, assistant.headline))
     }
 }
-
-// MARK: - Metric Pill
 
 private struct MetricPill: View {
     let icon: String
@@ -165,8 +153,6 @@ private struct MetricPill: View {
         )
     }
 }
-
-// MARK: - Sun Pill
 
 private struct SunPill: View {
     let icon: String

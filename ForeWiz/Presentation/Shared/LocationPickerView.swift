@@ -2,8 +2,6 @@ import CoreLocation
 import MapKit
 import SwiftUI
 
-// MARK: - LocationPickerView
-
 struct LocationPickerView: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var savedLocations: [SavedLocation]
@@ -46,8 +44,6 @@ struct LocationPickerView: View {
             }
         }
     }
-
-    // MARK: - Nav Bar
 
     private var navBar: some View {
         HStack(spacing: 8) {
@@ -95,8 +91,6 @@ struct LocationPickerView: View {
         .offset(y: appears ? 0 : -10)
         .animation(AppTheme.defaultEaseOut, value: appears)
     }
-
-    // MARK: - Empty State
 
     private var emptyState: some View {
         VStack(spacing: 20) {
@@ -155,12 +149,10 @@ struct LocationPickerView: View {
         }
     }
 
-    // MARK: - Location List
-
     private var locationList: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 10) {
-                // Current location always on top
+
                 if let current = savedLocations.first(where: { $0.id == "current-location" }) {
                     CurrentLocationCard(
                         location: current,
@@ -171,7 +163,6 @@ struct LocationPickerView: View {
                     .padding(.top, 12)
                 }
 
-                // Other locations
                 let others = savedLocations.filter { $0.id != "current-location" }
                 if !others.isEmpty {
                     if savedLocations.contains(where: { $0.id == "current-location" }) {
@@ -207,7 +198,6 @@ struct LocationPickerView: View {
                     }
                 }
 
-                // Add location button
                 Button {
                     showAddLocation = true
                 } label: {
@@ -238,8 +228,6 @@ struct LocationPickerView: View {
         }
     }
 
-    // MARK: - Actions
-
     private func selectLocation(_ location: SavedLocation) {
         guard editMode == .inactive else { return }
         HapticEngine.shared.light()
@@ -262,8 +250,6 @@ struct LocationPickerView: View {
         HapticEngine.shared.medium()
     }
 }
-
-// MARK: - Previews
 
 #if DEBUG
 #Preview("With locations") {

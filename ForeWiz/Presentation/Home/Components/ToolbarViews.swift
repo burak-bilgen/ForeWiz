@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Toolbar Language Button
-
 struct ToolbarLanguageButton: View {
     var body: some View {
         Menu {
@@ -22,12 +20,8 @@ struct ToolbarLanguageButton: View {
 
             Button {
                 Task {
-                    if AdConsentManager.shared.privacyOptionsRequired {
-                        await AdConsentManager.shared.presentPrivacyOptions()
-                    } else {
-                        if let url = URL(string: "https://burak-bilgen.github.io/ForeWiz/privacy/") {
-                            _ = await UIApplication.shared.open(url)
-                        }
+                    if let url = URL(string: "https://burak-bilgen.github.io/ForeWiz/privacy/") {
+                        await UIApplication.shared.open(url)
                     }
                 }
             } label: {
@@ -43,8 +37,6 @@ struct ToolbarLanguageButton: View {
         .accessibilityLabel(L10n.text("settings_language"))
     }
 }
-
-// MARK: - Toolbar WizPath Button
 
 struct ToolbarWizPathButton: View {
     let action: () -> Void

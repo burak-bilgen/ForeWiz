@@ -4,8 +4,6 @@ import OSLog
 import MapKit
 import WizPathKit
 
-/// Observes route completion events and auto-saves journal entries.
-/// Captures route snapshot, weather conditions, and health data at the time of the trip.
 final class JournalAutoSaveService {
     private let journalStore: JournalStore
 
@@ -26,8 +24,6 @@ final class JournalAutoSaveService {
             AppLogger.app.error("Failed to auto-save journal entry: \(error.localizedDescription)")
         }
     }
-
-    // MARK: - Entry Builder
 
     private func buildJournalEntry(
         route: WizPathRoute,
@@ -76,11 +72,10 @@ final class JournalAutoSaveService {
         )
     }
 
-    /// Extracts coordinate pairs from an MKPolyline for storage.
     private func extractPolylineCoords(_ polyline: MKPolyline?) -> [[Double]] {
         guard let polyline = polyline else { return [] }
         let points = polyline.points()
-        let count = min(polyline.pointCount, 50) // Limit to 50 points for storage
+        let count = min(polyline.pointCount, 50)
         var coords: [[Double]] = []
         let step = max(1, polyline.pointCount / count)
         var idx = 0
@@ -92,8 +87,6 @@ final class JournalAutoSaveService {
         return coords
     }
 }
-
-// MARK: - RouteSnapshot
 
 struct RouteSnapshot: Codable, Equatable, Sendable {
     let originName: String

@@ -1,9 +1,3 @@
-//
-//  ForeWizLiveActivityBundle.swift
-//  ForeWizLiveActivity
-//
-//  Created by Burak on 4.06.2026.
-//
 
 import WidgetKit
 import SwiftUI

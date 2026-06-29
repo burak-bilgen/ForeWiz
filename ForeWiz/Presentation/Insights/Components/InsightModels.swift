@@ -1,14 +1,10 @@
 import Foundation
 
-// MARK: - Chart Data Point
-
 struct ChartDataPoint {
     let hour: Int
     let value: Double
     let index: Int
 }
-
-// MARK: - Comfort Window
 
 struct ComfortWindow {
     let startHour: Int

@@ -33,8 +33,6 @@ struct WeatherInsightsView: View {
         }
     }
 
-    // MARK: - Metric Selector
-
     private var metricSelector: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
@@ -53,8 +51,6 @@ struct WeatherInsightsView: View {
         }
     }
 
-    // MARK: - Time Range Selector
-
     private var timeRangeSelector: some View {
         Picker(L10n.text("insights_time_range"), selection: $selectedTimeRange) {
             ForEach(TimeRange.allCases) { range in
@@ -64,8 +60,6 @@ struct WeatherInsightsView: View {
         }
         .pickerStyle(.segmented)
     }
-
-    // MARK: - Chart Section
 
     @ViewBuilder
     private var chartSection: some View {
@@ -186,8 +180,6 @@ struct WeatherInsightsView: View {
         return (min - padding)...(max + padding)
     }
 
-    // MARK: - Statistics Section
-
     private var statisticsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.text("insights_statistics"))
@@ -232,8 +224,6 @@ struct WeatherInsightsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: - Trends Section
-
     private var trendsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.text("insights_trends"))
@@ -262,8 +252,6 @@ struct WeatherInsightsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: - Comfort Analysis Section
-
     private var comfortAnalysisSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(L10n.text("insights_comfort_analysis"))
@@ -279,8 +267,6 @@ struct WeatherInsightsView: View {
         .background(Color.white.opacity(0.06))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
-
-    // MARK: - Computed
 
     private var comfortWindows: [ComfortWindow] {
         let hourly = snapshot.hourly
@@ -379,8 +365,6 @@ struct WeatherInsightsView: View {
         return .falling
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     let rec = PreviewWeatherFactory.dailyRecommendation()

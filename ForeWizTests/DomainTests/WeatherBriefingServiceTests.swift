@@ -10,8 +10,6 @@ struct WeatherBriefingServiceTests {
         return cal
     }()
 
-    // MARK: - Helpers
-
     private func makeSnapshot(temp: Double = 22) -> WeatherSnapshot {
         let now = Date()
         let current = CurrentWeatherPoint(
@@ -83,8 +81,6 @@ struct WeatherBriefingServiceTests {
             }
         )
     }
-
-    // MARK: - Briefing Generation Tests
 
     @Test func briefingContainsAllComponents() async {
         let snapshot = makeSnapshot()
@@ -161,7 +157,7 @@ struct WeatherBriefingServiceTests {
         let briefing = await service.generateBriefing(snapshot: snapshot, recommendation: recommendation, profile: makeProfile(), calendar: calendar)
 
         let priorities = briefing.actionItems.map { $0.priority }
-        // Verify items are sorted by priority (ascending)
+
         for i in 1..<priorities.count {
             #expect(priorities[i] >= priorities[i-1], "Action items should be sorted by priority ascending")
         }
@@ -178,7 +174,7 @@ struct WeatherBriefingServiceTests {
     }
 
     @Test func healthActionItemsAddedForHighMigraineRisk() async {
-        // Create conditions that trigger high migraine risk
+
         let now = Date()
         let hourlyData: [HourlyWeatherPoint] = {
             var result = [HourlyWeatherPoint]()

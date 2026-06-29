@@ -297,8 +297,6 @@ final class HealthKitRepository: HealthRepository {
         }
     }
 
-    // MARK: - Error Mapping
-
     private func mapError(_ error: Error) -> HealthError {
         guard let hkError = error as? HKError else {
             return .unknown(error)

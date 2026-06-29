@@ -17,7 +17,6 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
 
         var candidates: [NotificationPlan] = []
 
-        // 1. Morning briefing
         if enabledCategories.contains(.morningBriefing),
            let morningPlan = await MorningBriefingPlanner.makePlan(
             recommendation: recommendation,
@@ -29,7 +28,6 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             candidates.append(morningPlan)
         }
 
-        // 2. Weather alerts for high+ risks
         candidates.append(
             contentsOf: RiskPlanBuilder.makeAlertPlans(
                 recommendation: recommendation,
@@ -55,7 +53,6 @@ struct DefaultNotificationPlanningEngine: NotificationPlanningEngine {
             return p0.priority > p1.priority
         }
 
-        // Max 3 notifications per day, but weather alerts always pass through
         let highPriority = sorted.filter { $0.priority >= 90 }
         let regular = sorted.filter { $0.priority < 90 }
 

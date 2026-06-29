@@ -1,7 +1,5 @@
 import Foundation
 
-/// Generates a human-like weather narrative with personality, mood, and actionable tips.
-/// Analyzes raw weather data to create a conversational story about today's conditions.
 struct WeatherNarrativeService {
 
     func generateNarrative(
@@ -22,7 +20,6 @@ struct WeatherNarrativeService {
         let hasStorm = recommendation.risks.contains { $0.type == .storm && $0.severity >= .low }
         let hasWindRisk = recommendation.risks.contains { $0.type == .wind && $0.severity >= .low }
 
-        // 1. Determine personality archetype
         let personality = determinePersonality(
             apparentTemp: apparentTemp,
             condition: condition,
@@ -34,7 +31,6 @@ struct WeatherNarrativeService {
             hour: calendar.component(.hour, from: current.date)
         )
 
-        // 2. Generate headline
         let headline = generateHeadline(
             apparentTemp: apparentTemp,
             condition: condition,
@@ -43,7 +39,6 @@ struct WeatherNarrativeService {
             todayScore: recommendation.outdoorScore.rawValue
         )
 
-        // 3. Generate story
         let story = generateStory(
             apparentTemp: apparentTemp,
             condition: condition,
@@ -59,7 +54,6 @@ struct WeatherNarrativeService {
             hour: calendar.component(.hour, from: current.date)
         )
 
-        // 4. Generate pro tip
         let proTip = generateProTip(
             apparentTemp: apparentTemp,
             condition: condition,
@@ -72,7 +66,6 @@ struct WeatherNarrativeService {
             bestWindow: recommendation.bestOutdoorWindow
         )
 
-        // 5. Mood score
         let moodScore = calculateMoodScore(
             score: recommendation.outdoorScore.rawValue,
             apparentTemp: apparentTemp,
@@ -110,8 +103,6 @@ struct WeatherNarrativeService {
             moodSymbol: moodSymbol
         )
     }
-
-    // MARK: - Personality
 
     private func determinePersonality(
         apparentTemp: Double,
@@ -154,15 +145,12 @@ struct WeatherNarrativeService {
             return .serene
         }
 
-        // Morning/evening transitions
         if hour < 8 || hour > 20 {
             return .serene
         }
 
         return .stubborn
     }
-
-    // MARK: - Headline
 
     private func generateHeadline(
         apparentTemp: Double,
@@ -198,10 +186,6 @@ struct WeatherNarrativeService {
         }
     }
 
-    // MARK: - Story (Dynamic - Context-Aware)
-
-    /// Generates a dynamic, context-aware story that references actual weather values
-    /// instead of returning the same static template every time.
     private func generateStory(
         apparentTemp: Double,
         condition: String,
@@ -216,7 +200,7 @@ struct WeatherNarrativeService {
         decision: OutdoorDecision,
         hour: Int
     ) -> String {
-        // Build context-aware opener with actual weather data
+
         let contextPart = buildWeatherContext(
             apparentTemp: apparentTemp,
             condition: condition,
@@ -226,24 +210,20 @@ struct WeatherNarrativeService {
             hour: hour
         )
 
-        // Get the personality story (still thematic, but now follows dynamic context)
         let storyPart = getPersonalityStory(
             personality: personality,
             score: score,
             decision: decision
         )
 
-        // Add scoring context for extra relevance
         let scoreContext = buildScoreContext(score: score)
 
-        // Combine: context → story (with scorer if available)
         if !scoreContext.isEmpty {
             return "\(contextPart) \(storyPart) \(scoreContext)"
         }
         return "\(contextPart) \(storyPart)"
     }
 
-    /// Builds a weather-aware opener dynamically from actual conditions.
     private func buildWeatherContext(
         apparentTemp: Double,
         condition: String,
@@ -285,7 +265,6 @@ struct WeatherNarrativeService {
             humidityDesc = ""
         }
 
-        // Time-of-day greeting
         let timeGreeting: String
         if hour < 10 {
             timeGreeting = L10n.text("narrative_dynamic_morning")
@@ -297,7 +276,6 @@ struct WeatherNarrativeService {
 
         let connector = L10n.text("narrative_dynamic_context_connector")
 
-        // Assemble context (greeting optional, humidity optional)
         var parts: [String] = []
         if !timeGreeting.isEmpty {
             parts.append(timeGreeting)
@@ -311,13 +289,12 @@ struct WeatherNarrativeService {
         return parts.joined(separator: " ") + connector
     }
 
-    /// Returns the personality-specific story, with slight variations based on score.
     private func getPersonalityStory(
         personality: WeatherNarrative.WeatherPersonality,
         score: Int,
         decision: OutdoorDecision
     ) -> String {
-        // For perfect days, always use the serene_perfect template — best fit
+
         if score >= 80 {
             return L10n.text("narrative_story_serene_perfect")
         }
@@ -336,9 +313,8 @@ struct WeatherNarrativeService {
         }
     }
 
-    /// Adds a score-based observation to make the narrative feel more data-aware.
     private func buildScoreContext(score: Int) -> String {
-        // Only add when context-rich enough to matter
+
         if score >= 75 {
             return String(format: L10n.text("narrative_dynamic_score_high"), score)
         } else if score <= 30 {
@@ -346,8 +322,6 @@ struct WeatherNarrativeService {
         }
         return ""
     }
-
-    // MARK: - Pro Tip
 
     private func generateProTip(
         apparentTemp: Double,
@@ -387,29 +361,24 @@ struct WeatherNarrativeService {
         return L10n.text("narrative_tip_enjoy")
     }
 
-    // MARK: - Mood Score
-
     private func calculateMoodScore(
         score: Int,
         apparentTemp: Double,
         hasStorm: Bool,
         hasRain: Bool
     ) -> Int {
-        var mood = score / 10  // Convert 0-100 to 0-10
+        var mood = score / 10
 
-        // Storm penalty
         if hasStorm {
             mood -= 3
         }
 
-        // Extreme temps
         if apparentTemp >= 38 || apparentTemp <= 0 {
             mood -= 2
         } else if apparentTemp >= 35 || apparentTemp <= 3 {
             mood -= 1
         }
 
-        // Bonus for ideal temps
         if (18...26).contains(apparentTemp) && !hasRain {
             mood += 1
         }

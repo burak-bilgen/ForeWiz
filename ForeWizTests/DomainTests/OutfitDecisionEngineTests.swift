@@ -5,8 +5,6 @@ import Testing
 struct OutfitDecisionEngineTests {
     private let engine = DefaultOutfitDecisionEngine()
 
-    // MARK: - Base item tests (existing)
-
     @Test func warmWeatherOutfitIsLight() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 7, day: 10, hour: 14)
@@ -55,8 +53,6 @@ struct OutfitDecisionEngineTests {
         #expect(outfit.items.contains(lightJacketKey))
     }
 
-    // MARK: - Rain risk tests
-
     @Test func rainRiskIncludesUmbrella() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 5, day: 6, hour: 9)
@@ -92,8 +88,6 @@ struct OutfitDecisionEngineTests {
             #expect(advice.contains(L10n.text("outfit_advice_rain")))
         }
     }
-
-    // MARK: - Heat / UV tests
 
     @Test func heatAndUVRiskIncludesSunglassesAndHat() {
         let calendar = WeatherTestFixtures.calendar
@@ -131,8 +125,6 @@ struct OutfitDecisionEngineTests {
         }
     }
 
-    // MARK: - Wind risk tests
-
     @Test func windRiskAddsWindbreaker() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 5, day: 6, hour: 9)
@@ -168,8 +160,6 @@ struct OutfitDecisionEngineTests {
         }
     }
 
-    // MARK: - Temperature band advice tests
-
     @Test func freezingTemperatureGeneratesAdvice() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 1, day: 5, hour: 10)
@@ -202,8 +192,6 @@ struct OutfitDecisionEngineTests {
         #expect(outfit.detailedAdvice != nil)
     }
 
-    // MARK: - Evening cooling warning test
-
     @Test func eveningCoolingAddsWarning() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 4, day: 10, hour: 20)
@@ -227,8 +215,6 @@ struct OutfitDecisionEngineTests {
         #expect(outfit.warning == L10n.text("outfit_warning_evening"))
     }
 
-    // MARK: - detailedAdvice is always generated
-
     @Test func allOutfitsHaveDetailedAdvice() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 6, day: 15, hour: 12)
@@ -245,15 +231,13 @@ struct OutfitDecisionEngineTests {
         #expect(outfit.detailedAdvice?.isEmpty == false)
     }
 
-    // MARK: - Temperature swing (layer advice)
-
     @Test func largeTemperatureSwingGeneratesLayerAdvice() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 4, day: 15, hour: 14)
         let snapshot = WeatherTestFixtures.snapshot(
             now: now,
             temperature: { hour in
-                // Morning (6-10): cool 14°C, Afternoon (12-16): warm 26°C → 12°C swing
+
                 if hour >= 6, hour <= 10 { return 14 }
                 if hour >= 12, hour <= 16 { return 26 }
                 return 18
@@ -274,8 +258,6 @@ struct OutfitDecisionEngineTests {
         }
     }
 
-    // MARK: - Mild temperature title
-
     @Test func mildDayOutfitHasCorrectTitle() {
         let calendar = WeatherTestFixtures.calendar
         let now = WeatherTestFixtures.date(month: 5, day: 15, hour: 14)
@@ -290,8 +272,6 @@ struct OutfitDecisionEngineTests {
 
         #expect(outfit.title == L10n.text("outfit_title_mild"))
     }
-
-    // MARK: - Helpers
 
     private func makeInput(
         snapshot: WeatherSnapshot,

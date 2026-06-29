@@ -4,8 +4,6 @@ import OSLog
 import SwiftUI
 import WidgetKit
 
-// MARK: - Intents
-
 @available(iOS 16.0, *)
 struct GetWeatherRecommendationIntent: AppIntent {
     static var title: LocalizedStringResource { "Get Weather Recommendation" }
@@ -294,8 +292,6 @@ struct ForeWizShortcuts {
         ]
     }
 }
-
-// MARK: - Risk Level Description
 
 extension RiskLevel {
     var description: String {

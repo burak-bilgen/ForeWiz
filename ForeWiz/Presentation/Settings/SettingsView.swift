@@ -65,8 +65,6 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Header
-
     private var headerSection: some View {
         VStack(spacing: 14) {
             ZStack {
@@ -98,8 +96,6 @@ struct SettingsView: View {
                 .staggerEntrance(index: 2, appeared: appears)
         }
     }
-
-    // MARK: - Home Location
 
     private var homeLocationSection: some View {
         LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 16) {
@@ -140,8 +136,6 @@ struct SettingsView: View {
         .staggerEntrance(index: 3, appeared: appears)
     }
 
-    // MARK: - Work Location
-
     private var workLocationSection: some View {
         LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 16) {
             VStack(alignment: .leading, spacing: 12) {
@@ -175,8 +169,6 @@ struct SettingsView: View {
         }
         .staggerEntrance(index: 4, appeared: appears)
     }
-
-    // MARK: - Commute Mode
 
     private var commuteModeSection: some View {
         LiquidGlassCard(accentColor: AppTheme.liquidAccent, innerPadding: 14) {
@@ -219,8 +211,6 @@ struct SettingsView: View {
         }
         .staggerEntrance(index: 5, appeared: appears)
     }
-
-    // MARK: - Shared Rows
 
     private func locationRow(location: SavedLocation, isHome: Bool) -> some View {
         Button {
@@ -329,8 +319,6 @@ struct SettingsView: View {
         )
     }
 
-    // MARK: - Location Picker Sheet
-
     private func locationPickerSheet(for type: LocationType) -> some View {
         NavigationStack {
             ModernAddLocationView { location in
@@ -347,8 +335,6 @@ struct SettingsView: View {
             }
         }
     }
-
-    // MARK: - Helpers
 
     private func sectionLabel(icon: String, text: String) -> some View {
         HStack(spacing: 8) {

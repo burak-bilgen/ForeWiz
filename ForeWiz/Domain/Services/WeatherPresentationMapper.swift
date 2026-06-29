@@ -1,18 +1,7 @@
 import Foundation
 
-/// Single source of truth for weather-to-presentation mapping.
-///
-/// Consolidates duplicate `conditionText`, `symbolName`, temperature formatting,
-/// and daily scoring logic that was previously scattered across:
-/// - `HomeViewStateFactory`
-/// - `DefaultLoadHomeRecommendationUseCase` (widget caching)
-///
-/// Use this mapper everywhere weather data needs to be transformed for display.
 struct WeatherPresentationMapper {
 
-    // MARK: - Condition
-
-    /// Returns a localized display string for the given weather condition code.
     func conditionText(for conditionCode: String?) -> String {
         let condition = conditionCode?.lowercased() ?? ""
 
@@ -34,7 +23,6 @@ struct WeatherPresentationMapper {
         }
     }
 
-    /// Returns an SF Symbol name for the given weather condition code and daylight status.
     func symbolName(for conditionCode: String?, isDaylight: Bool?) -> String {
         let condition = conditionCode?.lowercased() ?? ""
 
@@ -54,9 +42,6 @@ struct WeatherPresentationMapper {
         }
     }
 
-    // MARK: - Temperature
-
-    /// Formats a Celsius temperature value as a localized display string.
     func temperatureText(_ celsius: Double, unitSystem: UnitSystem) -> String {
         let value: Double
         let suffix: String
@@ -73,7 +58,6 @@ struct WeatherPresentationMapper {
         return String(format: "%.0f", value) + suffix
     }
 
-    /// Converts a Celsius temperature to the value in the target unit system (for numeric display).
     func temperatureValue(_ celsius: Double, unitSystem: UnitSystem) -> Double {
         switch unitSystem {
         case .metric: return celsius
@@ -81,19 +65,12 @@ struct WeatherPresentationMapper {
         }
     }
 
-    // MARK: - Score
-
-    /// Computes a daily outdoor score (0–100) from temperature and precipitation data.
-    ///
-    /// Uses a climate-aware algorithm: higher temperatures and tropical nights are
-    /// penalised more aggressively to reflect long-term warming concerns.
     func dailyScore(highCelsius: Double, lowCelsius: Double, precipitationChance: Double?) -> Int {
         var score = 100.0
 
         let highTarget = 24.0
         let lowTarget = 16.0
 
-        // High temp penalty - aşırı sıcak günler çok daha ağır cezalandırılır
         let highDeviation = abs(highCelsius - highTarget)
         if highCelsius > 32 {
             score -= highDeviation * 3.5
@@ -103,7 +80,6 @@ struct WeatherPresentationMapper {
             score -= highDeviation * 1.8
         }
 
-        // Low temp penalty - tropikal geceler (>20°C low) skoru düşürür
         if lowCelsius > 20 {
             score -= (lowCelsius - 20) * 3.0
         } else {

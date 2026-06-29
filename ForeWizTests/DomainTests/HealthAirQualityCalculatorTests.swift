@@ -4,8 +4,6 @@ import Foundation
 
 struct HealthAirQualityCalculatorTests {
 
-    // MARK: - AQI Category Tests
-
     @Test("Good AQI returns index 0")
     func testGoodAQI() {
         let aq = AirQualityInfo(aqi: 35)
@@ -70,8 +68,6 @@ struct HealthAirQualityCalculatorTests {
         #expect(aboveMax.aqi == 500)
     }
 
-    // MARK: - Pollen Tests
-
     @Test("High pollen with sensitive AQI includes pollen in advice")
     func testPollenInAdvice() {
         let aq = AirQualityInfo(aqi: 120, pollenIndex: 7)
@@ -87,8 +83,6 @@ struct HealthAirQualityCalculatorTests {
         let lowPollen = AirQualityInfo(aqi: 50, pollenIndex: -5)
         #expect(lowPollen.pollenIndex == 0)
     }
-
-    // MARK: - Summary Tests
 
     @Test("Summary contains AQI value and category label")
     func testSummary() {
@@ -111,8 +105,6 @@ struct HealthAirQualityCalculatorTests {
         #expect(summary.isEmpty == false)
     }
 
-    // MARK: - Category Labels
-
     @Test("All category labels are non-empty")
     func testAllCategoryLabels() {
         for category in AirQualityCategory.allCases {
@@ -121,8 +113,6 @@ struct HealthAirQualityCalculatorTests {
             #expect(category.symbolName.isEmpty == false)
         }
     }
-
-    // MARK: - Boundary Tests
 
     @Test("Boundary at 50 is good")
     func testBoundaryGood() {

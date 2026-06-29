@@ -10,8 +10,6 @@ struct WeatherNarrativeServiceTests {
         return cal
     }()
 
-    // MARK: - Helpers
-
     private func makeSnapshot(
         temp: Double = 22,
         humidity: Double? = 0.5,
@@ -70,8 +68,6 @@ struct WeatherNarrativeServiceTests {
         WeatherRisk(type: type, severity: severity, title: title, message: message)
     }
 
-    // MARK: - Personality Tests
-
     @Test func energeticPersonalityInIdealConditions() {
         let snapshot = makeSnapshot(temp: 25, isDaylight: true)
         let recommendation = makeRecommendation(score: 90)
@@ -115,8 +111,6 @@ struct WeatherNarrativeServiceTests {
         #expect(narrative.personality == .mysterious)
     }
 
-    // MARK: - Headline Tests
-
     @Test func headlineIsNotEmpty() {
         let snapshot = makeSnapshot(temp: 22)
         let recommendation = makeRecommendation(score: 85)
@@ -140,16 +134,12 @@ struct WeatherNarrativeServiceTests {
         #expect(sunny.headline != stormy.headline)
     }
 
-    // MARK: - Story Tests
-
     @Test func storyIsNotEmpty() {
         let snapshot = makeSnapshot(temp: 20)
         let recommendation = makeRecommendation(score: 75)
         let narrative = service.generateNarrative(snapshot: snapshot, recommendation: recommendation, calendar: calendar)
         #expect(narrative.story.isEmpty == false)
     }
-
-    // MARK: - Pro Tip Tests
 
     @Test func proTipGeneratedForBestWindow() {
         let window = TimeWindow(start: Date(), end: Date().addingTimeInterval(7200))
@@ -170,15 +160,13 @@ struct WeatherNarrativeServiceTests {
 
     @Test func proTipForHighUV() {
         let snapshot = makeSnapshot(temp: 30, uv: 8)
-        // UV risk triggers proTip_uv when uv >= 6 and no storm/heat
+
         let recommendation = makeRecommendation(score: 40, decision: .moderate, risks: [
             makeRisk(type: .uv, severity: .high, title: "UV", message: "High UV")
         ])
         let narrative = service.generateNarrative(snapshot: snapshot, recommendation: recommendation, calendar: calendar)
         #expect(narrative.proTip.isEmpty == false)
     }
-
-    // MARK: - Mood Score Tests
 
     @Test func perfectConditionsGiveHighMood() {
         let snapshot = makeSnapshot(temp: 22)
@@ -210,8 +198,6 @@ struct WeatherNarrativeServiceTests {
         #expect(narrative.moodScore <= 10, "Mood score should never exceed 10")
     }
 
-    // MARK: - Narrative Integrity
-
     @Test func narrativeHasAllRequiredFields() {
         let snapshot = makeSnapshot(temp: 18)
         let recommendation = makeRecommendation(score: 70)
@@ -223,8 +209,6 @@ struct WeatherNarrativeServiceTests {
         #expect(narrative.moodSymbol.isEmpty == false)
     }
 
-    // MARK: - Edge Cases
-
     @Test func refreshingRainWithoutStorm() {
         let snapshot = makeSnapshot(temp: 18, condition: "rain")
         let recommendation = makeRecommendation(score: 50, risks: [
@@ -235,11 +219,11 @@ struct WeatherNarrativeServiceTests {
     }
 
     @Test func stubbornPersonalityInMixedConditions() {
-        // Night, no rain, no storm, temp between 15-22
+
         let snapshot = makeSnapshot(temp: 18, isDaylight: false, condition: "cloudy")
         let recommendation = makeRecommendation(score: 60)
         let narrative = service.generateNarrative(snapshot: snapshot, recommendation: recommendation, calendar: calendar)
-        // Night with 18°C should be serene (hour 0 < 8)
+
         #expect(narrative.personality == .serene)
     }
 

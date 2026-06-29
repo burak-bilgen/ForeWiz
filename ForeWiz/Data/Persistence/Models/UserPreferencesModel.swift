@@ -36,7 +36,7 @@ final class UserPreferencesModel {
         preferredAppearance: AppAppearance? = nil
     ) {
         self.id = id
-        
+
         if let quietHours {
             let calendar = Calendar.current
             self.quietHoursStartHour = calendar.component(.hour, from: quietHours.start)
@@ -51,7 +51,7 @@ final class UserPreferencesModel {
             self.quietHoursEndMinute = 0
             self.quietHoursEnabled = false
         }
-        
+
         self.onboardingCompleted = onboardingCompleted
         self.preferredLanguageRaw = preferredLanguage?.rawValue
         self.preferredAppearanceRaw = preferredAppearance?.rawValue
@@ -76,7 +76,7 @@ final class UserPreferencesModel {
         let selectedID = locations.contains(where: { $0.id == selectedLocationID })
             ? selectedLocationID
             : SavedLocation.currentLocation.id
-        
+
         var quietHours: TimeWindow?
         if quietHoursEnabled {
             let calendar = Calendar.current
@@ -97,7 +97,7 @@ final class UserPreferencesModel {
         } else {
             quietHours = nil
         }
-        
+
         return UserComfortProfile(
             usualWorkoutTime: dateComponents(hour: workoutHour, minute: workoutMinute),
             quietHours: quietHours,
@@ -117,7 +117,7 @@ final class UserPreferencesModel {
     func update(from profile: UserComfortProfile) {
         self.workoutHour = profile.usualWorkoutTime?.hour
         self.workoutMinute = profile.usualWorkoutTime?.minute
-        
+
         if let quietHours = profile.quietHours {
             let calendar = Calendar.current
             self.quietHoursStartHour = calendar.component(.hour, from: quietHours.start)
@@ -172,9 +172,6 @@ final class UserPreferencesModel {
         try? JSONEncoder().encode(value)
     }
 
-    /// Safely decodes JSON data with fallback to default value on corruption.
-    /// Prevents app crashes from corrupt persistence data (e.g., after iCloud sync issues,
-    /// incomplete writes, or version migration mismatches).
     private func decoded<T: Decodable>(_ type: T.Type, from data: Data?) -> T? {
         guard let data, !data.isEmpty else { return nil }
         do {

@@ -6,8 +6,6 @@ import WizPathKit
 @Suite("WizPathHUDManager Tests")
 struct WizPathHUDManagerTests {
 
-    // MARK: - Content State
-
     @available(iOS 18.0, *)
     @Test("ContentState initializes with default values")
     func contentStateInitializesWithDefaultValues() async throws {
@@ -127,8 +125,6 @@ struct WizPathHUDManagerTests {
         #expect(state1 == state2)
     }
 
-    // MARK: - Attributes
-
     @available(iOS 18.0, *)
     @Test("LiveActivityAttributes initializes correctly")
     func liveActivityAttributesInitializes() async throws {
@@ -155,8 +151,6 @@ struct WizPathHUDManagerTests {
         #expect(attrs.travelModeRaw == "cycling")
     }
 
-    // MARK: - HUD Manager Singleton
-
     @available(iOS 18.0, *)
     @Test("WizPathHUDManager shared is singleton")
     func hudManagerSharedIsSingleton() async throws {
@@ -165,11 +159,9 @@ struct WizPathHUDManagerTests {
         #expect(instance1 === instance2)
     }
 
-    // MARK: - Travel Mode Icon Mapping
-
     @Test("travelModeIcon returns correct SF Symbol for each mode")
     func travelModeIconMapping() async throws {
-        /// Mirrors the widget's travelModeIcon helper — update if widget changes
+
         func iconForTravelMode(_ rawValue: String) -> String {
             switch rawValue {
             case "car": return "car.fill"
@@ -184,6 +176,6 @@ struct WizPathHUDManagerTests {
         #expect(iconForTravelMode("walking") == "figure.walk")
         #expect(iconForTravelMode("cycling") == "bicycle")
         #expect(iconForTravelMode("transit") == "bus.fill")
-        #expect(iconForTravelMode("unknown") == "car.fill") // default fallback
+        #expect(iconForTravelMode("unknown") == "car.fill")
     }
 }

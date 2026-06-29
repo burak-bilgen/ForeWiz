@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - Liquid Glass Splash View
 struct AppSplashView: View {
     @State private var iconScale: CGFloat = 0.6
     @State private var iconOpacity: Double = 0

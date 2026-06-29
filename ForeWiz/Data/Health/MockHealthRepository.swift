@@ -9,7 +9,7 @@ final class MockHealthRepository: HealthRepository, @unchecked Sendable {
     var mockUVExposureSamples: [HealthSample] = []
     var mockRestingHeartRate: Double = 0
     var mockAuthorizationResult: Bool = true
-    
+
     func requestAuthorization() async throws -> Bool { mockAuthorizationResult }
     func authorizationStatus(for type: HKObjectType) -> HKAuthorizationStatus { .sharingAuthorized }
     func readHeartRateSamples(start: Date, end: Date) async throws -> [HealthSample] { mockHeartRateSamples }

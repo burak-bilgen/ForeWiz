@@ -1,8 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - Hourly Forecast Section
-
 struct HourlyForecastSection: View {
     let hourlyScores: [HourlyScoreItem]
 
@@ -35,8 +33,6 @@ struct HourlyForecastSection: View {
     }
 }
 
-// MARK: - Hourly Pill
-
 struct HourlyPill: View {
     let item: HourlyScoreItem
 
@@ -62,16 +58,13 @@ struct HourlyPill: View {
     }
 }
 
-// MARK: - Temperature Trend Chart
-
 struct TemperatureTrendChart: View {
     let hourlyScores: [HourlyScoreItem]
 
     var body: some View {
         let slots = hourlyScores.prefix(12)
         let temps = slots.map { extractTemp($0.temperatureText) }
-        // Pad the range on both sides so bars never start from zero height.
-        // This prevents dramatic visual cliffs (e.g., 10°C vs 20°C no longer shows 4px vs 80px).
+
         let rawMin = floor(temps.min() ?? 0)
         let rawMax = ceil(temps.max() ?? 1)
         let paddedMin = floor(rawMin - 5)

@@ -3,11 +3,8 @@ import CoreLocation
 import WizPathKit
 @testable import ForeWiz
 
-// MARK: - Mock Weather Service
-/// Simulates weather API responses for testing - both success and failure scenarios
 final class MockWeatherService {
-    
-    // MARK: - Configuration
+
     enum MockScenario {
         case success(SegmentWeather)
         case failure(Error)
@@ -15,7 +12,7 @@ final class MockWeatherService {
         case timeout
         case outOfRangeDate
     }
-    
+
     var scenario: MockScenario = .success(
         SegmentWeather(
             condition: .clear,
@@ -26,32 +23,30 @@ final class MockWeatherService {
             severity: .good
         )
     )
-    
+
     var callCount = 0
     var lastCoordinate: CLLocationCoordinate2D?
     var lastTime: Date?
     var delay: TimeInterval = 0
-    
-    // MARK: - Weather Fetching (for testing route segment weather)
+
     func fetchWeather(coordinate: CLLocationCoordinate2D, time: Date) async throws -> SegmentWeather {
         callCount += 1
         lastCoordinate = coordinate
         lastTime = time
-        
-        // Simulate network delay if configured
+
         if delay > 0 {
             try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         }
-        
+
         switch scenario {
         case .success(let weather):
             return weather
-            
+
         case .failure(let error):
             throw error
-            
+
         case .nilResponse:
-            // Return a weather with nil-like values that should trigger fallback
+
             return SegmentWeather(
                 condition: .clear,
                 temperature: 0,
@@ -60,14 +55,14 @@ final class MockWeatherService {
                 visibility: 0,
                 severity: .good
             )
-            
+
         case .timeout:
             throw NSError(
                 domain: "MockWeatherService",
                 code: -1001,
                 userInfo: [NSLocalizedDescriptionKey: "Request timed out"]
             )
-            
+
         case .outOfRangeDate:
             throw NSError(
                 domain: "MockWeatherService",
@@ -76,8 +71,7 @@ final class MockWeatherService {
             )
         }
     }
-    
-    // MARK: - Helper Methods
+
     func simulateExtremeHeat() {
         scenario = .success(
             SegmentWeather(
@@ -90,7 +84,7 @@ final class MockWeatherService {
             )
         )
     }
-    
+
     func simulateSevereStorm() {
         scenario = .success(
             SegmentWeather(
@@ -103,7 +97,7 @@ final class MockWeatherService {
             )
         )
     }
-    
+
     func simulateNetworkFailure() {
         scenario = .failure(
             NSError(
@@ -113,7 +107,7 @@ final class MockWeatherService {
             )
         )
     }
-    
+
     func reset() {
         callCount = 0
         lastCoordinate = nil
@@ -132,11 +126,8 @@ final class MockWeatherService {
     }
 }
 
-// MARK: - Mock Routing Service
-/// Simulates MapKit routing and ETA calculations
 final class MockRoutingService {
-    
-    // MARK: - Configuration
+
     enum MockScenario {
         case success(eta: TimeInterval, distance: CLLocationDistance)
         case noRoute
@@ -144,14 +135,13 @@ final class MockRoutingService {
         case invalidCoordinates
         case networkFailure
     }
-    
-    var scenario: MockScenario = .success(eta: 1800, distance: 15000) // 30 min, 15km
+
+    var scenario: MockScenario = .success(eta: 1800, distance: 15000)
     var callCount = 0
     var lastOrigin: CLLocationCoordinate2D?
     var lastDestination: CLLocationCoordinate2D?
     var delay: TimeInterval = 0
-    
-    // MARK: - Routing Simulation
+
     func calculateRoute(
         origin: CLLocationCoordinate2D,
         destination: CLLocationCoordinate2D
@@ -159,12 +149,11 @@ final class MockRoutingService {
         callCount += 1
         lastOrigin = origin
         lastDestination = destination
-        
-        // Simulate delay
+
         if delay > 0 {
             try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
         }
-        
+
         switch scenario {
         case .success(let eta, let distance):
             let mockRoute = MockRoute(
@@ -173,43 +162,43 @@ final class MockRoutingService {
                 polyline: MockPolyline(coordinates: [origin, destination])
             )
             return (eta, distance, mockRoute)
-            
+
         case .noRoute:
             throw WizPathError.noRouteAvailable
-            
+
         case .extremelyLongRoute:
-            // Simulate a very long route (e.g., cross-country)
-            let longETA: TimeInterval = 8 * 3600 // 8 hours
-            let longDistance: CLLocationDistance = 500_000 // 500km
+
+            let longETA: TimeInterval = 8 * 3600
+            let longDistance: CLLocationDistance = 500_000
             let mockRoute = MockRoute(
                 eta: longETA,
                 distance: longDistance,
                 polyline: MockPolyline(coordinates: [origin, destination])
             )
             return (longETA, longDistance, mockRoute)
-            
+
         case .invalidCoordinates:
             throw WizPathError.invalidCoordinates
-            
+
         case .networkFailure:
             throw WizPathError.networkFailure
         }
     }
-    
+
     func calculateETA(for hour: Int) -> TimeInterval {
-        // Simulate rush hour delays
-        let baseETA: TimeInterval = 1800 // 30 minutes
-        
+
+        let baseETA: TimeInterval = 1800
+
         switch hour {
-        case 7...9, 17...19: // Rush hours
-            return baseETA * 1.5 // 50% longer
-        case 22...23, 0...5: // Late night/early morning
-            return baseETA * 0.8 // Faster
+        case 7...9, 17...19:
+            return baseETA * 1.5
+        case 22...23, 0...5:
+            return baseETA * 0.8
         default:
             return baseETA
         }
     }
-    
+
     func reset() {
         callCount = 0
         lastOrigin = nil
@@ -219,7 +208,6 @@ final class MockRoutingService {
     }
 }
 
-// MARK: - Mock Types
 struct MockRoute {
     let eta: TimeInterval
     let distance: CLLocationDistance
@@ -230,7 +218,6 @@ struct MockPolyline {
     let coordinates: [CLLocationCoordinate2D]
 }
 
-// MARK: - WizPathError Extension for Testing
 extension WizPathError {
     static var noRouteAvailable: WizPathError { .routeUnavailable }
     static var invalidCoordinates: WizPathError { .destinationUnreachable }

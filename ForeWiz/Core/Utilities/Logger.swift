@@ -1,7 +1,6 @@
 import OSLog
 import Foundation
 
-/// Centralized loggers for each subsystem.
 enum AppLogger {
     static let app = Logger(subsystem: "com.forewiz.app", category: "app")
     static let weather = Logger(subsystem: "com.forewiz.app", category: "weather")
@@ -34,7 +33,6 @@ enum LogLevel: String, CaseIterable {
     }
 }
 
-/// Convenience logging methods that include source file/line information.
 enum AppLog {
     static func debug(_ message: String, metadata: [String: String]? = nil, file: String = #file, function: String = #function, line: Int = #line) {
         AppLogger.app.debug("\\((file as NSString).lastPathComponent):\(line) \(function) - \(message, privacy: .private)")

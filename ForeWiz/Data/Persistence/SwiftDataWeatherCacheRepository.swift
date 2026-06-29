@@ -18,24 +18,24 @@ final class SwiftDataWeatherCacheRepository: WeatherCacheRepository {
         guard let model = try modelContext.fetch(descriptor).first else {
             return nil
         }
-        
+
         let snapshot = try model.toSnapshot()
-        
+
         if cachePolicy.freshness(for: snapshot.fetchedAt, now: Date()) == .expired {
             modelContext.delete(model)
             try modelContext.save()
             return nil
         }
-        
+
         return snapshot
     }
 
     func save(_ snapshot: WeatherSnapshot) async throws {
         let descriptor = FetchDescriptor<WeatherSnapshotModel>()
         let existing = try modelContext.fetch(descriptor)
-        
+
         existing.forEach { modelContext.delete($0) }
-        
+
         let model = try WeatherSnapshotModel(snapshot: snapshot)
         modelContext.insert(model)
         try modelContext.save()

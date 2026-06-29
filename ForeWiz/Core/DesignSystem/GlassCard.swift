@@ -18,8 +18,6 @@ extension View {
     }
 }
 
-// MARK: - Glass Icon (minimal rounded-square icon)
-
 struct GlassIcon: View {
     let systemName: String
     let color: Color
@@ -35,8 +33,6 @@ struct GlassIcon: View {
         }
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     ZStack {

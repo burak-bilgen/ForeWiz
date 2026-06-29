@@ -14,11 +14,11 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
         let preferences = try modelContext.fetch(descriptor)
-        
+
         guard let model = preferences.first else {
             return .default
         }
-        
+
         return model.toProfile()
     }
 
@@ -27,7 +27,7 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
         let existing = try modelContext.fetch(descriptor)
-        
+
         if let model = existing.first {
             model.update(from: profile)
         } else {
@@ -40,7 +40,7 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             model.update(from: profile)
             modelContext.insert(model)
         }
-        
+
         try modelContext.save()
     }
 
@@ -57,7 +57,7 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
         )
         let existing = try modelContext.fetch(descriptor)
-        
+
         if let model = existing.first {
             model.onboardingCompleted = completed
         } else {
@@ -67,7 +67,7 @@ final class SwiftDataPreferencesRepository: PreferencesRepository {
             )
             modelContext.insert(model)
         }
-        
+
         try modelContext.save()
     }
 

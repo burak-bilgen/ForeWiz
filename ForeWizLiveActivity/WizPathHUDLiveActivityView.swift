@@ -7,11 +7,11 @@ import WizPathKit
 struct ForeWizLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: WizPathHUDLiveActivityAttributes.self) { context in
-            // Lock Screen / Banner view
+
             WizPathHUDLiveActivityView(context: context)
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI
+
                 DynamicIslandExpandedRegion(.leading) {
                     leadingView(context)
                 }
@@ -36,8 +36,6 @@ struct ForeWizLiveActivity: Widget {
         .description("Shows active route safety score and ETA")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
-
-    // MARK: - Compact Views
 
     private func compactLeadingView(_ context: ActivityViewContext<WizPathHUDLiveActivityAttributes>) -> some View {
         Image(systemName: travelModeIcon(for: context.attributes.travelModeRaw))
@@ -66,8 +64,6 @@ struct ForeWizLiveActivity: Widget {
         }
         .padding(2)
     }
-
-    // MARK: - Expanded Views
 
     private func leadingView(_ context: ActivityViewContext<WizPathHUDLiveActivityAttributes>) -> some View {
         VStack(spacing: 4) {
@@ -111,7 +107,7 @@ struct ForeWizLiveActivity: Widget {
 
     private func bottomView(_ context: ActivityViewContext<WizPathHUDLiveActivityAttributes>) -> some View {
         HStack(spacing: 12) {
-            // Safety score ring
+
             ZStack {
                 Circle()
                     .stroke(safetyColor(context.state.safetyScore).opacity(0.2), lineWidth: 3)
@@ -126,7 +122,6 @@ struct ForeWizLiveActivity: Widget {
                     .foregroundStyle(safetyColor(context.state.safetyScore))
             }
 
-            // Route status
             VStack(alignment: .leading, spacing: 2) {
                 Text(context.state.routeRiskLabel)
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -147,14 +142,11 @@ struct ForeWizLiveActivity: Widget {
 
             Spacer()
 
-            // Weather icon
             Image(systemName: context.state.weatherConditionSymbol)
                 .font(.system(size: 18))
                 .foregroundStyle(.white.opacity(0.6))
         }
     }
-
-    // MARK: - Helpers
 
     private func travelModeIcon(for rawValue: String) -> String {
         switch rawValue {
@@ -180,14 +172,12 @@ struct ForeWizLiveActivity: Widget {
     }
 }
 
-// MARK: - Lock Screen / Banner View
-
 struct WizPathHUDLiveActivityView: View {
     let context: ActivityViewContext<WizPathHUDLiveActivityAttributes>
 
     var body: some View {
         HStack(spacing: 14) {
-            // Icon
+
             ZStack {
                 Circle()
                     .fill(safetyColor.opacity(0.15))
@@ -197,7 +187,6 @@ struct WizPathHUDLiveActivityView: View {
                     .foregroundStyle(safetyColor)
             }
 
-            // Info
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
                     Text(context.attributes.routeOriginName)
@@ -231,7 +220,6 @@ struct WizPathHUDLiveActivityView: View {
 
             Spacer()
 
-            // Score
             ZStack {
                 Circle()
                     .stroke(safetyColor.opacity(0.2), lineWidth: 4)

@@ -1,10 +1,5 @@
 import SwiftUI
 
-// MARK: - Animated Liquid Orb Background
-/// Premium animated background with slowly drifting, breathing orbs.
-/// Uses TimelineView for 60fps continuous animation with weather-reactive speed.
-/// The orbs drift in organic patterns, gently pulse in opacity, and slowly
-/// oscillate in size — creating a living, liquid atmosphere.
 struct LiquidOrbBackground: View {
     var palette: OrbPalette = .default
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -58,8 +53,6 @@ struct LiquidOrbBackground: View {
             }
         }
 
-        /// How fast the orbs drift and pulse — higher = more dramatic.
-        /// Stormy weather feels agitated, clear nights are calm.
         var animationSpeed: Double {
             switch self {
             case .stormy:        return 1.8
@@ -82,7 +75,6 @@ struct LiquidOrbBackground: View {
         }
     }
 
-    /// Static fallback for users who prefer reduced motion.
     private var staticContent: some View {
         GeometryReader { geometry in
             let w = max(geometry.size.width, 1)
@@ -128,12 +120,10 @@ struct LiquidOrbBackground: View {
         }
     }
 
-    /// Live animated version — orbs slowly drift, pulse, and breathe.
     private func animatedContent(time: TimeInterval) -> some View {
         let speed = palette.animationSpeed
         let t = time * speed
 
-        // Unique phase offsets so each orb moves independently — organic, non-synchronized feel.
         let phase1 = t * 0.12
         let phase2 = t * 0.09 + 1.7
         let phase3 = t * 0.07 + 3.1
@@ -144,14 +134,13 @@ struct LiquidOrbBackground: View {
             let base = min(w, h)
 
             ZStack {
-                // Base gradient — static, deep background
+
                 LinearGradient(
                     colors: [palette.colors.base1, palette.colors.base2],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
 
-                // Primary orb — largest, slowest drift
                 DriftingOrb(
                     color: palette.colors.primary,
                     opacity: 0.18 + sin(phase1 * 1.8) * 0.035,
@@ -161,7 +150,6 @@ struct LiquidOrbBackground: View {
                     yOffset: 0.05 + cos(phase1 * 0.7) * 0.08
                 )
 
-                // Secondary orb — medium, circular drift
                 DriftingOrb(
                     color: palette.colors.secondary,
                     opacity: 0.12 + sin(phase2 * 1.5) * 0.03,
@@ -171,7 +159,6 @@ struct LiquidOrbBackground: View {
                     yOffset: 0.82 + cos(phase2 * 1.2) * 0.06
                 )
 
-                // Tertiary orb — smallest, most complex wander
                 DriftingOrb(
                     color: palette.colors.tertiary,
                     opacity: 0.10 + sin(phase3 * 2.0) * 0.025,
@@ -183,15 +170,11 @@ struct LiquidOrbBackground: View {
             }
             .frame(width: w, height: h)
             .clipped()
-            // Metal-accelerated compositing — keeps 60fps smooth despite heavy blur + animation.
+
             .drawingGroup()
         }
     }
 }
-
-// MARK: - Drifting Orb Component
-/// A single blurred elliptical orb whose position, opacity, and size can be
-/// driven by animation parameters computed from a timeline.
 
 private struct DriftingOrb: View {
     let color: Color
@@ -216,9 +199,6 @@ private struct DriftingOrb: View {
     }
 }
 
-// MARK: - Legacy AnimatedOrbBackground
-/// Convenience wrapper for callers that pass individual colors.
-
 struct AnimatedOrbBackground: View {
     var primary: Color = Color(red: 0.3, green: 0.5, blue: 1.0)
     var secondary: Color = Color(red: 0.5, green: 0.3, blue: 1.0)
@@ -235,12 +215,9 @@ struct AnimatedOrbBackground: View {
     }
 }
 
-// MARK: - Palette Init from Tuple (Legacy Support)
-
 extension LiquidOrbBackground.OrbPalette {
     init(colors: (primary: Color, secondary: Color, tertiary: Color, base1: Color, base2: Color)) {
         self = .default
-        // Dynamic palette creation for legacy support — palette is set via raw colors.
-        // The animation speed will default to 1.0, which is a reasonable middle ground.
+
     }
 }

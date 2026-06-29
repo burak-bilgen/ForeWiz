@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - Enhanced Splash Overlay
 struct EnhancedWeatherSplashOverlay: View {
     let kind: EnhancedWeatherSplashKind
     let onDismiss: () -> Void
@@ -122,7 +121,6 @@ struct EnhancedWeatherSplashOverlay: View {
     }
 }
 
-// MARK: - Animated Gradient Background
 struct WeatherSplashGradientBackground: View {
     let colors: [Color]
     let opacity: Double

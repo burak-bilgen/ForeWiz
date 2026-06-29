@@ -13,11 +13,11 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
     case photography
     case gardening
     case swimming
-    
+
     var localizedTitle: String {
         "activity_\(rawValue)"
     }
-    
+
     var iconName: String {
         switch self {
         case .goingOutside: return "figure.outdoor"
@@ -34,7 +34,7 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
         case .swimming: return "figure.pool.swim"
         }
     }
-    
+
     var typicalDuration: TimeInterval {
         switch self {
         case .goingOutside: return 60 * 60
@@ -51,7 +51,7 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
         case .swimming: return 60 * 60
         }
     }
-    
+
     var windSensitivity: ActivitySensitivity {
         switch self {
         case .cycling, .photography: return .high
@@ -59,7 +59,7 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
         case .goingOutside, .walking, .sightseeing, .gardening, .swimming: return .low
         }
     }
-    
+
     var sunSensitivity: ActivitySensitivity {
         switch self {
         case .picnic, .beach, .gardening, .swimming: return .high
@@ -67,7 +67,7 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
         case .goingOutside, .walking, .outdoorDining: return .low
         }
     }
-    
+
     var rainTolerance: ActivityTolerance {
         switch self {
         case .running, .cycling, .picnic, .beach, .outdoorDining, .photography, .swimming: return .low
@@ -75,14 +75,14 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
         case .goingOutside, .gardening: return .high
         }
     }
-    
+
     var heatTolerance: ActivityTolerance {
         switch self {
         case .beach, .outdoorDining, .gardening, .swimming: return .high
         case .goingOutside, .running, .cycling, .hiking, .walking, .picnic, .sightseeing, .photography: return .medium
         }
     }
-    
+
     var coldTolerance: ActivityTolerance {
         switch self {
         case .walking: return .high
@@ -90,14 +90,14 @@ enum ActivityType: String, Codable, Hashable, Sendable, CaseIterable {
         case .picnic, .beach, .swimming: return .low
         }
     }
-    
+
     var requiresDaylight: Bool {
         switch self {
         case .hiking, .picnic, .beach, .sightseeing, .gardening, .swimming: return true
         case .goingOutside, .running, .cycling, .walking, .outdoorDining, .photography: return false
         }
     }
-    
+
     var category: ActivityCategory {
         switch self {
         case .running, .cycling, .walking, .hiking, .swimming: return .fitness

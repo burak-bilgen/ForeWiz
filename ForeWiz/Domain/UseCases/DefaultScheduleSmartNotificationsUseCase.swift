@@ -31,7 +31,6 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
         let now = dateProvider.now
         let calendar = Calendar.current
 
-        // 1. Standard plans (morning briefing + weather alerts)
         let allPlans = await notificationPlanningEngine.makePlans(
             recommendation: recommendation,
             profile: profile,
@@ -39,12 +38,10 @@ final class DefaultScheduleSmartNotificationsUseCase: ScheduleSmartNotifications
             calendar: calendar
         )
 
-        // 2. Throttle: remove plans that violate cooldown / rate limits / dedup
         let throttledPlans = throttlingService.throttle(allPlans)
 
         try await notificationRepository.schedule(throttledPlans)
 
-        // 4. Record throttling state for future cycles
         throttlingService.didSchedule(throttledPlans)
 
         return throttledPlans

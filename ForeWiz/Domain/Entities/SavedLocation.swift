@@ -10,7 +10,7 @@ struct SavedLocation: Codable, Equatable, Identifiable, Sendable {
     var isFavorite: Bool
     var locationType: LocationType = .other
     var commuteModeRaw: String = "car"
-    
+
     var isHome: Bool { locationType == .home }
     var isWork: Bool { locationType == .work }
 

@@ -1,9 +1,6 @@
 import SwiftUI
 import WizPathKit
 
-// MARK: - WizPath HUD Card - Liquid Glass Premium
-/// Home screen entry point for WizPath with Liquid Glass aesthetic.
-/// Features rotating glowing borders, breathing warning overlays, and custom interactive springs.
 struct WizPathHUDCard: View {
     let routeStatus: RouteStatus
     let onTap: () -> Void
@@ -18,13 +15,12 @@ struct WizPathHUDCard: View {
             onTap()
         }) {
             HStack(spacing: 10) {
-                // Icon — compact size
+
                 ZStack {
                     Circle()
                         .fill(accentColor.opacity(0.18))
                         .frame(width: 36, height: 36)
-                    
-                    // Breathing aura for warnings/alerts
+
                     if isAlertActive {
                         Circle()
                             .stroke(accentColor.opacity(0.4), lineWidth: 1.5)
@@ -32,14 +28,13 @@ struct WizPathHUDCard: View {
                             .opacity(2.0 - pulseScale)
                             .frame(width: 36, height: 36)
                     }
-                    
+
                     Image(systemName: routeStatus.iconName)
                         .font(.system(size: 16, weight: .semibold))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(accentColor)
                 }
 
-                // Text
                 VStack(alignment: .leading, spacing: 2) {
                     Text(statusTitle)
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -65,10 +60,10 @@ struct WizPathHUDCard: View {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(.ultraThinMaterial)
                     .environment(\.colorScheme, .dark)
-                    // Shadow on the shape itself ensures rounded corners always
+
                     .shadow(color: accentColor.opacity(isPressed ? 0.12 : 0.22), radius: isPressed ? 6 : 14, x: 0, y: isPressed ? 3 : 6)
             )
-            // Premium rotating glass border mapping
+
             .overlay(
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .stroke(
@@ -97,18 +92,16 @@ struct WizPathHUDCard: View {
         .frame(minHeight: 48, maxHeight: 58)
         .clipped()
         .onAppear {
-            // Smooth, low-CPU infinite rotation for border glow
+
             withAnimation(.linear(duration: 6.0).repeatForever(autoreverses: false)) {
                 rotationAngle = 360.0
             }
-            // Breathing animation for hazard warning icons
+
             withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
                 pulseScale = 1.45
             }
         }
     }
-
-    // MARK: - Computed Properties
 
     private var isAlertActive: Bool {
         switch routeStatus {
@@ -145,10 +138,6 @@ struct WizPathHUDCard: View {
     }
 }
 
-// RouteStatus enum is imported from WizPathKit
-
-// MARK: - Preview
-
 #Preview {
     ZStack {
         AppTheme.ambientGradient(for: .dark).ignoresSafeArea()
@@ -161,4 +150,3 @@ struct WizPathHUDCard: View {
         .padding()
     }
 }
-

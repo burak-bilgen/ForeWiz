@@ -1,8 +1,5 @@
 import Foundation
 
-// MARK: - Migraine Risk Calculator
-
-/// Calculates migraine risk from weather triggers: temperature swings, humidity, storm fronts, light sensitivity.
 enum HealthMigraineCalculator {
 
     static func calculate(
@@ -12,7 +9,6 @@ enum HealthMigraineCalculator {
     ) -> (risk: Int, label: String, advice: String) {
         var riskScore = 0
 
-        // Temperature swing detection (major migraine trigger)
         let temps = hourly.map { $0.apparentTemperatureCelsius }
         if let maxTemp = temps.max(), let minTemp = temps.min() {
             let swing = maxTemp - minTemp
@@ -25,7 +21,6 @@ enum HealthMigraineCalculator {
             }
         }
 
-        // High humidity (barometric pressure correlate)
         if let humidity = current.humidity {
             if humidity >= 0.85 {
                 riskScore += 3
@@ -36,7 +31,6 @@ enum HealthMigraineCalculator {
             }
         }
 
-        // Storm front (rapid pressure drop)
         let hasStormRisk = hourly.contains { risk in
             guard let severeRisk = risk.severeWeatherRisk else { return false }
             return severeRisk >= .medium
@@ -45,7 +39,6 @@ enum HealthMigraineCalculator {
             riskScore += 3
         }
 
-        // Bright/dark contrast (light sensitivity)
         let isDaylight = current.isDaylight ?? true
         if isDaylight && (current.uvIndex ?? 0) >= 6 {
             riskScore += 1
@@ -56,8 +49,6 @@ enum HealthMigraineCalculator {
 
         return (clampedRisk, label, advice)
     }
-
-    // MARK: - Labels
 
     private static func labelAndAdvice(for risk: Int) -> (String, String) {
         switch risk {

@@ -1,6 +1,5 @@
 import Foundation
 
-/// Comparative weather intelligence - tells you how today compares to seasonal norms, yesterday, and weekly patterns.
 struct ComparativeWeatherService {
 
     func analyze(
@@ -11,19 +10,14 @@ struct ComparativeWeatherService {
     ) -> ComparativeWeatherAnalysis {
         let daily = snapshot.daily
 
-        // 1. Temperature anomaly (vs assumed "normal" baseline)
         let anomaly = calculateTemperatureAnomaly(daily: daily)
 
-        // 2. Precipitation comparison
         let isUnusuallyRainy = checkUnusualRain(snapshot: snapshot)
 
-        // 3. Day-over-day change
         let dayOverDay = calculateDayOverDayChange(daily: daily, yesterdayHigh: yesterdayHigh)
 
-        // 4. Week pattern analysis
         let weekPattern = analyzeWeekPattern(daily: daily)
 
-        // 5. Microclimate note
         let microclimateNote = generateMicroclimateNote(snapshot: snapshot)
 
         return ComparativeWeatherAnalysis(
@@ -40,10 +34,6 @@ struct ComparativeWeatherService {
         )
     }
 
-    // MARK: - Temperature Anomaly
-
-    /// Estimates temperature anomaly by comparing to seasonal norms
-    /// Uses rough seasonal baselines (can be enhanced with historical data)
     private func calculateTemperatureAnomaly(daily: [DailyWeatherPoint]) -> (anomaly: Double?, label: String, description: String) {
         guard let today = daily.first else {
             return (nil, L10n.text("comparative_no_data"), L10n.text("comparative_no_data_desc"))
@@ -59,8 +49,6 @@ struct ComparativeWeatherService {
         return (roundedAnomaly, label, desc)
     }
 
-    /// Rough seasonal temperature baselines for Mediterranean climate (Antalya region baseline)
-    /// In production, this would use actual historical weather data API
     private func seasonalBaseline(month: Int) -> Double {
         switch month {
         case 1: return 15
@@ -94,8 +82,6 @@ struct ComparativeWeatherService {
         }
     }
 
-    // MARK: - Precipitation Check
-
     private func checkUnusualRain(snapshot: WeatherSnapshot) -> (isUnusual: Bool, description: String) {
         let maxRainChance = snapshot.hourly.compactMap { $0.precipitationChance }.max() ?? 0
 
@@ -108,8 +94,6 @@ struct ComparativeWeatherService {
         }
         return (false, L10n.text("comparative_precip_dry"))
     }
-
-    // MARK: - Day Over Day
 
     private func calculateDayOverDayChange(
         daily: [DailyWeatherPoint],
@@ -139,8 +123,6 @@ struct ComparativeWeatherService {
         return L10n.text("comparative_dod_same")
     }
 
-    // MARK: - Week Pattern
-
     private func analyzeWeekPattern(daily: [DailyWeatherPoint]) -> (pattern: ComparativeWeatherAnalysis.WeekWeatherPattern, description: String) {
         guard daily.count >= 3 else {
             return (.stable, L10n.text("comparative_pattern_limited"))
@@ -148,19 +130,16 @@ struct ComparativeWeatherService {
 
         let temps = daily.map { $0.highTemperatureCelsius }
 
-        // Check for heatwave (3+ days above 30°C)
         let consecutiveHot = measureConsecutiveHotDays(temps: temps)
         if consecutiveHot >= 3 {
             return (.heatwave, L10n.text("comparative_pattern_heatwave"))
         }
 
-        // Check for cold snap (3+ days below 15°C)
         let consecutiveCold = measureConsecutiveColdDays(temps: temps)
         if consecutiveCold >= 3 {
             return (.coldSnap, L10n.text("comparative_pattern_coldsnap"))
         }
 
-        // Check for warming trend
         let firstHalf = Array(temps.prefix(temps.count / 2))
         let secondHalf = Array(temps.suffix(temps.count / 2))
         let firstAvg = firstHalf.reduce(0, +) / Double(firstHalf.count)
@@ -173,7 +152,6 @@ struct ComparativeWeatherService {
             return (.coolingDown, L10n.text("comparative_pattern_cooling"))
         }
 
-        // Check for stormy spell
         let rainyDays = daily.filter { ($0.precipitationChance ?? 0) >= 0.5 }.count
         if rainyDays >= 3 {
             return (.stormySpell, L10n.text("comparative_pattern_stormy"))
@@ -209,10 +187,6 @@ struct ComparativeWeatherService {
         return streak
     }
 
-    // MARK: - Microclimate
-
-    /// Generates a microclimate note based on geographic and weather context.
-    /// Detects coastal effects, urban heat island, mountain/shade effects, and seasonal transitions.
     private func generateMicroclimateNote(snapshot: WeatherSnapshot) -> String? {
         let current = snapshot.current
         let hourly = snapshot.hourly
@@ -223,13 +197,11 @@ struct ComparativeWeatherService {
         let calendar = Calendar.current
         let month = calendar.component(.month, from: current.date)
         let hour = calendar.component(.hour, from: current.date)
-        
+
         var notes: [String] = []
-        
-        // 1. Coastal effect detection (latitude-based heuristic for Turkey)
-        // Turkish coastline roughly: Akdeniz 36-37°N, Ege 37-39°N, Karadeniz 41-42°N
+
         let isCoastal: Bool = {
-            // Simple coastal band heuristic: within ~0.5° of major sea-level areas
+
             let coastalLatBands: [(ClosedRange<Double>, String)] = [
                 (36.0...37.5, "akdeniz"),
                 (37.5...39.5, "ege"),
@@ -238,59 +210,55 @@ struct ComparativeWeatherService {
             ]
             return coastalLatBands.contains { $0.0.contains(lat) }
         }()
-        
+
         if isCoastal {
             if month >= 5 && month <= 10 {
-                // Summer coastal: sea breeze effect
+
                 if hour >= 10 && hour <= 16 && wind >= 8 && wind <= 20 {
                     notes.append(L10n.text("microclimate_coastal_breeze_summer"))
                 } else if temp >= 30 && humidity >= 0.65 {
                     notes.append(L10n.text("microclimate_coastal_humid_summer"))
                 }
             } else if month >= 11 || month <= 3 {
-                // Winter coastal: milder than inland
+
                 if temp >= 12 && temp <= 18 {
                     notes.append(L10n.text("microclimate_coastal_mild_winter"))
                 }
             }
         }
-        
-        // 2. Urban heat island detection
-        // Large Turkish cities: Istanbul (~41°N, 29°E), Ankara (~40°N, 33°E), Izmir (~38°N, 27°E)
+
         let isUrban: Bool = {
             let urbanAreas: [(ClosedRange<Double>, ClosedRange<Double>)] = [
-                (40.8...41.3, 28.6...29.2),   // Istanbul
-                (39.7...40.1, 32.5...33.0),   // Ankara
-                (38.2...38.6, 26.8...27.4),   // Izmir
-                (36.7...37.2, 28.5...29.5),   // Antalya/Mugla coast
-                (36.8...37.2, 35.0...35.6),   // Adana
-                (40.1...40.4, 28.7...29.2),   // Bursa
+                (40.8...41.3, 28.6...29.2),
+                (39.7...40.1, 32.5...33.0),
+                (38.2...38.6, 26.8...27.4),
+                (36.7...37.2, 28.5...29.5),
+                (36.8...37.2, 35.0...35.6),
+                (40.1...40.4, 28.7...29.2),
             ]
             let lon = snapshot.location.longitude
             return urbanAreas.contains { $0.0.contains(lat) && $0.1.contains(lon) }
         }()
-        
+
         if isUrban {
-            // Urban heat island effect is most noticeable at night
+
             if !(hour >= 6 && hour <= 20) && temp >= 22 {
                 notes.append(L10n.text("microclimate_urban_heat_night"))
             } else if temp >= 32 && hour >= 11 && hour <= 17 {
                 notes.append(L10n.text("microclimate_urban_heat_day"))
             }
         }
-        
-        // 3. Mountain/shade effect (elevation proxy via lower temps)
-        // For non-coastal areas with lower than expected temps for the season
+
         if !isCoastal {
             let seasonalExpectedTemp: Double = {
                 switch month {
-                case 6...8: return 32.0  // Summer
-                case 3...5: return 22.0  // Spring
-                case 9...11: return 24.0 // Fall
-                default: return 12.0     // Winter
+                case 6...8: return 32.0
+                case 3...5: return 22.0
+                case 9...11: return 24.0
+                default: return 12.0
                 }
             }()
-            
+
             let diff = seasonalExpectedTemp - temp
             if diff >= 6 && !isUrban {
                 notes.append(L10n.text("microclimate_elevation_cool"))
@@ -298,21 +266,20 @@ struct ComparativeWeatherService {
                 notes.append(L10n.text("microclimate_inland_heat"))
             }
         }
-        
-        // 4. Seasonal transition detection
+
         if month == 4 || month == 5 {
-            // Spring transition: unstable weather typical
+
             let tempSwing = hourly.map { $0.apparentTemperatureCelsius }
             if let maxT = tempSwing.max(), let minT = tempSwing.min(), (maxT - minT) >= 10 {
                 notes.append(L10n.text("microclimate_spring_transition"))
             }
         } else if month == 10 || month == 11 {
-            // Fall transition
+
             if temp <= 15 && humidity >= 0.7 {
                 notes.append(L10n.text("microclimate_fall_chill"))
             }
         }
-        
+
         guard !notes.isEmpty else { return nil }
         return notes.joined(separator: " ")
     }

@@ -1,8 +1,6 @@
 import Foundation
 import SwiftData
 
-// MARK: - Protocol
-
 protocol JournalStore {
     func save(_ entry: JournalEntry) async throws
     func fetchAll() async throws -> [JournalEntry]
@@ -13,8 +11,6 @@ protocol JournalStore {
     func delete(_ id: UUID) async throws
     func updateEntry(_ entry: JournalEntry) async throws
 }
-
-// MARK: - Default Implementation
 
 @MainActor
 final class DefaultJournalStore: JournalStore {
@@ -113,8 +109,6 @@ final class DefaultJournalStore: JournalStore {
     }
 }
 
-// MARK: - Errors
-
 enum JournalStoreError: LocalizedError {
     case notFound(UUID)
 
@@ -125,8 +119,6 @@ enum JournalStoreError: LocalizedError {
         }
     }
 }
-
-// MARK: - Mock for Previews
 
 final class MockJournalStore: JournalStore, @unchecked Sendable {
     private var entries: [JournalEntry] = []

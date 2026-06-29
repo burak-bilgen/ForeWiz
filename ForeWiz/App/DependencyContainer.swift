@@ -27,18 +27,14 @@ final class DependencyContainer {
     let completeOnboardingUseCase: CompleteOnboardingUseCase
     let updateUserPreferencesUseCase: UpdateUserPreferencesUseCase
     let scheduleSmartNotificationsUseCase: ScheduleSmartNotificationsUseCase
-    
-    // MARK: - Health
+
     let healthRepository: HealthRepository
 
-    // MARK: - Services
     let severeWeatherAlertService: SevereWeatherAlertService
-    
-    // MARK: - WizPath
+
     let wizPathService: WizPathService
     let locationService: LocationService
-    
-    // MARK: - New Architecture Components
+
     let homeViewStateFactory: HomeViewStateFactory
     let weatherGradientService: WeatherGradientService
     let retryPolicy: NetworkRetryPolicy
@@ -103,8 +99,7 @@ final class DependencyContainer {
         let notificationEngine = DefaultNotificationPlanningEngine()
         let preferencesRepository = SwiftDataPreferencesRepository(modelContext: modelContext)
         let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
-        
-        // MARK: - New Architecture Services
+
         let locationRepository = MockLocationRepository()
         let weatherRepository = MockWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()
@@ -115,7 +110,7 @@ final class DependencyContainer {
         let weatherGradientService = WeatherGradientService.shared
         let retryPolicy = NetworkRetryPolicy.default
         let severeWeatherAlertService = SevereWeatherAlertService.shared
-        
+
         let locationService = LocationService(timeout: 8.0)
         let wizPathLocationSource = WizPathLocationServiceAdapter(locationService: locationService)
         let wizPathWeatherSource = WizPathWeatherServiceAdapter(weatherRepository: weatherRepository, dateProvider: dateProvider)
@@ -123,10 +118,9 @@ final class DependencyContainer {
             weatherRepository: wizPathWeatherSource,
             locationRepository: wizPathLocationSource
         )
-        
-        // Prepare haptic engine on launch
+
         HapticEngine.shared.prepare()
-        
+
         let briefingService = WeatherBriefingService()
 
         let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(
@@ -192,9 +186,8 @@ final class DependencyContainer {
         let notificationEngine = DefaultNotificationPlanningEngine()
         let preferencesRepository = SwiftDataPreferencesRepository(modelContext: modelContext)
         let weatherCacheRepository = SwiftDataWeatherCacheRepository(modelContext: modelContext)
-        
-        // MARK: - New Architecture Services (Production)
-        let locationService = LocationService(timeout: 8.0) // Hardened with timeout
+
+        let locationService = LocationService(timeout: 8.0)
         let locationRepository = locationService as LocationRepository
         let weatherRepository = WeatherKitWeatherRepository(dateProvider: dateProvider)
         let notificationRepository = UserNotificationRepository()
@@ -203,9 +196,9 @@ final class DependencyContainer {
             activityWindowScoringEngine: activityEngine
         )
         let weatherGradientService = WeatherGradientService.shared
-        let retryPolicy = NetworkRetryPolicy.aggressive // More retries for production
+        let retryPolicy = NetworkRetryPolicy.aggressive
         let severeWeatherAlertService = SevereWeatherAlertService.shared
-        
+
         let wizPathLocationSource = WizPathLocationServiceAdapter(locationService: locationService)
         let wizPathWeatherSource = WizPathWeatherServiceAdapter(
             weatherRepository: weatherRepository,
@@ -215,10 +208,9 @@ final class DependencyContainer {
             weatherRepository: wizPathWeatherSource,
             locationRepository: wizPathLocationSource
         )
-        
-        // Prepare haptic engine on launch
+
         HapticEngine.shared.prepare()
-        
+
         let briefingService = WeatherBriefingService()
 
         let loadHomeRecommendationUseCase = DefaultLoadHomeRecommendationUseCase(

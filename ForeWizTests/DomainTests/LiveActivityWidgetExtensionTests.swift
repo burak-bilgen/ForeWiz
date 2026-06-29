@@ -6,9 +6,6 @@ import WizPathKit
 @Suite("LiveActivity Widget Extension Tests")
 struct LiveActivityWidgetExtensionTests {
 
-    // MARK: - Safety Score Color
-
-    /// Mirrors the widget's safetyColor helper — update if widget changes
     private func safetyColor(_ score: Int) -> String {
         switch score {
         case 80...100: return "green"
@@ -48,15 +45,12 @@ struct LiveActivityWidgetExtensionTests {
 
     @Test("safetyColor handles edge values correctly")
     func safetyColorEdgeValues() async throws {
-        #expect(safetyColor(80) == "green")  // lower bound of green
-        #expect(safetyColor(60) == "yellow") // lower bound of yellow
-        #expect(safetyColor(40) == "orange") // lower bound of orange
-        #expect(safetyColor(0) == "red")     // absolute minimum
+        #expect(safetyColor(80) == "green")
+        #expect(safetyColor(60) == "yellow")
+        #expect(safetyColor(40) == "orange")
+        #expect(safetyColor(0) == "red")
     }
 
-    // MARK: - Hazard Color
-
-    /// Mirrors the widget's hazardColor helper — update if widget changes
     private func hazardColor(_ count: Int) -> String {
         count == 0 ? "green" : count <= 3 ? "yellow" : "red"
     }
@@ -80,9 +74,6 @@ struct LiveActivityWidgetExtensionTests {
         #expect(hazardColor(100) == "red")
     }
 
-    // MARK: - Travel Mode Icon
-
-    /// Mirrors the widget's travelModeIcon helper — update if widget changes
     private func widgetTravelModeIcon(_ rawValue: String) -> String {
         switch rawValue {
         case "car": return "car.fill"
@@ -107,8 +98,6 @@ struct LiveActivityWidgetExtensionTests {
         #expect(widgetTravelModeIcon("scooter") == "car.fill")
         #expect(widgetTravelModeIcon("unknown") == "car.fill")
     }
-
-    // MARK: - Content State Combinations
 
     @available(iOS 18.0, *)
     @Test("ContentState with no hazards shows clear state")

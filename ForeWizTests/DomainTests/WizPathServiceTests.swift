@@ -7,20 +7,20 @@ import CoreLocation
 @MainActor
 @Suite("WizPathService Tests")
 struct WizPathServiceTests {
-    
+
     @Test("WizPathService initializes with DI")
     func serviceInitializesWithDI() async throws {
         let mockWeather = MockWizPathWeatherSource()
         let mockLocation = MockWizPathLocationSource()
-        
+
         let service = WizPathService(
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
-        
+
         #expect(service.loadRecentDestinations().count >= 0)
     }
-    
+
     @Test("Recent destinations save and load")
     func recentDestinationsSaveAndLoad() async throws {
         let mockWeather = MockWizPathWeatherSource()
@@ -29,18 +29,18 @@ struct WizPathServiceTests {
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
-        
+
         let testCoordinate = CLLocationCoordinate2D(latitude: 41.0082, longitude: 28.9784)
         let testName = "Test Destination"
-        
+
         service.saveRecentDestination(name: testName, coordinate: testCoordinate)
         let recents = service.loadRecentDestinations()
-        
+
         #expect(recents.contains { $0.name == testName })
         #expect(recents.contains { $0.latitude == testCoordinate.latitude })
         #expect(recents.contains { $0.longitude == testCoordinate.longitude })
     }
-    
+
     @Test("Recent destinations limited to 10")
     func recentDestinationsLimitedToTen() async throws {
         let mockWeather = MockWizPathWeatherSource()
@@ -49,20 +49,20 @@ struct WizPathServiceTests {
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
-        
+
         Foundation.UserDefaults.standard.removeObject(forKey: WizPathKitKeys.UserDefaults.wizPathRecentDestinations)
-        
+
         for i in 0..<15 {
             service.saveRecentDestination(
                 name: "Destination \(i)",
                 coordinate: CLLocationCoordinate2D(latitude: Double(i), longitude: Double(i))
             )
         }
-        
+
         let recents = service.loadRecentDestinations()
         #expect(recents.count <= 10)
     }
-    
+
     @Test("Recent destinations are deduplicated")
     func recentDestinationsAreDeduplicated() async throws {
         let mockWeather = MockWizPathWeatherSource()
@@ -71,22 +71,22 @@ struct WizPathServiceTests {
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
-        
+
         Foundation.UserDefaults.standard.removeObject(forKey: WizPathKitKeys.UserDefaults.wizPathRecentDestinations)
-        
+
         let coord1 = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let coord2 = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
-        
+
         service.saveRecentDestination(name: "Istanbul", coordinate: coord1)
         service.saveRecentDestination(name: "Ankara", coordinate: coord2)
         service.saveRecentDestination(name: "Istanbul", coordinate: coord1)
-        
+
         let recents = service.loadRecentDestinations()
         let istanbulCount = recents.filter { $0.name == "Istanbul" }.count
         #expect(istanbulCount == 1)
         #expect(recents.first?.name == "Istanbul")
     }
-    
+
     @Test("GetCurrentLocation returns mock location")
     func getCurrentLocationReturnsMockLocation() async throws {
         let mockWeather = MockWizPathWeatherSource()
@@ -95,20 +95,20 @@ struct WizPathServiceTests {
             weatherRepository: mockWeather,
             locationRepository: mockLocation
         )
-        
+
         let location = try await service.getCurrentLocation()
-        
+
         #expect(location.latitude == 41.0082)
         #expect(location.longitude == 28.9784)
     }
-    
+
     @Test("WizPathCache stores and retrieves routes")
     func wizPathCacheStoresAndRetrievesRoutes() async throws {
         let cache = WizPathCache()
-        
+
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0)
-        
+
         let testRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -120,32 +120,32 @@ struct WizPathServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         await cache.store(route: testRoute)
-        
+
         let retrieved = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(retrieved != nil)
         #expect(retrieved?.totalDuration == 1800)
     }
-    
+
     @Test("WizPathCache returns nil for missing routes")
     func wizPathCacheReturnsNilForMissingRoutes() async throws {
         let cache = WizPathCache()
-        
+
         let origin = CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0)
         let destination = CLLocationCoordinate2D(latitude: 50.0, longitude: 40.0)
-        
+
         let retrieved = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(retrieved == nil)
     }
-    
+
     @Test("WizPathCache clear removes all routes")
     func wizPathCacheClearRemovesAllRoutes() async throws {
         let cache = WizPathCache()
-        
+
         let origin = CLLocationCoordinate2D(latitude: 55.123, longitude: 37.456)
         let destination = CLLocationCoordinate2D(latitude: 56.789, longitude: 38.012)
-        
+
         let testRoute = WizPathRoute(
             id: UUID(),
             origin: origin,
@@ -157,19 +157,18 @@ struct WizPathServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         await cache.store(route: testRoute)
-        
-        // Verify it was stored
+
         let storedRoute = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(storedRoute != nil)
-        
+
         await cache.clear()
-        
+
         let retrieved = await cache.route(origin: origin, destination: destination, mode: .car)
         #expect(retrieved == nil)
     }
-    
+
     @Test("WizPathRoute overall risk calculation")
     func wizPathRouteOverallRiskCalculation() async throws {
         let goodSegment = WizPathSegment(
@@ -187,7 +186,7 @@ struct WizPathServiceTests {
                 severity: .good
             )
         )
-        
+
         let cautionSegment = WizPathSegment(
             id: UUID(),
             coordinate: CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0),
@@ -203,7 +202,7 @@ struct WizPathServiceTests {
                 severity: .caution
             )
         )
-        
+
         let routeWithCaution = WizPathRoute(
             id: UUID(),
             origin: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
@@ -215,9 +214,9 @@ struct WizPathServiceTests {
             totalDistance: 10000,
             polyline: nil
         )
-        
+
         #expect(routeWithCaution.overallRisk == .caution)
-        
+
         let severeSegment = WizPathSegment(
             id: UUID(),
             coordinate: CLLocationCoordinate2D(latitude: 43.0, longitude: 31.0),
@@ -233,7 +232,7 @@ struct WizPathServiceTests {
                 severity: .severe
             )
         )
-        
+
         let routeWithSevere = WizPathRoute(
             id: UUID(),
             origin: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
@@ -245,9 +244,9 @@ struct WizPathServiceTests {
             totalDistance: 15000,
             polyline: nil
         )
-        
+
         #expect(routeWithSevere.overallRisk == .severe)
-        
+
         let routeWithGood = WizPathRoute(
             id: UUID(),
             origin: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
@@ -259,10 +258,10 @@ struct WizPathServiceTests {
             totalDistance: 5000,
             polyline: nil
         )
-        
+
         #expect(routeWithGood.overallRisk == .good)
     }
-    
+
     @Test("WizPathRoute weather change points detection")
     func wizPathRouteWeatherChangePointsDetection() async throws {
         let clearSegment = WizPathSegment(
@@ -280,7 +279,7 @@ struct WizPathServiceTests {
                 severity: .good
             )
         )
-        
+
         let rainSegment = WizPathSegment(
             id: UUID(),
             coordinate: CLLocationCoordinate2D(latitude: 42.0, longitude: 30.0),
@@ -296,7 +295,7 @@ struct WizPathServiceTests {
                 severity: .caution
             )
         )
-        
+
         let anotherClearSegment = WizPathSegment(
             id: UUID(),
             coordinate: CLLocationCoordinate2D(latitude: 43.0, longitude: 31.0),
@@ -312,7 +311,7 @@ struct WizPathServiceTests {
                 severity: .good
             )
         )
-        
+
         let route = WizPathRoute(
             id: UUID(),
             origin: CLLocationCoordinate2D(latitude: 41.0, longitude: 29.0),
@@ -324,20 +323,20 @@ struct WizPathServiceTests {
             totalDistance: 10000,
             polyline: nil
         )
-        
+
         let changePoints = route.weatherChangePoints
         #expect(changePoints.count == 3)
         #expect(changePoints[0].weather?.condition == .clear)
         #expect(changePoints[1].weather?.condition == .rain)
         #expect(changePoints[2].weather?.condition == .clear)
     }
-    
+
     @Test("TravelMode segment intervals")
     func travelModeSegmentIntervals() async throws {
         #expect(WizPathKit.TravelMode.car.segmentInterval == 15 * 60)
         #expect(WizPathKit.TravelMode.walking.segmentInterval == 30 * 60)
     }
-    
+
     @Test("SegmentWeatherCondition severity mapping")
     func segmentWeatherConditionSeverityMapping() async throws {
         #expect(SegmentWeatherCondition.clear.severity == .good)
@@ -348,8 +347,6 @@ struct WizPathServiceTests {
         #expect(SegmentWeatherCondition.thunderstorm.severity == .severe)
         #expect(SegmentWeatherCondition.snow.severity == .severe)
     }
-
-    // MARK: - Route Risk Enum Tests
 
     @Test("RouteRisk enum values and colors")
     func routeRiskEnumValuesAndColors() async throws {
@@ -375,8 +372,6 @@ struct WizPathServiceTests {
         #expect(RouteRisk.caution.safetyScore == 60)
         #expect(RouteRisk.severe.safetyScore == 30)
     }
-
-    // MARK: - ScoredRouteCandidate Tests
 
     @Test("ScoredRouteCandidate computed properties")
     func scoredRouteCandidateComputedProperties() async throws {
@@ -420,8 +415,6 @@ struct WizPathServiceTests {
         #expect(!candidate.formattedDistance.isEmpty)
     }
 
-    // MARK: - Segment Tests
-
     @Test("WizPathSegment eta display format")
     func wizPathSegmentEtaDisplay() async throws {
         let segment = WizPathSegment(
@@ -451,8 +444,6 @@ struct WizPathServiceTests {
         #expect(SegmentWeatherSeverity.severe.severityOrder == 3)
     }
 
-    // MARK: - TravelMode Tests
-
     @Test("TravelMode all properties")
     func travelModeAllProperties() async throws {
         #expect(WizPathKit.TravelMode.allCases.count == 3)
@@ -469,8 +460,6 @@ struct WizPathServiceTests {
         #expect(WizPathKit.TravelMode.cycling.isWindSensitive == true)
     }
 
-    // MARK: - WizPathError Tests
-
     @Test("WizPathError localized descriptions")
     func wizPathErrorLocalizedDescriptions() async throws {
         #expect(WizPathError.routeUnavailable.errorDescription?.isEmpty == false)
@@ -479,8 +468,6 @@ struct WizPathServiceTests {
         #expect(WizPathError.destinationUnreachable.errorDescription?.isEmpty == false)
         #expect(WizPathError.invalidDepartureTime.errorDescription?.isEmpty == false)
     }
-
-    // MARK: - Traffic Congestion Tests
 
     @Test("TrafficCongestionLevel order")
     func trafficCongestionLevelOrder() async throws {
@@ -506,8 +493,6 @@ struct WizPathServiceTests {
         #expect(!TrafficCongestionLevel.heavy.localizedTitle.isEmpty)
         #expect(!TrafficCongestionLevel.gridlock.localizedTitle.isEmpty)
     }
-
-    // MARK: - WizPathRoute JourneyHUD Tests
 
     @Test("WizPathRoute journeyHUDData generation")
     func wizPathRouteJourneyHUDData() async throws {
@@ -558,6 +543,6 @@ struct WizPathServiceTests {
         let hud = route.journeyHUDData()
         #expect(hud.hazardCount > 0)
         #expect(hud.activeHazards.count > 0)
-        #expect(hud.safetyScore == 30) // severe risk
+        #expect(hud.safetyScore == 30)
     }
 }

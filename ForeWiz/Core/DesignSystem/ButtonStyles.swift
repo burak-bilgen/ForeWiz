@@ -1,7 +1,5 @@
 import SwiftUI
 
-// MARK: - Button Styles
-
 struct PressScaleButtonStyle: ButtonStyle {
     var scale: CGFloat = 0.96
     func makeBody(configuration: Configuration) -> some View {

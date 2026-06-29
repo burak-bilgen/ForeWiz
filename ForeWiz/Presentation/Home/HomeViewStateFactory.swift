@@ -1,15 +1,11 @@
 import Foundation
 
-/// Factory for creating HomeViewState from domain models.
-///
-/// Extracts all presentation logic from HomeViewModel, following the
-/// Factory pattern for testability and separation of concerns.
 @MainActor
 final class HomeViewStateFactory {
     private let dateProvider: DateProvider
     let activityWindowScoringEngine: ActivityWindowScoringEngine
     private let mapper: WeatherPresentationMapper
-    
+
     init(
         dateProvider: DateProvider = SystemDateProvider(),
         activityWindowScoringEngine: ActivityWindowScoringEngine = DefaultActivityWindowScoringEngine(),
@@ -19,8 +15,7 @@ final class HomeViewStateFactory {
         self.activityWindowScoringEngine = activityWindowScoringEngine
         self.mapper = mapper
     }
-    
-    /// Creates complete view state from a recommendation result.
+
     func makeViewState(
         from result: HomeRecommendationResult,
         profile: UserComfortProfile,
@@ -40,8 +35,6 @@ final class HomeViewStateFactory {
     }
 }
 
-// MARK: - Assistant State
-
 private extension HomeViewStateFactory {
     func makeAssistantState(from result: HomeRecommendationResult) -> HomeAssistantViewState {
         let recommendation = result.recommendation
@@ -51,7 +44,7 @@ private extension HomeViewStateFactory {
             }
             return lhs.severity > rhs.severity
         }.first
-        
+
         let criticalAlert: HomeAssistantSignal? = topAlert.flatMap { alert in
             guard alert.severity >= .high else { return nil }
             return HomeAssistantSignal(
@@ -63,13 +56,13 @@ private extension HomeViewStateFactory {
                 tone: .danger
             )
         }
-        
+
         let (headline, symbolName, tone) = resolveAssistantPresentation(
             recommendation: recommendation,
             criticalAlert: criticalAlert,
             topRisk: recommendation.risks.first { $0.severity >= .high }
         )
-        
+
         return HomeAssistantViewState(
             headline: headline,
             summary: makeAssistantSummary(for: recommendation),
@@ -80,7 +73,7 @@ private extension HomeViewStateFactory {
             criticalAlert: criticalAlert
         )
     }
-    
+
     func resolveAssistantPresentation(
         recommendation: DailyRecommendation,
         criticalAlert: HomeAssistantSignal?,
@@ -88,7 +81,7 @@ private extension HomeViewStateFactory {
     ) -> (headline: String, symbolName: String, tone: HomeAssistantTone) {
         let isTomorrow = recommendation.isTomorrowsRecommendation
         let prefix = isTomorrow ? L10n.text("tomorrow_prefix") + " " : ""
-        
+
         if criticalAlert != nil {
             let localizedText = L10n.text("official_weather_alert")
             let adjustedText = isTomorrow ? localizedText.lowercasedFirst : localizedText
@@ -98,7 +91,7 @@ private extension HomeViewStateFactory {
                 .danger
             )
         }
-        
+
         if let risk = topRisk {
             let localizedText = L10n.text("adjust_the_plan_for_safety")
             let adjustedText = isTomorrow ? localizedText.lowercasedFirst : localizedText
@@ -108,14 +101,14 @@ private extension HomeViewStateFactory {
                 .danger
             )
         }
-        
+
         let (headline, symbol, tone) = decisionPresentation(for: recommendation.outdoorDecision, isTomorrow: isTomorrow)
         return (headline, symbol, tone)
     }
-    
+
     func decisionPresentation(for decision: OutdoorDecision, isTomorrow: Bool) -> (String, String, HomeAssistantTone) {
         let prefix = isTomorrow ? L10n.text("tomorrow_prefix") + " " : ""
-        
+
         let rawHeadline: String
         switch decision {
         case .good:
@@ -127,9 +120,9 @@ private extension HomeViewStateFactory {
         case .avoid:
             rawHeadline = L10n.text("better_to_postpone_outdoor_plans")
         }
-        
+
         let headline = isTomorrow ? rawHeadline.lowercasedFirst : rawHeadline
-        
+
         switch decision {
         case .good:
             return (prefix + headline, "checkmark.seal.fill", .good)
@@ -141,19 +134,19 @@ private extension HomeViewStateFactory {
             return (prefix + headline, "xmark.octagon.fill", .danger)
         }
     }
-    
+
     func makeAssistantSummary(for recommendation: DailyRecommendation) -> String {
         if let risk = recommendation.risks.first(where: { $0.severity >= .high }) {
             return String(format: L10n.text("home_assistant_summary_risk_format"), risk.title, actionText(for: risk))
         }
-        
+
         if let bestWindow = recommendation.bestOutdoorWindow {
             return makeSummaryWithWindow(recommendation.outdoorDecision, bestWindow: bestWindow)
         }
-        
+
         return makeSummaryWithoutWindow(recommendation.outdoorDecision)
     }
-    
+
     func makeSummaryWithWindow(_ decision: OutdoorDecision, bestWindow: TimeWindow) -> String {
         switch decision {
         case .good:
@@ -166,7 +159,7 @@ private extension HomeViewStateFactory {
             return L10n.text("home_assistant_summary_avoid")
         }
     }
-    
+
     func makeSummaryWithoutWindow(_ decision: OutdoorDecision) -> String {
         switch decision {
         case .good:
@@ -179,7 +172,7 @@ private extension HomeViewStateFactory {
             return L10n.text("home_assistant_summary_avoid")
         }
     }
-    
+
     func primaryActionTitle(for recommendation: DailyRecommendation) -> String {
         switch recommendation.outdoorDecision {
         case .avoid:
@@ -190,16 +183,16 @@ private extension HomeViewStateFactory {
                 : L10n.text("home_assistant_action_flexible_title")
         }
     }
-    
+
     func primaryActionDetail(for recommendation: DailyRecommendation) -> String {
         if recommendation.outdoorDecision == .avoid {
             return L10n.text("home_assistant_action_indoor_detail")
         }
-        
+
         return recommendation.bestOutdoorWindow?.shortDisplayText
             ?? L10n.text("home_assistant_action_flexible_detail")
     }
-    
+
     func actionText(for risk: WeatherRisk) -> String {
         switch risk.type {
         case .heat: return L10n.text("stick_to_shade_water_and")
@@ -212,7 +205,7 @@ private extension HomeViewStateFactory {
         case .airQuality: return L10n.text("action_air_quality_advice")
         }
     }
-    
+
     func iconName(for riskType: WeatherRiskType) -> String {
         switch riskType {
         case .heat: return "thermometer.sun.fill"
@@ -228,10 +221,6 @@ private extension HomeViewStateFactory {
     }
 }
 
-
-
-// MARK: - Weather State
-
 private extension HomeViewStateFactory {
     func makeCurrentWeatherState(
         from current: CurrentWeatherPoint,
@@ -239,7 +228,7 @@ private extension HomeViewStateFactory {
         unitSystem: UnitSystem
     ) -> HomeCurrentWeatherViewState {
         let humidityText = current.humidity.map { String(format: "%.0f%%", $0 * 100) } ?? "–"
-        
+
         let windText: String
         if let wind = current.windSpeedKph {
             switch unitSystem {
@@ -249,15 +238,15 @@ private extension HomeViewStateFactory {
         } else {
             windText = "–"
         }
-        
+
         let uvText = current.uvIndex.map { String($0) } ?? "–"
-        
+
         let today = dailyPoints.first
         let highText = today.map { mapper.temperatureText($0.highTemperatureCelsius, unitSystem: unitSystem) } ?? "–"
         let lowText = today.map { mapper.temperatureText($0.lowTemperatureCelsius, unitSystem: unitSystem) } ?? "–"
-        
+
         let sunriseSunset = makeSunriseSunsetText(from: dailyPoints)
-        
+
         return HomeCurrentWeatherViewState(
             temperatureText: mapper.temperatureText(current.temperatureCelsius, unitSystem: unitSystem),
             feelsLikeText: L10n.text("weather_feels_like") + " " + mapper.temperatureText(current.apparentTemperatureCelsius, unitSystem: unitSystem),
@@ -272,36 +261,33 @@ private extension HomeViewStateFactory {
             sunsetText: sunriseSunset?.1
         )
     }
-    
+
     func makeSunriseSunsetText(from dailyPoints: [DailyWeatherPoint]) -> (String, String)? {
         guard let today = dailyPoints.first,
               let sunrise = today.sunrise,
               let sunset = today.sunset else { return nil }
-        
+
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
         return (formatter.string(from: sunrise), formatter.string(from: sunset))
     }
-    
 
 }
-
-// MARK: - Forecasts
 
 private extension HomeViewStateFactory {
     func makeDailyForecasts(from dailyPoints: [DailyWeatherPoint], unitSystem: UnitSystem) -> [DailyForecastItem] {
         let calendar = Calendar.current
         let todayStart = calendar.startOfDay(for: dateProvider.now)
-        
+
         return dailyPoints.map { point in
             let dayStart = calendar.startOfDay(for: point.date)
             let isToday = dayStart == todayStart
-            
+
             let dayName: String
             if isToday {
                 dayName = L10n.text("today_label")
             } else {
-                // Get localized weekday name using weekday symbol
+
                 let weekdayIndex = calendar.component(.weekday, from: point.date) - 1
                 let weekdays = [
                     L10n.text("sunday"),
@@ -314,10 +300,10 @@ private extension HomeViewStateFactory {
                 ]
                 dayName = weekdays[weekdayIndex]
             }
-            
+
             let score = mapper.dailyScore(highCelsius: point.highTemperatureCelsius, lowCelsius: point.lowTemperatureCelsius, precipitationChance: point.precipitationChance)
             let decision = OutdoorDecision(score: WeatherScore(rawValue: score))
-            
+
             return DailyForecastItem(
                 dayName: dayName,
                 date: point.date,
@@ -331,7 +317,7 @@ private extension HomeViewStateFactory {
             )
         }
     }
-    
+
     func makeHourlyScores(
         from hourlyPoints: [HourlyWeatherPoint],
         profile: UserComfortProfile,
@@ -348,7 +334,7 @@ private extension HomeViewStateFactory {
                     profile: profile,
                     calendar: .current
                 )
-                
+
                 return HourlyScoreItem(
                     date: point.date,
                     hour: Calendar.current.component(.hour, from: point.date),
@@ -359,12 +345,8 @@ private extension HomeViewStateFactory {
                 )
             }
     }
-    
 
 }
-
-
-// MARK: - Formatting
 
 private extension HomeViewStateFactory {
     func lastUpdatedText(for date: Date) -> String {
@@ -374,8 +356,6 @@ private extension HomeViewStateFactory {
         return formatter.localizedString(for: date, relativeTo: dateProvider.now)
     }
 }
-
-// MARK: - String Helpers
 
 fileprivate extension String {
     var lowercasedFirst: String {

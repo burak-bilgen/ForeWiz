@@ -36,13 +36,6 @@ enum L10n {
         return String(format: safeFormat, locale: locale, arguments: arguments)
     }
 
-    /// Escapes bare `%` in the format string that aren't part of valid
-    /// format specifiers (`%@`, `%lld`, `%d`, `%f`, etc.), preventing
-    /// `String(format:)` from crashing with EXC_BAD_ACCESS.
-    ///
-    /// For example, `"0%"` becomes `"0%%"` so the `%` renders as literal.
-    /// `"%lld daha"` is left untouched since `%lld` is valid.
-    /// `"%"` becomes `"%%"`.
     static func sanitizedFormat(_ format: String) -> String {
         let chars = Array(format)
         var result = ""
@@ -61,12 +54,12 @@ enum L10n {
                         if c.isNumber || "-+#0.$ hlLzqtj'*".contains(c) {
                             j += 1
                         } else if c == "%" {
-                            // Invalid: specifier with embedded % (like %% inside specifier)
+
                             result += "%%"
                             i = j + 1
                             break
                         } else {
-                            // Conversion character or invalid
+
                             if "@dDiuUxXoOeEfFgGcCsSpPaA".contains(c) {
                                 result += String(chars[i...j])
                                 i = j + 1
@@ -137,7 +130,7 @@ enum L10n {
     private static func bundle(for languageCode: String) -> Bundle {
         lock.lock()
         defer { lock.unlock() }
-        
+
         if let cached = bundleCache[languageCode] {
             return cached
         }
