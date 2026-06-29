@@ -120,6 +120,10 @@ public final class WizPathViewModel {
     // MARK: - Waypoint Selection
     public var selectedWaypointIds: Set<UUID>? = nil
 
+    public var mapsNavigationRoute: WizPathRoute? = nil
+
+    public var mapsWaypoints: [SmartStop] { smartStops }
+
     // MARK: - Internal State
     /// fileprivate internal erişim — extension dosyaları erişebilir.
     var lastCalculatedRoute: WizPathRoute?
@@ -162,6 +166,25 @@ public final class WizPathViewModel {
     public var weatherChangePoints: [WizPathSegment] { currentRoute?.weatherChangePoints ?? [] }
     public var overallRisk: RouteRisk { currentRoute?.overallRisk ?? .good }
 
+    public func appleMapsURLString() -> String {
+        guard let dest = destinationCoordinate else { return "" }
+        let encodedName = destinationName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return "https://maps.apple.com/?daddr=\(dest.latitude),\(dest.longitude)&q=\(encodedName)"
+    }
+
+    public func appleMapsWebURLString() -> String {
+        appleMapsURLString()
+    }
+
+    public func googleMapsURLString() -> String {
+        guard let dest = destinationCoordinate else { return "" }
+        let encodedName = destinationName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return "https://maps.google.com/?daddr=\(dest.latitude),\(dest.longitude)&q=\(encodedName)"
+    }
+
+    public func googleMapsWebURLString() -> String {
+        googleMapsURLString()
+    }
 
     // MARK: - Init
     public init(
@@ -236,6 +259,7 @@ public final class WizPathViewModel {
         let candidate = routeCandidates[index]
         state = .routeReady(candidate.route)
         lastCalculatedRoute = candidate.route
+        mapsNavigationRoute = candidate.route
         lastCalculatedRouteTimestamp = Date()
         currentTrafficCongestion = candidate.trafficCongestion
         hasTollRoads = candidate.hasTollRoads
